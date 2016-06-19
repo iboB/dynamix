@@ -37,7 +37,9 @@ option(DYNAMIX_BUILD_TUTORIALS "DynaMix: build tutorials" ON)
 option(DYNAMIX_BUILD_PERF "DynaMix: build performance tests" OFF)
 
 # config
-if(NOT MSVC)
+if(CMAKE_HOST_APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++0x -stdlib=libc++")
+elseif(NOT MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++0x")
 endif()
 
