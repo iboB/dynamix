@@ -23,6 +23,13 @@ src_group("src" sources
 )
 
 add_library(common STATIC ${sources})
-add_precompiled_header(common common_pch.hpp common_pch.cpp)
+add_precompiled_header(common ${CMAKE_CURRENT_SOURCE_DIR}/common_pch.hpp ${CMAKE_CURRENT_SOURCE_DIR}/common_pch.cpp)
 
 set_target_properties(common PROPERTIES FOLDER examples/multi_dll)
+
+# To fix: relocation R_X86_64_32 against `a local symbol' can not be
+# used when making a shared object; recompile with -fPIC
+# See http://www.cmake.org/pipermail/cmake/2007-May/014350.html
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+  set_target_properties(common PROPERTIES COMPILE_FLAGS "-fPIC")
+endif()

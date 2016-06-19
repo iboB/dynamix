@@ -40,7 +40,7 @@ typedef void* DynamicLib;
 
 void load_plugin()
 {
-    DynamicLib lib = LoadLibrary("plugin");
+    DynamicLib lib = LoadDynamicLib("plugin");
     DYNAMIX_ASSERT(lib);
 
     auto fp = GetProc(lib, "modify_object");

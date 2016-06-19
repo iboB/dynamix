@@ -16,6 +16,7 @@
 
 #include "global.hpp"
 #include "object_type_mutation.hpp"
+#include "assert.hpp"
 
 namespace dynamix
 {

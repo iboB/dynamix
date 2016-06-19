@@ -27,4 +27,8 @@ target_link_libraries(executable
     common
 )
 
+if(NOT MSVC)
+    target_link_libraries(executable dl)
+endif()
+
 set_target_properties(executable PROPERTIES FOLDER examples/multi_dll)
