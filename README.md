@@ -1,6 +1,12 @@
 DynaMix
 ===========
 
+[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/) [![Standard](https://img.shields.io/badge/C%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
+[![Travis CI](https://travis-ci.org/iboB/dynamix.svg?branch=master)](https://travis-ci.org/iboB/dynamix) [![AppVeyor](https://ci.appveyor.com/api/projects/status/02qjl0v3np4boo46?svg=true)](https://ci.appveyor.com/project/iboB/dynamix)
+
+
+
 DynaMix (Dynamic Mixins) is a new take on polymorphism. It allows the composition and modification of polymorphic types at run time in C++. 
 
 The library is a means to create a project's architecture rather than achieve its purpose.
@@ -56,8 +62,6 @@ cache-locality for critical parts of the code
 * Ability to have dynamic libraries that can enrich or modify objects, without
 modifying (or even rebuilding) the executable.
 * Thread safe message calls - as thread safe as the underlying methods.
-
-[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/) [![Standard](https://img.shields.io/badge/C%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## Documentation
 
