@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+    <Type Name="dynamix::internal::mixin_type_info">
+        <DisplayString>{name,sb}</DisplayString>
+    </Type>
+    <Type Name="dynamix::object">
+        <DisplayString>[type = {_type_info}]</DisplayString>
+        <Expand>
+            <Item Name="type">_type_info</Item>
+            <Item Name="#mixins">_type_info->_compact_mixins._Mylast - _type_info->_compact_mixins._Myfirst</Item>
+            <IndexListItems>
+                <Size>_type_info->_compact_mixins._Mylast - _type_info->_compact_mixins._Myfirst</Size>
+                <ValueNode>*(_type_info->_compact_mixins._Myfirst[$i])</ValueNode>
+            </IndexListItems>
+            <Item Name="mixin ptr">_type_info->_compact_mixins._Mylast - _type_info->_compact_mixins._Myfirst</Item>
+            <IndexListItems>
+                <Size>_type_info->_compact_mixins._Mylast - _type_info->_compact_mixins._Myfirst</Size>
+                <ValueNode>(void*)_mixin_data[$i+1]._mixin</ValueNode>
+            </IndexListItems>
+        </Expand>
+    </Type>
+</AutoVisualizer>

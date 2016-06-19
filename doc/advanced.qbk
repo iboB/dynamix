@@ -1,0 +1,589 @@
+[/
+ DynaMix
+ Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+
+ Distributed under the MIT Software License
+ See accompanying file LICENSE.txt or copy at
+ https://opensource.org/licenses/MIT
+/]
+
+[section:advanced Advanced topics]
+
+
+[section:performance Performance]
+[indexterm performance]
+
+[section:msg_perf Message performance]
+[indexterm2 message..performance]
+
+The performance of messages is indeed slower than regular function calls and even
+virtual function calls. Even though a call's algorithmic complexity is still
+O(1), a number of memory indirections happen in order to call the actual method
+behind the message.
+
+Unfortunately it's hard to estimate exactly how much slower the message call is.
+With perfect cache locality and compiler optimizations a message call will take
+about 15 cycles, compared to about 5-7 cycles for a virtual call and 10-12
+cycles for a std::function call. 15 cycles on a modern 2.8 GHz processor take
+about 5 nanoseconds to execute, which is a negligible cost for a call.
+
+Unfortunately perfect cache locality is hard to come by, and especially hard in
+polymorphic code. In an amortized test with potential cache misses
+for all calls, DynaMix messages take on average about 120 cycles (40
+nanoseconds on the same processor), compared to 90 cycles on average for virtual
+calls and 115 cycles for a `std::function` call.
+
+So, generally speaking if the programmer doesn't take special care to achieve
+cache locality for their object lists, a message call is about 2 times slower
+than a regular method call and about 1.3 times slower than a virtual call and
+about as fast as a `std::function` call, which
+again can be called negligible.
+
+As, we've mentioned before if cache locality is an absolutely
+critical feature for the desired performance, mixin messages, virtual calls,
+`std::function`, and other types of polymorphism will almost certainly
+be detrimental for this code, and the programmers are advised to do something
+else.
+
+[section:msg_perf_test Message performance test]
+
+The message performance test compares regular method calls vs virtual method
+calls vs `std::function` calls vs DynaMix unicast message calls.
+
+It creates 10,000 objects, then processes them until 10,000,000 calls are made.
+The actual calls are of two kinds:
+
+* *Noop*: call to a completely empty function that does nothing
+* *Sum*: performs a simple addition and stores the result in the object.
+This is used to simulate a function argument and also a this pointer indirection.
+
+The regular method calls are what you would have in cache-locality optimized
+setting -- they are methods in an array of objects of the the same type stored
+by value.
+
+The other calls are polymorphic and their arrays store objects by address that
+can be one of two types to simulate some cache misses in a real-world scenario
+with various polymorphic object types.
+
+Here are some sample test results:
+
+* OS: Ubuntu 13.04
+* CPU: AMD FX X8 8150
+* Compiler: g++ (Ubuntu/Linaro 4.7.3-1ubuntu1)
+* Debug compilation parameters: `-fexceptions -g`
+* Release compilation parameters `-fexceptions -O2`
+
+[table
+    [
+        [Method]
+        [Debug noop]
+        [Debug sum]
+        [Release noop]
+        [Release sum]
+    ]
+    [
+        [Regular]
+        [8 ns]
+        [18 ns]
+        [8 ns]
+        [8 ns]
+    ]
+    [
+        [Virtual]
+        [22 ns]
+        [23 ns]
+        [15 ns]
+        [16 ns]
+    ]
+    [
+        [`std::function`]
+        [73 ns]
+        [129 ns]
+        [30 ns]
+        [34 ns]
+    ]
+    [
+        [DynaMix msg]
+        [48 ns]
+        [72 ns]
+        [24 ns]
+        [35 ns]
+    ]
+]
+
+* OS: Windows 7
+* CPU: AMD FX 4100
+* Compiler: msvc 9 (Visual Studio 2008)
+* Debug compilation parameters: Standard (`/Od /EHsc /RTC1 /MDd /ZI`)
+* Release compilation parameters: Standard, but with no link time code generation (`/O2 /Oi /EHsc /MD /Gy /Zi`)
+
+[table
+    [
+        [Method]
+        [Debug noop]
+        [Debug sum]
+        [Release noop]
+        [Release sum]
+    ]
+    [
+        [Regular]
+        [33 ns]
+        [36 ns]
+        [9 ns]
+        [11 ns]
+    ]
+    [
+        [Virtual]
+        [50 ns]
+        [55 ns]
+        [14 ns]
+        [14 ns]
+    ]
+    [
+        [`std::function`]
+        [427 ns]
+        [444 ns]
+        [9 ns]
+        [16 ns]
+    ]
+    [
+        [DynaMix msg]
+        [232 ns]
+        [235 ns]
+        [14 ns]
+        [28 ns]
+    ]
+]
+
+[endsect]
+
+[section:optimize_msg Optimizing message calls]
+
+The stand-alone functions generated for messages typically have an `if`
+statement in them. It's there so as to throw an exception if none of the mixins
+in an object implements the message. If you disable the library's exceptions
+those `if`-s will be converted to `assert`-s (which in non-debug compilations
+are simply ignored).
+
+If you don't want to recompile the library with exceptions disabled, or if you
+just want all other exceptions, but not these, you can disable the throwing of
+exceptions from the message functions if you define `DYNAMIX_NO_MSG_THROW`
+/before/ including the DynaMix headers.
+
+Note that if you disable the exceptions from the message functions, calling a
+message on an object that doesn't implement it, will certainly lead to undefined
+behavior and crashes.
+
+Also have in mind, that removing the 'if'-s will improve the performance by only
+a small amount of nanoseconds per message call on a modern CPU. Situations where
+such a thing could be significant should be very very rare.
+
+[endsect]
+
+[endsect]
+
+[section:mutation_perf Mutation performance]
+[indexterm2 mutation..performance]
+
+An object mutation can be a relatively slow operation.
+
+Every mutation will invoke all mutation rules registered within the system.
+Their speed may vary and will depend on whether they end up changing the
+mutation or not. If they do change it, some allocation may take place. Even if
+they don't, each of them will be invoked by a virtual function and will have
+at least one 'if' check (possibly more, depending on the mutation rule).
+
+If the mutation ends up creating a new type -- a mixin combination that hasn't
+yet been met -- this will also lead to the relatively slow process of
+initializing the internal data structures for that type. This will lead to
+some allocations and loops that generate the type's call table.
+
+Even if the mutation doesn't generate a new type, it will have to find the
+existing one, which is a hash table lookup with key a bitset of size
+`DYNAMIX_MAX_MIXINS`.
+
+Finally, the mutation will change the object (unless it happens to be an
+identity mutation -- adding and removing nothing). To change it it will have to
+allocate new mixin data for it -- an array of pointers to mixins, then
+deallocate any mixins being removed and allocate any mixins being added, and
+finally deallocate the old mixin data for the object.
+
+[section:optimize_mutation Optimizing mutations]
+
+Using `object_type_template` or `same_type_mutator` will perform the first steps
+-- the ones concerning the identification of the object's type -- only once.
+
+To reduce the allocations for the individual object's being mutated, you can add
+custom allocators to some of the mixins or to the entire domain.
+
+[endsect]
+
+[section:mutation_perf_test Mutations performance test]
+
+The mutation performance tests performs a couple of tasks to evaluate the time
+they consume:
+
+* *New type* -- Creation of new types. Mutating objects in such a way that each
+mutation triggers the creation of a new object type.
+* *Existing type* -- Creation of objects with a type template, such that each
+object is created with a type, that's already been met in the system.
+* *Mutate* -- Mutation of objects of different types with a target an existing
+type.
+* *Same type mutate*: Mutation of objects of the same type with
+`same_type_mutator`. It adds two mixins and removes one.
+* *Custom allocator*: Mutation of objects of different types with a mixin that
+has a custom allocator attached. The custom allocator preallocates pools of
+100,000 mixins.
+* *Same type alloc*: Mutation of objects of the same type with
+`same_type_mutator`. It adds a mixin with the same custom allocator.
+
+Here are some sample test results:
+
+* OS: Ubuntu 13.04
+* CPU: AMD FX X8 8150
+* Compiler: g++ (Ubuntu/Linaro 4.7.3-1ubuntu1)
+* Debug compilation parameters: `-fexceptions -g`
+* Release compilation parameters `-fexceptions -O2`
+
+[table
+    [
+        [Task]
+        [Mean time in Debug]
+        [Mean time in Release]
+    ]
+    [
+        [New type]
+        [2119 ns]
+        [682 ns]
+    ]
+    [
+        [Existing type]
+        [1821 ns]
+        [561 ns]
+    ]
+    [
+        [Mutate]
+        [6635 ns]
+        [742 ns]
+    ]
+    [
+        [Same type mutate]
+        [1403 ns]
+        [303 ns]
+    ]
+    [
+        [Custom allocator]
+        [5570 ns]
+        [632 ns]
+    ]
+    [
+        [Same type alloc]
+        [1073 ns]
+        [164 ns]
+    ]
+]
+
+* OS: Windows 7
+* CPU: AMD FX 4100
+* Compiler: msvc 9 (Visual Studio 2008)
+* Debug compilation parameters: Standard (`/Od /EHsc /RTC1 /MDd /ZI`)
+* Release compilation parameters: Standard, but with no link time code generation (`/O2 /Oi /EHsc /MD /Gy /Zi`)
+
+[table
+    [
+        [Task]
+        [Mean time in Debug]
+        [Mean time in Release]
+    ]
+    [
+        [New type]
+        [21,256 ns]
+        [1,113 ns]
+    ]
+    [
+        [Existing type]
+        [20,343 ns]
+        [814 ns]
+    ]
+    [
+        [Mutate]
+        [238,219 ns]
+        [3,125 ns]
+    ]
+    [
+        [Same type mutate]
+        [16,668 ns]
+        [489 ns]
+    ]
+    [
+        [Custom allocator]
+        [219,416 ns]
+        [2,740 ns]
+    ]
+    [
+        [Same type alloc]
+        [16,176 ns]
+        [286 ns]
+    ]
+]
+
+[endsect]
+
+[endsect]
+
+[endsect]
+
+[section:allocators Using custom allocators]
+
+[indexterm2 allocators..using]
+
+[import ../tutorial/allocators.cpp]
+[tutorial_allocators]
+
+[endsect]
+
+[section:arity Having messages with more arguments]
+
+Currently the maximum number of arguments you can have in a message is:
+[include ../gen/arity]
+
+There simply is no message declaration macro for messages with more. If you need
+macros for messages with more arguments, you can do so, without having to
+rebuild the library.
+
+In your DynaMix installation, in the `gen` directory you will see a file,
+named `arity`. It is a text file with a single number in it. Edit the file,
+setting the number to whichever value you need. Then run the script
+`gen_message_macros.rb` (you will need a Ruby interpreter to do so). It will
+generate the file `include/dynamix/gen/message_macros.hpp` with macros for
+messages with 0 to /arity/ arguments.
+
+If you use an include directory for DynaMix diferent from the one in your
+installation, you will have to manually copy the newly generated message macros
+file over the one you use.
+
+[endsect]
+
+[section:dynlib Shared libraries and program plugins]
+
+As long as the library itself is shared (`.dll` on Windows or `.so` on Unix or
+Linux) it's safe to use in an application that has shared libraries which use
+DynaMix.
+
+An interesting thing which you can accomplish with the library is to have
+optional plugins -- dynamic libraries that aren't linked with the executable
+but may or may not be present, and if they are, they are being loaded
+dynamically (with `LoadLibrary` or `dlopen`).
+
+Such plugin may add a mutation rule for its special mixins, or export functions
+that mutate objects.
+
+For example this may be very useful for an engineering CAD system that could
+potentially have many different optional plugins for its different needs. Say, a
+plugin that extends the buildings with electrical wiring could simply mutate
+objects, adding a mixin
+mixin called `electrical_wiring` that contains the appropriate functionality.
+
+There is only one thing you need to remember when you're exporting mixins or
+messages from a dynamic library: to use the export macros:
+`DYNAMIX_DECLARE_EXPORTED_MIXIN` and `DYNAMIX_EXPORTED_xxx_MESSAGE_N`. They
+are exactly like their regular counterparts but for their first argument, which
+is the compiler specific export symbol (`__declspec(dllexport)` for Visual
+C++ or, say, `BOOST_SYMBOL_EXPORT` if you're using Boost).
+
+[link dynamix.examples.multi_dll One of the examples] that come with the
+library illustrates how you can have the two types of dynamic libraries --
+one which you link with, and one plugin.
+
+[endsect]
+
+[section:serialization Serializing objects]
+
+[import ../tutorial/serialization.cpp]
+[tutorial_serialization]
+
+[endsect]
+
+[section:implementation Implementation notes]
+
+Here are some explanations that may help you make sense of the code of the
+library if you need to read it:
+
+The overall structure of the library is based on a main class called `domain`
+which holds all registered mixins and messages, and keeps the type registry.
+
+[section:reg Mixin and feature registration]
+
+The `DYNAMIX_DEFINE_MIXIN` macro instantiates a class that is similar to a
+metafunction, as its only purpose is to globally instantiate itself, which in
+turn will lead to `domain::register_mixin_type` being called.
+
+It also generates a function that registers the mixin features.
+
+`domain::register_mixin_type` is a template method and it will appropriately
+fill a structure, containing the mixin type information -- name, constructor,
+destructor, id -- and will also call the generated function that registers its
+features.
+
+The feature registration is composed of two parts: one global - to introduce the
+feature to the domain, and local called for the specific mixin type being
+registered. This means that a feature is globally registered multiple times -
+once for each of its uses for a mixin type. The first of those times will give
+it an id and fill the feature information structure appropriately. The other
+global registrations of a feature will see that it has a valid id, and will
+simply skip the rest of the code.
+
+The local feature registration is performed by the class `feature_parser` that
+has overloads for the supported mixin features: currently messages and
+allocators. The allocator registration is simple. It just sets the allocator
+member in the mixin type information structure to the appropriate value.
+
+The message registration generates a caller function, based on the specific
+mixin. This caller function is a specific instantiation of a template function
+which is generated by the message declaration macros. Its template parameters
+are the mixin type and the actual member function in the mixin. The caller is
+then cast to `void (*)()` to be stored in a vector in the mixin type information
+structure along with the caller functions for all of its messages.
+
+This process of creating a caller function is based on the article
+[@http://www.codeproject.com/Articles/11015/The-Impossibly-Fast-C-Delegates
+The Impossibly Fast C++ Delegates] by Sergey Ryazanov.
+
+[endsect]
+
+[section:reg Mixin and message id-s]
+
+Each newly registered mixin and message get an id. The id-s are consecutive
+indexes in arrays (of `mixin_type_info` and `message_t` respectively) in the
+domain. Thus getting the information for a mixin or a message through its id
+is a O(1) operation.
+
+The maximum numbers of registered messages and mixins are fixed through the
+constants `DYNAMIX_MAX_MIXINS` and `DYNAMIX_MAX_MESSAGES` in `config.hpp`.
+
+This allows us to have fixed-size arrays for both in the domain and per object
+type.
+
+[endsect]
+
+[section:reg Mutation and type information]
+
+A new object type is initially identified via a bitset per mixin. The domain
+contains an unordered (hash) map where the key is such a bitset, and the value
+is an object type info.
+
+The object type info consists of such a bitset (to mark which mixins are
+available in this type), a compact vector of mixin type information structures
+a cross indexing array (to indicate which mixin data is at which position in the
+compact array), and a call table.
+
+The call table plays the same role as the virtual table in C++. It's a fixed
+size array for every message with non-null values for the messages that are
+implemented by that type. An element of that array is of type
+`call_table_entry`. This is a union that, based on whether the message is a
+unicast or a multicast, will contain the message data or a begin and an end
+for a buffer or message datas.
+
+When a type is requested for an object, first it's checked whether such a
+combination of mixins is an existing type. If not a new object type is created.
+This fills the mixin information bitset, vector and cross indexing array and
+then fills the call table. It will allocate a single buffer for all multicast
+messages within that type. When filling the call table the type creation process
+will choose the top priority unicast messages and sort the multicasts by
+priority. It will throw an exception if same-priority unicasts exist.
+
+After the type is available the object data needs to be filled. The object
+consists of a pointer to its type and an array of the structure
+`mixin_data_in_object`. This structure wraps a simple buffer that contains the
+mixin instance and a pointer to the owning object right in front of it. This
+is required for the need to get the owning object from within the code of the
+mixin class (made through `bm_this` or `object_of`). Thus, getting the owning
+object from the mixin is an offset from the `this` pointer.
+
+[endsect]
+
+[section:msg_call Calling messages]
+
+The message calling happens through the message functions which are generated
+by the message declaration macros.
+
+The call consists of the following steps:
+
+* Get the message info through a function generated by the message definition
+macro
+* Get the call table entry for this message from the object's type
+* Get the mixin info and the caller function from the call table entry
+* Get the mixin pointer from the object, based on the mixin info
+* Cast the caller function from `void (*)()` to the appropriate signature.
+* Call the caller function for the mixin pointer.
+
+For multicasts there is a `for` loop for the last four steps.
+
+[endsect]
+
+[endsect]
+
+[section:macros Macros rationale]
+
+Many people, upon seeing DynaMix for the first time, have expressed a
+concern with the seemingly excessive amount of macros the library's users are
+required to write.
+
+[section:mixin Mixin definition and declaration macros]
+
+The mixin definition and declaration macros are often mentioned as easy to
+remove, and indeed there is a way to reproduce almost all of their functionality
+without any macros. However not all of it can be reproduced.
+
+One of the key features those macros provide is the global instantiation.
+Without them, the users will be required to provide explicit entry points for
+their subsystems and dynamic libraries, where they will have to call some
+mixin initialization functions. This is not as simple as it sounds. Here is a
+list of downsides that such explicit entry points may introduce:
+
+* They will be compilation dependency "focal points": All mixins classes
+introduced by a subsystem would need to be visible from there, which means
+recompilations on every change, and more maintenance for the code.
+* The users will have to be extra careful not to add mixins to objects before
+their initialization is called.
+* Duplicated instances of the mixin data structures will exist in different
+modules (executable and dynamic libraries). In order to deal with this, the
+domain would need to store multiple copies of info for the same mixin. This will
+add a small runtime cost to the message calls and mutations.
+
+[endsect]
+
+[section:message Message definition and declaration macros]
+
+The message macros are most likely impossible to remove. Unlike the mixin ones,
+each of them generates many lines of code. More than a hundred.
+
+Probably the only way to remove them completely, would be to make the message
+calls by string. This will cause the calls to make hash table look-ups
+(or worse) and will prohibitively slow them down. Such a scenario will also
+reflect on the way mixins are registerd. The mixin messages would have to be
+set through something that resembles `std::bind` adding yet more complexity to
+the user code.
+
+[endsect]
+
+[section:moc External custom preprocessor]
+
+Is is possible (and probably part of the future of the library) to create an
+external tool that makes the user code a bit nicer. It would resemble
+[@http://qt-project.org/doc/qt-4.8/moc.html The Meta-Object Compiler of Qt],
+and similarly, would require a custom preprocessing step of the users' code.
+
+Such a tool could theoretically solve more of the library's problems, like the
+need to call `message(object)` instead of `object.message()` at the very least,
+and many more...
+
+Still, such an approach also has many opponents, as the code you write when you
+use it becomes effectively not-C++, but something that can be called a C++
+dialect.
+
+[endsect]
+
+[endsect]
+
+[endsect]

@@ -1,0 +1,96 @@
+[/
+ Copyright (c) 2013 Borislav Stanimirov, Zahary Karadjov
+
+ Distributed under the Boost Software License, Version 1.0.
+ See accompanying file LICENSE_1_0.txt or copy at
+ http://www.boost.org/LICENSE_1_0.txt
+/]
+
+[section:examples Examples]
+
+The examples given with the library are programs composed of multiple files and
+modules that provide a deeper illustration of how the library is supposed to be
+used, as opposed to the tutorials, which are single stand-alone files that
+illustrate concrete library features focusing on functionality and not on
+structure.
+
+[section:basic Basic]
+
+The "Basic" example illustrates most of the library's features, but it mainly
+gives an idea of project file structure.
+
+[section:includes Includes]
+
+[section:mixins Mixins]
+
+There are several files named `*_mixin.hpp`. They have a single line in them
+which declares that a class is a mixin.
+
+They are /all/ you need to include in order to use these mixins to mutate
+objects. The users are encouraged to implement a similar structure in their own
+applications. It allows us to modify the mixin classes, without having to
+recompile anything but the compilation units that define the actual classes.
+
+In most cases a C++ class is split between two files. A header for the
+declaration to be included in compilation units that use the class, and a
+compilation unit with the class definition. The mixin classes in the example
+are similarly split. /However/, you may notice that the only place the header
+files that declare a mixin class are included is in their corresponding
+compilation units. In fact, your mixins that are like the ones in the example and
+are never used with `object::get` as actual C++ classes, /don't need header
+files at all/. You may simply write them in their compilation units only, much
+like Java or C# classes are written.
+
+[endsect]
+
+[section:messages Messages]
+
+There are also several header files, named `*_messages.hpp` and their
+corresponding `*_messages.cpp` compilation units.
+
+They are used to declare and define messages. The messages in a file are grouped
+by some common factor.
+
+You need to include such files (and only them) if you want to call messages for
+and object. The code that calls the messages is completely oblivious to what
+mixins might actually implement them. You may add or remove mixins from your
+project and all your code that only calls messages, won't need to be recompiled.
+
+The users are encouraged to separate any messages they create in a similar
+fashion.
+
+[endsect]
+
+[endsect]
+
+[section:code Code]
+Even though some mixins in the project are named `*_renderer` they don't
+actually do any graphical rendering. They are merely stub classes that are
+used to show how a project may be structured and to give and idea of what and
+when is being called.
+[endsect]
+
+[endsect]
+
+[section:multi_dll Multi DLL]
+
+The Multi DLL example (currently Windows only) is an example that shows how
+multiple dynamic libraries can work together sharing mixins and messages.
+
+It has four modules:
+
+* *common* - a static library linked with all other modules, that provides
+a mixin and some messages.
+* *dynlib* - a C++ dynamic library, linked with all other modules that a mixin
+and some messages.
+* *plugin* - a plugin-style dynamic library, which is not linked with the
+executable and, as plugins in other applications, may or may not be present with
+it. If it is present, the executable loads it, and calls its exported function,
+which enriches an object with a custom plugin mixin.
+* *executable* - the actual project executable that creates an object,
+optionally gives it to the plugin for custom mutation and then calls some
+messages.
+
+[endsect]
+
+[endsect]
