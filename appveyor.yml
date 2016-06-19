@@ -1,0 +1,45 @@
+# http://www.appveyor.com/docs/appveyor-yml
+
+notifications:
+  - provider: Email
+    to:
+      - b.stanimirov@abv.bg
+    on_build_status_changed: true
+    on_build_failure: true
+    on_build_success: false
+
+clone_depth: 5
+branches:
+  only:
+    - master
+
+matrix:
+  fast_finish: false
+
+environment:
+  matrix:
+  - platform: x86
+    configuration: Debug
+    arch: "Win32"
+    VS_GEN: "Visual Studio 14 2015"
+  - platform: x86
+    configuration: Release
+    arch: "Win32"
+    VS_GEN: "Visual Studio 14 2015"
+  - platform: x64
+    configuration: Debug
+    arch: "x64"
+    VS_GEN: "Visual Studio 14 2015 Win64"
+  - platform: x64
+    configuration: Release
+    arch: "x64"
+    VS_GEN: "Visual Studio 14 2015 Win64"
+
+before_build:
+  - if not exist vcbuild mkid vcbuild
+  - cd vcbuild
+  - cmake .. -G "%VS_GEN%"
+build_script:
+  - msbuild mathgp-test.sln /p:Configuration=%Configuration%;Platform=%arch% /maxcpucount
+test_script:
+  - ctest -C %configuration% --output-on-failure
