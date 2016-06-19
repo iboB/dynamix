@@ -1,6 +1,6 @@
+language: cpp
 sudo: required
 dist: precise
-language: c++
 
 notifications:
   email:
@@ -11,7 +11,8 @@ git:
 
 matrix:
   include:
-    - compiler: gcc
+    - os: linux
+      compiler: gcc
       addons:
         apt:
           sources:
@@ -19,7 +20,11 @@ matrix:
           packages:
             - g++-4.9
       env: COMPILER=g++-4.9
-    - compiler: gcc
+      before_install:
+        - sudo apt-get update -qq
+
+    - os: linux
+      compiler: gcc
       addons:
         apt:
           sources:
@@ -27,29 +32,22 @@ matrix:
           packages:
             - g++-5
       env: COMPILER=g++-5
-    - compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
-          packages:
-            - clang-3.6
-      env: COMPILER=clang++-3.6
-    - compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
-          packages:
-            - clang-3.7
-      env: COMPILER=clang++-3.7
+      before_install:
+        - sudo apt-get update -qq
 
-before_install:
-  - sudo apt-get update -qq
+    - os: osx
+      osx_image: xcode7.3
+      compiler: clang
+      env:
+       - COMPILER=clang
+
+    - os: osx
+      osx_image: xcode8
+      compiler: clang
+      env:
+       - COMPILER=clang
+
 script:
-  # initial run with options
   - mkdir -p debug_build
   - cd debug_build
   - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Debug
