@@ -1,4 +1,5 @@
-sudo: false
+sudo: required
+dist: precise
 language: c++
 
 notifications:
@@ -8,28 +9,55 @@ notifications:
 git:
   depth: 5
 
-env:
-  global:
-    - CMAKE_OPTIONS_GLOBAL="-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+matrix:
+  include:
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env: COMPILER=g++-4.9
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env: COMPILER=g++-5
+    - compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.6
+          packages:
+            - clang-3.6
+      env: COMPILER=clang++-3.6
+    - compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - clang-3.7
+      env: COMPILER=clang++-3.7
 
-compiler:
-  - clang
-  - gcc
-os: linux
-
+before_install:
+  - sudo apt-get update -qq
 script:
   # initial run with options
   - mkdir -p debug_build
   - cd debug_build
-  - cmake ${CMAKE_OPTIONS_GLOBAL} .. -DCMAKE_BUILD_TYPE=Debug
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Debug
   - make -j2
   - ctest --output-on-failure
   - cd ..
   - mkdir -p release_build
   - cd release_build
-  - cmake ${CMAKE_OPTIONS_GLOBAL} .. -DCMAKE_BUILD_TYPE=Release
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Release
   - make -j2
   - ctest --output-on_failure
-
-after_script:
-  - cat compile_commands.json
