@@ -36,7 +36,7 @@ environment:
     VS_GEN: "Visual Studio 14 2015 Win64"
 
 before_build:
-  - if not exist vcbuild mkid vcbuild
+  - if not exist vcbuild mkdir vcbuild
   - cd vcbuild
   - cmake .. -G "%VS_GEN%"
 build_script:
