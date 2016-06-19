@@ -6,7 +6,7 @@
 # https://opensource.org/licenses/MIT
 #
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 2.8.7)
 
 include_directories(common)
 
