@@ -40,6 +40,6 @@ before_build:
   - cd vcbuild
   - cmake .. -G "%VS_GEN%"
 build_script:
-  - msbuild mathgp-test.sln /p:Configuration=%Configuration%;Platform=%arch% /maxcpucount
+  - msbuild dynamix.sln /p:Configuration=%Configuration%;Platform=%arch% /maxcpucount
 test_script:
   - ctest -C %configuration% --output-on-failure
