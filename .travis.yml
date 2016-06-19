@@ -35,18 +35,6 @@ matrix:
       before_install:
         - sudo apt-get update -qq
 
-    - os: osx
-      osx_image: xcode7.3
-      compiler: clang
-      env:
-       - COMPILER=clang
-
-    - os: osx
-      osx_image: xcode8
-      compiler: clang
-      env:
-       - COMPILER=clang
-
 script:
   - mkdir -p debug_build
   - cd debug_build
