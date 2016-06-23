@@ -41,13 +41,13 @@ To create a global allocator, you need to create a class derived from
 class custom_allocator : public dynamix::global_allocator
 {
 
-    /*`
-    The first two methods allocate a buffer for the mixin data pointers. Every
-    object has pointers to its mixins within it. This is the array of such
-    pointers. The class `global_allocator` has a static constant member --
-    `mixin_data_size` -- which you should use to see the size of a single
-    element in that array.
-    */
+/*`
+The first two methods allocate a buffer for the mixin data pointers. Every
+object has pointers to its mixins within it. This is the array of such
+pointers. The class `global_allocator` has a static constant member --
+`mixin_data_size` -- which you should use to see the size of a single
+element in that array.
+*/
     virtual char* alloc_mixin_data(size_t count) override
     {
         return allocate(count * mixin_data_size);
@@ -58,50 +58,50 @@ class custom_allocator : public dynamix::global_allocator
         deallocate(ptr);
     }
 
-    /*`
-    The other two methods you need to overload allocate and deallocate the
-    memory for an actual mixin class instance. As you may have already read, the
-    buffer allocated for a mixin instance is bigger than needed because the
-    library stores a pointer to the owning object immediately before the memory
-    used by the mixin instance.
+/*`
+The other two methods you need to overload allocate and deallocate the
+memory for an actual mixin class instance. As you may have already read, the
+buffer allocated for a mixin instance is bigger than needed because the
+library stores a pointer to the owning object immediately before the memory
+used by the mixin instance.
 
-    That's why this function is not as simple as the one for the mixin data
-    array. It has to conform to the mixin (and also `object` pointer) alignment.
-    */
+That's why this function is not as simple as the one for the mixin data
+array. It has to conform to the mixin (and also `object` pointer) alignment.
+*/
     virtual void alloc_mixin(size_t mixin_size, size_t mixin_alignment, char*& out_buffer, size_t& out_mixin_offset) override
     {
-        /*`
-        The users are strongly advised to use the static method
-        `global_allocator::calculate_mem_size_for_mixin`. It will appropriately
-        calculate how much memory is needed for the mixin instance such that
-        there is enough room at the beginning for the pointer to the owning
-        object and the memory alignment is respected.
-        */
+/*`
+The users are strongly advised to use the static method
+`global_allocator::calculate_mem_size_for_mixin`. It will appropriately
+calculate how much memory is needed for the mixin instance such that
+there is enough room at the beginning for the pointer to the owning
+object and the memory alignment is respected.
+*/
         size_t size = calculate_mem_size_for_mixin(mixin_size, mixin_alignment);
         out_buffer = allocate(size);
 
-        /*`
-        After you allocate the buffer you should take care of the other output
-        parameter - the mixin offset. It calculates the offset of the actual
-        mixin instance memory within the buffer, such that there is room for
-        the owning object pointer in before it and all alignments are
-        respected.
+/*`
+After you allocate the buffer you should take care of the other output
+parameter - the mixin offset. It calculates the offset of the actual
+mixin instance memory within the buffer, such that there is room for
+the owning object pointer in before it and all alignments are
+respected.
 
-        You are encouraged to use the static method
-        `global_allocator::calculate_mixin_offset`  for this purpose.
-        */
+You are encouraged to use the static method
+`global_allocator::calculate_mixin_offset` for this purpose.
+*/
         out_mixin_offset = calculate_mixin_offset(out_buffer, mixin_alignment);
     }
 
-    /*`
-    The mixin instance deallocation method can be trivial
-    */
+/*`
+The mixin instance deallocation method can be trivial
+*/
     virtual void dealloc_mixin(char* ptr) override
     {
         deallocate(ptr);
     }
 
-    //]
+//]
 };
 
 //[allocators_mixin
@@ -263,34 +263,34 @@ DYNAMIX_DEFINE_MIXIN(dead_character, /*...*/ dynamix::priority(1, die_msg)
 /*`
 If we share a mixin instance allocator between multiple mixins, the second way
 is also the way to go.
-*/
 
+*/
 //]
 
 int main()
 {
 //[allocators_global_use
-    /*`
-    To use the custom global allocator you need to instantiate it and then set
-    it with `set_global_allocator`. Unlike the mutation rules, the
-    responsibility for the allocator instance is yours. You need to make sure
-    that the lifetime of the instance is at least as long as the lifetime of
-    all objects in the system.
+/*`
+To use the custom global allocator you need to instantiate it and then set
+it with `set_global_allocator`. Unlike the mutation rules, the
+responsibility for the allocator instance is yours. You need to make sure
+that the lifetime of the instance is at least as long as the lifetime of
+all objects in the system.
 
-    Unfortunately this means that if you have global or static objects, you need
-    to create a new pointer that is, in a way, a memory leak. If you do not have
-    global or static objects, it should be safe for it to just be a local
-    variable in your program's entry point function.
-    */
+Unfortunately this means that if you have global or static objects, you need
+to create a new pointer that is, in a way, a memory leak. If you do not have
+global or static objects, it should be safe for it to just be a local
+variable in your program's entry point function.
+*/
     custom_allocator alloc;
     dynamix::set_global_allocator(&alloc);
 //]
 
 //[allocators_mixin_use
-    /*`
-    Now all mixin allocations and deallocations will pass through our mixin
-    allocator:
-    */
+/*`
+Now all mixin allocations and deallocations will pass through our mixin
+allocator:
+*/
     dynamix::object o;
 
     dynamix::mutate(o)
@@ -299,7 +299,7 @@ int main()
     dynamix::mutate(o)
         .remove<dead_character>();
 
-    // safe because we've destroyed all instances of `dead_character`
+    // safe because we've destroyed all instances of dead_character
     per_frame_allocator<dead_character>::instance().reset();
 //]
 
@@ -317,10 +317,8 @@ void deallocate(char* buffer)
 }
 
 //[tutorial_allocators
-//` (For the complete, working source of this example see
-//` [tutorialfile allocators.cpp])
-//` [allocators_global]
-//` [allocators_global_use]
-//` [allocators_mixin]
-//` [allocators_mixin_use]
+//` %{allocators_global}
+//` %{allocators_global_use}
+//` %{allocators_mixin}
+//` %{allocators_mixin_use}
 //]

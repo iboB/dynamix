@@ -1,0 +1,16 @@
+/*! \page revisions Revision History
+
+DynaMix 1.0.1
+=============
+
+* Removed build tools other than CMake
+* Removed C++98/03 support. Switch to C++11 only.
+* Added default message implementations.
+* Library rebranded
+
+DynaMix 1.0.0
+=============
+
+First official release of the library (as Boost.Mixin)
+
+*/

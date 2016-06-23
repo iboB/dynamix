@@ -22,14 +22,14 @@
 // ides that support these
 // that shows that they're for internal use only
 
-/// INTERNAL ONLY
+/// \internal
 #define _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) _DYNAMIX_PP_CAT(dynamix_msg_, message_name)
-/// INTERNAL ONLY
+/// \internal
 #define _DYNAMIX_MESSAGE_TAG(message_name) _DYNAMIX_PP_CAT(message_name, _msg)
 
 // a macro used in messages to get the mixin data directly, skipping function calls
 // GREATLY improves message call time
-/// INTERNAL ONLY
+/// \internal
 #define _DYNAMIX_GET_MIXIN_DATA(obj, id) \
     reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[obj._type_info->_mixin_indices[id]].mixin()))
 
@@ -37,7 +37,7 @@
 // default impl helper macros
 
 // name of default implementation struct
-/// INTERNAL ONLY
+/// \internal
 #define DYNAMIX_DEFAULT_IMPL_STRUCT(message_name) _DYNAMIX_PP_CAT(message_name, _default_impl_t)
 
 #if defined(DYNAMIX_DOXYGEN)

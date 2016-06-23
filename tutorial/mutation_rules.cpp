@@ -246,8 +246,6 @@ So, that's all there is to know about mutation rules.
 }
 
 //[tutorial_mutation_rules
-//` (For the complete, working source of this example see
-//` [tutorialfile mutation_rules.cpp])
-//` [tutorial_mutation_rules_A]
-//` [tutorial_mutation_rules_B]
+//` %{tutorial_mutation_rules_A}
+//` %{tutorial_mutation_rules_B}
 //]

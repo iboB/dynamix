@@ -195,8 +195,6 @@ mixins.
 }
 
 //[tutorial_mutation
-//` (For the complete, working source of this example see
-//` [tutorialfile mutation.cpp])
-//` [tutorial_mutation_A]
-//` [tutorial_mutation_B]
+//` %{tutorial_mutation_A}
+//` %{tutorial_mutation_B}
 //]

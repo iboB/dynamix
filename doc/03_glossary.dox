@@ -1,18 +1,11 @@
-[/
- DynaMix
- Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+/*! \page glossary Glossary
 
- Distributed under the MIT Software License
- See accompanying file LICENSE.txt or copy at
- https://opensource.org/licenses/MIT
-/]
-
-[section:glossary Glossary]
+[TOC]
 
 Here is a list of the major idioms, introduced by DynaMix.
 
-[section:object Objects]
-[indexterm object]
+Objects {#object}
+=======
 
 An object in terms of DynaMix is an instance of the class `dynamix::object`.
 By itself it's not much more than an empty class. Its main purpose is to be a
@@ -25,7 +18,7 @@ The particular set of mixins in an object defines its type. An object mutation
 Now, "type", as mentioned above has nothing to do with the concept of type in
 C++. A `dynamix::object` naturally always is a `dynamix:object`. The
 object's type is a runtime concept, which is rarely (or never) used in a program.
-Instead, what's relevant for objects is their interface -- which messages they
+Instead, what's relevant for objects is their interface &ndash; which messages they
 implement.
 
 The purpose of the object is not much different from the objects in the regular
@@ -33,10 +26,8 @@ OOP style, you're probably used to. If you're developing a game, every "thing"
 in the game's world could be a `dynamix::object`. If you're developing a
 CAD system, every graphical element from a document could be one.
 
-[endsect]
-
-[section:mixin Mixins]
-[indexterm mixin]
+Mixins {#mixin}
+======
 
 A mixin is a class used as a "building block" for an object. In DynaMix a
 mixin doesn't have a specified type. It's the job of the library's users to
@@ -48,7 +39,7 @@ existing code, to which you want to add DynaMix.
 Once you have mixins, you can combine them into objects. Adding or removing
 mixins to an object will internally instantiate them (via their default
 constructor) or destroy them. This means that a mixin instance is bound to an
-object instance. While it can be accessed via `object::get`, the mixin instance
+object instance. While it can be accessed via `dynamix::object::get`, the mixin instance
 cannot be "removed" from an object, while also preserving it. Objects cannot
 share mixin instances.
 
@@ -56,10 +47,8 @@ You can think of mixins as the multiple parents of a class, when using multiple
 inheritance. Only in the case of DynaMix, they can be added and removed
 dynamically, while preserving the state of the rest.
 
-[endsect]
-
-[section:message Messages]
-[indexterm message]
+Messages {#message}
+========
 
 Messages in DynaMix are a way of calling the methods of the mixins that
 comprise an object. You can think of messages as the methods of an object.
@@ -74,25 +63,20 @@ specify which messages it will implement. You will get a compilation error if
 the class, you've made into a mixin, doesn't have the method with the
 appropriate name and signature.
 
-[section:multicast Multicast messages]
-[indexterm2 message..multicast message]
+Multicast messages {#multicast}
+------------------
 
 One key difference between messages and methods is the multicast mechanism,
 introduced by DynaMix. For example consider the case when you add several
 mixins that implement the same message to an object and then call this message.
 
 In the regular case one (based on priority) of those mixin will handle it. But if you
-define the message as a /multicast/, all of them will. This is very useful for
+define the message as a *multicast*, all of them will. This is very useful for
 cases such as information gathering (say with a message like `trace
 (std::ostream& out)`)
 
-[endsect]
-
-[endsect]
-
-[section:priority Message priority]
-[indexterm priority]
-[indexterm2 message..message priority]
+Message priority {#priority}
+================
 
 A message priority can be used for both unicast and multicast messages. In both
 cases it's only relevant when multiple mixins in an object implement the same
@@ -102,16 +86,13 @@ For a unicast (regular) message, the mixin with the highest message priority
 will handle it. If multiple mixins have the same top priority, a runtime error
 will be triggered.
 
-For a multicast message, the order of the mixins that handle it will be
-/descending/ by priority. The order between mixins with the same priority cannot
+For a multicast message, the order of the mixins that handle it will be *descending*
+by priority. The order between mixins with the same priority cannot
 be defined. It's related to both global object initialization and how the
 unstable `std::sort` handles equal values.
 
-[endsect]
-
-[section:combinators Multicast result combinators]
-[indexterm combinators]
-[indexterm2 message..multicast result combinators]
+Multicast result combinators {#combinators}
+============================
 
 When calling multicast messages, their return values are lost. Naturally, you
 can use an output parameter to collect those return values, but if you don't
@@ -120,22 +101,20 @@ in them, the library provides a way to collect the return values externally.
 
 This happens with multicast result combinators.
 
-The library provides some common combinators, like `boolean_or`, `boolean_and`,
-and `sum`. It also allows you to easily create your own, for whatever purpose
+The library provides some common combinators, like `dynamix::combinators::boolean_or`, `dynamix::combinators::boolean_and`,
+and `dynamix::combinators::sum`. It also allows you to easily create your own, for whatever purpose
 you need.
 
-[endsect]
-
-[section:mutation Mutations]
-[indexterm mutation]
+Mutations {#mutation}
+=========
 
 A mutation changes the type of an object. You have to use some kind of mutator
 to give type to the object.
 
 Basically a mutation adds or removes mixins from an object.
 
-[section:mrules Mutation rules]
-[indexterm mutation rules]
+Mutation rules {#mrules}
+--------------
 
 A mutation rule is set globally applied to all mutations. A mutation rule may
 prevent a mixin to be added to an object or force one, even though the mutation
@@ -147,8 +126,4 @@ add one, the other is removed.
 The library offers some common mutation rules, but users can easily define their
 own custom ones.
 
-[endsect]
-
-[endsect]
-
-[endsect]
+*/

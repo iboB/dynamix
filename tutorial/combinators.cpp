@@ -390,12 +390,10 @@ int surface::elements_count() const
 }
 
 //[tutorial_combinators
-//` (For the complete, working source of this example see
-//` [tutorialfile combinators.cpp])
-//` [tutorial_combinators_intro]
-//` [tutorial_combinators_fill_objects]
-//` [tutorial_combinators_built_in]
-//` [tutorial_combinators_custom_arg]
-//` [tutorial_combinators_custom_template_A]
-//` [tutorial_combinators_custom_template_B]
+//` %{tutorial_combinators_intro}
+//` %{tutorial_combinators_fill_objects}
+//` %{tutorial_combinators_built_in}
+//` %{tutorial_combinators_custom_arg}
+//` %{tutorial_combinators_custom_template_A}
+//` %{tutorial_combinators_custom_template_B}
 //]

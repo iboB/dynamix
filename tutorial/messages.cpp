@@ -392,8 +392,6 @@ void stunned_ai::trace(ostream& out) const
 
 
 //[tutorial_messages
-//` (For the complete, working source of this example see
-//` [tutorialfile messages.cpp])
-//` [tutorial_messages_A]
-//` [tutorial_messages_B]
+//` %{tutorial_messages_A}
+//` %{tutorial_messages_B}
 //]

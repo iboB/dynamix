@@ -124,9 +124,9 @@ protected:
 class DYNAMIX_API mixin_allocator : public global_allocator
 {
 private:
-    /// INTERNAL ONLY
+    /// \internal
     virtual char* alloc_mixin_data(size_t count) override;
-    /// INTERNAL ONLY
+    /// \internal
     virtual void dealloc_mixin_data(char* ptr) override;
 };
 
@@ -141,13 +141,13 @@ namespace internal
 class DYNAMIX_API default_allocator : public global_allocator
 {
 public:
-    /// INTERNAL ONLY
+    /// \internal
     virtual char* alloc_mixin_data(size_t count) override;
-    /// INTERNAL ONLY
+    /// \internal
     virtual void dealloc_mixin_data(char* ptr) override;
-    /// INTERNAL ONLY
+    /// \internal
     virtual void alloc_mixin(size_t mixin_size, size_t mixin_alignment, char*& out_buffer, size_t& out_mixin_offset) override;
-    /// INTERNAL ONLY
+    /// \internal
     virtual void dealloc_mixin(char* ptr) override;
 };
 

@@ -1,17 +1,12 @@
-[/
- DynaMix
- Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+/*! \page appendix Appendix
 
- Distributed under the MIT Software License
- See accompanying file LICENSE.txt or copy at
- https://opensource.org/licenses/MIT
-/]
+[TOC]
 
-[section:appendix Appendix]
+Appendix A. Entity-Component-System {#aecs}
+===================================
 
-[section:app_ecs Appendix A. Entity-component-systems]
-
-[section:what_is_an_ecs What is an entity-component-system?]
+What is an entity-component-system {#what_is_ecs}
+----------------------------------
 
 An entity-component-system (ECS) allows users to create entities which consist
 of components. A simplified way of thinking about that is a container of
@@ -37,9 +32,8 @@ derived from both `serializer` and `data`. However it is not exactly a container
 as it cannot have two instances of the same class, and it is not exactly a class
 with multiple inheritance as its contents cannot be statically analyzed.
 
-[endsect]
-
-[section:whats_good_in_ecs Why are entity-component-systems good?]
+Why are entity-component-systems good? {#why_is_ecs_good}
+--------------------------------------
 
 They allow the users to achieve true decoupling of their subsystems. For example
 if we extend the above example to have a registered component of type
@@ -53,7 +47,7 @@ able to change the last part to something a bit more useful:
     }
 
 Now all functions that want to call `serialize` for an object may as well be
-oblivious to what the /actual/ serializer within the entity. Keep in mind that
+oblivious to what the *actual* serializer within the entity. Keep in mind that
 this is nearly impossible to achieve with plain multiple inheritance as users
 would have to handle the combinatorial explosion of different `serializer`'s,
 `data`'s and other possible super-classes.
@@ -68,15 +62,15 @@ Imagine a the straight-forward way to composition. An object from our system
 will have methods like `get_serializer()`, `get_data()`, and more. This means
 that every time we add a new sub-system, we'll have to change the object type
 to "enrich" it with its new components. Removing the aforementioned limitation
-allows independent sub-system development -- without changing the code of the
+allows independent sub-system development &ndash; without changing the code of the
 original product. I also allows the introduction of entire subsystems with
 dynamic libraries, which don't change the binary. For example, writing an
-entirely new serialization mechanism -- say encrypted serialization -- for a
+entirely new serialization mechanism &ndash; say encrypted serialization &ndash; for a
 product and introducing it as an optional plug-in becomes a breeze.
 
-[endsect]
 
-[section:nonpoly_ecs Non-polymorphic entity-component-systems]
+Non-polymorphic entity-component-systems {#nonpoly_ecs}
+----------------------------------------
 
 There exists a technique, often also called entity-component-system, that is not
 polymorphic. It can be combined to a degree with code like the one described
@@ -96,9 +90,7 @@ This is especially popular in high-end games, where in order to produce state
 of the art graphics and physics with a decent framerate, each microsecond is of
 importance.
 
-[endsect]
-
-[section:who_uses_ecs Who uses entity-component-systems?]
+Who uses entity-component-systems? {#who_uses_ecs}
 
 They are very popular in game development, as most objects in a game have many
 different aspects for different sub-systems. Still, being as powerful as they
@@ -112,35 +104,31 @@ dynamic library plug-ins, most CAD systems, graph editors, project management
 tools, and many others.
 
 Most script-language objects natively support a functionality resembling the
-polymorphic form of these systems, and most of them call it /Mixins/.
+polymorphic form of these systems, and most of them call it *Mixins*.
 
-[endsect]
+Further reading {#more_ecs}
+---------------
 
-[section:more_ecs Further reading]
-
-* In his e-book Game Programming Patterns, Robert Nystrom has a wonderful
-[@http://gameprogrammingpatterns.com/component.html chapter, called Components],
+- In his e-book Game Programming Patterns, Robert Nystrom has a wonderful
+[chapter, called Components](http://gameprogrammingpatterns.com/component.html),
 in which he describes the benefits of using an ECS and gives a simple example.
-* Adam Martin has a great [@http://t-machine.org/index.php/2007/09/03/entity-systems-are-the-future-of-mmog-development-part-1/
-series of articles] on the subject. Especially on how such systems are related
-to game and MMOG development.
-* An existing simple classic entity-component-system is
-[@http://code.google.com/p/cistron/ cistron] by Karel Crombecq. You can also
-check out the [@http://www.codeximperium.be/stuff/Component-based%20programming.pdf slides]
+- Adam Martin has a great [series of articles](@http://t-machine.org/index.php/2007/09/03/entity-systems-are-the-future-of-mmog-development-part-1/)
+on the subject. Especially on how such systems are related to game and MMOG
+development.
+- An existing simple classic entity-component-system is
+[cistron](http://code.google.com/p/cistron/) by Karel Crombecq. You can also
+check out the [slides](http://www.codeximperium.be/stuff/Component-based%20programming.pdf)
 from his presentation on the subject.
-* Building Object Systems is a talk by Alex Duran. The slides are available
-[@http://wenku.baidu.com/view/7917fe26ccbff121dd3683b6.html here].
-* Chris Granger has an [@http://www.chris-granger.com/2012/12/11/anatomy-of-a-knockout/
-article] on the benefits of using an entity-component-system in ClojureScript
+- Building Object Systems is a talk by Alex Duran. The slides are available
+[here](http://wenku.baidu.com/view/7917fe26ccbff121dd3683b6.html).
+- Chris Granger has an [article](http://www.chris-granger.com/2012/12/11/anatomy-of-a-knockout/)
+on the benefits of using an entity-component-system in ClojureScript
 for game development
-* An interesting discussion on the subject can be found at the
-[@http://forums.xkcd.com/viewtopic.php?f=11&t=81459 xkcd forums].
+- An interesting discussion on the subject can be found at the
+[xkcd forums](http://forums.xkcd.com/viewtopic.php?f=11&t=81459).
 
-[endsect]
-
-[endsect]
-
-[section:app_vs_watch Appendix B. Visual Studio watch visualizers]
+Appendix B. Visual Studio watch visualizers {#app_vs_watch}
+===========================================
 
 If you're using Microsoft Visual Studio, you can install special watch
 visualizers which will make adding `dynamix::object` in a watch window a
@@ -149,48 +137,47 @@ better experience.
 There are two ways to do this, which will work on both the full and express
 versions of Visual Studio.
 
-[section:natvis Modern: .natvis files. VS 2012 and later]
+Modern: .natvis files. VS 2012 and later {#natvis}
+----------------------------------------
 
 The result when adding a watch on an object should resemble this:
 
-[$dynamix/vs_natvis.png]
+![natvis file](img/vs_natvis.png "natvis visualization")
 
 To install this visualizer:
 
-* Locate `dynamix.natvis` in your DynaMix installation. It should be in
+- Locate `dynamix.natvis` in your DynaMix installation. It should be in
 the `tools` subdirectory.
-* To install for your user only, copy it to
+- To install for your user only, copy it to
 `<Documents>\<Visual Studio Version>\Visualizers`. If the directory doesn't
 exist, create it manually.
-* To install for all users, copy it to
+- To install for all users, copy it to
 `%VSINSTALLDIR%\Common7\Packages\Debugger\Visualizers`. You will need
 administrator access to do this.
 
-[endsect]
-
-[section:autoexp Classic: autoexp.dat. VS 2003 and later]
+Classic: autoexp.dat. VS 2003 and later {#autoexp}
+---------------------------------------
 
 The result when adding a watch on an object should resemble this:
 
-[$dynamix/vs_autoexp.png]
+![autoexp.dat](img/vs_autoexp.png "autoexp.dat visualization")
 
 To install this visualizer:
 
-* Locate `autoexp.txt` in your DynaMix installation. It should be in the
+- Locate `autoexp.txt` in your DynaMix installation. It should be in the
 `tools` subdirectory.
-* Open it in a text editor
-* Open `%VSINSTALLDIR%\Common7\Packages\Debugger\autoexp.dat` in a text editor
-* Typically it will end with a `[hresult]` section.
-* Paste the entire content of `autoexp.txt` /just before/ the line `[hresult]`
+- Open it in a text editor
+- Open `%VSINSTALLDIR%\Common7\Packages\Debugger\autoexp.dat` in a text editor
+- Typically it will end with a `[hresult]` section.
+- Paste the entire content of `autoexp.txt` /just before/ the line `[hresult]`
 
 To use this visualizer with Visual Studio versions 2012 or newer, you should
 also go to in your menus to `Tools > Options > Debugging > Edit and Continue`
 and there check `Enable native Edit and Continue`. Warning: This will also
 disable any natvis visualizers you might have installed.
 
-[endsect]
-
-[section:mixin Watching a mixin]
+Watching a mixin {#watch_mixin}
+----------------
 
 No matter which (if any) of these visualizers you use, to watch concrete mixin
 from an object, you should add a new watch where you explicitly cast the address
@@ -200,10 +187,6 @@ cast.
 
 If you perform the cast correctly, the result will resemble this:
 
-[$dynamix/vs_watch.png]
+![watch](img/vs_watch.png "watched mixin")
 
-[endsect]
-
-[endsect]
-
-[endsect]
+*/

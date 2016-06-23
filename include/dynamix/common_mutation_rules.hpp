@@ -42,7 +42,7 @@ public:
 
 namespace internal
 {
-/// INTERNAL ONLY
+/// \internal
 class DYNAMIX_API mandatory_mixin_impl : public mutation_rule
 {
 public:
@@ -57,7 +57,7 @@ protected:
     const mixin_id _id;
 };
 
-/// INTERNAL ONLY
+/// \internal
 class DYNAMIX_API deprecated_mixin_impl : public mutation_rule
 {
 public:
@@ -72,7 +72,7 @@ protected:
     const mixin_id _id;
 };
 
-/// INTERNAL ONLY
+/// \internal
 class DYNAMIX_API substitute_mixin_impl : public mutation_rule
 {
 public:

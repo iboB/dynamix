@@ -47,6 +47,7 @@
 // };
 #define _dynamix_internal public
 
+
 #include <bitset>
 
 namespace dynamix

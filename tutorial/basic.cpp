@@ -241,9 +241,7 @@ And this covers the most basic usage of DynaMix.
 //]
 
 //[basic
-//` (For the complete, working source of this example see
-//` [tutorialfile basic.cpp])
-//` [basic_A]
-//` [basic_B]
-//` [basic_C]
+//` %{basic_A}
+//` %{basic_B}
+//` %{basic_C}
 //]
