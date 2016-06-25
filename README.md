@@ -65,7 +65,7 @@ modifying (or even rebuilding) the executable.
 
 ## Documentation
 
-*Coming up*
+The full documentation is available at the [GitHub page of the library](https://ibob.github.io/dynamix/)
 
 ## License
 
