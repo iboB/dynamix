@@ -34,7 +34,7 @@ option(DYNAMIX_BUILD_SCRATCH "DynaMix: build scratch project" ON)
 option(DYNAMIX_BUILD_TUTORIALS "DynaMix: build tutorials" ON)
 
 # Off by default since generated.h/cpp needs to be... well... generated for this to work
-option(DYNAMIX_BUILD_PERF "DynaMix: build performance tests" OFF)
+option(DYNAMIX_BUILD_PERF "DynaMix: build performance tests (requires manual code generation step)" OFF)
 
 # config
 if(CMAKE_HOST_APPLE)
