@@ -83,6 +83,19 @@ Several small fully working annotated tutorial programs are provided with the li
 * [Allocators](https://ibob.github.io/dynamix/advanced.html#using_allocators) a tutorial about using the library's mixin allocators.
 * [Serialization](https://ibob.github.io/dynamix/advanced.html#serializing) a tutorial which looks at the possibilities available for serializing objects.
 
+## Building
+
+There is an accompanying `CMakeLists.txt` file in the repo.  Use [CMake](https://cmake.org/) to generate project or make files for your desired platform and compiler.
+
+## Contributing
+
+Contributions in the form of issues and pull requests are welcome.
+
+You can also help by donating money with Pledgie:
+
+[![Donate to support](https://pledgie.com/campaigns/32064.png)](https://pledgie.com/campaigns/32064)
+
+
 ## License
 
 This software is distributed under the MIT Software License.
