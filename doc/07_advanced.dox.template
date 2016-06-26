@@ -351,7 +351,7 @@ consists of a pointer to its type and an array of the structure
 `mixin_data_in_object`. This structure wraps a simple buffer that contains the
 mixin instance and a pointer to the owning object right in front of it. This
 is required for the need to get the owning object from within the code of the
-mixin class (made through `bm_this` or `object_of`). Thus, getting the owning
+mixin class (made through `dm_this` or `object_of`). Thus, getting the owning
 object from the mixin is an offset from the `this` pointer.
 
 Calling messages {#calling_msgs}

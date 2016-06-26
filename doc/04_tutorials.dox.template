@@ -60,14 +60,14 @@ some common functionality. Moving the shared functionality in the same common
 parent is a good idea and DynaMix will work exactly the same way if you do
 this. However there is a pitfall in this case. It happens when you have
 multiple inheritance. Due to the special nature in which the library arranges the
-memory internally, if a mixin type has more than one parent, using `bm_this` in
+memory internally, if a mixin type has more than one parent, using `dm_this` in
 some of those parents might lead to crashes.
 
 More precisely, when the library allocates memory for a mixin type, it allocates
 a buffer that is slightly bigger than needed and puts the pointer to the owning
-object at its front. What `bm_this` does is actually an offset from `this` with
+object at its front. What `dm_this` does is actually an offset from `this` with
 the appropriate number of bytes for `object*`. So if a parent of your mixin
-type, other than the first, calls `bm_this`, it will end up returning an invalid
+type, other than the first, calls `dm_this`, it will end up returning an invalid
 pointer to the owning object.
 
 To be able to have parents, other than the first, with access to the owning
@@ -76,7 +76,7 @@ actual mixin type.
 
 Say `virtual object* get_bm_object() = 0;` in the parents, which is implemented
 in the child class (the actual mixin defined with `DYNAMIX_DEFINE_MIXIN`) by
-simply `return bm_this`.
+simply `return dm_this`.
 
 Of course there are other ways to accomplish this, for example with CRTP, but
 the virtual function is probably the cleanest and safest one.
