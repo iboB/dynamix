@@ -215,8 +215,6 @@ DYNAMIX_DEFINE_MIXIN(animated_model,
 The reason we left out `has_id` and `stunned_ai` is because we'd like to do
 something special with their message lists.
 
-[indexterm2 priority..example]
-
 First, about `has_id`. What we'd like to do is display its info first, because
 the object id is usually the first thing you need about an object. So in order
 to achieve this, the notion of message priority is introduced. Each message in

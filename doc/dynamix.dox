@@ -213,7 +213,7 @@ library is as if it is one of those, and indeed, it has many features that are
 characteristic for such systems.
 
 If you're not familiar with entity-component-systems, you might want to check
-out the [appendix entry](Appendix.html#ecs) on them.
+out the [appendix entry](appendix.html#ecs) on them.
 
 Here's how DynaMix is like an ECS:
 

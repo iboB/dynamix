@@ -18,7 +18,7 @@ comprise it.
 
 If you're using Microsoft Visual Studio, you can install one of the debug
 visualizers, provided with the library. There are instructions on how to do so
-in [appendix entry B of this book](Appendix.html#app_vs_watch).
+in [appendix entry B of this book](appendix.html#app_vs_watch).
 
 If you're not using Microsoft Visual Studio or you don't want to install the
 visualizers, we'll assume you're trying to inspect an object instance called `obj`

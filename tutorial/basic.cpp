@@ -14,10 +14,10 @@ using namespace std;
 //[basic_A
 /*`
 Let's imagine a program that needs to create representations for various music
-players.
+players. So let's first write the media reader interfaces.
 */
 
-class cd_player
+class cd_reader
 {
 public:
     string get_sound();
@@ -27,7 +27,7 @@ private:
     string _cd;
 };
 
-class mp3_player
+class mp3_reader
 {
 public:
     string get_sound();
@@ -38,7 +38,7 @@ private:
 };
 
 /*`
-As you can see with respect to the type media is played we could have those two
+As you can see with respect to the type of media which is played, we could have those two
 classes that share the interface `get_sound` and have some unique methods to
 provide the media.
 
@@ -52,14 +52,17 @@ that will define the message, that they will implement.
 DYNAMIX_MESSAGE_0(string, get_sound);
 DYNAMIX_DEFINE_MESSAGE(get_sound);
 
-DYNAMIX_DECLARE_MIXIN(cd_player);
-DYNAMIX_DEFINE_MIXIN(cd_player, get_sound_msg);
+DYNAMIX_DECLARE_MIXIN(cd_reader);
+DYNAMIX_DEFINE_MIXIN(cd_reader, get_sound_msg);
 
-DYNAMIX_DECLARE_MIXIN(mp3_player);
-DYNAMIX_DEFINE_MIXIN(mp3_player, get_sound_msg);
+DYNAMIX_DECLARE_MIXIN(mp3_reader);
+DYNAMIX_DEFINE_MIXIN(mp3_reader, get_sound_msg);
 
 /*`
-Although we declare and define the messages and mixins on consecutive lines
+First, notice how we tell the library that the mixin implements the interface (or message)
+`get_sound`. We need to add the suffix `_msg` when we refer to the message like this.
+
+Second, although we declare and define the messages and mixins on consecutive lines
 here, this is not a requirement. Normally you'd want to have the declarations in
 header files and the definitions in cpp files. See the more detailed Examples
 section for an example about that.
@@ -67,13 +70,13 @@ section for an example about that.
 Now let's define a new axis for our classes: the type of output they'll have:
 */
 
-class headphones_player
+class headphones_output
 {
 public:
     void play();
 };
 
-class speakers_player
+class speakers_output
 {
 public:
     void play();
@@ -86,11 +89,11 @@ and then, again "tell" the library about the new message and mixins:
 DYNAMIX_MESSAGE_0(void, play);
 DYNAMIX_DEFINE_MESSAGE(play);
 
-DYNAMIX_DECLARE_MIXIN(headphones_player);
-DYNAMIX_DEFINE_MIXIN(headphones_player, play_msg);
+DYNAMIX_DECLARE_MIXIN(headphones_output);
+DYNAMIX_DEFINE_MIXIN(headphones_output, play_msg);
 
-DYNAMIX_DECLARE_MIXIN(speakers_player);
-DYNAMIX_DEFINE_MIXIN(speakers_player, play_msg);
+DYNAMIX_DECLARE_MIXIN(speakers_output);
+DYNAMIX_DEFINE_MIXIN(speakers_output, play_msg);
 //]
 
 int main()
@@ -103,17 +106,17 @@ mixins:
     dynamix::object sound_player; // just an empty dynamix::object
 
     dynamix::mutate(sound_player)
-        .add<cd_player>()
-        .add<headphones_player>();
+        .add<cd_reader>()
+        .add<headphones_output>();
 
 /*`
-Now we have an empty object, which has internally instantiated the mixin
+Now we have an object, which has internally instantiated the mixin
 classes. So let's start using it.
 
 Since there is no polymorphic way of setting the music, we'll have to explicitly
 get the appropriate mixin and set it like this:
 */
-    sound_player.get<cd_player>()->insert_cd("Led Zeppelin IV (1971)");
+    sound_player.get<cd_reader>()->insert_cd("Led Zeppelin IV (1971)");
 
 /*`
 However playing music *is* a polymorphic operation and via the message `play` it
@@ -132,8 +135,8 @@ type via the `mutate` class. And change the playing behavior.
 */
 
     dynamix::mutate(sound_player)
-        .remove<headphones_player>()
-        .add<speakers_player>();
+        .remove<headphones_output>()
+        .add<speakers_output>();
 
     play(sound_player);
 
@@ -144,15 +147,15 @@ Naturally we could also mutate the object by changing the media provider part:
 */
 
     dynamix::mutate(sound_player)
-        .remove<cd_player>()
-        .add<mp3_player>();
+        .remove<cd_reader>()
+        .add<mp3_reader>();
 
-    sound_player.get<mp3_player>()->copy_mp3("Led Zeppelin - Black Dog.mp3");
+    sound_player.get<mp3_reader>()->copy_mp3("Led Zeppelin - Black Dog.mp3");
 
     play(sound_player);
 
 /*`
-And have "Black Dog" played through the existing mixin `speakers_player`.
+And have "Black Dog" played through the existing mixin `speakers_output`.
 
 Compared to a classic approach to a similar problem: multiple inheritance this
 saves us a lot of classes -- in this case four for all the combinations of types
@@ -166,7 +169,7 @@ even thousands of possible combinations.
 }
 
 
-string cd_player::get_sound()
+string cd_reader::get_sound()
 {
     string sound;
 
@@ -182,12 +185,12 @@ string cd_player::get_sound()
     return sound;
 }
 
-void cd_player::insert_cd(const string& cd)
+void cd_reader::insert_cd(const string& cd)
 {
     _cd = cd;
 }
 
-string mp3_player::get_sound()
+string mp3_reader::get_sound()
 {
     string sound;
 
@@ -203,7 +206,7 @@ string mp3_player::get_sound()
     return sound;
 }
 
-void mp3_player::copy_mp3(const string& mp3)
+void mp3_reader::copy_mp3(const string& mp3)
 {
     _mp3 = mp3;
 }
@@ -222,13 +225,13 @@ All mixins may use a special macro that refers to their owning object --
 Thus the following (pseudo) methods are possible:
 */
 
-void headphones_player::play()
+void headphones_output::play()
 {
     cout << "playing " << get_sound(dm_this)
         << " through headphones" << endl;
 }
 
-void speakers_player::play()
+void speakers_output::play()
 {
     cout << "PLAYING " << get_sound(dm_this)
         << " THROUGH SPEAKERS" << endl;

@@ -71,6 +71,18 @@ modifying, or even rebuilding, the executable.
 
 The full documentation is available at the [GitHub page of the library](https://ibob.github.io/dynamix/)
 
+### Tutorials
+
+Several small fully working annotated tutorial programs are provided with the library:
+
+* [Basic](https://ibob.github.io/dynamix/basic.html) &ndash; a program which illustrates the basic usage of DynaMix. It's a tutorial on creating mixins and messages, and creating and modifying (or *mutating*) objects.
+* [Messages](https://ibob.github.io/dynamix/tutorials.html#messages) &ndash; a tutorial which takes a deeper look at creating and calling the various types of messages.
+* [Mutation](https://ibob.github.io/dynamix/tutorials.html#obj_mutation) &ndash; a tutorial about the various ways by which objects can be created and mutated.
+    * [Mutation rules](https://ibob.github.io/dynamix/tutorials.html#mut_rules) &ndash; a deeper look at the library's capabilities for automatic object mutation.
+* [Combinators](https://ibob.github.io/dynamix/tutorials.html#mult_combinators) a tutorial about handling the return type of multicast messages.
+* [Allocators](https://ibob.github.io/dynamix/advanced.html#using_allocators) a tutorial about using the library's mixin allocators.
+* [Serialization](https://ibob.github.io/dynamix/advanced.html#serializing) a tutorial which looks at the possibilities available for serializing objects.
+
 ## License
 
 This software is distributed under the MIT Software License.
