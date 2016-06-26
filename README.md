@@ -7,7 +7,7 @@ DynaMix
 
 DynaMix (*Dynamic Mixins*) is a new take on polymorphism. It lets the user compose and modify types at run time in C++. 
 
-The library is a means to create a project's **architecture** rather than achieve its purpose. It focuses on **maximal performance** and minimal **memory overhead**.
+The library is a means to create a project's **architecture** rather than achieve its purpose. It focuses on **maximal performance** and **minimal memory overhead**.
 
 DynaMix is great for the software architecture of systems with very complex objects including, but not limited to:
 
