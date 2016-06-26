@@ -1078,3 +1078,431 @@
     } \
     /* begin default impl function so the used can just enter it after the macro */ \
     return_type DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::impl(arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3)
+
+#define _DYNAMIX_MESSAGE5_DECL(export, message_name, method_name, return_type, constness, message_mechanism , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    /* mechanism shows whether it's a multicast or unicast */ \
+    \
+    /* step 1: define the message struct */ \
+    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::message_t \
+    { \
+        /* define the actual caller func */ \
+        template <typename Mixin, typename Ret, Ret (Mixin::*Method)(arg0_type, arg1_type, arg2_type, arg3_type, arg4_type) constness> \
+        static Ret caller5(void* _d_ptr , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
+        { \
+            Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
+            return (_d_m->*Method)(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
+        } \
+        typedef return_type (*caller_func)(void* , arg0_type, arg1_type, arg2_type, arg3_type, arg4_type); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
+            : ::dynamix::internal::message_t(_DYNAMIX_PP_STRINGIZE(message_name), message_mechanism, false) \
+        {} \
+        template <typename Mixin> \
+        ::dynamix::internal::func_ptr get_caller_for() const \
+        { \
+            /* prevent the linker from optimizing away the caller function */ \
+            static caller_func caller = caller5<constness Mixin, return_type, &Mixin::method_name>; \
+            /* cast the caller to a void (*)() - safe according to the standard */ \
+            return reinterpret_cast< ::dynamix::internal::func_ptr>(caller); \
+        } \
+    }; \
+    /* step 2: define a message tag, that will be used to identify the message in feature lists */ \
+    /* it would have been nice if we could set this global variable to the unique global instance of the feature*/ \
+    /* but unfortunately we cannot trust dynamic libraries to keep it straight for us */ \
+    /* hence we rely on a getter like the mixin one */ \
+    extern export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) * _DYNAMIX_MESSAGE_TAG(message_name); \
+    /* step 3: declare the feature getter and manual registrator for the message */ \
+    extern export ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+
+#define _DYNAMIX_MESSAGE5_UNI(export, message_name, method_name, return_type, constness , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_DECL(export, message_name, method_name, return_type, constness, unicast , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    /* step 4: define the message function -> the one that will be called for the objects */ \
+    inline return_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
+    {\
+        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
+        const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
+        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
+        DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
+        /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
+        char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
+                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
+        /* forward unicast arguments since some of them might be rvalue references */ \
+        return _d_func(_d_mixin_data , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
+    }\
+    /* also define a pointer function */ \
+    inline return_type method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
+    {\
+        return method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
+    }\
+
+#define _DYNAMIX_MESSAGE5_MULTI(export, message_name, method_name, return_type, constness , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_DECL(export, message_name, method_name, return_type, constness, multicast , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    /* step 4: define the message functions -> the one that will be called for the objects */ \
+    /* function A: concrete combinator */ \
+    template <typename Combinator> \
+    void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, Combinator& _d_combinator) \
+    { \
+        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
+        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
+        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
+        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
+        DYNAMIX_ASSERT(_d_end); \
+        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        { \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            DYNAMIX_ASSERT(_d_msg_data); \
+            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
+            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
+            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
+                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
+            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+            if(!_d_combinator.add_result(_d_func(_d_mixin_data , a0, a1, a2, a3, a4))) \
+            { \
+                return; \
+            } \
+        } \
+    } \
+    /* function B: template combinator -> can be called on a single line */ \
+    template <template <typename> class Combinator> \
+    typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
+    { \
+        Combinator<return_type> _d_combinator; \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        method_name(_d_obj , a0, a1, a2, a3, a4, _d_combinator); \
+        return _d_combinator.result(); \
+    } \
+    /* function C: no combinator */ \
+    inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
+    { \
+        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
+        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
+        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
+        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
+        DYNAMIX_ASSERT(_d_end); \
+        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        { \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            DYNAMIX_ASSERT(_d_msg_data); \
+            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
+            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
+            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
+                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
+            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+            _d_func(_d_mixin_data , a0, a1, a2, a3, a4); \
+        } \
+    } \
+    /* also define a pointer function with no combinator */ \
+    inline void method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
+    {\
+        method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
+    }\
+
+#define DYNAMIX_MESSAGE_5(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_UNI(_DYNAMIX_PP_EMPTY(), message, message, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_CONST_MESSAGE_5(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_UNI(_DYNAMIX_PP_EMPTY(), message, message, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_MULTICAST_MESSAGE_5(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_MULTI(_DYNAMIX_PP_EMPTY(), message, message, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_CONST_MULTICAST_MESSAGE_5(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_MULTI(_DYNAMIX_PP_EMPTY(), message, message, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_EXPORTED_MESSAGE_5(export, return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_UNI(export, message, message, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_EXPORTED_CONST_MESSAGE_5(export, return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_UNI(export, message, message, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_EXPORTED_MULTICAST_MESSAGE_5(export, return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_MULTI(export, message, message, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_EXPORTED_CONST_MULTICAST_MESSAGE_5(export, return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_MULTI(export, message, message, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_MESSAGE_5_OVERLOAD(message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_UNI(_DYNAMIX_PP_EMPTY(), message_name, method_name, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_CONST_MESSAGE_5_OVERLOAD(message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_UNI(_DYNAMIX_PP_EMPTY(), message_name, method_name, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_MULTICAST_MESSAGE_5_OVERLOAD(message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_MULTI(_DYNAMIX_PP_EMPTY(), message_name, method_name, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_CONST_MULTICAST_MESSAGE_5_OVERLOAD(message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_MULTI(_DYNAMIX_PP_EMPTY(), message_name, method_name, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_EXPORTED_MESSAGE_5_OVERLOAD(export, message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_UNI(export, message_name, method_name, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_EXPORTED_CONST_MESSAGE_5_OVERLOAD(export, message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_UNI(export, message_name, method_name, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_EXPORTED_MULTICAST_MESSAGE_5_OVERLOAD(export, message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_MULTI(export, message_name, method_name, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_EXPORTED_CONST_MULTICAST_MESSAGE_5_OVERLOAD(export, message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    _DYNAMIX_MESSAGE5_MULTI(export, message_name, method_name, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
+
+#define DYNAMIX_DEFINE_MESSAGE_5_WITH_DEFAULT_IMPL(return_type, message_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    /* standard message definition */ \
+    struct DYNAMIX_DEFAULT_IMPL_STRUCT(message_name) \
+    { \
+        return_type impl(arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4); \
+        static return_type caller(void* self , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
+        { \
+            return reinterpret_cast<DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)*>(self)->impl(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
+        } \
+    }; \
+    /* create a feature getter for the message */ \
+    ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
+    } \
+    /* create a feature registrator */ \
+    void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
+        ::dynamix::internal::domain::instance().register_feature(msg); \
+        \
+        /* set message default implementation data */ \
+        static ::dynamix::internal::message_for_mixin default_impl = { \
+            &msg, \
+            DYNAMIX_MAX_MIXINS, \
+            reinterpret_cast<::dynamix::internal::func_ptr>(&DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::caller), \
+            ::std::numeric_limits<int>::min(), \
+        }; \
+        msg.default_impl_data = &default_impl; \
+    } \
+    /* provide a tag instance */ \
+    _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)* _DYNAMIX_MESSAGE_TAG(message_name); \
+    /* instantiate metafunction initializator in case no class registers the message */ \
+    inline void _dynamix_register_message_default_impl(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        ::dynamix::internal::message_default_impl_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
+    } \
+    /* begin default impl function so the used can just enter it after the macro */ \
+    return_type DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::impl(arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4)
+
+#define _DYNAMIX_MESSAGE6_DECL(export, message_name, method_name, return_type, constness, message_mechanism , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    /* mechanism shows whether it's a multicast or unicast */ \
+    \
+    /* step 1: define the message struct */ \
+    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::message_t \
+    { \
+        /* define the actual caller func */ \
+        template <typename Mixin, typename Ret, Ret (Mixin::*Method)(arg0_type, arg1_type, arg2_type, arg3_type, arg4_type, arg5_type) constness> \
+        static Ret caller6(void* _d_ptr , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
+        { \
+            Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
+            return (_d_m->*Method)(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
+        } \
+        typedef return_type (*caller_func)(void* , arg0_type, arg1_type, arg2_type, arg3_type, arg4_type, arg5_type); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
+            : ::dynamix::internal::message_t(_DYNAMIX_PP_STRINGIZE(message_name), message_mechanism, false) \
+        {} \
+        template <typename Mixin> \
+        ::dynamix::internal::func_ptr get_caller_for() const \
+        { \
+            /* prevent the linker from optimizing away the caller function */ \
+            static caller_func caller = caller6<constness Mixin, return_type, &Mixin::method_name>; \
+            /* cast the caller to a void (*)() - safe according to the standard */ \
+            return reinterpret_cast< ::dynamix::internal::func_ptr>(caller); \
+        } \
+    }; \
+    /* step 2: define a message tag, that will be used to identify the message in feature lists */ \
+    /* it would have been nice if we could set this global variable to the unique global instance of the feature*/ \
+    /* but unfortunately we cannot trust dynamic libraries to keep it straight for us */ \
+    /* hence we rely on a getter like the mixin one */ \
+    extern export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) * _DYNAMIX_MESSAGE_TAG(message_name); \
+    /* step 3: declare the feature getter and manual registrator for the message */ \
+    extern export ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+
+#define _DYNAMIX_MESSAGE6_UNI(export, message_name, method_name, return_type, constness , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_DECL(export, message_name, method_name, return_type, constness, unicast , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    /* step 4: define the message function -> the one that will be called for the objects */ \
+    inline return_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
+    {\
+        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
+        const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
+        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
+        DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
+        /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
+        char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
+                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
+        /* forward unicast arguments since some of them might be rvalue references */ \
+        return _d_func(_d_mixin_data , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
+    }\
+    /* also define a pointer function */ \
+    inline return_type method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
+    {\
+        return method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
+    }\
+
+#define _DYNAMIX_MESSAGE6_MULTI(export, message_name, method_name, return_type, constness , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_DECL(export, message_name, method_name, return_type, constness, multicast , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    /* step 4: define the message functions -> the one that will be called for the objects */ \
+    /* function A: concrete combinator */ \
+    template <typename Combinator> \
+    void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, Combinator& _d_combinator) \
+    { \
+        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
+        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
+        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
+        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
+        DYNAMIX_ASSERT(_d_end); \
+        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        { \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            DYNAMIX_ASSERT(_d_msg_data); \
+            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
+            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
+            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
+                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
+            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+            if(!_d_combinator.add_result(_d_func(_d_mixin_data , a0, a1, a2, a3, a4, a5))) \
+            { \
+                return; \
+            } \
+        } \
+    } \
+    /* function B: template combinator -> can be called on a single line */ \
+    template <template <typename> class Combinator> \
+    typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
+    { \
+        Combinator<return_type> _d_combinator; \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        method_name(_d_obj , a0, a1, a2, a3, a4, a5, _d_combinator); \
+        return _d_combinator.result(); \
+    } \
+    /* function C: no combinator */ \
+    inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
+    { \
+        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
+        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
+        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
+        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
+        DYNAMIX_ASSERT(_d_end); \
+        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        { \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            DYNAMIX_ASSERT(_d_msg_data); \
+            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
+            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
+            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
+                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
+            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+            _d_func(_d_mixin_data , a0, a1, a2, a3, a4, a5); \
+        } \
+    } \
+    /* also define a pointer function with no combinator */ \
+    inline void method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
+    {\
+        method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
+    }\
+
+#define DYNAMIX_MESSAGE_6(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_UNI(_DYNAMIX_PP_EMPTY(), message, message, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_CONST_MESSAGE_6(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_UNI(_DYNAMIX_PP_EMPTY(), message, message, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_MULTICAST_MESSAGE_6(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_MULTI(_DYNAMIX_PP_EMPTY(), message, message, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_CONST_MULTICAST_MESSAGE_6(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_MULTI(_DYNAMIX_PP_EMPTY(), message, message, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_EXPORTED_MESSAGE_6(export, return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_UNI(export, message, message, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_EXPORTED_CONST_MESSAGE_6(export, return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_UNI(export, message, message, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_EXPORTED_MULTICAST_MESSAGE_6(export, return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_MULTI(export, message, message, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_EXPORTED_CONST_MULTICAST_MESSAGE_6(export, return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_MULTI(export, message, message, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_MESSAGE_6_OVERLOAD(message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_UNI(_DYNAMIX_PP_EMPTY(), message_name, method_name, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_CONST_MESSAGE_6_OVERLOAD(message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_UNI(_DYNAMIX_PP_EMPTY(), message_name, method_name, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_MULTICAST_MESSAGE_6_OVERLOAD(message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_MULTI(_DYNAMIX_PP_EMPTY(), message_name, method_name, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_CONST_MULTICAST_MESSAGE_6_OVERLOAD(message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_MULTI(_DYNAMIX_PP_EMPTY(), message_name, method_name, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_EXPORTED_MESSAGE_6_OVERLOAD(export, message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_UNI(export, message_name, method_name, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_EXPORTED_CONST_MESSAGE_6_OVERLOAD(export, message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_UNI(export, message_name, method_name, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_EXPORTED_MULTICAST_MESSAGE_6_OVERLOAD(export, message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_MULTI(export, message_name, method_name, return_type, _DYNAMIX_PP_EMPTY() , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_EXPORTED_CONST_MULTICAST_MESSAGE_6_OVERLOAD(export, message_name, return_type, method_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    _DYNAMIX_MESSAGE6_MULTI(export, message_name, method_name, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
+
+#define DYNAMIX_DEFINE_MESSAGE_6_WITH_DEFAULT_IMPL(return_type, message_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    /* standard message definition */ \
+    struct DYNAMIX_DEFAULT_IMPL_STRUCT(message_name) \
+    { \
+        return_type impl(arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5); \
+        static return_type caller(void* self , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
+        { \
+            return reinterpret_cast<DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)*>(self)->impl(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
+        } \
+    }; \
+    /* create a feature getter for the message */ \
+    ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
+    } \
+    /* create a feature registrator */ \
+    void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
+        ::dynamix::internal::domain::instance().register_feature(msg); \
+        \
+        /* set message default implementation data */ \
+        static ::dynamix::internal::message_for_mixin default_impl = { \
+            &msg, \
+            DYNAMIX_MAX_MIXINS, \
+            reinterpret_cast<::dynamix::internal::func_ptr>(&DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::caller), \
+            ::std::numeric_limits<int>::min(), \
+        }; \
+        msg.default_impl_data = &default_impl; \
+    } \
+    /* provide a tag instance */ \
+    _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)* _DYNAMIX_MESSAGE_TAG(message_name); \
+    /* instantiate metafunction initializator in case no class registers the message */ \
+    inline void _dynamix_register_message_default_impl(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        ::dynamix::internal::message_default_impl_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
+    } \
+    /* begin default impl function so the used can just enter it after the macro */ \
+    return_type DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::impl(arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5)
