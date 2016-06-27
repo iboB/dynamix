@@ -26,6 +26,7 @@ option(DYNAMIX_BUILD_UNIT_TESTS "DynaMix: enable testing and build tests" ON)
 
 option(DYNAMIX_BUILD_EXAMPLES "DynaMix: build examples" ON)
 # Individual example settings. Only relevant if DYNAMIX_BUILD_EXAMPLES is on
+option(DYNAMIX_EXAMPLE_HELLO_WORLD "DynaMix: build hello world example" ON)
 option(DYNAMIX_EXAMPLE_BASIC "DynaMix: build basic example" ON)
 option(DYNAMIX_EXAMPLE_MULTI_DLL "DynaMix: build multi_dll example" ON)
 
@@ -125,6 +126,10 @@ if(DYNAMIX_BUILD_UNIT_TESTS)
 endif()
 
 if(DYNAMIX_BUILD_EXAMPLES)
+    if(DYNAMIX_EXAMPLE_HELLO_WORLD)
+        add_subdirectory(example/hello_world)
+    endif()
+
     if(DYNAMIX_EXAMPLE_BASIC)
         add_subdirectory(example/basic)
     endif()
