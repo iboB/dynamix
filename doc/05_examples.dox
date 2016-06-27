@@ -8,11 +8,18 @@ used, as opposed to the tutorials, which are single stand-alone files that
 illustrate concrete library features focusing on functionality and not on
 structure.
 
+Hello World {#example_hello}
+===========
+
+The "Hello World" example is a very simple program with a single source file,
+which shows a usage of the very core library functionality. It is a no means an
+example of architecture.
+
 Basic {#example_basic}
 =====
 
 The "Basic" example illustrates most of the library's features, but it mainly
-gives an idea of project file structure.
+gives an idea of a sample project file structure.
 
 Includes {#basic_inc}
 ---------

@@ -5,24 +5,24 @@
 Abstract {#abstract}
 ========
 
-DynaMix is a library that allows the composition and modifications of polymorphic types
-at run time. Types and objects are constructed out of building blocks called
+DynaMix is a library that allows the composition and modification of polymorphic types
+at run time. Types and objects are constructed from building blocks called
 mixins enabling an effect similar to multiple inheritance, while allowing the
 client code to remain oblivious to the actual composition of the objects.
 
 A take on the
 [Composition over inheritance](http://en.wikipedia.org/wiki/Composition_over_inheritance)
-technique, the result closely resembles the popular pattern
-[entity-component-system](appendix.html#ecs)
+technique, the result resembles the
+[mixins in Ruby](http://www.ruby-doc.org/docs/ProgrammingRuby/html/tut_modules.html)
 or the
-[mixins in Ruby](http://www.ruby-doc.org/docs/ProgrammingRuby/html/tut_modules.html).
+popular pattern [entity-component-system](appendix.html#ecs).
 It can also be compared to the
 [inheritance in Eiffel](http://archive.eiffel.com/doc/online/eiffel50/intro/language/tutorial-10.html)
 or the traits in
 [Self](http://selflanguage.org/_static/tutorial/Language/Prototypes/Organizing.html),
 [Scala](http://www.scala-lang.org/node/126),
 [PHP](http://php.net/manual/en/language.oop5.traits.php),
-[and many others](https://en.wikipedia.org/wiki/Trait_(computer_programming))
+[and many others](https://en.wikipedia.org/wiki/Trait_(computer_programming)),
 or the [roles in Perl](http://doc.perl6.org/language/objects#Roles).
 
 This is given while also having full abstraction between the interface and the
@@ -62,7 +62,7 @@ Basic look and feel of the code with DynaMix {#look_feel}
 --------------------------------------------
 
 Here is a very small and incomplete example of what your code may look like if
-you use the library.
+you use the library:
 
 ```
     // assuming my_objects.get_ally(0); is a way to get an ally to the
@@ -92,7 +92,7 @@ you use the library.
                 // character, since it's no longer an ally, but an enemy
 ```
 
-For a more detailed, working example see [Basic usage](Basic.html).
+For a more detailed, working example see [the basic usage tutorial](basic.html).
 
 List of features {#features}
 ================
@@ -101,6 +101,8 @@ List of features {#features}
 - Physically separate interface and implementation
 - Non-intrusive &ndash; mixins don't need to have a common parent or any special code
 inside
+- No external dependencies other than the standard library
+- Fast polymorphic calls &ndash; comparable to `std::function`
 - Mutate "live" objects by changing their composition at run time
 - Have multicast messages, which are handled by many mixins within an object
 - Possibility to have custom allocators to finely tune the memory and aim for
@@ -114,7 +116,7 @@ When (and when not) to use DynaMix {#when_to_use}
 
 The more complex your objects are, the more beneficial it will be to use the
 library. Pieces of software that typically have very complex objects include
-Games (especially role-playing ones or strategies), CAD systems, enterprise
+games (especially role-playing ones or strategies), CAD systems, enterprise
 systems, UI libraries, and more.
 
 As a general rule of thumb: if you have complex polymorphic objects, DynaMix is
@@ -130,7 +132,7 @@ including C++ virtual methods and `std::function`, uses of DynaMix's
 features will almost certainly lead to cache misses. Of course, you may still
 rely on the library in other parts of your code, like the business (or gameplay)
 logic. For more information about the library performance, see the
-[Performance section](Advanced.html#performance).
+[Performance section](advanced.html#performance).
 
 Of course, small projects with simple objects, even if they are polymorphic, may
 end up not finding any particular benefits in using the library, since their
@@ -213,7 +215,7 @@ library is as if it is one of those, and indeed, it has many features that are
 characteristic for such systems.
 
 If you're not familiar with entity-component-systems, you might want to check
-out the [appendix entry](appendix.html#ecs) on them.
+out the [appendix entry](appendix.html#aecs) on them.
 
 Here's how DynaMix is like an ECS:
 

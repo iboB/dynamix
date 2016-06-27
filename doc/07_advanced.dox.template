@@ -392,12 +392,12 @@ their subsystems and dynamic libraries, where they will have to call some
 mixin initialization functions. This is not as simple as it sounds. Here is a
 list of downsides that such explicit entry points may introduce:
 
-* They will be compilation dependency "focal points": All mixins classes
+- They will be compilation dependency "focal points": All mixins classes
 introduced by a subsystem would need to be visible from there, which means
 recompilations on every change, and more maintenance for the code.
-* The users will have to be extra careful not to add mixins to objects before
+- The users will have to be extra careful not to add mixins to objects before
 their initialization is called.
-* Duplicated instances of the mixin data structures will exist in different
+- Duplicated instances of the mixin data structures will exist in different
 modules (executable and dynamic libraries). In order to deal with this, the
 domain would need to store multiple copies of info for the same mixin. This will
 add a small runtime cost to the message calls and mutations.
