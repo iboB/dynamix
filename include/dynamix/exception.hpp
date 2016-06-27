@@ -57,7 +57,7 @@ class unicast_clash : public exception {};
 
 
 #if !defined(DYNAMIX_NO_MSG_THROW)
-/// This macro us used internally to throw exceptions within the functions generated
+/// This macro is used internally to throw exceptions within the functions generated
 /// for the mixin messages.
 ///
 /// \note You can disable the throwing of exceptions in the message functions by defining

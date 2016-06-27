@@ -51,8 +51,8 @@ size_t global_allocator::calculate_mixin_offset(const char* buffer, size_t mixin
 
     // WARNING: if you don't have a custom allocator and this assert fails
     // this means that memory not-aligned to the pointer size was allocated
-    // Thie platform is strange and creepy and is not supported by the default allocator
-    // you should write your own, that does allocate properly aligned memory
+    // This platform is strange and creepy and is not supported by the default allocator
+    // you should write your own, that allocates properly aligned memory
     DYNAMIX_ASSERT_MSG(uintptr_t(buffer) % sizeof(object*) == 0,
         "allocators should always return memory aligned to sizeof(void*)");
 
@@ -81,7 +81,7 @@ char* mixin_allocator::alloc_mixin_data(size_t count)
 
 void mixin_allocator::dealloc_mixin_data(char* ptr)
 {
-    DYNAMIX_ASSERT(false); // a mixin allocator should never heve do deallocate mixin data
+    DYNAMIX_ASSERT(false); // a mixin allocator should never have do deallocate mixin data
     deallocate_mixin_data(ptr);
 }
 
