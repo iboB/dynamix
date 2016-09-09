@@ -14,10 +14,25 @@ file(GLOB_RECURSE tests *.cpp)
 
 foreach(source ${tests})
     get_filename_component(test ${source} NAME_WE)
-    set(executable "test_${test}")
 
-    add_executable(${executable} ${source})
-    target_link_libraries(${executable} dynamix)
-    set_target_properties(${executable} PROPERTIES FOLDER tests)
-    add_test(NAME ${test} COMMAND $<TARGET_FILE:${executable}>)
+    if(test MATCHES "^plugin_" OR test MATCHES "^dynlib_")
+        set(lib "test_${test}")
+
+        add_library(${lib} SHARED ${source})
+        target_link_libraries(${lib} dynamix)
+        set_target_properties(${lib} PROPERTIES FOLDER tests)
+    else()
+        set(executable "test_${test}")
+
+        add_executable(${executable} ${source})
+        target_link_libraries(${executable} dynamix)
+        set_target_properties(${executable} PROPERTIES FOLDER tests)
+        add_test(NAME ${test} COMMAND $<TARGET_FILE:${executable}>)
+    endif()
 endforeach()
+
+# custom deps
+target_link_libraries(test_loader test_dynlib_A)
+target_link_libraries(test_plugin_A test_dynlib_A)
+target_link_libraries(test_plugin_Amod test_dynlib_A)
+target_link_libraries(test_plugin_B test_dynlib_A)
