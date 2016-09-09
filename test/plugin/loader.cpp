@@ -33,7 +33,6 @@ inline DynamicLib LoadDynamicLib(const char* lib)
 #include <dlfcn.h>
 
 typedef void* DynamicLib;
-#define LoadDynamicLib(lib) 
 
 inline DynamicLib LoadDynamicLib(const char* lib)
 {
