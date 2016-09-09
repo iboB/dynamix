@@ -162,25 +162,102 @@ void domain::internal_register_mixin_type(mixin_type_info& info)
     // due to module specific template instantiation
     // check if we already have this mixin registered
 
-    for(size_t i=0; i<_num_registered_mixins; ++i)
+    mixin_id free = INVALID_MIXIN_ID;
+
+    for (size_t i = 0; i < _num_registered_mixins; ++i)
     {
-        const mixin_type_info& registered = *_mixin_type_infos[i];
-        DYNAMIX_ASSERT(registered.id != INVALID_MIXIN_ID);
+        mixin_type_info* registered = _mixin_type_infos[i];
 
-        if(strcmp(info.name, registered.name) == 0)
+        if (registered)
         {
-            // we have this mixin registered
+            DYNAMIX_ASSERT(registered->is_valid());
 
-            DYNAMIX_ASSERT_MSG(registered.size == info.size,
-                "trying to register a mixin with the name of an existing mixin");
+            if (strcmp(info.name, registered->name) == 0)
+            {
+                // we have this mixin registered
 
-            info.id = registered.id;
-            return;
+                DYNAMIX_ASSERT_MSG(registered->size == info.size,
+                    "trying to register a mixin with the name of an existing mixin");
+
+                info.id = registered->id;
+
+                // link info in list
+                mixin_type_info* mi = registered;
+                while (mi->sibling)
+                {
+                    mi = mi->sibling;
+                }
+                mi->sibling = &info;
+
+                return;
+            }
+        }
+        else
+        {
+            free = i;
         }
     }
 
-    info.id = _num_registered_mixins;
-    _mixin_type_infos[_num_registered_mixins++] = &info;
+    if (free == INVALID_MIXIN_ID)
+    {
+        // no free slot has been found dugin the iteration, so add a new one
+        info.id = _num_registered_mixins;
+        ++_num_registered_mixins;
+    }
+    else
+    {
+        info.id = free;
+    }
+
+    _mixin_type_infos[info.id] = &info;
+}
+
+void domain::unregister_mixin_type(const mixin_type_info& info)
+{
+    DYNAMIX_ASSERT_MSG(info.id < _num_registered_mixins, "Unregistering a mixin which isn't registered");
+    mixin_type_info* registered = _mixin_type_infos[info.id];
+    DYNAMIX_ASSERT_MSG(registered, "Unregistering a mixin which isn't registered");
+
+    // remove info from linked list
+    if (registered == &info)
+    {
+        _mixin_type_infos[info.id] = nullptr;
+
+        // since this no more registrations of this mixin exist, 
+        // clean up all object type infos which reference it
+
+        for (auto i = _object_type_infos.begin(); i!=_object_type_infos.end(); )
+        {
+            if (i->first[info.id])
+            {
+                delete i->second;
+                i = _object_type_infos.erase(i);
+            }
+            else
+            {
+                ++i;
+            }
+        }
+    }
+    else
+    {
+        while (registered->sibling && registered->sibling != &info)
+        {
+            registered = registered->sibling;
+        }
+
+        while (registered->sibling && registered->sibling != &info)
+        {
+            registered = registered->sibling;
+        }
+
+        DYNAMIX_ASSERT_MSG(registered->sibling, "Unregistering an known mixin, which hasn't been registered");
+
+        if (registered->sibling)
+        {
+            registered->sibling = registered->sibling->sibling;
+        }        
+    }    
 }
 
 void domain::set_allocator(global_allocator* allocator)
@@ -189,12 +266,15 @@ void domain::set_allocator(global_allocator* allocator)
 
     for(size_t i=0; i<_num_registered_mixins; ++i)
     {
-        mixin_type_info& registered = *_mixin_type_infos[i];
-        if(registered.allocator == _allocator)
+        mixin_type_info* registered = _mixin_type_infos[i];
+
+        if (!registered) continue;
+
+        if(registered->allocator == _allocator)
         {
             // set the new domain allocator to all mixins that don't
             // have a specific one of their own
-            registered.allocator = allocator;
+            registered->allocator = allocator;
         }
     }
 
@@ -205,11 +285,13 @@ mixin_id domain::get_mixin_id_by_name(const char* mixin_name) const
 {
     for(size_t i=0; i<_num_registered_mixins; ++i)
     {
-        const mixin_type_info& registered = *_mixin_type_infos[i];
+        const mixin_type_info* registered = _mixin_type_infos[i];
 
-        if(strcmp(mixin_name, registered.name) == 0)
+        if (!registered) continue;
+
+        if(strcmp(mixin_name, registered->name) == 0)
         {
-            return registered.id;
+            return registered->id;
         }
     }
 

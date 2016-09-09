@@ -72,6 +72,8 @@ public:
         _dynamix_parse_mixin_features((Mixin*)nullptr, parser);
     }
 
+    void unregister_mixin_type(const mixin_type_info& info);
+
     template <typename Feature>
     void register_feature(Feature& feature)
     {
@@ -108,8 +110,12 @@ _dynamix_internal:
     domain();
     ~domain();
 
+    // sparse list of all mixin infos
+    // some elements might be nullptr
+    // such elements are registered from a loadable module (plugin) 
+    // and then unregistered when the plugin was unloaded
     mixin_type_info* _mixin_type_infos[DYNAMIX_MAX_MIXINS];
-    size_t _num_registered_mixins;
+    size_t _num_registered_mixins; // max registered mixin
 
     void internal_register_mixin_type(mixin_type_info& info);
 

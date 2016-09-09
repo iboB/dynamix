@@ -56,6 +56,10 @@ public:
     // usually equal to the allocator of the domain
     global_allocator* allocator;
 
+    // many modules may potentially register the same mixin
+    // in such case a linked list is formed which holds all infos (for all modules) for a given mixin
+    mixin_type_info* sibling;
+
     mixin_type_info()
         : id(INVALID_MIXIN_ID)
         // since this is always static, other members will be initialized with 0
@@ -81,6 +85,8 @@ struct mixin_type_info_instance : public noncopyable
 
     // the constructor is defined in mixin.h because it references the domain object
     mixin_type_info_instance();
+    
+    ~mixin_type_info_instance();
 
     // to prevent warnings and optimizations that will say that we're not using
     // mixin_type_info_instance by simply referencing it

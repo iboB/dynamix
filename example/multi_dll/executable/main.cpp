@@ -12,10 +12,6 @@
 
 using namespace std;
 
-typedef void (*plugin_modify_object_proc)(dynamix::object*);
-
-plugin_modify_object_proc plugin_modify_object;
-
 #if defined (WIN32)
 
 #define WIN32_LEAN_AND_MEAN
@@ -38,15 +34,27 @@ typedef void* DynamicLib;
 
 #endif
 
+typedef void(*plugin_proc)(dynamix::object*);
+
+DynamicLib plugin;
+
+plugin_proc plugin_modify_object;
+plugin_proc plugin_release_object;
+
 void load_plugin()
 {
-    DynamicLib lib = LoadDynamicLib("plugin");
-    DYNAMIX_ASSERT(lib);
+    plugin = LoadDynamicLib("plugin");
+    DYNAMIX_ASSERT(plugin);
 
-    auto fp = GetProc(lib, "modify_object");
+    auto fp = GetProc(plugin, "modify_object");
     DYNAMIX_ASSERT(fp);
 
-    plugin_modify_object = reinterpret_cast<plugin_modify_object_proc>(fp);
+    plugin_modify_object = reinterpret_cast<plugin_proc>(fp);
+
+    fp = GetProc(plugin, "release_object");
+    DYNAMIX_ASSERT(fp);
+
+    plugin_release_object = reinterpret_cast<plugin_proc>(fp);
 }
 
 void call_messages(dynamix::object* o)
@@ -75,6 +83,21 @@ int main()
     plugin_modify_object(f.the_object);
 
     call_messages(f.the_object);
+
+    cout << endl << endl << endl << " ====== unloading plugin ====== " << endl;
+
+    plugin_release_object(f.the_object);
+    CloseDynamicLib(plugin);
+
+    call_messages(f.the_object);
+
+    cout << endl << endl << endl << " ====== reloading plugin ====== " << endl;
+
+    load_plugin();
+    plugin_modify_object(f.the_object);
+
+    call_messages(f.the_object);
+
 
     return 0;
 }

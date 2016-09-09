@@ -173,13 +173,15 @@ bool object_mutator::remove(const char* mixin_type_name)
 
 void object_mutator::add(mixin_id id)
 {
-    DYNAMIX_THROW_UNLESS(id < domain::instance()._num_registered_mixins, bad_mutation);
+    DYNAMIX_THROW_UNLESS(id < domain::instance().num_registered_mixins(), bad_mutation);
+    DYNAMIX_THROW_UNLESS(domain::instance()._mixin_type_infos[id], bad_mutation);
     _mutation.start_adding(id);
 }
 
 void object_mutator::remove(mixin_id id)
 {
-    DYNAMIX_THROW_UNLESS(id < domain::instance()._num_registered_mixins, bad_mutation);
+    DYNAMIX_THROW_UNLESS(id < domain::instance().num_registered_mixins(), bad_mutation);
+    DYNAMIX_THROW_UNLESS(domain::instance()._mixin_type_infos[id], bad_mutation);
     _mutation.start_removing(id);
 }
 

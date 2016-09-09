@@ -20,6 +20,11 @@ extern "C" DYNAMIX_SYMBOL_EXPORT void modify_object(object* o)
     mutate(o).add<plugin_mixin>();
 }
 
+extern "C" DYNAMIX_SYMBOL_EXPORT void release_object(object* o)
+{
+    mutate(o).remove<plugin_mixin>();
+}
+
 class plugin_mixin
 {
 public:

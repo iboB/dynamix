@@ -29,11 +29,18 @@ namespace internal
 template <typename Mixin>
 mixin_type_info_instance<Mixin>::mixin_type_info_instance()
 {
-    // register the mixin int the domain
+    // register the mixin in the domain
     domain::instance().
         // we use the function to get the type info, to guarantee that an instantiation of the template
         // from another module won't override if
         template register_mixin_type<Mixin>(_dynamix_get_mixin_type_info((Mixin*)nullptr));
+}
+
+template <typename Mixin>
+mixin_type_info_instance<Mixin>::~mixin_type_info_instance()
+{
+    // unregister the mixin from the domain
+    domain::instance().unregister_mixin_type(info());
 }
 
 } // namespace internal
