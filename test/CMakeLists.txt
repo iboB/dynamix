@@ -36,3 +36,7 @@ target_link_libraries(test_loader test_dynlib_A)
 target_link_libraries(test_plugin_A test_dynlib_A)
 target_link_libraries(test_plugin_Amod test_dynlib_A)
 target_link_libraries(test_plugin_B test_dynlib_A)
+
+if(NOT MSVC)
+    target_link_libraries(test_loader dl)
+endif()
