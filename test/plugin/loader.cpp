@@ -123,12 +123,16 @@ TEST_CASE("plugin")
     CHECK(dl_a_multicast<sum>(o) == 24);
     CHECK_THROWS_AS(dl_a_exported(o), bad_message_call);
 
+    // apparently dlclose with gnuc doesn't consider unloading the plugin so file
+    // this test works with MSVC and clang
+#if !defined(__GNUC__) || defined(__clang__)
     p = LoadPlugin("test_plugin_Amod", o);
 
     CHECK(dl_a_multicast<sum>(o) == 126);
     CHECK(dl_a_exported(o) == -126);
 
     ClosePlugin(p, o);
+#endif
 }
 
 TEST_CASE("shared")
