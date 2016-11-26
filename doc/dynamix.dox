@@ -178,7 +178,7 @@ overhead, using the library comes with some inevitable downsides when compared
 with plain multiple inheritance:
 
 - **No compile-time type**: An object derived from, say, `foo` and `bar` can
-implicitly be cast too `foo` or `bar`. Since the library uses a placeholder type
+implicitly be cast to `foo` or `bar`. Since the library uses a placeholder type
 &ndash; `dynamix::object` &ndash; implicit casts to any of its mixins are
 impossible. That aside, the hypothetical object from above will receive all of
 the methods from foo and bar, but while this is true for the `dynamix::object`
