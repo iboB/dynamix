@@ -116,7 +116,7 @@ Basically a mutation adds or removes mixins from an object.
 Mutation rules {#mrules}
 --------------
 
-A mutation rule is set globally applied to all mutations. A mutation rule may
+A mutation rule is set globally and applied to all mutations. A mutation rule may
 prevent a mixin to be added to an object or force one, even though the mutation
 wants to add it or doesn't mention it.
 

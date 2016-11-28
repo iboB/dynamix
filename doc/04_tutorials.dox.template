@@ -74,7 +74,7 @@ To be able to have parents, other than the first, with access to the owning
 object we suggest that you create a pure virtual function that gets it from the
 actual mixin type.
 
-Say `virtual object* get_bm_object() = 0;` in the parents, which is implemented
+Say `virtual object* get_dm_object() = 0;` in the parents, which is implemented
 in the child class (the actual mixin defined with `DYNAMIX_DEFINE_MIXIN`) by
 simply `return dm_this`.
 
