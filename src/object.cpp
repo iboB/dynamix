@@ -158,7 +158,7 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
     data.set_object(this);
 }
 
-void object::construct_mixin(mixin_id id, const void* source)
+bool object::construct_mixin(mixin_id id, const void* source)
 {
     DYNAMIX_ASSERT(_type_info->has(id));
     mixin_data_in_object& data = _mixin_data[_type_info->mixin_index(id)];
@@ -191,15 +191,23 @@ void object::construct_mixin(mixin_id id, const void* source)
         auto cc = dom.mixin_info(id).copy_constructor;
         if (!cc)
         {
-            // construct *something* so we don't have an invalid object
+            // so... we now have a problem
+            // some mixins are constructed and some are not, while this cannot be constructed
+            // we could potentially invalidate the object, and we should, too, since regular constructors
+            // may throw outside of our code
+            // for now, though, use a quick and dirty fix and default construct and then return false
+            // thus we will have a valid object, but the non-copyable mixins won't be copied
+            // finally throw after the object construction is complete
             dom.mixin_info(id).constructor(data.mixin());
-            DYNAMIX_THROW_UNLESS(cc, bad_copy_construction);
+            return false;
         }
         else
         {
             cc(data.mixin(), source);
         }
     }
+
+    return true;
 }
 
 void object::destroy_mixin(mixin_id id)
@@ -312,6 +320,11 @@ void object::copy_from(const object& o)
 
     domain& dom = domain::instance();
 
+    enum
+    {
+        none, bad_assign, bad_copy_construct
+    } copy_fail = none;
+
     for (const mixin_type_info* mixin_info : old_type->_compact_mixins)
     {
         mixin_id id = mixin_info->id;
@@ -320,8 +333,15 @@ void object::copy_from(const object& o)
             auto new_index = o._type_info->mixin_index(id);
             auto& data = new_mixin_data[new_index];
             data = old_mixin_data[old_type->mixin_index(id)];
-            DYNAMIX_THROW_UNLESS(dom.mixin_info(id).copy_assignment, bad_copy_assignment);
-            dom.mixin_info(id).copy_assignment(data.mixin(), o._mixin_data[new_index].mixin());
+
+            if (!dom.mixin_info(id).copy_assignment)
+            {
+                copy_fail = bad_assign;
+            }
+            else
+            {
+                dom.mixin_info(id).copy_assignment(data.mixin(), o._mixin_data[new_index].mixin());
+            }
         }
         else
         {
@@ -343,7 +363,10 @@ void object::copy_from(const object& o)
         size_t index = _type_info->mixin_index(id);
         if (!new_mixin_data[index].buffer())
         {
-            construct_mixin(id, o._mixin_data[index].mixin());
+            if (!construct_mixin(id, o._mixin_data[index].mixin()))
+            {
+                copy_fail = bad_copy_construct;
+            }
         }
     }
 
@@ -351,6 +374,12 @@ void object::copy_from(const object& o)
     mixin_data_in_object& data = _mixin_data[object_type_info::DEFAULT_MSG_IMPL_INDEX];
     data.set_buffer(reinterpret_cast<char*>(&_default_impl_virtual_mixin_data), sizeof(object*));
     data.set_object(this);
+
+    if (copy_fail)
+    {
+        DYNAMIX_THROW_UNLESS(copy_fail == bad_assign, bad_copy_construction);
+        DYNAMIX_THROW_UNLESS(copy_fail == bad_copy_construct, bad_copy_assignment);
+    }
 }
 
 void object::copy_matching_from(const object& o)

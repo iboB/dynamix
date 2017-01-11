@@ -168,8 +168,8 @@ _dynamix_internal:
     void usurp(object&& o);
 
     // constructs mixin with optional source to copy from
-    // will throw an exception if source is provided but no copy constructor exists
-    void construct_mixin(mixin_id id, const void* source);
+    // will return false if source is provided but no copy constructor exists
+    bool construct_mixin(mixin_id id, const void* source);
     void destroy_mixin(mixin_id id);
 
     const internal::object_type_info* _type_info;
