@@ -223,7 +223,7 @@ void domain::unregister_mixin_type(const mixin_type_info& info)
     {
         _mixin_type_infos[info.id] = nullptr;
 
-        // since this no more registrations of this mixin exist, 
+        // since this no more registrations of this mixin exist,
         // clean up all object type infos which reference it
 
         for (auto i = _object_type_infos.begin(); i!=_object_type_infos.end(); )
@@ -256,8 +256,8 @@ void domain::unregister_mixin_type(const mixin_type_info& info)
         if (registered->sibling)
         {
             registered->sibling = registered->sibling->sibling;
-        }        
-    }    
+        }
+    }
 }
 
 void domain::set_allocator(global_allocator* allocator)

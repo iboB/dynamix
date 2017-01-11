@@ -43,6 +43,14 @@ class bad_message_call : public exception {};
 /// the same unicast message with the same priority
 class unicast_clash : public exception {};
 
+/// Thrown when a copy construction is performed from an object which has a
+/// non-copy-constructioble mixin
+class bad_copy_construction : public exception {};
+
+/// Thrown when a copy assignment is performed from an object which has a
+/// non-copy-assignable mixin
+class bad_copy_assignment : public exception {};
+
 }
 
 /// A macro that throws an exception if `DYNAMIX_USE_EXCEPTIONS`

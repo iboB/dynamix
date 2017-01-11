@@ -139,7 +139,7 @@ void object_mutator::apply_to(object& obj) const
     {
         // we allow adding mixins that are already there
         if(!obj.internal_get_mixin(add->id))
-            obj.construct_mixin(add->id);
+            obj.construct_mixin(add->id, nullptr);
     }
 }
 

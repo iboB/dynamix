@@ -16,6 +16,7 @@
 
 #include "global.hpp"
 #include "message.hpp"
+#include <type_traits>
 
 namespace dynamix
 {
@@ -28,6 +29,7 @@ namespace internal
 {
 
 typedef void (*mixin_constructor_proc)(void* memory);
+typedef void (*mixin_copy_proc)(void* memory, const void* source);
 typedef void (*mixin_destructor_proc)(void* memory);
 
 // this struct contains information for a given mixin
@@ -45,6 +47,12 @@ public:
     // construction and destruction
     mixin_constructor_proc constructor;
     mixin_destructor_proc destructor;
+
+    // might be left null for mixins which aren't copy-constructible
+    mixin_copy_proc copy_constructor;
+
+    // might be left null for mixins which aren't copy-assignable
+    mixin_copy_proc copy_assignment;
 
     // shows whether this is as initialized mixin
     bool is_valid() const { return id != INVALID_MIXIN_ID; }
@@ -85,7 +93,7 @@ struct mixin_type_info_instance : public noncopyable
 
     // the constructor is defined in mixin.h because it references the domain object
     mixin_type_info_instance();
-    
+
     ~mixin_type_info_instance();
 
     // to prevent warnings and optimizations that will say that we're not using
@@ -106,6 +114,46 @@ template <typename Mixin>
 void call_mixin_destructor(void* memory)
 {
     reinterpret_cast<Mixin*>(memory)->~Mixin();
+}
+
+template <typename Mixin>
+void call_mixin_copy_constructor(void* memory, const void* source)
+{
+    new (memory) Mixin(*reinterpret_cast<const Mixin*>(source));
+}
+
+template <typename Mixin>
+void call_mixin_copy_assignment(void* target, const void* source)
+{
+    *reinterpret_cast<Mixin*>(target) = *reinterpret_cast<const Mixin*>(source);
+}
+
+template <typename Mixin>
+typename std::enable_if<std::is_copy_constructible<Mixin>::value,
+    mixin_copy_proc>::type get_mixin_copy_constructor()
+{
+    return call_mixin_copy_constructor<Mixin>;
+}
+
+template <typename Mixin>
+typename std::enable_if<!std::is_copy_constructible<Mixin>::value,
+    mixin_copy_proc>::type get_mixin_copy_constructor()
+{
+    return nullptr;
+}
+
+template <typename Mixin>
+typename std::enable_if<std::is_copy_assignable<Mixin>::value,
+    mixin_copy_proc>::type get_mixin_copy_assignment()
+{
+    return call_mixin_copy_assignment<Mixin>;
+}
+
+template <typename Mixin>
+typename std::enable_if<!std::is_copy_assignable<Mixin>::value,
+    mixin_copy_proc>::type get_mixin_copy_assignment()
+{
+    return nullptr;
 }
 
 } // namespace internal

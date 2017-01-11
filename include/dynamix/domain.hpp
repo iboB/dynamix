@@ -60,6 +60,8 @@ public:
         info.alignment = std::alignment_of<Mixin>::value;
         info.constructor = &call_mixin_constructor<Mixin>;
         info.destructor = &call_mixin_destructor<Mixin>;
+        info.copy_constructor = get_mixin_copy_constructor<Mixin>();
+        info.copy_assignment = get_mixin_copy_assignment<Mixin>();
         info.allocator = _allocator;
 
         internal_register_mixin_type(info);
@@ -112,7 +114,7 @@ _dynamix_internal:
 
     // sparse list of all mixin infos
     // some elements might be nullptr
-    // such elements are registered from a loadable module (plugin) 
+    // such elements are registered from a loadable module (plugin)
     // and then unregistered when the plugin was unloaded
     mixin_type_info* _mixin_type_infos[DYNAMIX_MAX_MIXINS];
     size_t _num_registered_mixins; // max registered mixin

@@ -24,19 +24,55 @@ namespace internal
 class object_type_template;
 
 /// The main object class.
-class DYNAMIX_API object : public internal::noncopyable
+class DYNAMIX_API object
 {
 public:
     /// Constructs an empty object - no mixins.
     object();
+
     /// Constructs an object from a specific type template.
     explicit object(const object_type_template& type_template);
+
+    ~object();
 
     /// Move constructor from an existing object
     object(object&& o);
 
-    ~object();
+    /// Move assignment
+    object& operator=(object&& o);
 
+#if DYNAMIX_OBJECT_IMPLICIT_COPY
+    /// Copy constructor
+    object(const object& o);
+
+    /// Assignment
+    /// Will also change the type of the target to the source type.
+    /// Will call assignment operators for mixins that exist in both.
+    /// Will copy-construct new mixins for this.
+    /// Will destroy mixins that don't exist in source.
+    /// It will not, however, match asssignment operators for different mixin types which have such defined between them,
+    object& operator=(const object& o);
+#else
+    object(const object& o) = delete;
+    object& operator=(const object& o) = delete;
+#endif
+
+    /// Explicit copy via move assignment
+    object copy() const;
+
+    /// Explicit assignment from existing object
+    /// Will also change the type of the target to the source type.
+    /// Will call assignment operators for mixins that exist in both.
+    /// Will copy-construct new mixins for this.
+    /// Will destroy mixins that don't exist in source.
+    /// It will not, however, match asssignment operators for different mixin types which have such defined between them,
+    void copy_from(const object& o);
+
+    /// Assignment of mixins that exist in both objects
+    /// Will not change the type of the target.
+    /// Will call assignment operators for mixins that exist in both objects.
+    /// It will not, however, match asssignment operators for different mixin types which have such defined between them,
+    void copy_matching_from(const object& o);
 
     /////////////////////////////////////////////////////////////////
     // mixin info
@@ -127,7 +163,13 @@ _dynamix_internal:
     // if we know exactly what's added and removed
     void change_type(const internal::object_type_info* new_type, bool manage_mixins/* = true*/);
 
-    void construct_mixin(mixin_id id);
+    // performs the move from one object source to this
+    // can only be performed on empty objects
+    void usurp(object&& o);
+
+    // constructs mixin with optional source to copy from
+    // will throw an exception if source is provided but no copy constructor exists
+    void construct_mixin(mixin_id id, const void* source);
     void destroy_mixin(mixin_id id);
 
     const internal::object_type_info* _type_info;

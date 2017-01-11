@@ -12,6 +12,7 @@
 #include <dynamix/message.hpp>
 #include <dynamix/domain.hpp>
 #include <dynamix/object_type_template.hpp>
+#include <dynamix/exception.hpp>
 
 namespace dynamix
 {
@@ -36,28 +37,45 @@ object::object(const object_type_template& type)
     type.apply_to(*this);
 }
 
-object::object(object&& o)
-    : _type_info(o._type_info)
-    , _mixin_data(o._mixin_data)
-{
-    for (size_t i = object_type_info::MIXIN_INDEX_OFFSET; i < _type_info->_compact_mixins.size() + object_type_info::MIXIN_INDEX_OFFSET; ++i)
-    {
-        _mixin_data[i].set_object(this);
-    }
-
-    mixin_data_in_object& data = _mixin_data[object_type_info::DEFAULT_MSG_IMPL_INDEX];
-    data.set_buffer(reinterpret_cast<char*>(&_default_impl_virtual_mixin_data), sizeof(object*));
-    data.set_object(this);
-
-    // clear other object
-    o._type_info = &object_type_info::null();
-    o._mixin_data = &null_mixin_data;
-}
-
 object::~object()
 {
     clear();
 }
+
+object::object(object&& o)
+{
+    usurp(std::move(o));
+}
+
+object& object::operator=(object&& o)
+{
+    clear();
+    usurp(std::move(o));
+    return *this;
+}
+
+#if DYNAMIX_OBJECT_IMPLICIT_COPY
+object::object(const object& o)
+    : _type_info(&object_type_info::null())
+    , _mixin_data(&null_mixin_data)
+{
+    copy_from(o);
+}
+
+object& object::operator=(const object& o)
+{
+    copy_from(o);
+    return *this;
+}
+#endif
+
+object object::copy() const
+{
+    object o;
+    o.copy_from(*this);
+    return o;
+}
+
 
 void* object::internal_get_mixin(mixin_id id)
 {
@@ -129,7 +147,7 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
             size_t index = new_type->mixin_index(mixin_info->id);
             if(!new_mixin_data[index].buffer())
             {
-                construct_mixin(mixin_info->id);
+                construct_mixin(mixin_info->id, nullptr);
             }
         }
     }
@@ -140,7 +158,7 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
     data.set_object(this);
 }
 
-void object::construct_mixin(mixin_id id)
+void object::construct_mixin(mixin_id id, const void* source)
 {
     DYNAMIX_ASSERT(_type_info->has(id));
     mixin_data_in_object& data = _mixin_data[_type_info->mixin_index(id)];
@@ -164,7 +182,24 @@ void object::construct_mixin(mixin_id id)
     data.set_buffer(buffer, mixin_offset);
     data.set_object(this);
 
-    dom.mixin_info(id).constructor(data.mixin());
+    if (!source)
+    {
+        dom.mixin_info(id).constructor(data.mixin());
+    }
+    else
+    {
+        auto cc = dom.mixin_info(id).copy_constructor;
+        if (!cc)
+        {
+            // construct *something* so we don't have an invalid object
+            dom.mixin_info(id).constructor(data.mixin());
+            DYNAMIX_THROW_UNLESS(cc, bad_copy_construction);
+        }
+        else
+        {
+            cc(data.mixin(), source);
+        }
+    }
 }
 
 void object::destroy_mixin(mixin_id id)
@@ -227,6 +262,110 @@ const void* object::get(mixin_id id) const
     if (id >= DYNAMIX_MAX_MIXINS)
         return nullptr;
     return internal_get_mixin(id);
+}
+
+void object::usurp(object&& o)
+{
+    _type_info = o._type_info;
+    _mixin_data = o._mixin_data;
+
+    for (size_t i = object_type_info::MIXIN_INDEX_OFFSET; i < _type_info->_compact_mixins.size() + object_type_info::MIXIN_INDEX_OFFSET; ++i)
+    {
+        _mixin_data[i].set_object(this);
+    }
+
+    mixin_data_in_object& data = _mixin_data[object_type_info::DEFAULT_MSG_IMPL_INDEX];
+    data.set_buffer(reinterpret_cast<char*>(&_default_impl_virtual_mixin_data), sizeof(object*));
+    data.set_object(this);
+
+    // clear other object
+    o._type_info = &object_type_info::null();
+    o._mixin_data = &null_mixin_data;
+}
+
+void object::copy_from(const object& o)
+{
+    if (&o == this)
+    {
+        // check for self usurp
+        return;
+    }
+
+    if (o._type_info == &object_type_info::null())
+    {
+        clear();
+        return;
+    }
+
+    if (o._type_info == _type_info)
+    {
+        copy_matching_from(o);
+        return;
+    }
+
+    // what follows is basically copy-pasted from change_type
+    // think of a way to share the code
+
+    const object_type_info* old_type = _type_info;
+    mixin_data_in_object* old_mixin_data = _mixin_data;
+    mixin_data_in_object* new_mixin_data = o._type_info->alloc_mixin_data();
+
+    domain& dom = domain::instance();
+
+    for (const mixin_type_info* mixin_info : old_type->_compact_mixins)
+    {
+        mixin_id id = mixin_info->id;
+        if (o._type_info->has(id))
+        {
+            auto new_index = o._type_info->mixin_index(id);
+            auto& data = new_mixin_data[new_index];
+            data = old_mixin_data[old_type->mixin_index(id)];
+            DYNAMIX_THROW_UNLESS(dom.mixin_info(id).copy_assignment, bad_copy_assignment);
+            dom.mixin_info(id).copy_assignment(data.mixin(), o._mixin_data[new_index].mixin());
+        }
+        else
+        {
+            destroy_mixin(id);
+        }
+    }
+
+    if (old_mixin_data != &null_mixin_data)
+    {
+        old_type->dealloc_mixin_data(old_mixin_data);
+    }
+
+    _type_info = o._type_info;
+    _mixin_data = new_mixin_data;
+
+    for (const mixin_type_info* mixin_info : _type_info->_compact_mixins)
+    {
+        auto id = mixin_info->id;
+        size_t index = _type_info->mixin_index(id);
+        if (!new_mixin_data[index].buffer())
+        {
+            construct_mixin(id, o._mixin_data[index].mixin());
+        }
+    }
+
+    // set the appropriate default message implementation virtual mixin
+    mixin_data_in_object& data = _mixin_data[object_type_info::DEFAULT_MSG_IMPL_INDEX];
+    data.set_buffer(reinterpret_cast<char*>(&_default_impl_virtual_mixin_data), sizeof(object*));
+    data.set_object(this);
+}
+
+void object::copy_matching_from(const object& o)
+{
+    domain& dom = domain::instance();
+
+    for (const mixin_type_info* info : o._type_info->_compact_mixins)
+    {
+        auto id = info->id;
+        if (_type_info->has(id))
+        {
+            DYNAMIX_THROW_UNLESS(dom.mixin_info(id).copy_assignment, bad_copy_assignment);
+            dom.mixin_info(id).copy_assignment(_mixin_data[_type_info->mixin_index(id)].mixin(), o._mixin_data[o._type_info->mixin_index(id)].mixin());
+        }
+    }
 }
 
 } // dynamix

@@ -42,6 +42,11 @@
 // setting this to true will cause some functions to throw exceptions instead of asserting
 #define DYNAMIX_USE_EXCEPTIONS 1
 
+// setting this to true will cause the object type to have a copy constructor and a copy assignment operator
+// however it is set to false by default so as to prevent accidental copying of objects
+// explicit copying is still possible via object::copy_from or object::copy
+#define DYNAMIX_OBJECT_IMPLICIT_COPY 0
+
 // there is warning push/pop about this in the main header
 #if defined(_MSC_VER)
 // msvc complains that template classes don't have a dll interface (they shouldn't).

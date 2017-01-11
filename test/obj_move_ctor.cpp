@@ -54,7 +54,7 @@ object gen_obj()
         .add<a>()
         .add<b>();
 
-    return std::move(obj);
+    return obj;
 }
 
 TEST_CASE("obj_move_ctor")
@@ -104,4 +104,42 @@ TEST_CASE("obj_move_ctor")
     CHECK(&v.back() == get_obj_a(v.back()));
     CHECK(&v.back() == get_obj_b(v.back()));
     CHECK(11 == value<combinators::sum>(v.back()));
+}
+
+TEST_CASE("obj_move_assignment")
+{
+    object empty;
+
+    object o1;
+    o1 = std::move(empty); // to check that this won't crash
+
+    mutate(o1)
+        .add<a>()
+        .add<b>();
+
+    // sanity
+    CHECK(&o1 == get_obj_a(o1));
+    CHECK(&o1 == get_obj_b(o1));
+    CHECK(11 == value<combinators::sum>(o1));
+
+    // actual tests
+    object o1_moved;
+    o1_moved = std::move(o1);
+
+    CHECK(&o1_moved == get_obj_a(o1_moved));
+    CHECK(&o1_moved == get_obj_b(o1_moved));
+    CHECK(11 == value<combinators::sum>(o1_moved));
+
+    CHECK(!o1.has<a>());
+    CHECK(!o1.has<b>());
+    CHECK(!o1.implements(value_msg));
+    CHECK(!o1.implements(get_obj_a_msg));
+    CHECK(!o1.implements(get_obj_b_msg));
+
+    object o2;
+    o2 = gen_obj();
+
+    CHECK(&o2 == get_obj_a(o2));
+    CHECK(&o2 == get_obj_b(o2));
+    CHECK(11 == value<combinators::sum>(o2));
 }
