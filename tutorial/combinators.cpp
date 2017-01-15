@@ -7,6 +7,7 @@
 //
 #include <dynamix/dynamix.hpp>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -252,7 +253,7 @@ more than 1 element among all objects:
 //[tutorial_combinators_custom_template_A
 
 /*`
-Now, the last case we need to cover is when you want your custom combinator to
+Another case we need to cover is when you want your custom combinator to
 be added as a template argument to the message's function giving it a return
 value of its own.
 
@@ -313,9 +314,83 @@ Now we can use our new custom combinator as we used `boolean_or` above.
 */
     cout << "There are " << elements_count<more_than_1_t>(o)
         << " mixins with more than 1 element in the first object." << endl;
+//]
+}
+
+//[tutorial_combinators_custom_collection_B
+
+/*`
+Here is a sample custom combinator which allows the user to collect all return
+values and also calls reserve with an appropriate size:
+*/
+
+template <typename MsgReturnType>
+struct collection_t
+{
+    void set_num_results(size_t num)
+    {
+        cout << "collection_t reserving space for " << num << " results." << endl;
+        results.reserve(num);
+    }
+
+    bool add_result(MsgReturnType result)
+    {
+        results.push_back(result);
+
+        // Never break. We need this for all mixins in an object
+        return true;
+    }
+
+    // return type of message function
+    typedef std::vector<MsgReturnType> result_type;
+
+    result_type result() const
+    {
+        return results;
+    }
+
+    std::vector<MsgReturnType> results;
+};
+
 /*`
 And that's all there is about multicast result combinators.
 */
+
+//]
+
+void collection()
+{
+
+//[tutorial_combinators_custom_collection_A
+
+/*`
+The last example in this tutorial deals with finding the number of times your
+`add_result` function will be called.
+
+Suppose you want to implement a combinator which collects all execution results
+of the messages in the multicast in a vector. Now, this is easy, given what
+we've learned so far. Just create the combinator and call `vec.push_back` for
+each result in `add_result`. Then simply use it like this:
+*/
+
+    auto results = elements_count<collection_t>(o);
+    cout << "The number of elemens per mixin in the first object is:\n";
+    for (auto i : results)
+    {
+        cout << '\t' << i << endl;
+    }
+
+
+/*`
+This, however, will potentially cause useless allocations. A much better
+implementation would call `vec.reserve` before calling `push_back` many times.
+
+The library helps you do this by allowing combinator classes to have an
+optional method `set_num_results(size_t)`. If a combinator has such, it will be
+called by the runtime before executing the methods associated with the
+multicast message.
+*/
+
 //]
 }
 
@@ -325,6 +400,13 @@ int main()
     built_in_combinators();
     custom_combinator_arg();
     custom_combinator_t();
+    collection();
+
+    // required for global objects
+    for (auto& o : objects)
+    {
+        o.clear();
+    }
 
     return 0;
 }
@@ -396,4 +478,6 @@ int surface::elements_count() const
 //` %{tutorial_combinators_custom_arg}
 //` %{tutorial_combinators_custom_template_A}
 //` %{tutorial_combinators_custom_template_B}
+//` %{tutorial_combinators_custom_collection_A}
+//` %{tutorial_combinators_custom_collection_B}
 //]

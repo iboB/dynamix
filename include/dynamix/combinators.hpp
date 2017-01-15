@@ -148,5 +148,53 @@ private:
     result_type _result;
 };
 
+/**
+* A combinator that calculates an arithmetic mean of all return values in the
+* multicast chain
+*
+* \tparam MessageReturnType The actual return type of the messages.
+*/
+template <typename MessageReturnType>
+class mean
+{
+public:
+    typedef MessageReturnType result_type;
+
+    mean()
+        : _sum(0)
+        , _num_results(0)
+    {}
+
+    /// The function called by the multicast caller to set the number of results
+    void set_num_results(size_t num)
+    {
+        _num_results = num;
+    }
+
+    /// The function used by the code generated for multicast messages.
+    bool add_result(const MessageReturnType& r)
+    {
+        _sum += r;
+        return true;
+    }
+
+    /// The result of the operation if the multicast call has been made
+    /// with an input/output parameter - an instance of `sum`
+    result_type result() const
+    {
+        return _sum / result_type(_num_results);
+    }
+
+    /// Resets the result, so the instance could be reused.
+    void reset()
+    {
+        _sum = 0;
+    }
+
+private:
+    result_type _sum;
+    size_t _num_results;
+};
+
 } // namespace combinators
 } // namespace dynamix

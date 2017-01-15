@@ -79,6 +79,16 @@ public:
         return _count;
     }
 
+    size_t num_results() const
+    {
+        return _num_results;
+    }
+
+    void set_num_results(size_t num_results)
+    {
+        _num_results = num_results;
+    }
+
     bool add_result(double d)
     {
         _count += int(d < _value);
@@ -88,6 +98,7 @@ public:
 private:
     double _value;
     int _count;
+    size_t _num_results;
 };
 
 TEST_CASE("combinators")
@@ -142,6 +153,11 @@ TEST_CASE("combinators")
     CHECK(Approx(dval<sum>(o)) == 0.111);
 
     /////////////////////////////////////////
+    // ================ mean =================
+    CHECK(ival<mean>(o) == 37);
+    CHECK(Approx(dval<mean>(o)) == 0.037);
+
+    /////////////////////////////////////////
     // ============= custom ===============
     CHECK(ival<count_bigger_than<0>::combinator>(o) == 3);
     CHECK(ival<count_bigger_than<5>::combinator>(o) == 2);
@@ -151,6 +167,7 @@ TEST_CASE("combinators")
     count_smaller_than count_smaller;
     dval(o, count_smaller);
     CHECK(count_smaller.count() == 0);
+    CHECK(count_smaller.num_results() == 3);
 
     count_smaller.set_compare_value(0.05);
     dval(o, count_smaller);
@@ -159,6 +176,7 @@ TEST_CASE("combinators")
     count_smaller.set_compare_value(1);
     dval(o, count_smaller);
     CHECK(count_smaller.count() == 3);
+    CHECK(count_smaller.num_results() == 3);
 };
 
 

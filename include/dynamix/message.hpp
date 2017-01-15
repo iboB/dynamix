@@ -13,8 +13,8 @@
  * Defines message related operations for the feature list.
  */
 
-
 #include "feature.hpp"
+#include <type_traits>
 
 namespace dynamix
 {
@@ -102,6 +102,29 @@ struct message_default_impl_registrator
 template <typename Message>
 message_default_impl_registrator<Message> message_default_impl_registrator<Message>::registrator;
 
+// check if a class has a method set_num_results
+template <typename Combinator>
+struct has_set_num_results
+{
+private:
+    template<typename C> static auto test(int) -> decltype(std::declval<C>().set_num_results(1), std::true_type());
+    template<typename> static std::false_type test(...);
+public:
+    static constexpr bool value = std::is_same<decltype(test<Combinator>(0)), std::true_type>::value;
+};
+
+// call set_num_results for combinators that have it
+template <typename Combinator>
+typename std::enable_if<has_set_num_results<Combinator>::value>::type
+set_num_results_for(Combinator& c, size_t num_results)
+{
+    c.set_num_results(num_results);
+}
+
+// do nothing for combinators that don't
+template <typename Combinator>
+typename std::enable_if<!has_set_num_results<Combinator>::value>::type
+set_num_results_for(Combinator&, size_t) {}
 
 } // namespace internal
 

@@ -82,6 +82,7 @@
         const call_table_entry* _d_end = _d_call_entry.multicast_end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
+        ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
         for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
             const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
@@ -296,6 +297,7 @@
         const call_table_entry* _d_end = _d_call_entry.multicast_end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
+        ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
         for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
             const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
@@ -510,6 +512,7 @@
         const call_table_entry* _d_end = _d_call_entry.multicast_end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
+        ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
         for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
             const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
@@ -724,6 +727,7 @@
         const call_table_entry* _d_end = _d_call_entry.multicast_end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
+        ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
         for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
             const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
@@ -938,6 +942,7 @@
         const call_table_entry* _d_end = _d_call_entry.multicast_end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
+        ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
         for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
             const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
@@ -1152,6 +1157,7 @@
         const call_table_entry* _d_end = _d_call_entry.multicast_end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
+        ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
         for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
             const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
@@ -1366,6 +1372,7 @@
         const call_table_entry* _d_end = _d_call_entry.multicast_end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
+        ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
         for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
             const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
