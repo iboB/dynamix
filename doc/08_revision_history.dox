@@ -1,5 +1,11 @@
 /*! \page revisions Revision History
 
+DynaMix 1.0.2
+=============
+
+- Added copying of objects
+- Added optional call to `set_num_results` to multicast result combinators
+
 DynaMix 1.0.1
 =============
 

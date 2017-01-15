@@ -179,7 +179,7 @@ public:
     }
 
     /// The result of the operation if the multicast call has been made
-    /// with an input/output parameter - an instance of `sum`
+    /// with an input/output parameter - an instance of `mean`
     result_type result() const
     {
         return _sum / result_type(_num_results);

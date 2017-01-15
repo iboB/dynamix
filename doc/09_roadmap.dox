@@ -4,7 +4,6 @@ Here is a list of planned features and events for the library: (The authors
 write it in their own free time, so concrete dates are hard to estimate)
 
 - Soon
-    - object copy-constructors + mixin feature `copyable`
     - Call mixin constructors when mutating object or constructing them via
     object type templates. Sample usage:
     `mutate(obj).add<mixin>("foo", param2).add<other_mixin>(42)`
