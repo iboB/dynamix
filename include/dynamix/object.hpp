@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -129,8 +129,21 @@ public:
     {
         const Feature& f = static_cast<Feature&>(_dynamix_get_mixin_feature((Feature*)nullptr));
         DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
-        // intentionally disregarding the actual feature
+        // intentionally disregarding the actual feature,
+        // because of potential multiple implementations
         return internal_implements(f.id, typename Feature::feature_tag());
+    }
+
+    /// Returns the number of mixins in the object which implement a feature.
+    template <typename Feature>
+    size_t num_implementers(const Feature*) const
+    {
+        const Feature& f = static_cast<Feature&>(_dynamix_get_mixin_feature((Feature*)nullptr));
+        DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
+        // intentionally disregarding the actual feature,
+        // because of potential multiple implementations
+        // the actual feature will be gotten from the feature registry in the domain
+        return internal_num_implementers(f.id, typename Feature::feature_tag());
     }
     /////////////////////////////////////////////////////////////////
 
@@ -185,6 +198,13 @@ _dynamix_internal:
     }
 
     bool implements_message(feature_id id) const;
+
+    size_t internal_num_implementers(feature_id id, const internal::message_feature_tag&) const
+    {
+        return message_num_implementers(id);
+    }
+
+    size_t message_num_implementers(feature_id id) const;
 
     // virtual mixin for default behavior
     // used only so as to not have a null pointer cast to the appropriate type for default implementations

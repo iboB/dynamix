@@ -4,6 +4,8 @@ DynaMix 1.0.2
 =============
 
 - Added copying of objects
+- Added `num_implementers` to `object` to check the number of mixins which
+implement a message
 - Added optional call to `set_num_results` to multicast result combinators
 
 DynaMix 1.0.1

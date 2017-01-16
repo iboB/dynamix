@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -228,6 +228,25 @@ void object::destroy_mixin(mixin_id id)
 bool object::implements_message(feature_id id) const
 {
     return !!_type_info->_call_table[id].message_data;
+}
+
+size_t object::message_num_implementers(feature_id id) const
+{
+    auto& entry = _type_info->_call_table[id];
+
+    if (!entry.message_data)
+    {
+        return 0;
+    }
+
+    if (domain::instance()._messages[id]->mechanism == message_t::unicast)
+    {
+        return 1;
+    }
+    else
+    {
+        return entry.multicast_end - entry.multicast_begin;
+    }
 }
 
 void object::get_message_names(std::vector<const char*>& out_message_names) const
