@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -101,6 +101,7 @@ TEST_CASE("complex_apply_mutation")
     CHECK(!o.has<counter>());
     CHECK_FALSE(o.get<counter>());
     CHECK(!o.implements(dummy_msg));
+    CHECK(o.num_implementers(dummy_msg) == 0);
 
     single_object_mutator mutation(o);
 
@@ -109,6 +110,7 @@ TEST_CASE("complex_apply_mutation")
     CHECK(o.has<no_messages>());
     CHECK(o.get<no_messages>());
     CHECK(!o.implements(dummy_msg));
+    CHECK(o.num_implementers(dummy_msg) == 0);
 
     mutation.add<counter>();
     mutation.apply();
@@ -116,6 +118,7 @@ TEST_CASE("complex_apply_mutation")
     CHECK(o.has<counter>());
     CHECK(o.get<counter>());
     CHECK(o.implements(dummy_msg));
+    CHECK(o.num_implementers(dummy_msg) == 1);
     CHECK(o.get<counter>()->get_count() == 0);
     o.get<counter>()->count_uni();
     CHECK(o.get<counter>()->get_count() == 1);
@@ -150,6 +153,7 @@ TEST_CASE("complex_apply_mutation")
     CHECK_FALSE(o.get<counter>());
 
     CHECK(!o.implements(dummy_msg));
+    CHECK(o.num_implementers(dummy_msg) == 0);
 }
 
 TEST_CASE("type_template")
@@ -167,6 +171,7 @@ TEST_CASE("type_template")
     CHECK(o1.has<counter>());
     CHECK(o1.get<counter>());
     CHECK(o1.implements(dummy_msg));
+    CHECK(o1.num_implementers(dummy_msg) == 1);
 
     object o2;
     type.apply_to(o2);
@@ -175,6 +180,7 @@ TEST_CASE("type_template")
     CHECK(o2.has<counter>());
     CHECK(o2.get<counter>());
     CHECK(o2.implements(dummy_msg));
+    CHECK(o2.num_implementers(dummy_msg) == 1);
 
     object o3;
     mutate(o3)

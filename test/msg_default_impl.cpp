@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -56,6 +56,9 @@ TEST_CASE("basic_msgs")
 
     setn(o, 50);
 
+    CHECK(o.implements(basic_def_no_impl_msg));
+    CHECK(o.implements(basic_def_msg));
+
     CHECK(1110 == basic_def(o));
     CHECK(2111 == basic_def_no_impl(o));
     CHECK(83 == basic_1_def(o, 3));
@@ -93,11 +96,15 @@ TEST_CASE("multi")
     mutate(o)
         .add<mix_c>();
 
+    CHECK(o.implements(def_multi_msg));
     CHECK(400 == def_multi<combinators::sum>(o, 2));
 
     mutate(o)
         .add<mix_a>()
         .add<mix_b>();
+
+    // two since the default implementation should be overriden
+    CHECK(o.num_implementers(def_multi_msg) == 2);
 
     setn(o, 3);
 
