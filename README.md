@@ -5,7 +5,7 @@ DynaMix
 
 [![Travis CI](https://travis-ci.org/iboB/dynamix.svg?branch=master)](https://travis-ci.org/iboB/dynamix) [![AppVeyor](https://ci.appveyor.com/api/projects/status/02qjl0v3np4boo46?svg=true)](https://ci.appveyor.com/project/iboB/dynamix)
 
-DynaMix (*Dynamic Mixins*) is a new take on polymorphism. It lets the user compose and modify types at run time in C++. 
+DynaMix (*Dynamic Mixins*) is a new take on polymorphism. It lets the user compose and modify types at run time in C++.
 
 The library is a means to create a project's **architecture** rather than achieve its purpose. It focuses on **maximal performance** and **minimal memory overhead**.
 
@@ -57,7 +57,7 @@ Here are some of the key features of the library:
 * Compose types from mixins at run time
 * Physically separate interface and implementation
 * Fast polymorphic calls &ndash; comparable to `std::function`
-* No external dependencies other than the standard library 
+* No external dependencies other than the standard library
 * Non-intrusive &ndash; mixins don't need to have a common parent or any special code inside
 * Mutate "live" objects by changing their composition at run time
 * Have multicast messages, which are handled by many mixins within an object
@@ -102,7 +102,7 @@ This software is distributed under the MIT Software License.
 
 See accompanying file LICENSE.txt or copy [here](https://opensource.org/licenses/MIT).
 
-Copyright &copy; 2013-2016 [Borislav Stanimirov](http://github.com/iboB), [Zahary Karadjov](http://github.com/zah)
+Copyright &copy; 2013-2017 [Borislav Stanimirov](http://github.com/iboB), [Zahary Karadjov](http://github.com/zah)
 
 ## Boost.Mixin
 
@@ -110,5 +110,5 @@ DynaMix was initially developed as [Boost.Mixin](https://github.com/iboB/boost.m
 
 DynaMix, unlike Boost.Mixin, has no C++98 support. It's C++11 only.
 
-DynaMix is distributed under the MIT license, whereas Boost.Mixin is distributed under the Boost Software License. 
+DynaMix is distributed under the MIT license, whereas Boost.Mixin is distributed under the Boost Software License.
 

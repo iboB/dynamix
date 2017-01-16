@@ -1,5 +1,5 @@
 # DynaMix
-# Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+# Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 #
 # Distributed under the MIT Software License
 # See accompanying file LICENSE.txt or copy at
@@ -13,7 +13,7 @@ OUT_FILE = '../include/dynamix/gen/message_macros.hpp'
 
 HEADER = <<DATA
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
