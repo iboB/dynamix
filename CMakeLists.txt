@@ -39,9 +39,9 @@ option(DYNAMIX_BUILD_PERF "DynaMix: build performance tests (requires manual cod
 
 # config
 if(CMAKE_HOST_APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++0x -stdlib=libc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -stdlib=libc++")
 elseif(NOT MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++0x")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}) # so executables are next to the dll
