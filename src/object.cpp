@@ -164,7 +164,7 @@ bool object::construct_mixin(mixin_id id, const void* source)
     mixin_data_in_object& data = _mixin_data[_type_info->mixin_index(id)];
     DYNAMIX_ASSERT(!data.buffer());
 
-    domain& dom = domain::instance();
+    auto& dom = domain::instance();
 
     const mixin_type_info& mixin_info = dom.mixin_info(id);
 
@@ -337,7 +337,7 @@ void object::copy_from(const object& o)
     mixin_data_in_object* old_mixin_data = _mixin_data;
     mixin_data_in_object* new_mixin_data = o._type_info->alloc_mixin_data();
 
-    domain& dom = domain::instance();
+    auto& dom = domain::instance();
 
     enum
     {
@@ -403,7 +403,7 @@ void object::copy_from(const object& o)
 
 void object::copy_matching_from(const object& o)
 {
-    domain& dom = domain::instance();
+    auto& dom = domain::instance();
 
     for (const mixin_type_info* info : o._type_info->_compact_mixins)
     {

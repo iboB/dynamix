@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -57,10 +57,20 @@ template <typename Feature>
 struct feature_instance
 {
     // using a static function instead of a member to guarantee the constructor is called
-    static Feature& the_feature()
+    // however this leads to the compiler generating thread-safe initialization
+    // which we don't care about
+    static Feature& the_feature_safe()
     {
         static Feature f;
         return f;
+    }
+
+    // to work around the thread-safe slownes from the above function we can use this instead
+    // HOWEVER, it's not global-call safe, so be sure to only call it when you're sure you're
+    // not in global scope. Otherwise it may just return null
+    static const Feature& the_feature_fast()
+    {
+        return _feature;
     }
 
     // unfortunately we cannot do the mixin trick of global instantiation here
@@ -68,7 +78,14 @@ struct feature_instance
     // and their id's are needed
     // instead we'll register the features manually when registering the mixin
     // this will be at the cost of having features registered multiple times
+
+private:
+    // used for the fast getter
+    static const Feature& _feature;
 };
+
+template <typename Feature>
+const Feature& feature_instance<Feature>::_feature = feature_instance::the_feature_safe();
 
 } // namespace internal
 } // namespace dynamix

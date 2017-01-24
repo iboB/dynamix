@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -34,10 +34,11 @@ object_type_info::~object_type_info()
     delete[] _multicast_buffer;
 }
 
+static const object_type_info null_type_info;
+
 const object_type_info& object_type_info::null()
 {
-    static const object_type_info n;
-    return n;
+    return null_type_info;
 };
 
 mixin_data_in_object* object_type_info::alloc_mixin_data() const

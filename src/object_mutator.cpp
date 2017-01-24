@@ -50,7 +50,7 @@ void object_mutator::create()
 
     _mutation.normalize();
 
-    domain& dom = domain::instance();
+    auto& dom = domain::safe_instance();
     dom.apply_mutation_rules(_mutation);
 
     // in case the rules broke it somehow

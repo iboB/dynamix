@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -30,7 +30,7 @@ template <typename Mixin>
 mixin_type_info_instance<Mixin>::mixin_type_info_instance()
 {
     // register the mixin in the domain
-    domain::instance().
+    domain::safe_instance().
         // we use the function to get the type info, to guarantee that an instantiation of the template
         // from another module won't override if
         template register_mixin_type<Mixin>(_dynamix_get_mixin_type_info((Mixin*)nullptr));
@@ -40,7 +40,7 @@ template <typename Mixin>
 mixin_type_info_instance<Mixin>::~mixin_type_info_instance()
 {
     // unregister the mixin from the domain
-    domain::instance().unregister_mixin_type(info());
+    domain::safe_instance().unregister_mixin_type(info());
 }
 
 } // namespace internal

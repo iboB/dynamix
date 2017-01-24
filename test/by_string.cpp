@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -29,7 +29,7 @@ DYNAMIX_DEFINE_MIXIN(unused, none);
 TEST_CASE("mixin_ids")
 {
     using internal::domain;
-    domain& di = domain::instance();
+    const domain& di = domain::instance();
 
     mixin_id aid = di.get_mixin_id_by_name("mixin_a");
     mixin_id omid = di.get_mixin_id_by_name("other_mixin");

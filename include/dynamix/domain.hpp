@@ -41,7 +41,12 @@ struct message_t;
 class DYNAMIX_API domain : public noncopyable
 {
 public:
-    static domain& instance();
+    // contains static local variable which has thread-safe initialization
+    // so this function is a bit slower, but it's safe to call globally
+    static domain& safe_instance();
+
+    // no static variables, not safe to call globally
+    static const domain& instance();
 
     void add_new_mutation_rule(mutation_rule* rule);
     void apply_mutation_rules(object_type_mutation& mutation);
@@ -135,6 +140,9 @@ _dynamix_internal:
 
     // allocators
     global_allocator* _allocator;
+
+private:
+    static const domain& _instance; // used for the fast version of the instance getter
 };
 
 } // namespace internal

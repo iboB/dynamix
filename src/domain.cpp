@@ -20,10 +20,17 @@ namespace internal
 
 DYNAMIX_API default_allocator the_default_allocator;
 
-domain& domain::instance()
+domain& domain::safe_instance()
 {
     static domain the_domain;
     return the_domain;
+}
+
+const domain& domain::_instance = domain::safe_instance();
+
+const domain& domain::instance()
+{
+    return _instance;
 }
 
 domain::domain()
@@ -303,13 +310,13 @@ mixin_id domain::get_mixin_id_by_name(const char* mixin_name) const
 
 void add_new_mutation_rule(mutation_rule* rule)
 {
-    internal::domain::instance().add_new_mutation_rule(rule);
+    internal::domain::safe_instance().add_new_mutation_rule(rule);
 }
 
 // set allocator to all domains
 void set_global_allocator(global_allocator* allocator)
 {
-    internal::domain::instance().set_allocator(allocator);
+    internal::domain::safe_instance().set_allocator(allocator);
 }
 
 } // namespace dynamix

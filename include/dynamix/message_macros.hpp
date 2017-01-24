@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -158,16 +158,20 @@
  * Use it once per message in a compilation unit (.cpp file)
  */
 #define DYNAMIX_DEFINE_MESSAGE(message_name) \
-    /* create a feature getter for the message */ \
-    ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    /* create feature getters for the message */ \
+    ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+    } \
+    const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_fast(); \
     } \
     /* create a feature registrator */ \
     void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        ::dynamix::internal::domain::instance(). \
-            register_feature(::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature()); \
+        ::dynamix::internal::domain::safe_instance(). \
+            register_feature(::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe()); \
     } \
     /* provide a tag instance */ \
     _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) * _DYNAMIX_MESSAGE_TAG(message_name)

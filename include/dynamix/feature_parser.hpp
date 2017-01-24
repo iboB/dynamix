@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -64,7 +64,7 @@ public:
     template <typename Feature>
     feature_parser& operator & (const Feature*)
     {
-        Feature& f = static_cast<Feature&>(_dynamix_get_mixin_feature((Feature*)nullptr));
+        Feature& f = static_cast<Feature&>(_dynamix_get_mixin_feature_safe((Feature*)nullptr));
         DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
 
         mixin_type_info& mixin_info = _dynamix_get_mixin_type_info((Mixin*)nullptr);
@@ -77,7 +77,7 @@ public:
     template <typename Message>
     feature_parser& operator & (message_priority<Message> mp)
     {
-        Message& msg = static_cast<Message&>(_dynamix_get_mixin_feature((Message*)nullptr));
+        Message& msg = static_cast<Message&>(_dynamix_get_mixin_feature_safe((Message*)nullptr));
         DYNAMIX_ASSERT(msg.id != INVALID_FEATURE_ID);
 
         mixin_type_info& mixin_info = _dynamix_get_mixin_type_info((Mixin*)nullptr);

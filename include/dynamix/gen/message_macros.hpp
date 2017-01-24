@@ -41,7 +41,8 @@
     /* hence we rely on a getter like the mixin one */ \
     extern export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) * _DYNAMIX_MESSAGE_TAG(message_name); \
     /* step 3: declare the feature getter and manual registrator for the message */ \
-    extern export ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
     extern export void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
 
 #define _DYNAMIX_MESSAGE0_UNI(export, message_name, method_name, return_type, constness ) \
@@ -49,8 +50,8 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj ) \
     {\
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
         DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
@@ -74,8 +75,8 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj , Combinator& _d_combinator) \
     { \
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
@@ -110,8 +111,8 @@
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj ) \
     { \
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
@@ -194,16 +195,20 @@
             return reinterpret_cast<DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)*>(self)->impl(); \
         } \
     }; \
-    /* create a feature getter for the message */ \
-    ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    /* create feature getters for the message */ \
+    ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+    } \
+    const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_fast(); \
     } \
     /* create a feature registrator */ \
     void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
-        ::dynamix::internal::domain::instance().register_feature(msg); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+        ::dynamix::internal::domain::safe_instance().register_feature(msg); \
         \
         /* set message default implementation data */ \
         static ::dynamix::internal::message_for_mixin default_impl = { \
@@ -256,7 +261,8 @@
     /* hence we rely on a getter like the mixin one */ \
     extern export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) * _DYNAMIX_MESSAGE_TAG(message_name); \
     /* step 3: declare the feature getter and manual registrator for the message */ \
-    extern export ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
     extern export void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
 
 #define _DYNAMIX_MESSAGE1_UNI(export, message_name, method_name, return_type, constness , arg0_type, a0) \
@@ -264,8 +270,8 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0) \
     {\
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
         DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
@@ -289,8 +295,8 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, Combinator& _d_combinator) \
     { \
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
@@ -325,8 +331,8 @@
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0) \
     { \
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
@@ -409,16 +415,20 @@
             return reinterpret_cast<DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)*>(self)->impl(std::forward<arg0_type>(a0)); \
         } \
     }; \
-    /* create a feature getter for the message */ \
-    ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    /* create feature getters for the message */ \
+    ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+    } \
+    const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_fast(); \
     } \
     /* create a feature registrator */ \
     void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
-        ::dynamix::internal::domain::instance().register_feature(msg); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+        ::dynamix::internal::domain::safe_instance().register_feature(msg); \
         \
         /* set message default implementation data */ \
         static ::dynamix::internal::message_for_mixin default_impl = { \
@@ -471,7 +481,8 @@
     /* hence we rely on a getter like the mixin one */ \
     extern export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) * _DYNAMIX_MESSAGE_TAG(message_name); \
     /* step 3: declare the feature getter and manual registrator for the message */ \
-    extern export ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
     extern export void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
 
 #define _DYNAMIX_MESSAGE2_UNI(export, message_name, method_name, return_type, constness , arg0_type, a0, arg1_type, a1) \
@@ -479,8 +490,8 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1) \
     {\
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
         DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
@@ -504,8 +515,8 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, Combinator& _d_combinator) \
     { \
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
@@ -540,8 +551,8 @@
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1) \
     { \
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
@@ -624,16 +635,20 @@
             return reinterpret_cast<DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)*>(self)->impl(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
         } \
     }; \
-    /* create a feature getter for the message */ \
-    ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    /* create feature getters for the message */ \
+    ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+    } \
+    const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_fast(); \
     } \
     /* create a feature registrator */ \
     void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
-        ::dynamix::internal::domain::instance().register_feature(msg); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+        ::dynamix::internal::domain::safe_instance().register_feature(msg); \
         \
         /* set message default implementation data */ \
         static ::dynamix::internal::message_for_mixin default_impl = { \
@@ -686,7 +701,8 @@
     /* hence we rely on a getter like the mixin one */ \
     extern export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) * _DYNAMIX_MESSAGE_TAG(message_name); \
     /* step 3: declare the feature getter and manual registrator for the message */ \
-    extern export ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
     extern export void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
 
 #define _DYNAMIX_MESSAGE3_UNI(export, message_name, method_name, return_type, constness , arg0_type, a0, arg1_type, a1, arg2_type, a2) \
@@ -694,8 +710,8 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2) \
     {\
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
         DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
@@ -719,8 +735,8 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, Combinator& _d_combinator) \
     { \
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
@@ -755,8 +771,8 @@
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2) \
     { \
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
@@ -839,16 +855,20 @@
             return reinterpret_cast<DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)*>(self)->impl(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
         } \
     }; \
-    /* create a feature getter for the message */ \
-    ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    /* create feature getters for the message */ \
+    ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+    } \
+    const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_fast(); \
     } \
     /* create a feature registrator */ \
     void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
-        ::dynamix::internal::domain::instance().register_feature(msg); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+        ::dynamix::internal::domain::safe_instance().register_feature(msg); \
         \
         /* set message default implementation data */ \
         static ::dynamix::internal::message_for_mixin default_impl = { \
@@ -901,7 +921,8 @@
     /* hence we rely on a getter like the mixin one */ \
     extern export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) * _DYNAMIX_MESSAGE_TAG(message_name); \
     /* step 3: declare the feature getter and manual registrator for the message */ \
-    extern export ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
     extern export void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
 
 #define _DYNAMIX_MESSAGE4_UNI(export, message_name, method_name, return_type, constness , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3) \
@@ -909,8 +930,8 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
     {\
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
         DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
@@ -934,8 +955,8 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, Combinator& _d_combinator) \
     { \
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
@@ -970,8 +991,8 @@
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
     { \
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
@@ -1054,16 +1075,20 @@
             return reinterpret_cast<DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)*>(self)->impl(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
         } \
     }; \
-    /* create a feature getter for the message */ \
-    ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    /* create feature getters for the message */ \
+    ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+    } \
+    const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_fast(); \
     } \
     /* create a feature registrator */ \
     void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
-        ::dynamix::internal::domain::instance().register_feature(msg); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+        ::dynamix::internal::domain::safe_instance().register_feature(msg); \
         \
         /* set message default implementation data */ \
         static ::dynamix::internal::message_for_mixin default_impl = { \
@@ -1116,7 +1141,8 @@
     /* hence we rely on a getter like the mixin one */ \
     extern export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) * _DYNAMIX_MESSAGE_TAG(message_name); \
     /* step 3: declare the feature getter and manual registrator for the message */ \
-    extern export ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
     extern export void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
 
 #define _DYNAMIX_MESSAGE5_UNI(export, message_name, method_name, return_type, constness , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
@@ -1124,8 +1150,8 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
     {\
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
         DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
@@ -1149,8 +1175,8 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, Combinator& _d_combinator) \
     { \
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
@@ -1185,8 +1211,8 @@
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
     { \
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
@@ -1269,16 +1295,20 @@
             return reinterpret_cast<DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)*>(self)->impl(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
         } \
     }; \
-    /* create a feature getter for the message */ \
-    ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    /* create feature getters for the message */ \
+    ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+    } \
+    const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_fast(); \
     } \
     /* create a feature registrator */ \
     void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
-        ::dynamix::internal::domain::instance().register_feature(msg); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+        ::dynamix::internal::domain::safe_instance().register_feature(msg); \
         \
         /* set message default implementation data */ \
         static ::dynamix::internal::message_for_mixin default_impl = { \
@@ -1331,7 +1361,8 @@
     /* hence we rely on a getter like the mixin one */ \
     extern export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) * _DYNAMIX_MESSAGE_TAG(message_name); \
     /* step 3: declare the feature getter and manual registrator for the message */ \
-    extern export ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
     extern export void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
 
 #define _DYNAMIX_MESSAGE6_UNI(export, message_name, method_name, return_type, constness , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
@@ -1339,8 +1370,8 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
     {\
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
         DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
@@ -1364,8 +1395,8 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, Combinator& _d_combinator) \
     { \
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
@@ -1400,8 +1431,8 @@
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
     { \
-        ::dynamix::feature& _d_self = _dynamix_get_mixin_feature((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
-        DYNAMIX_ASSERT(static_cast< ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
@@ -1484,16 +1515,20 @@
             return reinterpret_cast<DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)*>(self)->impl(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
         } \
     }; \
-    /* create a feature getter for the message */ \
-    ::dynamix::feature& _dynamix_get_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    /* create feature getters for the message */ \
+    ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+    } \
+    const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        return ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_fast(); \
     } \
     /* create a feature registrator */ \
     void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature(); \
-        ::dynamix::internal::domain::instance().register_feature(msg); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)& msg = ::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe(); \
+        ::dynamix::internal::domain::safe_instance().register_feature(msg); \
         \
         /* set message default implementation data */ \
         static ::dynamix::internal::message_for_mixin default_impl = { \

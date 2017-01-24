@@ -127,7 +127,7 @@ public:
     template <typename Feature>
     bool implements(const Feature*) const
     {
-        const Feature& f = static_cast<Feature&>(_dynamix_get_mixin_feature((Feature*)nullptr));
+        const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast((Feature*)nullptr));
         DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
         // intentionally disregarding the actual feature,
         // because of potential multiple implementations
@@ -138,7 +138,7 @@ public:
     template <typename Feature>
     size_t num_implementers(const Feature*) const
     {
-        const Feature& f = static_cast<Feature&>(_dynamix_get_mixin_feature((Feature*)nullptr));
+        const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast((Feature*)nullptr));
         DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
         // intentionally disregarding the actual feature,
         // because of potential multiple implementations

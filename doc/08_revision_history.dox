@@ -1,5 +1,12 @@
 /*! \page revisions Revision History
 
+DynaMix 1.0.3
+=============
+
+- Optimized around local static variables in feature registration and the domain
+singleton. As a result mutation is about 5% faster and, more importantly,
+message calls are about 12% faster.
+
 DynaMix 1.0.2
 =============
 
