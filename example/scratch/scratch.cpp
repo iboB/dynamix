@@ -9,68 +9,70 @@
 #include <string>
 #include <sstream>
 #include <dynamix/dynamix.hpp>
+#include <dynamix/gen/no_arity_message_macros.hpp>
 
 using namespace std;
 using namespace dynamix;
 
-class trivial_copy
+using namespace dynamix;
+
+// some mixins and messages
+DYNAMIX_DECLARE_MIXIN(counter);
+DYNAMIX_DECLARE_MIXIN(no_messages);
+DYNAMIX_DECLARE_MIXIN(type_checker);
+//DYNAMIX_DECLARE_MIXIN(overrider);
+//DYNAMIX_DECLARE_MIXIN(foo);
+//DYNAMIX_DECLARE_MIXIN(bar);
+
+DYNAMIX_MESSAGE(void, dummy);
+DYNAMIX_CONST_MESSAGE(const void*, get_self);
+
+class no_messages
 {
-public:
-    int i = 0;
 };
 
-DYNAMIX_DECLARE_MIXIN(trivial_copy);
-DYNAMIX_DEFINE_MIXIN(trivial_copy, none);
-
-class special_copy
+class counter
 {
 public:
-    special_copy() = default;
-    special_copy(const special_copy& other)
-        : i(other.i + 1)
-        , cc(1)
+    counter()
+        : _count(0)
     {}
-    special_copy& operator=(const special_copy& other)
-    {
-        i = other.i + 2;
-        ++a;
-        return *this;
-    }
-    int i = 0;
-    int cc = 0;
-    int a = 0;
+
+    void dummy() {}
+
+    void count_uni() { ++_count; }
+    void count_multi();
+
+    int get_count() const { return _count; }
+private:
+    int _count;
 };
 
-DYNAMIX_DECLARE_MIXIN(special_copy);
-DYNAMIX_DEFINE_MIXIN(special_copy, none);
-
-class no_copy
+class type_checker
 {
 public:
-    no_copy() = default;
-    no_copy(const no_copy&) = delete;
-    no_copy& operator=(const no_copy& other) = delete;
-    int i = 0;
+    const void* get_self() const
+    {
+        return this;
+    }
 };
-
-DYNAMIX_DECLARE_MIXIN(no_copy);
-DYNAMIX_DEFINE_MIXIN(no_copy, none);
 
 int main()
 {
-    object osrc;
-    mutate(osrc)
-        .add<trivial_copy>()
-        .add<special_copy>();
+    object o;
+    mutate(o).add<type_checker>();
 
-    osrc.get<special_copy>()->i = 5;
+    cout << (get_self(o) == o.get<type_checker>()) << endl;
 
-    object o1 = osrc.copy();
-
-    cout << o1.get<special_copy>()->i << endl;
-
-    o1.copy_from(osrc);
+    // works as ptr too
+    cout << (get_self(&o) == o.get<type_checker>()) << endl;
 
     return 0;
 }
 
+DYNAMIX_DEFINE_MIXIN(no_messages, none);
+DYNAMIX_DEFINE_MIXIN(counter, dummy_msg);
+DYNAMIX_DEFINE_MIXIN(type_checker, get_self_msg);
+
+DYNAMIX_DEFINE_MESSAGE(dummy);
+DYNAMIX_DEFINE_MESSAGE(get_self);

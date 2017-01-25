@@ -40,6 +40,16 @@
 /// \internal
 #define DYNAMIX_DEFAULT_IMPL_STRUCT(message_name) _DYNAMIX_PP_CAT(message_name, _default_impl_t)
 
+// no-arity macros
+
+// macro which gives out a sensible error if a no-arity macro is called with a bad number of arguments
+/// \internal
+#define _DYNAMIX_MESSAGE_ARG_ERROR static_assert(false, "DynaMix macro called with a bad number of arguments")
+
+// a workaround to a visaul c issue which doesn't expand __VA_ARGS__ but inead gives them as a single argument
+/// \internal
+#define _DYNAMIX_VA_ARGS_PROXY(MACRO, args) MACRO args
+
 #if defined(DYNAMIX_DOXYGEN)
 // use these macros for the docs only
 

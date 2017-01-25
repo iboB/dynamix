@@ -1,5 +1,5 @@
 # DynaMix
-# Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+# Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 #
 # Distributed under the MIT Software License
 # See accompanying file LICENSE.txt or copy at
@@ -91,6 +91,7 @@ src_group(public dynamix_sources
 
 src_group("public~gen" dynamix_sources
     ${inc_path}/gen/message_macros.hpp
+    ${inc_path}/gen/no_arity_message_macros.hpp
 )
 
 src_group("private" dynamix_sources
