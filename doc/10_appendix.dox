@@ -130,15 +130,9 @@ for game development
 Appendix B. Visual Studio watch visualizers {#app_vs_watch}
 ===========================================
 
-If you're using Microsoft Visual Studio, you can install special watch
-visualizers which will make adding `dynamix::object` in a watch window a
-better experience.
-
-There are two ways to do this, which will work on both the full and express
-versions of Visual Studio.
-
-Modern: .natvis files. VS 2012 and later {#natvis}
-----------------------------------------
+If you're using Microsoft Visual Studio 2015, you can install a special watch
+visualizer which will make adding `dynamix::object` in a watch window a better
+experience.
 
 The result when adding a watch on an object should resemble this:
 
@@ -155,34 +149,13 @@ exist, create it manually.
 `%VSINSTALLDIR%\Common7\Packages\Debugger\Visualizers`. You will need
 administrator access to do this.
 
-Classic: autoexp.dat. VS 2003 and later {#autoexp}
----------------------------------------
-
-The result when adding a watch on an object should resemble this:
-
-![autoexp.dat](img/vs_autoexp.png "autoexp.dat visualization")
-
-To install this visualizer:
-
-- Locate `autoexp.txt` in your DynaMix installation. It should be in the
-`tools` subdirectory.
-- Open it in a text editor
-- Open `%VSINSTALLDIR%\Common7\Packages\Debugger\autoexp.dat` in a text editor
-- Typically it will end with a `[hresult]` section.
-- Paste the entire content of `autoexp.txt` /just before/ the line `[hresult]`
-
-To use this visualizer with Visual Studio versions 2012 or newer, you should
-also go to in your menus to `Tools > Options > Debugging > Edit and Continue`
-and there check `Enable native Edit and Continue`. Warning: This will also
-disable any natvis visualizers you might have installed.
-
 Watching a mixin {#watch_mixin}
 ----------------
 
-No matter which (if any) of these visualizers you use, to watch concrete mixin
+To watch concrete mixin
 from an object, you should add a new watch where you explicitly cast the address
-to the correct mixin type. The visualizers only help you quickly find the
-address and the target type. They don't (and unfortunately can't) perform the
+to the correct mixin type. The visualizer only helps you quickly find the
+address and the target type. It doesn't (and unfortunately can't) perform the
 cast.
 
 If you perform the cast correctly, the result will resemble this:
