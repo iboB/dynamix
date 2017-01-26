@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -13,6 +13,7 @@
  */
 
 #include "global.hpp"
+#include "object_type_info.hpp"
 
 namespace dynamix
 {
@@ -96,7 +97,7 @@ public:
     ///
     /// Use this to determine how many bytes you'll allocate for single
     /// mixin data in `alloc_mixin_data`
-    static const size_t mixin_data_size;
+    static constexpr size_t mixin_data_size = sizeof(internal::mixin_data_in_object);
 
 #if defined(DYNAMIX_DEBUG)
     // checks to see if an allocator is changed after it has already started allocating

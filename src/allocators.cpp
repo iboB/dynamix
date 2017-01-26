@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -8,7 +8,6 @@
 #include "internal.hpp"
 
 #include <dynamix/allocators.hpp>
-#include <dynamix/object_type_info.hpp>
 
 namespace dynamix
 {
@@ -22,8 +21,6 @@ static size_t ceil_scale(size_t a, size_t b)
 
     return result;
 }
-
-const size_t global_allocator::mixin_data_size = sizeof(internal::mixin_data_in_object);
 
 size_t global_allocator::calculate_mem_size_for_mixin(size_t mixin_size, size_t mixin_alignment)
 {
