@@ -3,16 +3,16 @@
 Here is a list of planned features and events for the library: (The authors
 write it in their own free time, so concrete dates are hard to estimate)
 
-- Soon
+- Possibly soon
+    - Case-study: A demo project, that better illustrates the libraries
+    functionalities in a "real life" scenario. Complete with a document which
+    gives problems for motivation and their DynaMix solutions.
+- Not soon, but with concrete idea of how to be done:
     - Call mixin constructors when mutating object or constructing them via
     object type templates. Sample usage:
     `mutate(obj).add<mixin>("foo", param2).add<other_mixin>(42)`
     - Message bids &ndash; allow mixins to "bid" for different messages (analogous to
     `priority` for unicasts, but hides implementations on multicast messages)
-- Not soon, but with concrete idea of how to be done:
-    - Case-study: A demo project, that better illustrates the libraries
-    functionalities in a "real life" scenario. Complete with a document which
-    gives problems for motivation and their DynaMix solutions.
     - Optimize mutation process: less allocations. Design special
     `mixin_collection` for the process, that can be preallocated (or that uses
     a buffer that's allocated only once) and has `reserve`. Allow reuse of
@@ -23,10 +23,10 @@ write it in their own free time, so concrete dates are hard to estimate)
     module - leave more room for other messages/mixins
     - Add a new mixin feature `fact`. Facts are static const variables in a
     mixin. No multicasts. No virtual tables.
-    - Reflection. Create objects with mixins by string. Call messages by string.
+    - Reflection. Call messages by string.
     - "Static" mixins. As long as they're not mutated in or out, it provides a
     faster message execution.
-    - Make use of the fact that a BIG execution time improvement can be made if
+    - Make use of the fact that a BIG performance improvement can be made if
     a user has no mixins or messages defined in a dynamic library (and has no
     plans to add such)
     - Reduce library memory footprint
@@ -37,9 +37,9 @@ write it in their own free time, so concrete dates are hard to estimate)
     can be garbage collected, saving up to a kilobyte of memory.
     - Create a preprocessing tool (like Qt's moc) that can be used instead of
     the macros for mixin and message definition.
+    - Allow allocators to move mixins.
 - When humankind becomes a Kardashev type two civilization:
     - A way to mutate static mixins in and out. Slight mutation execution penalty.
-    - Some magic to make it work even faster.
 	- Mixin/Message domains &ndash; sets of mixins and messages that cannot be mixed.
 	Will throw a runtime error when trying to combine certain mixins or messages.
 
