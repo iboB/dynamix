@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -185,13 +185,21 @@ public:
     {
 #if !defined(NDEBUG)
         // in debug mode check if the mixin is within any of our pages
-        for(size_t i=0; i<_pages.size(); ++i)
+        bool found = false;
+        for (size_t i = 0; i < _pages.size(); ++i)
         {
             const char* page_begin = _pages[i];
             const char* page_end = page_begin + page_size;
 
-            DYNAMIX_ASSERT(buf >= page_begin && buf < page_end);
+            if (buf >= page_begin && buf < page_end)
+            {
+                found = true;
+                break;
+            }
         }
+
+        // deallocating memory, which hasn't been allocated from that allocator
+        DYNAMIX_ASSERT(found);
 #else
         buf; // to skip warning for unused parameter
 #endif
@@ -209,6 +217,7 @@ public:
         {
             delete[] _pages[i];
         }
+        _pages.resize(1);
 
         _page_byte_index = 0;
     }
