@@ -3,9 +3,13 @@
 DynaMix 1.0.3
 =============
 
+- Added a optional header with message macros with no arity. Its use is not
+recommended because it breaks all known code-completion tools.
 - Optimized around local static variables in feature registration and the domain
 singleton. As a result mutation is about 5% faster and, more importantly,
 message calls are about 12% faster.
+- Fixed some bugs in the allocator tutorial.
+- `global_allocator::mixin_data_size` is now `constexpr`
 
 DynaMix 1.0.2
 =============
