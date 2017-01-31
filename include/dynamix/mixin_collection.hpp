@@ -25,7 +25,7 @@ public:
     template <typename Mixin>
     bool has() const
     {
-        const internal::mixin_type_info& info = _dynamix_get_mixin_type_info((Mixin*)nullptr);
+        const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
         return has(info.id);
     }
     bool has(mixin_id id) const { return _mixins[id]; }
@@ -34,7 +34,7 @@ public:
     template <typename Mixin>
     void add()
     {
-        const internal::mixin_type_info& info = _dynamix_get_mixin_type_info((Mixin*)nullptr);
+        const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
         check_valid_mixin(info);
         add(info.id);
     }
@@ -44,7 +44,7 @@ public:
     template <typename Mixin>
     void remove()
     {
-        const internal::mixin_type_info& info = _dynamix_get_mixin_type_info((Mixin*)nullptr);
+        const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
         remove(info.id);
     }
     void remove(mixin_id id);

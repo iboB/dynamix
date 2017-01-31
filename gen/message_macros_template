@@ -40,7 +40,7 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj %{coma_args_signature}) \
     {\
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
         const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
@@ -65,7 +65,7 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj %{coma_args_signature}, Combinator& _d_combinator) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
@@ -101,7 +101,7 @@
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj %{coma_args_signature}) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast((_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*)nullptr); \
+        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \

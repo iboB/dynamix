@@ -33,14 +33,14 @@ public:
     template <typename Feature>
     feature_registrator& operator & (const Feature*)
     {
-        _dynamix_register_mixin_feature((Feature*)nullptr);
+        _dynamix_register_mixin_feature(static_cast<Feature*>(nullptr));
         return *this;
     }
 
     template <typename Message>
     feature_registrator& operator & (message_priority<Message>)
     {
-        _dynamix_register_mixin_feature((Message*)nullptr);
+        _dynamix_register_mixin_feature(static_cast<Message*>(nullptr));
         return *this;
     }
 
@@ -64,10 +64,10 @@ public:
     template <typename Feature>
     feature_parser& operator & (const Feature*)
     {
-        Feature& f = static_cast<Feature&>(_dynamix_get_mixin_feature_safe((Feature*)nullptr));
+        Feature& f = static_cast<Feature&>(_dynamix_get_mixin_feature_safe(static_cast<Feature*>(nullptr)));
         DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
 
-        mixin_type_info& mixin_info = _dynamix_get_mixin_type_info((Mixin*)nullptr);
+        mixin_type_info& mixin_info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
 
         parse_feature(mixin_info, f, typename Feature::feature_tag());
 
@@ -77,10 +77,10 @@ public:
     template <typename Message>
     feature_parser& operator & (message_priority<Message> mp)
     {
-        Message& msg = static_cast<Message&>(_dynamix_get_mixin_feature_safe((Message*)nullptr));
+        Message& msg = static_cast<Message&>(_dynamix_get_mixin_feature_safe(static_cast<Message*>(nullptr)));
         DYNAMIX_ASSERT(msg.id != INVALID_FEATURE_ID);
 
-        mixin_type_info& mixin_info = _dynamix_get_mixin_type_info((Mixin*)nullptr);
+        mixin_type_info& mixin_info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
         parse_message(mixin_info, msg, mp.priority);
 
         return *this;
@@ -88,7 +88,7 @@ public:
 
     feature_parser& operator & (mixin_allocator& allocator)
     {
-        mixin_type_info& mixin_info = _dynamix_get_mixin_type_info((Mixin*)nullptr);
+        mixin_type_info& mixin_info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
         mixin_info.allocator = &allocator;
 
         return *this;

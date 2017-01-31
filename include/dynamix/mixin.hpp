@@ -33,7 +33,7 @@ mixin_type_info_instance<Mixin>::mixin_type_info_instance()
     domain::safe_instance().
         // we use the function to get the type info, to guarantee that an instantiation of the template
         // from another module won't override if
-        template register_mixin_type<Mixin>(_dynamix_get_mixin_type_info((Mixin*)nullptr));
+        template register_mixin_type<Mixin>(_dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr)));
 }
 
 template <typename Mixin>

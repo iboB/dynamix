@@ -88,7 +88,7 @@ struct message_default_impl_registrator
 {
     message_default_impl_registrator()
     {
-        _dynamix_register_mixin_feature((Message*)nullptr);
+        _dynamix_register_mixin_feature(static_cast<Message*>(nullptr));
     }
 
     // "payload" instance of the type

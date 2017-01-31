@@ -73,10 +73,10 @@ public:
 
         // see comments in feature_instance on why this manual registration is needed
         feature_registrator reg;
-        _dynamix_parse_mixin_features((Mixin*)nullptr, reg);
+        _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), reg);
 
         feature_parser<Mixin> parser;
-        _dynamix_parse_mixin_features((Mixin*)nullptr, parser);
+        _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), parser);
     }
 
     void unregister_mixin_type(const mixin_type_info& info);

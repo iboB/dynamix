@@ -103,7 +103,7 @@ class mandatory_mixin : public internal::mandatory_mixin_impl
 {
 public:
     mandatory_mixin()
-        : mandatory_mixin_impl(_dynamix_get_mixin_type_info((Mixin*)nullptr).id)
+        : mandatory_mixin_impl(_dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr)).id)
     {}
 };
 
@@ -121,7 +121,7 @@ class deprecated_mixin : public internal::deprecated_mixin_impl
 {
 public:
     deprecated_mixin()
-        : deprecated_mixin_impl(_dynamix_get_mixin_type_info((Mixin*)nullptr).id)
+        : deprecated_mixin_impl(_dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr)).id)
     {}
 };
 
@@ -140,8 +140,8 @@ class substitute_mixin : public internal::substitute_mixin_impl
 public:
     substitute_mixin()
         : substitute_mixin_impl(
-            _dynamix_get_mixin_type_info((SourceMixin*)nullptr).id,
-            _dynamix_get_mixin_type_info((TargetMixin*)nullptr).id)
+            _dynamix_get_mixin_type_info(static_cast<SourceMixin*>(nullptr)).id,
+            _dynamix_get_mixin_type_info(static_cast<TargetMixin*>(nullptr)).id)
     {}
 };
 
