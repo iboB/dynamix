@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -56,6 +56,67 @@ void mutually_exclusive_mixins::apply_to(object_type_mutation& mutation)
         if(mutation.source_has(mixin_info->id))
         {
             // remove all others from the object
+            mutation.start_removing(mixin_info->id);
+        }
+    }
+}
+
+void bundled_mixins::apply_to(object_type_mutation& mutation)
+{
+    // find if the mutation is adding any of the bundled mixins
+
+    mixin_id adding = INVALID_MIXIN_ID;
+    mixin_id removing = INVALID_MIXIN_ID;
+
+    for (const auto* mixin_info : _compact_mixins)
+    {
+        if (mutation.is_adding(mixin_info->id))
+        {
+            adding = mixin_info->id;
+            break;
+        }
+        else if (mutation.is_removing(mixin_info->id))
+        {
+            removing = mixin_info->id;
+            break;
+        }
+    }
+
+    DYNAMIX_ASSERT_MSG(adding == INVALID_MIXIN_ID || removing == INVALID_MIXIN_ID, "mutation breaking a bundle mixin rule");
+
+    if (adding != INVALID_MIXIN_ID)
+    {
+        for (const auto* mixin_info : _compact_mixins)
+        {
+            // add all others to the object
+            mutation.start_adding(mixin_info->id);
+        }
+    }
+    else if (removing != INVALID_MIXIN_ID)
+    {
+        for (const auto* mixin_info : _compact_mixins)
+        {
+            // remove all others from the object
+            mutation.start_removing(mixin_info->id);
+        }
+    }
+}
+
+void dependent_mixins::apply_to(object_type_mutation& mutation)
+{
+    if (mutation.is_adding(_master_id))
+    {
+        for (const auto* mixin_info : _compact_mixins)
+        {
+            // add all dependent mixins to the object
+            mutation.start_adding(mixin_info->id);
+        }
+    }
+    else if (mutation.is_removing(_master_id))
+    {
+        for (const auto* mixin_info : _compact_mixins)
+        {
+            // remove all dependent mixins from the object
             mutation.start_removing(mixin_info->id);
         }
     }
