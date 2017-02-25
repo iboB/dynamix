@@ -1,5 +1,11 @@
 /*! \page revisions Revision History
 
+DynaMix 1.0.4
+=============
+
+- Added check for object copy safety.
+- Added two new common mutation rules `bundled_mixins` and `dependent_mixins`.
+
 DynaMix 1.0.3
 =============
 
