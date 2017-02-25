@@ -105,6 +105,15 @@ The library provides some common combinators, like `dynamix::combinators::boolea
 and `dynamix::combinators::sum`. It also allows you to easily create your own, for whatever purpose
 you need.
 
+Default message implementation {#defaultimpl}
+==============================
+
+Sometimes you want some messages to be valid for all objects. You could, of
+course, add them to a mixin and then add this mixin to every object, but the
+library provides an easier way to do this. You can define a message with a
+default implementation. You write the code at the message definition and it will
+be executed if no mixin within an object implements the message.
+
 Mutations {#mutation}
 =========
 
