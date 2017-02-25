@@ -416,4 +416,15 @@ void object::copy_matching_from(const object& o)
     }
 }
 
+bool object::copyable() const
+{
+    for (const mixin_type_info* info : _type_info->_compact_mixins)
+    {
+        if (!info->copy_constructor) return false;
+        if (!info->copy_assignment) return false;
+    }
+
+    return true;
+}
+
 } // dynamix

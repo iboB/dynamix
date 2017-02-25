@@ -60,7 +60,7 @@ public:
     /// Explicit copy via move assignment
     object copy() const;
 
-    /// Explicit assignment from existing object
+    /// Explicit assignment from existing object.
     /// Will also change the type of the target to the source type.
     /// Will call assignment operators for mixins that exist in both.
     /// Will copy-construct new mixins for this.
@@ -68,11 +68,17 @@ public:
     /// It will not, however, match asssignment operators for different mixin types which have such defined between them,
     void copy_from(const object& o);
 
-    /// Assignment of mixins that exist in both objects
+    /// Assignment of mixins that exist in both objects.
     /// Will not change the type of the target.
     /// Will call assignment operators for mixins that exist in both objects.
     /// It will not, however, match asssignment operators for different mixin types which have such defined between them,
     void copy_matching_from(const object& o);
+
+    /// Checks whether all of the object's mixins have copy-constructors and assignment operators.
+    /// Returns false if either is missing from at least one of its mixins
+    /// (note that there might be cases where copy_from or copy_matching_from won't throw
+    /// even though this function returns false).
+    bool copyable() const;
 
     /////////////////////////////////////////////////////////////////
     // mixin info

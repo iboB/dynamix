@@ -68,6 +68,8 @@ TEST_CASE("obj_copy")
     osrc1.get<trivial_copy>()->i = 2;
     osrc1.get<special_copy>()->i = 5;
 
+    CHECK(osrc1.copyable());
+
     object c1 = osrc1.copy();
     CHECK(c1._type_info == osrc1._type_info);
     CHECK(c1.get<trivial_copy>()->i == 2);
@@ -80,6 +82,8 @@ TEST_CASE("obj_copy")
         .add<special_copy>();
 
     osrc2.get<special_copy>()->i = 3;
+
+    CHECK(osrc2.copyable());
 
     c1.copy_matching_from(osrc2);
     CHECK(c1._type_info == osrc1._type_info);
@@ -127,6 +131,7 @@ TEST_CASE("obj_copy_fail")
         .add<trivial_copy>()
         .add<no_copy>();
 
+    CHECK(!o1.copyable());
     CHECK_THROWS_AS(object foo = o1.copy(), bad_copy_construction);
 
     object o2;
@@ -135,12 +140,15 @@ TEST_CASE("obj_copy_fail")
         .add<trivial_copy>()
         .add<no_copy>();
 
+    CHECK(!o2.copyable());
     CHECK_THROWS_AS(o1.copy_from(o2), bad_copy_assignment);
 
     object o3;
     mutate(o3)
         .add<trivial_copy>()
         .add<no_copy>();
+
+    CHECK(!o3.copyable());
     CHECK_THROWS_AS(o1.copy_from(o3), bad_copy_assignment);
 
     object o4;
