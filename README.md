@@ -91,11 +91,6 @@ There is an accompanying `CMakeLists.txt` file in the repo.  Use [CMake](https:/
 
 Contributions in the form of issues and pull requests are welcome.
 
-You can also help by donating money with Pledgie:
-
-[![Donate to support](https://pledgie.com/campaigns/32064.png)](https://pledgie.com/campaigns/32064)
-
-
 ## License
 
 This software is distributed under the MIT Software License.
