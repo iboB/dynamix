@@ -1,5 +1,14 @@
 /*! \page revisions Revision History
 
+DynaMix 1.1.0
+=============
+
+- Fixed various bugs with unused (which no mixin features) messages:
+    - `obj.implements(unused_msg)` caused a crash
+    - `unused(obj ...)` cause a crash (instead of exception)
+    - Crash when only a plugin uses the message
+
+
 DynaMix 1.0.4
 =============
 

@@ -222,9 +222,9 @@
     /* provide a tag instance */ \
     _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)* _DYNAMIX_MESSAGE_TAG(message_name); \
     /* instantiate metafunction initializator in case no class registers the message */ \
-    inline void _dynamix_register_message_default_impl(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    inline void _dynamix_register_message(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        ::dynamix::internal::message_default_impl_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
+        ::dynamix::internal::message_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
     } \
     /* begin default impl function so the used can just enter it after the macro */ \
     return_type DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::impl()
@@ -442,9 +442,9 @@
     /* provide a tag instance */ \
     _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)* _DYNAMIX_MESSAGE_TAG(message_name); \
     /* instantiate metafunction initializator in case no class registers the message */ \
-    inline void _dynamix_register_message_default_impl(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    inline void _dynamix_register_message(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        ::dynamix::internal::message_default_impl_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
+        ::dynamix::internal::message_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
     } \
     /* begin default impl function so the used can just enter it after the macro */ \
     return_type DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::impl(arg0_type a0)
@@ -662,9 +662,9 @@
     /* provide a tag instance */ \
     _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)* _DYNAMIX_MESSAGE_TAG(message_name); \
     /* instantiate metafunction initializator in case no class registers the message */ \
-    inline void _dynamix_register_message_default_impl(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    inline void _dynamix_register_message(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        ::dynamix::internal::message_default_impl_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
+        ::dynamix::internal::message_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
     } \
     /* begin default impl function so the used can just enter it after the macro */ \
     return_type DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::impl(arg0_type a0, arg1_type a1)
@@ -882,9 +882,9 @@
     /* provide a tag instance */ \
     _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)* _DYNAMIX_MESSAGE_TAG(message_name); \
     /* instantiate metafunction initializator in case no class registers the message */ \
-    inline void _dynamix_register_message_default_impl(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    inline void _dynamix_register_message(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        ::dynamix::internal::message_default_impl_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
+        ::dynamix::internal::message_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
     } \
     /* begin default impl function so the used can just enter it after the macro */ \
     return_type DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::impl(arg0_type a0, arg1_type a1, arg2_type a2)
@@ -1102,9 +1102,9 @@
     /* provide a tag instance */ \
     _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)* _DYNAMIX_MESSAGE_TAG(message_name); \
     /* instantiate metafunction initializator in case no class registers the message */ \
-    inline void _dynamix_register_message_default_impl(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    inline void _dynamix_register_message(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        ::dynamix::internal::message_default_impl_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
+        ::dynamix::internal::message_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
     } \
     /* begin default impl function so the used can just enter it after the macro */ \
     return_type DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::impl(arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3)
@@ -1322,9 +1322,9 @@
     /* provide a tag instance */ \
     _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)* _DYNAMIX_MESSAGE_TAG(message_name); \
     /* instantiate metafunction initializator in case no class registers the message */ \
-    inline void _dynamix_register_message_default_impl(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    inline void _dynamix_register_message(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        ::dynamix::internal::message_default_impl_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
+        ::dynamix::internal::message_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
     } \
     /* begin default impl function so the used can just enter it after the macro */ \
     return_type DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::impl(arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4)
@@ -1542,9 +1542,9 @@
     /* provide a tag instance */ \
     _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)* _DYNAMIX_MESSAGE_TAG(message_name); \
     /* instantiate metafunction initializator in case no class registers the message */ \
-    inline void _dynamix_register_message_default_impl(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    inline void _dynamix_register_message(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        ::dynamix::internal::message_default_impl_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
+        ::dynamix::internal::message_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
     } \
     /* begin default impl function so the used can just enter it after the macro */ \
     return_type DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::impl(arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5)

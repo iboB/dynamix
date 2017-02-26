@@ -81,18 +81,18 @@ struct DYNAMIX_API message_for_mixin
 };
 
 
-// metafunction used to register default implementations of messages
+// metafunction used to register messages
 // in case no mixin implements them (if it does, it will also register the message)
 template <typename Message>
-struct message_default_impl_registrator
+struct message_registrator
 {
-    message_default_impl_registrator()
+    message_registrator()
     {
         _dynamix_register_mixin_feature(static_cast<Message*>(nullptr));
     }
 
     // "payload" instance of the type
-    static message_default_impl_registrator registrator;
+    static message_registrator registrator;
 
     // as with mixin_type_info_instance, this is
     // to prevent warnings and optimizations that will say that we're not using
@@ -100,7 +100,7 @@ struct message_default_impl_registrator
     int unused;
 };
 template <typename Message>
-message_default_impl_registrator<Message> message_default_impl_registrator<Message>::registrator;
+message_registrator<Message> message_registrator<Message>::registrator;
 
 // check if a class has a method set_num_results
 template <typename Combinator>

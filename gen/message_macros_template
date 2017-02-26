@@ -212,9 +212,9 @@
     /* provide a tag instance */ \
     _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)* _DYNAMIX_MESSAGE_TAG(message_name); \
     /* instantiate metafunction initializator in case no class registers the message */ \
-    inline void _dynamix_register_message_default_impl(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    inline void _dynamix_register_message(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
     { \
-        ::dynamix::internal::message_default_impl_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
+        ::dynamix::internal::message_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
     } \
     /* begin default impl function so the used can just enter it after the macro */ \
     return_type DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::impl(%{args_signature})

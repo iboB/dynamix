@@ -25,6 +25,7 @@ DYNAMIX_MULTICAST_MESSAGE_0(int, m1);
 DYNAMIX_MULTICAST_MESSAGE_0(int, m2);
 DYNAMIX_MESSAGE_0(void, u1);
 DYNAMIX_MESSAGE_0(void, u2);
+DYNAMIX_MESSAGE_0(void, unused);
 
 TEST_CASE("ex_bad_message_call")
 {
@@ -45,6 +46,7 @@ TEST_CASE("ex_bad_message_call")
     CHECK_THROWS_AS(m2(o), bad_message_call);
     CHECK_THROWS_AS(m2<combinators::sum>(o), bad_message_call);
     CHECK_THROWS_AS(m2(o, sum), bad_message_call);
+    CHECK_THROWS_AS(unused(o), bad_message_call);
 }
 
 TEST_CASE("ex_bad_mutation_source")
@@ -198,3 +200,4 @@ DYNAMIX_DEFINE_MESSAGE(m1);
 DYNAMIX_DEFINE_MESSAGE(m2);
 DYNAMIX_DEFINE_MESSAGE(u1);
 DYNAMIX_DEFINE_MESSAGE(u2);
+DYNAMIX_DEFINE_MESSAGE(unused);

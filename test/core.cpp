@@ -24,6 +24,7 @@ DYNAMIX_DECLARE_MIXIN(type_checker);
 
 DYNAMIX_MESSAGE_0(void, dummy);
 DYNAMIX_CONST_MESSAGE_0(const void*, get_self);
+DYNAMIX_MESSAGE_0(void, unused);
 
 class no_messages
 {
@@ -101,6 +102,7 @@ TEST_CASE("complex_apply_mutation")
     CHECK(!o.has<counter>());
     CHECK_FALSE(o.get<counter>());
     CHECK(!o.implements(dummy_msg));
+    CHECK(!o.implements(unused_msg));
     CHECK(o.num_implementers(dummy_msg) == 0);
 
     single_object_mutator mutation(o);
@@ -198,3 +200,4 @@ DYNAMIX_DEFINE_MIXIN(type_checker, get_self_msg);
 
 DYNAMIX_DEFINE_MESSAGE(dummy);
 DYNAMIX_DEFINE_MESSAGE(get_self);
+DYNAMIX_DEFINE_MESSAGE(unused);

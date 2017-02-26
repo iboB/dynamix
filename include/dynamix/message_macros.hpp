@@ -158,15 +158,19 @@
 * implementation will be unreachable. Multicasts won't feature it.
 */
 #define DYNAMIX_DEFINE_MESSAGE_N_WITH_DEFAULT_IMPL(return_type, message_name, args)
-#else
-// include the generated macros
-#include "gen/message_macros.hpp"
-#endif
 
 /**
- * The macro for defining a message.
- * Use it once per message in a compilation unit (.cpp file)
- */
+* The macro for defining a message.
+* Use it once per message in a compilation unit (.cpp file)
+*/
+#define DYNAMIX_DEFINE_MESSAGE(message_name)
+
+#else
+
+// include the generated macros
+#include "gen/message_macros.hpp"
+
+// define message macro
 #define DYNAMIX_DEFINE_MESSAGE(message_name) \
     /* create feature getters for the message */ \
     ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
@@ -183,5 +187,12 @@
         ::dynamix::internal::domain::safe_instance(). \
             register_feature(::dynamix::internal::feature_instance<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::the_feature_safe()); \
     } \
+    /* instantiate metafunction initializator in case no class registers the message */ \
+    inline void _dynamix_register_message(_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*) \
+    { \
+        ::dynamix::internal::message_registrator<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)>::registrator.unused = true; \
+    } \
     /* provide a tag instance */ \
     _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) * _DYNAMIX_MESSAGE_TAG(message_name)
+
+#endif
