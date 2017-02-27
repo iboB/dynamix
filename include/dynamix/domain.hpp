@@ -57,8 +57,6 @@ public:
     void register_mixin_type(mixin_type_info& info)
     {
         DYNAMIX_ASSERT(info.id == INVALID_MIXIN_ID);
-        DYNAMIX_ASSERT_MSG(_num_registered_mixins < DYNAMIX_MAX_MIXINS,
-                         "you have to increase the maximum number of mixins");
 
         info.name = DYNAMIX_MIXIN_TYPE_NAME(Mixin);
         info.size = sizeof(Mixin);
@@ -93,6 +91,12 @@ public:
         internal_register_feature(feature);
     }
 
+    template <typename Feature>
+    void unregister_feature(Feature& feature)
+    {
+        internal_unregister_feature(feature);
+    }
+
     // creates a new type info if needed
     const object_type_info* get_object_type_info(const mixin_type_info_vector& mixins);
 
@@ -119,14 +123,18 @@ _dynamix_internal:
 
     // sparse list of all mixin infos
     // some elements might be nullptr
-    // such elements are registered from a loadable module (plugin)
-    // and then unregistered when the plugin was unloaded
+    // such elements have been registered from a loadable module (plugin)
+    // and then unregistered when it was unloaded
     mixin_type_info* _mixin_type_infos[DYNAMIX_MAX_MIXINS];
     size_t _num_registered_mixins; // max registered mixin
 
     void internal_register_mixin_type(mixin_type_info& info);
 
-    const message_t* _messages[DYNAMIX_MAX_MESSAGES];
+    // sparse list of all message infos
+    // some elements might be nullptr
+    // such elements have been registered from a loadable module (plugin)
+    // and then unregistered when it was unloaded
+    message_t* _messages[DYNAMIX_MAX_MESSAGES];
     size_t _num_registered_messages;
 
     typedef std::unordered_map<available_mixins_bitset, object_type_info*> object_type_info_map;
@@ -137,6 +145,8 @@ _dynamix_internal:
 
     // feature registration functions for the supported kinds of features
     void internal_register_feature(message_t& m);
+    void internal_unregister_feature(message_t& m);
+
 
     // allocators
     global_allocator* _allocator;

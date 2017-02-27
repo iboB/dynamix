@@ -55,7 +55,6 @@ using namespace dynamix;
 using namespace dynamix::combinators;
 
 DYNAMIX_DECLARE_MIXIN(exe_mixin);
-DYNAMIX_MULTICAST_MESSAGE_0(int, shared);
 
 TEST_CASE("lib")
 {
@@ -64,7 +63,6 @@ TEST_CASE("lib")
     mutate(o)
         .add<exe_mixin>();
 
-    CHECK(shared<sum>(o) == 3);
     CHECK(dl_a_multicast<sum>(o) == 1);
 
     mutate(o)
@@ -147,15 +145,11 @@ TEST_CASE("shared")
     auto p = LoadPlugin("test_plugin_B", o);
 
     CHECK(dl_a_multicast<sum>(o) == 1025);
-    CHECK(shared<sum>(o) == 10);    
 
     ClosePlugin(p, o);
 
     CHECK(dl_a_multicast<sum>(o) == 24);
-    CHECK(shared<sum>(o) == 3);
 }
-
-DYNAMIX_DEFINE_MESSAGE(shared);
 
 class exe_mixin
 {
@@ -164,11 +158,6 @@ public:
     {
         return 1;
     }
-
-    int shared()
-    {
-        return 3;
-    }
 };
 
-DYNAMIX_DEFINE_MIXIN(exe_mixin, shared_msg & dl_a_multicast_msg);
+DYNAMIX_DEFINE_MIXIN(exe_mixin, dl_a_multicast_msg);

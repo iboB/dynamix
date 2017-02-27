@@ -7,7 +7,6 @@
 //
 #include <iostream>
 #include <dynamix/dynamix.hpp>
-#include "../common/messages.hpp"
 #include "../dynlib/dynlib_messages.hpp"
 
 using namespace std;

@@ -24,7 +24,6 @@ add_executable(executable ${sources})
 target_link_libraries(executable
     dynamix
     dynlib
-    common
 )
 
 if(NOT MSVC)

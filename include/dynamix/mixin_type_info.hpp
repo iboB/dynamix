@@ -64,10 +64,6 @@ public:
     // usually equal to the allocator of the domain
     global_allocator* allocator;
 
-    // many modules may potentially register the same mixin
-    // in such case a linked list is formed which holds all infos (for all modules) for a given mixin
-    mixin_type_info* sibling;
-
     mixin_type_info()
         : id(INVALID_MIXIN_ID)
         // since this is always static, other members will be initialized with 0

@@ -7,7 +7,6 @@
 //
 #include "executable_pch.hpp"
 #include "object_factory.hpp"
-#include "../common/messages.hpp"
 #include "../dynlib/dynlib_messages.hpp"
 
 using namespace std;
@@ -72,8 +71,6 @@ void call_messages(dynamix::object* o)
 int main()
 {
     object_factory f;
-
-    set_id(f.the_object, 42);
 
     call_messages(f.the_object);
 

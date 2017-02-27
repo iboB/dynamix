@@ -112,13 +112,7 @@ const object_type_info* domain::get_object_type_info(const mixin_type_info_vecto
 
 void domain::internal_register_feature(message_t& m)
 {
-    DYNAMIX_ASSERT_MSG(_num_registered_messages < DYNAMIX_MAX_MESSAGES,
-                        "you have to increase the maximum number of messages");
-
-    // the messages can be instantiated from different modules
-    // for example if different modules use the same static library
-    //
-    // we need see if we don't already have a message by that name
+    // we need to see if we don't already have a message by that name
     // if we do we'll set this instantiation's id to the already existing one
     // and disregard this instantiation
     //
@@ -131,35 +125,69 @@ void domain::internal_register_feature(message_t& m)
     // registered within a single domain from different modules
     // crashes may ensue (as a message gets called, for objects that can't actually handle it)
 
-    if(!m.is_private)
+    feature_id free = INVALID_FEATURE_ID;
+
+    // check for message of the same name
+    for(size_t i=0; i<_num_registered_messages; ++i)
     {
-        // check for message of the same name
-        for(size_t i=0; i<_num_registered_messages; ++i)
+        if (!_messages[i])
         {
-            const message_t& registered_message = *_messages[i];
+            free = i;
+            continue;
+        }
 
-            DYNAMIX_ASSERT(registered_message.id != INVALID_FEATURE_ID); // how could this happen?
-            if(strcmp(m.name, registered_message.name) == 0)
-            {
-                // already registered from a different module
+        message_t& registered_message = *_messages[i];
 
-                // at least check if the mechanism is the same
-                DYNAMIX_ASSERT_MSG(m.mechanism == registered_message.mechanism,
-                    "Attempting to register a message that has already been registered "
-                    "from a different module with a different mechanism");
+        DYNAMIX_ASSERT(registered_message.id != INVALID_FEATURE_ID); // how could this happen?
 
-                // here we'll have to assume that's the same message
-                m.id = registered_message.id;
-                return;
-            }
+        if(strcmp(m.name, registered_message.name) == 0)
+        {
+            // we need check for private-ness when private is supported
+            // for now this is an error
+
+            // at least check if the mechanism is the same
+            DYNAMIX_ASSERT_MSG(false, "Attempting to register a message that has already been registered");
+
+            // try to resque the situation in some way
+            m.id = registered_message.id;
+
+            return;
         }
     }
-    // if the message is private treat it as an unrelated different message
-    // although it has the same name
 
-    m.id = _num_registered_messages;
+    if (free == INVALID_FEATURE_ID)
+    {
+        DYNAMIX_ASSERT_MSG(_num_registered_messages < DYNAMIX_MAX_MESSAGES,
+            "you have to increase the maximum number of messages");
 
-    _messages[_num_registered_messages++] = &m;
+        m.id = _num_registered_messages;
+        ++_num_registered_messages;
+    }
+    else
+    {
+        m.id = free;
+    }
+
+    _messages[m.id] = &m;
+}
+
+void domain::internal_unregister_feature(message_t& msg)
+{
+    DYNAMIX_ASSERT_MSG(msg.id < _num_registered_messages, "unregistering a message which isn't registered");
+    auto* registered = _messages[msg.id];
+    DYNAMIX_ASSERT_MSG(registered, "unregistering a message which isn't registered");
+    DYNAMIX_ASSERT_MSG(registered == &msg, "unregistering a message with know id but unknown data");
+
+    _messages[msg.id] = nullptr;
+
+    // to be pedantic we should clear all type infos which have this message,
+    // but this seems to be unnecessary
+    // if a message has found its way into a type info, then there must be a mixin that uses it
+    // if the message is local to a module, then that mixin must be local to the module too
+    // since the message is being unregistered, because the module is unloaded
+    // then surely the mixin should be unregistered too
+    // then all types infos containing that mixin (and in turn this message)
+    // will be dropped
 }
 
 void domain::internal_register_mixin_type(mixin_type_info& info)
@@ -178,26 +206,7 @@ void domain::internal_register_mixin_type(mixin_type_info& info)
         if (registered)
         {
             DYNAMIX_ASSERT(registered->is_valid());
-
-            if (strcmp(info.name, registered->name) == 0)
-            {
-                // we have this mixin registered
-
-                DYNAMIX_ASSERT_MSG(registered->size == info.size,
-                    "trying to register a mixin with the name of an existing mixin");
-
-                info.id = registered->id;
-
-                // link info in list
-                mixin_type_info* mi = registered;
-                while (mi->sibling)
-                {
-                    mi = mi->sibling;
-                }
-                mi->sibling = &info;
-
-                return;
-            }
+            DYNAMIX_ASSERT_MSG(strcmp(info.name, registered->name) != 0, "registering the same mixin twice");
         }
         else
         {
@@ -208,6 +217,9 @@ void domain::internal_register_mixin_type(mixin_type_info& info)
     if (free == INVALID_MIXIN_ID)
     {
         // no free slot has been found dugin the iteration, so add a new one
+        DYNAMIX_ASSERT_MSG(_num_registered_mixins < DYNAMIX_MAX_MIXINS,
+            "you have to increase the maximum number of mixins");
+
         info.id = _num_registered_mixins;
         ++_num_registered_mixins;
     }
@@ -221,48 +233,26 @@ void domain::internal_register_mixin_type(mixin_type_info& info)
 
 void domain::unregister_mixin_type(const mixin_type_info& info)
 {
-    DYNAMIX_ASSERT_MSG(info.id < _num_registered_mixins, "Unregistering a mixin which isn't registered");
-    mixin_type_info* registered = _mixin_type_infos[info.id];
-    DYNAMIX_ASSERT_MSG(registered, "Unregistering a mixin which isn't registered");
+    DYNAMIX_ASSERT_MSG(info.id < _num_registered_mixins, "unregistering a mixin which isn't registered");
+    mixin_type_info* const registered = _mixin_type_infos[info.id];
+    DYNAMIX_ASSERT_MSG(registered, "unregistering a mixin which isn't registered");
+    DYNAMIX_ASSERT_MSG(registered == &info, "unregistering a mixin with known id but unknown data");
 
-    // remove info from linked list
-    if (registered == &info)
+    _mixin_type_infos[info.id] = nullptr;
+
+    // since this mixin is no longer valid
+    // clean up all object type infos which reference it
+
+    for (auto i = _object_type_infos.begin(); i != _object_type_infos.end(); )
     {
-        _mixin_type_infos[info.id] = nullptr;
-
-        // since this no more registrations of this mixin exist,
-        // clean up all object type infos which reference it
-
-        for (auto i = _object_type_infos.begin(); i!=_object_type_infos.end(); )
+        if (i->first[info.id])
         {
-            if (i->first[info.id])
-            {
-                delete i->second;
-                i = _object_type_infos.erase(i);
-            }
-            else
-            {
-                ++i;
-            }
+            delete i->second;
+            i = _object_type_infos.erase(i);
         }
-    }
-    else
-    {
-        while (registered->sibling && registered->sibling != &info)
+        else
         {
-            registered = registered->sibling;
-        }
-
-        while (registered->sibling && registered->sibling != &info)
-        {
-            registered = registered->sibling;
-        }
-
-        DYNAMIX_ASSERT_MSG(registered->sibling, "Unregistering an known mixin, which hasn't been registered");
-
-        if (registered->sibling)
-        {
-            registered->sibling = registered->sibling->sibling;
+            ++i;
         }
     }
 }

@@ -76,9 +76,7 @@ multiple dynamic libraries can work together sharing mixins and messages.
 
 It has four modules:
 
-- **common** - a static library linked with all other modules, that provides
-a mixin and some messages.
-- **dynlib** - a C++ dynamic library, linked with all other modules that a mixin
+- **dynlib** - a C++ dynamic library, linked with all other modules that has a mixin
 and some messages.
 - **plugin** - a plugin-style dynamic library, which is not linked with the
 executable and, as plugins in other applications, may or may not be present with

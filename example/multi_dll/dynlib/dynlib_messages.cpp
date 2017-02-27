@@ -11,3 +11,5 @@
 DYNAMIX_DEFINE_MESSAGE(dl_mixin_specific);
 DYNAMIX_DEFINE_MESSAGE(dl_exported);
 DYNAMIX_DEFINE_MESSAGE(dl_multicast);
+
+DYNAMIX_DEFINE_MESSAGE(trace);

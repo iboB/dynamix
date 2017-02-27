@@ -119,8 +119,9 @@ void object_type_info::fill_call_table()
     // we need to set the multicast buffer size to include those ones too
     for (size_t i = 0; i < dom._num_registered_messages; ++i)
     {
-        if (!dom._messages[i]->default_impl_data)
+        if (!dom._messages[i] || !dom._messages[i]->default_impl_data)
         {
+            // no such mesasge or
             // message doesn't have default implementation
             continue;
         }
@@ -213,6 +214,12 @@ void object_type_info::fill_call_table()
     // if we implement it AND it is a multicast, sort our buffer
     for(size_t i=0; i<dom._num_registered_messages; ++i)
     {
+        if (!dom._messages[i])
+        {
+            // no such message
+            continue;
+        }
+
         if(dom._messages[i]->mechanism == message_t::multicast)
         {
             call_table_entry& table_entry = _call_table[i];
@@ -244,6 +251,12 @@ void object_type_info::fill_call_table()
         }
 
         const message_t* msg_data = dom._messages[i];
+
+        if (!msg_data)
+        {
+            // no such message
+            continue;
+        }
 
         if (!msg_data->default_impl_data)
         {

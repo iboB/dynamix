@@ -24,7 +24,6 @@ add_library(dynlib SHARED ${sources})
 
 target_link_libraries(dynlib
     dynamix
-    common
 )
 
 set_target_properties(dynlib PROPERTIES FOLDER examples/multi_dll)

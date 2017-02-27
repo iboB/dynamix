@@ -22,6 +22,9 @@ extern "C" DYNAMIX_SYMBOL_EXPORT void release_object(object* o)
     mutate(o).remove<mixin_a>();
 }
 
+DYNAMIX_CONST_MESSAGE_0(int, plugin_a_local);
+DYNAMIX_DEFINE_MESSAGE(plugin_a_local);
+
 class mixin_a
 {
 public:
@@ -32,8 +35,13 @@ public:
 
     int dl_a_multicast()
     {
+        return ::plugin_a_local(dm_this);
+    }
+
+    int plugin_a_local() const
+    {
         return 101;
     }
 };
 
-DYNAMIX_DEFINE_MIXIN(mixin_a, dl_a_exported_msg & dl_a_multicast_msg);
+DYNAMIX_DEFINE_MIXIN(mixin_a, dl_a_exported_msg & dl_a_multicast_msg & plugin_a_local_msg);

@@ -13,7 +13,6 @@ add_library(plugin SHARED plugin.cpp)
 target_link_libraries(plugin
     dynamix
     dynlib
-    common
 )
 
 set_target_properties(plugin PROPERTIES FOLDER examples/multi_dll)
