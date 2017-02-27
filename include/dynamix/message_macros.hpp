@@ -17,6 +17,21 @@
 #include "message.hpp"
 #include "preprocessor.hpp"
 #include "assert.hpp"
+#include "domain.hpp"
+
+namespace dynamix
+{
+namespace internal
+{
+    template <typename Message>
+    message_registrator<Message>::~message_registrator()
+    {
+        internal::domain::safe_instance().
+            unregister_feature(static_cast<message_t&>(_dynamix_get_mixin_feature_safe(static_cast<Message*>(nullptr))));
+    }
+}
+}
+
 
 // some macros here have an underscore in front so it doesn't appear as a suggestion in
 // ides that support these

@@ -91,11 +91,9 @@ struct message_registrator
         _dynamix_register_mixin_feature(static_cast<Message*>(nullptr));
     }
 
-    ~message_registrator()
-    {
-        internal::domain::safe_instance().
-            unregister_feature(static_cast<message_t&>(_dynamix_get_mixin_feature_safe(static_cast<Message*>(nullptr))));
-    }
+    // defined in message_macros because it depends on domain.hpp
+    // unregisteres the message
+    ~message_registrator();
 
     // "payload" instance of the type
     static message_registrator registrator;
