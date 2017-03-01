@@ -64,6 +64,11 @@ public:
     // usually equal to the allocator of the domain
     global_allocator* allocator;
 
+#if DYNAMIX_ADDITIONAL_METRICS
+    // number of living mixins of this type
+    mutable size_t num_mixins;
+#endif
+
     mixin_type_info()
         : id(INVALID_MIXIN_ID)
         // since this is always static, other members will be initialized with 0

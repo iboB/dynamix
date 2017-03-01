@@ -55,6 +55,13 @@
 // mutating an object in one thread and calling messages for this object in another is never safe
 #define DYNAMIX_THREAD_SAFE_MUTATIONS 1
 
+// setting this to true will add additional metrics to the library's structures
+// maintaining them is cheap, but does not cost zero
+// the additional metrics are
+// mixin_type_info::num_mixins - number of living mixins of this type
+// object_type_info::num_objects - number of living objects of this type
+#define DYNAMIX_ADDITIONAL_METRICS 1
+
 // there is warning push/pop about this in the main header
 #if defined(_MSC_VER)
 // msvc complains that template classes don't have a dll interface (they shouldn't).

@@ -98,6 +98,11 @@ _dynamix_internal:
     call_table_entry* _multicast_buffer; // a single buffer for all multicast messages to save allocation calls
     call_table_entry _call_table[DYNAMIX_MAX_MESSAGES];
 
+#if DYNAMIX_ADDITIONAL_METRICS
+    // number of living objects with this type info
+    mutable size_t num_objects;
+#endif
+
     // this should be called after the mixins have been initialized
     void fill_call_table();
 };
