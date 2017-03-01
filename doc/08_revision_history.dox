@@ -3,6 +3,8 @@
 DynaMix 1.1.0
 =============
 
+- Added (optional) mutation thread safety; in that mutating two different
+objects in two different threads is now safe.
 - Dropped support for an obscure optimization feature which allowed for the same
 mixins and messages to be defined multiple times in multiple modules (i.e. in a
 static library linked to those modules)

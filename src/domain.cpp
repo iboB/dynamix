@@ -82,6 +82,11 @@ const object_type_info* domain::get_object_type_info(const mixin_type_info_vecto
         query[info->id] = true;
     }
 
+#if DYNAMIX_THREAD_SAFE_MUTATIONS
+    // TODO C++17: do this with a shared mutex instead
+    std::lock_guard<std::mutex> lock(_object_type_infos_mutex);
+#endif
+
     object_type_info_map::iterator i = _object_type_infos.find(query);
 
     if(i != _object_type_infos.end())
@@ -242,6 +247,11 @@ void domain::unregister_mixin_type(const mixin_type_info& info)
 
     // since this mixin is no longer valid
     // clean up all object type infos which reference it
+
+#if DYNAMIX_THREAD_SAFE_MUTATIONS
+    // TODO C++17: do this with a shared mutex instead
+    std::lock_guard<std::mutex> lock(_object_type_infos_mutex);
+#endif
 
     for (auto i = _object_type_infos.begin(); i != _object_type_infos.end(); )
     {

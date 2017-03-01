@@ -17,6 +17,10 @@
 #include <unordered_map>
 #include <type_traits> // alignment of
 
+#if DYNAMIX_THREAD_SAFE_MUTATIONS
+#include <mutex>
+#endif
+
 
 /**
  * \file
@@ -140,6 +144,7 @@ _dynamix_internal:
     typedef std::unordered_map<available_mixins_bitset, object_type_info*> object_type_info_map;
 
     object_type_info_map _object_type_infos;
+    std::mutex _object_type_infos_mutex;
 
     std::vector<mutation_rule*> _mutation_rules;
 

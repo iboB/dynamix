@@ -47,6 +47,14 @@
 // explicit copying is still possible via object::copy_from or object::copy
 #define DYNAMIX_OBJECT_IMPLICIT_COPY 0
 
+// setting this to true will add a mutex for the object type infos and lock it when new type infos
+// are created queried or created, thus making the mutation of multiple objects in multiple threads
+// safe.
+// HOWEVER
+// mutating the same object in multiple threads is never safe
+// mutating an object in one thread and calling messages for this object in another is never safe
+#define DYNAMIX_THREAD_SAFE_MUTATIONS 1
+
 // there is warning push/pop about this in the main header
 #if defined(_MSC_VER)
 // msvc complains that template classes don't have a dll interface (they shouldn't).
