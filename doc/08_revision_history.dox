@@ -3,8 +3,6 @@
 DynaMix 1.1.0
 =============
 
-- Added (optional) mutation thread safety; in that mutating two different
-objects in two different threads is now safe.
 - Dropped support for an obscure optimization feature which allowed for the same
 mixins and messages to be defined multiple times in multiple modules (i.e. in a
 static library linked to those modules)
@@ -14,7 +12,10 @@ defines a message.
     - `obj.implements(unused_msg)` caused a crash
     - `unused(obj ...)` cause a crash (instead of exception)
     - Crash when only a plugin uses the message
-
+- Added (optional) mutation thread safety; in that mutating two different
+objects in two different threads is now safe.
+- Added optional additional metrics to object and mixin type data to show the
+number of objects and mixins, respectively, of a given type.
 
 DynaMix 1.0.4
 =============
