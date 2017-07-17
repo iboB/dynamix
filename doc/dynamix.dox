@@ -5,17 +5,15 @@
 Abstract {#abstract}
 ========
 
-DynaMix is a library that allows the composition and modification of polymorphic types
-at run time. Types and objects are constructed from building blocks called
-mixins enabling an effect similar to multiple inheritance, while allowing the
+DynaMix is a library that allows the composition and modification of polymorphic objects
+at run time. Objects are constructed from building blocks called
+"mixins" enabling an effect similar to multiple inheritance, while allowing the
 client code to remain oblivious to the actual composition of the objects.
 
 A take on the
 [Composition over inheritance](http://en.wikipedia.org/wiki/Composition_over_inheritance)
 technique, the result resembles the
-[mixins in Ruby](http://www.ruby-doc.org/docs/ProgrammingRuby/html/tut_modules.html)
-or the
-popular pattern [entity-component-system](appendix.html#ecs).
+[mixins in Ruby](http://www.ruby-doc.org/docs/ProgrammingRuby/html/tut_modules.html).
 It can also be compared to the
 [inheritance in Eiffel](http://archive.eiffel.com/doc/online/eiffel50/intro/language/tutorial-10.html)
 or the traits in
@@ -75,7 +73,7 @@ you use the library:
     think(obj); // C++ doesn't allow us to have obj.think().
                 // DynaMix's messages are standalone functions
 
-    // type composition
+    // object composition
     dynamix::mutate(obj)
         .add<flying_creature>();
 
@@ -83,7 +81,7 @@ you use the library:
 
     fly(obj); // ...instead of obj.fly()
 
-    // type mutation
+    // object mutation
     dynamix::mutate(obj)
         .remove<ally>()
         .add<enemy>();
@@ -97,7 +95,7 @@ For a more detailed, working example see [the basic usage tutorial](basic.html).
 List of features {#features}
 ================
 
-- Compose types from mixins at run time
+- Compose objects from mixins at run time
 - Physically separate interface and implementation
 - Non-intrusive &ndash; mixins don't need to have a common parent or any special code
 inside
@@ -212,12 +210,13 @@ DynaMix as an entity-component-system {#ecs}
 
 If you're familiar with entity-component-systems, one way of looking at at the
 library is as if it is one of those, and indeed, it has many features that are
-characteristic for such systems.
+characteristic for such systems. More specifically the Interface to Component
+pattern
 
 If you're not familiar with entity-component-systems, you might want to check
 out the [appendix entry](appendix.html#aecs) on them.
 
-Here's how DynaMix is like an ECS:
+Here's how DynaMix is like an Interface to Component ECS:
 
 - `dynamix::object` can be interpreted as an entity in an ECS. It's just an
 empty class, that needs to be "built" from mixins.
@@ -249,6 +248,10 @@ subsystems, that require them to be aligned in dense arrays for faster
 processing, without cache misses. As we mentioned before, DynaMix isn't
 designed for such cases, and while in terms of design and ease of use, it is a
 better choice than such an approach, it cannot help you in their main goal.
+Still, a non-polymorphic ECS and DynaMix can be (and have been) used together in
+a signle piece of software where DynaMix is used in the business logic
+subsystem, while the performance critical low-level parts of the software make
+use of a non-polymorphic ECS.
 
 Comparison with traits {#traits}
 ----------------------

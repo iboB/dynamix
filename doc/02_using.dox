@@ -37,8 +37,8 @@ If you want something else, all you need to do is compile and link all the
 Configuration {#config}
 -------------
 
-Here is a list of the configuration options from `config.hpp`. You need to
-rebiuld the library if you change any of those.
+Here is a list of the configuration options from `config.hpp`. *You need to
+rebiuld the library if you change any of those*.
 
 - `DYNAMIX_USE_TYPEID` &ndash; determines the way by which the mixin class names
 are obtained by the library. The default value is nonzero which makes use of
@@ -50,6 +50,20 @@ to have a public static method &ndash; `static const char* dynamix_mixin_name()`
 registered in an application.
 - `DYNAMIX_MAX_MESSAGES` &ndash; determines the maximum number of messages that can
 be registered in an application.
+-  `DYNAMIX_USE_EXCEPTIONS` &ndash; shows whether the library throws exceptions.
+You can disable this for a small performance gain.
+- `DYNAMIX_OBJECT_IMPLICIT_COPY` &ndash; enables and disables the
+copy-constructros and assignment operators for `dynamix::object`. The default is
+off to prevent unwanted copies.
+- `DYNAMIX_THREAD_SAFE_MUTATIONS` &ndash; allows the mutation of objects in
+different threads. You can disable this for a small performance gain on
+mutation. HOWEVER:
+    - Mutating the same object in multiple threads is never safe.
+    - Mutating an object in one thread and calling messages for this object in
+    another is never safe.
+- `DYNAMIX_ADDITIONAL_METRICS` &dnash; allows the access to some useful metrics
+about the library's usage such as number of "living" objects or mixins of a
+given type.
 
 Using the library {#using}
 =================

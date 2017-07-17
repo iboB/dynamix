@@ -81,7 +81,7 @@ concrete components, that aren't managed by it, but by the subsystems that use
 these components. The subsystems contain dense arrays of these components, which
 they process, often being oblivious of entities and other higher-level concepts.
 
-This is done in very performance heavy pieces of software, where even the
+This is done in very performance heavy pieces of software, where the
 cache locality of the data is critical. Since polymorphism is incompatible with
 cache locality, those systems sacrifice (at least to some degree) the ease of
 use and maintainability for the speed.
@@ -91,6 +91,7 @@ of the art graphics and physics with a decent framerate, each microsecond is of
 importance.
 
 Who uses entity-component-systems? {#who_uses_ecs}
+----------------------------------
 
 They are very popular in game development, as most objects in a game have many
 different aspects for different sub-systems. Still, being as powerful as they

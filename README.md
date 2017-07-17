@@ -35,7 +35,7 @@ Here is a small example of what your code may look like if you use the library:
     think(obj); // C++ doesn't allow us to have obj.think().
                 // DynaMix's messages are standalone functions
 
-    // type composition
+    // composition
     dynamix::mutate(obj)
         .add<flying_creature>();
 
@@ -43,7 +43,7 @@ Here is a small example of what your code may look like if you use the library:
 
     fly(obj); // ...instead of obj.fly()
 
-    // type mutation
+    // mutation
     dynamix::mutate(obj)
         .remove<ally>()
         .add<enemy>();
@@ -54,7 +54,7 @@ Here is a small example of what your code may look like if you use the library:
 
 Here are some of the key features of the library:
 
-* Compose types from mixins at run time
+* Compose objects from mixins at run time
 * Physically separate interface and implementation
 * Fast polymorphic calls &ndash; comparable to `std::function`
 * No external dependencies other than the standard library
