@@ -191,6 +191,30 @@ Same type mutate | 16,668 ns          | 489 ns
 Custom allocator | 219,416 ns         | 2,740 ns
 Same type alloc  | 16,176 ns          | 238 ns
 
+Thread safety {#thread_safety}
+=============
+
+Some functionalities of the library are purposefully not thread-safe so as to
+avoid the synchronization overhead for users which don't need it. For those
+it is possible to implement thread-safety in the client code.
+
+- Querying objects (say with `has`, `get`, or `implements`) is thread-safe.
+- Calling messages is thread-safe. As thread-safe as the underlying functions
+of course.
+- Copying objects is thread-safe. As thread-safe as the copy-constructors and
+assignment operators of the mixins in those objects.
+- Mutating different objects in different threads is thread-safe. *HOWEVER*
+- Mutating the same object in multiple threads is **not** thread-safe. If you
+need this, you can subclass object and have a mutex within your class, which
+can be maintained by a mutation rule
+- Mutating objects in some threads, while calling messages to *other* objects in
+other threads is thread-safe. *HOWEVER*
+- Mutating an object in one thread and calling messages for this object in
+another is **not** thread-safe and, alas, it's hard to accomplish. If you
+absolutely need this, our suggestion is to first add a mutex to each object by
+inheriting it. Second, lock/unlock it via mutation rules. And, third, define
+your own message macros, for your object type which also lock said mutex.
+
 Using custom allocators {#using_allocators}
 =======================
 
