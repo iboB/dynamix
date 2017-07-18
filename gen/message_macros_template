@@ -7,7 +7,7 @@
     { \
         /* define the actual caller func */ \
         template <typename Mixin, typename Ret, Ret (Mixin::*Method)(%{arg_types}) constness> \
-        static Ret caller%{arity}(void* _d_ptr %{coma_args_signature}) \
+        static Ret caller(void* _d_ptr %{coma_args_signature}) \
         { \
             Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
             return (_d_m->*Method)(%{fwd_args}); \
@@ -20,9 +20,9 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func caller = caller%{arity}<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
-            return reinterpret_cast< ::dynamix::internal::func_ptr>(caller); \
+            return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
     }; \
     /* step 2: define a message tag, that will be used to identify the message in feature lists */ \

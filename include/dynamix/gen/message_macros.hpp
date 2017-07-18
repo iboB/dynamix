@@ -17,7 +17,7 @@
     { \
         /* define the actual caller func */ \
         template <typename Mixin, typename Ret, Ret (Mixin::*Method)() constness> \
-        static Ret caller0(void* _d_ptr ) \
+        static Ret caller(void* _d_ptr ) \
         { \
             Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
             return (_d_m->*Method)(); \
@@ -30,9 +30,9 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func caller = caller0<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
-            return reinterpret_cast< ::dynamix::internal::func_ptr>(caller); \
+            return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
     }; \
     /* step 2: define a message tag, that will be used to identify the message in feature lists */ \
@@ -237,7 +237,7 @@
     { \
         /* define the actual caller func */ \
         template <typename Mixin, typename Ret, Ret (Mixin::*Method)(arg0_type) constness> \
-        static Ret caller1(void* _d_ptr , arg0_type a0) \
+        static Ret caller(void* _d_ptr , arg0_type a0) \
         { \
             Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
             return (_d_m->*Method)(std::forward<arg0_type>(a0)); \
@@ -250,9 +250,9 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func caller = caller1<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
-            return reinterpret_cast< ::dynamix::internal::func_ptr>(caller); \
+            return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
     }; \
     /* step 2: define a message tag, that will be used to identify the message in feature lists */ \
@@ -457,7 +457,7 @@
     { \
         /* define the actual caller func */ \
         template <typename Mixin, typename Ret, Ret (Mixin::*Method)(arg0_type, arg1_type) constness> \
-        static Ret caller2(void* _d_ptr , arg0_type a0, arg1_type a1) \
+        static Ret caller(void* _d_ptr , arg0_type a0, arg1_type a1) \
         { \
             Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
             return (_d_m->*Method)(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
@@ -470,9 +470,9 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func caller = caller2<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
-            return reinterpret_cast< ::dynamix::internal::func_ptr>(caller); \
+            return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
     }; \
     /* step 2: define a message tag, that will be used to identify the message in feature lists */ \
@@ -677,7 +677,7 @@
     { \
         /* define the actual caller func */ \
         template <typename Mixin, typename Ret, Ret (Mixin::*Method)(arg0_type, arg1_type, arg2_type) constness> \
-        static Ret caller3(void* _d_ptr , arg0_type a0, arg1_type a1, arg2_type a2) \
+        static Ret caller(void* _d_ptr , arg0_type a0, arg1_type a1, arg2_type a2) \
         { \
             Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
             return (_d_m->*Method)(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
@@ -690,9 +690,9 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func caller = caller3<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
-            return reinterpret_cast< ::dynamix::internal::func_ptr>(caller); \
+            return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
     }; \
     /* step 2: define a message tag, that will be used to identify the message in feature lists */ \
@@ -897,7 +897,7 @@
     { \
         /* define the actual caller func */ \
         template <typename Mixin, typename Ret, Ret (Mixin::*Method)(arg0_type, arg1_type, arg2_type, arg3_type) constness> \
-        static Ret caller4(void* _d_ptr , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
+        static Ret caller(void* _d_ptr , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
         { \
             Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
             return (_d_m->*Method)(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
@@ -910,9 +910,9 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func caller = caller4<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
-            return reinterpret_cast< ::dynamix::internal::func_ptr>(caller); \
+            return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
     }; \
     /* step 2: define a message tag, that will be used to identify the message in feature lists */ \
@@ -1117,7 +1117,7 @@
     { \
         /* define the actual caller func */ \
         template <typename Mixin, typename Ret, Ret (Mixin::*Method)(arg0_type, arg1_type, arg2_type, arg3_type, arg4_type) constness> \
-        static Ret caller5(void* _d_ptr , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
+        static Ret caller(void* _d_ptr , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
         { \
             Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
             return (_d_m->*Method)(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
@@ -1130,9 +1130,9 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func caller = caller5<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
-            return reinterpret_cast< ::dynamix::internal::func_ptr>(caller); \
+            return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
     }; \
     /* step 2: define a message tag, that will be used to identify the message in feature lists */ \
@@ -1337,7 +1337,7 @@
     { \
         /* define the actual caller func */ \
         template <typename Mixin, typename Ret, Ret (Mixin::*Method)(arg0_type, arg1_type, arg2_type, arg3_type, arg4_type, arg5_type) constness> \
-        static Ret caller6(void* _d_ptr , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
+        static Ret caller(void* _d_ptr , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
         { \
             Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
             return (_d_m->*Method)(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
@@ -1350,9 +1350,9 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func caller = caller6<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
-            return reinterpret_cast< ::dynamix::internal::func_ptr>(caller); \
+            return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
     }; \
     /* step 2: define a message tag, that will be used to identify the message in feature lists */ \
