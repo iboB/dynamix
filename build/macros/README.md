@@ -1,1 +1,1 @@
-Some useful CMake macros taken from the [MaiBo](https://github.com/iboB/maibo) project.
+Some useful CMake macros.

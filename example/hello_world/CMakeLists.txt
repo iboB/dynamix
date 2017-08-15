@@ -6,7 +6,7 @@
 # https://opensource.org/licenses/MIT
 #
 
-cmake_minimum_required(VERSION 2.8.7)
+cmake_minimum_required(VERSION 3.2.2)
 
 add_executable(hello-world hello.cpp)
 target_link_libraries(hello-world dynamix)
