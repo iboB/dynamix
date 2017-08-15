@@ -1,6 +1,7 @@
 language: cpp
+os: linux
 sudo: required
-dist: precise
+dist: trusty
 
 notifications:
   email:
@@ -11,8 +12,7 @@ git:
 
 matrix:
   include:
-    - os: linux
-      compiler: gcc
+    - compiler: gcc
       addons:
         apt:
           sources:
@@ -23,8 +23,7 @@ matrix:
       before_install:
         - sudo apt-get update -qq
 
-    - os: linux
-      compiler: gcc
+    - compiler: gcc
       addons:
         apt:
           sources:
@@ -34,6 +33,21 @@ matrix:
       env: COMPILER=g++-5
       before_install:
         - sudo apt-get update -qq
+
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env: COMPILER=g++-6
+      before_install:
+        - sudo apt-get update -qq
+
+before_script:
+  - ${COMPILER} --version
+  - cmake --version
 
 script:
   - mkdir -p debug_build
