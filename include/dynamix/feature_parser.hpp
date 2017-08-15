@@ -38,7 +38,7 @@ public:
     }
 
     template <typename Message>
-    feature_registrator& operator & (message_priority<Message>)
+    feature_registrator& operator & (message_perks<Message>)
     {
         _dynamix_register_mixin_feature(static_cast<Message*>(nullptr));
         return *this;
@@ -75,13 +75,13 @@ public:
     }
 
     template <typename Message>
-    feature_parser& operator & (message_priority<Message> mp)
+    feature_parser& operator & (message_perks<Message> mp)
     {
         Message& msg = static_cast<Message&>(_dynamix_get_mixin_feature_safe(static_cast<Message*>(nullptr)));
         DYNAMIX_ASSERT(msg.id != INVALID_FEATURE_ID);
 
         mixin_type_info& mixin_info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
-        parse_message(mixin_info, msg, mp.priority);
+        parse_message(mixin_info, msg, mp.bid, mp.priority);
 
         return *this;
     }
@@ -102,11 +102,11 @@ private:
     template <typename Message>
     void parse_feature(mixin_type_info& mixin_info, Message& msg, const message_feature_tag&)
     {
-        parse_message(mixin_info, msg, 0);
+        parse_message(mixin_info, msg, 0, 0);
     }
 
     template <typename Message>
-    void parse_message(mixin_type_info& mixin_info, Message& msg, int priority)
+    void parse_message(mixin_type_info& mixin_info, Message& msg, int bid, int priority)
     {
 #if defined(DYNAMIX_DEBUG)
         // check for duplicate entries
@@ -117,11 +117,12 @@ private:
         }
 #endif
         mixin_info.message_infos.resize(mixin_info.message_infos.size()+1);
-        mixin_info.message_infos.back().message = &msg;
-        mixin_info.message_infos.back().priority = priority;
-        mixin_info.message_infos.back()._mixin_id = mixin_info.id;
-
-        mixin_info.message_infos.back().caller = msg.template get_caller_for<Mixin>();
+        message_for_mixin& mfm = mixin_info.message_infos.back();
+        mfm.message = &msg;
+        mfm._mixin_id = mixin_info.id;
+        mfm.caller = msg.template get_caller_for<Mixin>();
+        mfm.bid = bid;
+        mfm.priority = priority;
     }
 };
 

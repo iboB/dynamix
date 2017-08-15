@@ -58,9 +58,10 @@ protected:
 };
 
 template <typename Message>
-struct message_priority
+struct message_perks
 {
-    int priority;
+    int bid = 0;
+    int priority = 0;
 };
 
 // a structure that describes a message with specific data for a concrete mixin
@@ -77,6 +78,7 @@ struct DYNAMIX_API message_for_mixin
     func_ptr caller;
 
     // message perks
+    int bid;
     int priority;
 };
 
@@ -132,13 +134,36 @@ set_num_results_for(Combinator&, size_t) {}
 
 } // namespace internal
 
-// Used in the mixin's feature list to give a priority to a message.
+// Used in the mixin's feature list to set perks to messages
 template <typename Message>
-internal::message_priority<Message> priority(int p, Message*)
+internal::message_perks<Message> priority(int p, Message*)
 {
-    internal::message_priority<Message> mp;
+    internal::message_perks<Message> mp;
     mp.priority = p;
     return mp;
+}
+
+template <typename Message>
+internal::message_perks<Message> bid(int b, Message*)
+{
+    internal::message_perks<Message> mp;
+    mp.bid = b;
+    return mp;
+}
+
+// So perks can be passed as arguments to one another
+template <typename Message>
+internal::message_perks<Message> priority(int p, internal::message_perks<Message> perks)
+{
+    perks.priority = p;
+    return perks;
+}
+
+template <typename Message>
+internal::message_perks<Message> bid(int b, internal::message_perks<Message> perks)
+{
+    perks.bid = b;
+    return perks;
 }
 
 } // namespace dynamix

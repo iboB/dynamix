@@ -25,6 +25,7 @@ DYNAMIX_DECLARE_MIXIN(type_checker);
 DYNAMIX_MESSAGE_0(void, dummy);
 DYNAMIX_CONST_MESSAGE_0(const void*, get_self);
 DYNAMIX_MESSAGE_0(void, unused);
+DYNAMIX_MULTICAST_MESSAGE_1(void, multi, int&, n)
 
 class no_messages
 {
@@ -43,6 +44,12 @@ public:
     void count_multi();
 
     int get_count() const { return _count; }
+
+    void multi(int& n)
+    {
+        ++n;
+    }
+
 private:
     int _count;
 };
@@ -54,6 +61,12 @@ public:
     {
         return this;
     }
+
+    void multi(int& n)
+    {
+        n+=2;
+    }
+
 };
 
 
@@ -158,6 +171,29 @@ TEST_CASE("complex_apply_mutation")
     CHECK(o.num_implementers(dummy_msg) == 0);
 }
 
+TEST_CASE("multicast")
+{
+    object o;
+
+    mutate(o)
+        .add<counter>();
+
+    int n = 0;
+    multi(o, n);
+    CHECK(n == 1);
+
+    mutate(o)
+        .add<type_checker>();
+
+    multi(o, n);
+    CHECK(n == 4);
+
+    mutate(o)
+        .remove<counter>();
+    multi(o, n);
+    CHECK(n == 6);
+}
+
 TEST_CASE("type_template")
 {
     object_type_template type;
@@ -195,9 +231,10 @@ TEST_CASE("type_template")
 }
 
 DYNAMIX_DEFINE_MIXIN(no_messages, none);
-DYNAMIX_DEFINE_MIXIN(counter, dummy_msg);
-DYNAMIX_DEFINE_MIXIN(type_checker, get_self_msg);
+DYNAMIX_DEFINE_MIXIN(counter, dummy_msg & multi_msg);
+DYNAMIX_DEFINE_MIXIN(type_checker, get_self_msg & multi_msg);
 
 DYNAMIX_DEFINE_MESSAGE(dummy);
 DYNAMIX_DEFINE_MESSAGE(get_self);
 DYNAMIX_DEFINE_MESSAGE(unused);
+DYNAMIX_DEFINE_MESSAGE(multi);

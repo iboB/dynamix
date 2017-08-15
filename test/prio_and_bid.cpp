@@ -8,9 +8,9 @@
 #include <dynamix/dynamix.hpp>
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "../../test/doctest/doctest.h"
+#include "doctest/doctest.h"
 
-TEST_SUITE("bids");
+TEST_SUITE("prio & bid");
 
 using namespace dynamix;
 using namespace std;
@@ -20,10 +20,50 @@ DYNAMIX_DECLARE_MIXIN(b);
 DYNAMIX_DECLARE_MIXIN(c);
 DYNAMIX_DECLARE_MIXIN(d);
 
+DYNAMIX_MULTICAST_MESSAGE_1(void, trace, std::ostream&, out);
+DYNAMIX_MULTICAST_MESSAGE_1(void, priority_trace, std::ostream&, out);
+
 DYNAMIX_MESSAGE_1(void, bids_uni, std::ostream&, out);
 DYNAMIX_CONST_MESSAGE_1(void, bids_bad_uni, std::ostream&, out);
 DYNAMIX_MULTICAST_MESSAGE_1(void, bids_multi, std::ostream&, out);
 DYNAMIX_CONST_MULTICAST_MESSAGE_1(void, bids_multi_override, std::ostream&, out);
+
+TEST_CASE("different_priority")
+{
+    object o;
+
+    mutate(o)
+        .add<a>()
+        .add<b>()
+        .add<c>()
+        .add<d>();
+
+    CHECK(o.implements(priority_trace_msg));
+    CHECK(o.num_implementers(priority_trace_msg) == 4);
+
+    ostringstream sout;
+    priority_trace(o, sout);
+    CHECK(sout.str() == "210-1");
+}
+
+TEST_CASE("same_priority")
+{
+    object o;
+
+    mutate(o)
+        .add<a>()
+        .add<b>()
+        .add<c>()
+        .add<d>();
+
+    CHECK(o.implements(trace_msg));
+    CHECK(o.num_implementers(trace_msg) == 4);
+
+    ostringstream sout;
+    trace(o, sout);
+    CHECK(sout.str() == "abcd");
+}
+
 
 TEST_CASE("bids")
 {
@@ -67,6 +107,16 @@ TEST_CASE("bids")
 class a
 {
 public:
+    void trace(std::ostream& out)
+    {
+        out << "a";
+    }
+
+    void priority_trace(std::ostream& out)
+    {
+        out << "-1";
+    }
+
     void bids_uni(std::ostream& out)
     {
         out << "a";
@@ -95,6 +145,16 @@ public:
 class b
 {
 public:
+    void trace(std::ostream& out)
+    {
+        out << "b";
+    }
+
+    void priority_trace(std::ostream& out)
+    {
+        out << "2";
+    }
+
     void bids_uni(std::ostream& out)
     {
         out << "b";
@@ -122,6 +182,16 @@ public:
 class c
 {
 public:
+    void trace(std::ostream& out)
+    {
+        out << "c";
+    }
+
+    void priority_trace(std::ostream& out)
+    {
+        out << "1";
+    }
+
     void bids_uni(std::ostream& out)
     {
         out << "c";
@@ -142,6 +212,16 @@ public:
 class d
 {
 public:
+    void trace(std::ostream& out)
+    {
+        out << "d";
+    }
+
+    void priority_trace(std::ostream& out)
+    {
+        out << "0";
+    }
+
     void bids_uni(std::ostream& out)
     {
         out << "d";
@@ -159,11 +239,20 @@ public:
 };
 
 // this order should be important if the messages aren't sorted by mixin name
-DYNAMIX_DEFINE_MIXIN(b, priority(1, bid(1, bids_uni_msg)) & priority(-1, bids_bad_uni_msg) & bids_multi_override_msg & bid(1, bids_multi_msg));
-DYNAMIX_DEFINE_MIXIN(d, bids_uni_msg & bid(1, bids_multi_override_msg) & bid(1, bids_multi_msg));
-DYNAMIX_DEFINE_MIXIN(a, bid(2, priority(1, bids_uni_msg)) & bids_bad_uni_msg & bids_multi_override_msg & bids_multi_msg);
-DYNAMIX_DEFINE_MIXIN(c, priority(1, bids_uni_msg) & bid(1, bids_multi_override_msg) & bids_multi_msg);
+DYNAMIX_DEFINE_MIXIN(b,
+    trace_msg & priority(2, priority_trace_msg)
+    & priority(1, bid(1, bids_uni_msg)) & priority(-1, bids_bad_uni_msg) & bids_multi_override_msg & bid(1, bids_multi_msg));
+DYNAMIX_DEFINE_MIXIN(a,
+    trace_msg & priority(-1, priority_trace_msg)
+    & bid(2, priority(1, bids_uni_msg)) & bids_bad_uni_msg & bids_multi_override_msg & bids_multi_msg);
+DYNAMIX_DEFINE_MIXIN(c,
+    trace_msg & priority(1, priority_trace_msg)
+    & priority(1, bids_uni_msg) & bid(1, bids_multi_override_msg) & bids_multi_msg);
+DYNAMIX_DEFINE_MIXIN(d,
+    trace_msg & priority_trace_msg & bids_uni_msg & bid(1, bids_multi_override_msg) & bid(1, bids_multi_msg));
 
+DYNAMIX_DEFINE_MESSAGE(trace);
+DYNAMIX_DEFINE_MESSAGE(priority_trace);
 DYNAMIX_DEFINE_MESSAGE(bids_uni);
 DYNAMIX_DEFINE_MESSAGE(bids_bad_uni);
 DYNAMIX_DEFINE_MESSAGE(bids_multi);

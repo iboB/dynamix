@@ -53,7 +53,7 @@
         const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
+        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
         DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
         /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
         char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -79,14 +79,14 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
-        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
         ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
             DYNAMIX_ASSERT(_d_msg_data); \
             /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
             char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -115,13 +115,13 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
-        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
-        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
             DYNAMIX_ASSERT(_d_msg_data); \
             /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
             char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -273,7 +273,7 @@
         const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
+        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
         DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
         /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
         char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -299,14 +299,14 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
-        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
         ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
             DYNAMIX_ASSERT(_d_msg_data); \
             /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
             char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -335,13 +335,13 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
-        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
-        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
             DYNAMIX_ASSERT(_d_msg_data); \
             /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
             char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -493,7 +493,7 @@
         const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
+        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
         DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
         /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
         char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -519,14 +519,14 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
-        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
         ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
             DYNAMIX_ASSERT(_d_msg_data); \
             /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
             char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -555,13 +555,13 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
-        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
-        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
             DYNAMIX_ASSERT(_d_msg_data); \
             /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
             char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -713,7 +713,7 @@
         const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
+        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
         DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
         /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
         char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -739,14 +739,14 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
-        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
         ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
             DYNAMIX_ASSERT(_d_msg_data); \
             /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
             char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -775,13 +775,13 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
-        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
-        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
             DYNAMIX_ASSERT(_d_msg_data); \
             /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
             char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -933,7 +933,7 @@
         const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
+        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
         DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
         /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
         char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -959,14 +959,14 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
-        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
         ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
             DYNAMIX_ASSERT(_d_msg_data); \
             /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
             char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -995,13 +995,13 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
-        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
-        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
             DYNAMIX_ASSERT(_d_msg_data); \
             /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
             char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -1153,7 +1153,7 @@
         const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
+        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
         DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
         /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
         char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -1179,14 +1179,14 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
-        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
         ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
             DYNAMIX_ASSERT(_d_msg_data); \
             /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
             char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -1215,13 +1215,13 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
-        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
-        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
             DYNAMIX_ASSERT(_d_msg_data); \
             /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
             char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -1373,7 +1373,7 @@
         const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.message_data; \
+        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
         DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
         /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
         char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -1399,14 +1399,14 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
-        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
         ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
             DYNAMIX_ASSERT(_d_msg_data); \
             /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
             char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
@@ -1435,13 +1435,13 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const call_table_entry* _d_begin = _d_call_entry.multicast_begin; \
-        const call_table_entry* _d_end = _d_call_entry.multicast_end; \
+        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
         DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         DYNAMIX_ASSERT(_d_end); \
-        for(const call_table_entry* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_iter->message_data; \
+            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
             DYNAMIX_ASSERT(_d_msg_data); \
             /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
             char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \

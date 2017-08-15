@@ -51,6 +51,9 @@ class bad_copy_construction : public exception {};
 /// non-copy-assignable mixin
 class bad_copy_assignment : public exception {};
 
+/// Thrown by DYNAMIX_CALL_NEXT_BIDDER if no next bidder is available
+class bad_next_bidder_call : public exception {};
+
 }
 
 /// A macro that throws an exception if `DYNAMIX_USE_EXCEPTIONS`
