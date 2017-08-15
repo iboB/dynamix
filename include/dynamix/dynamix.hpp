@@ -38,6 +38,7 @@
 #include "allocators.hpp"
 
 // possibly leave those to be included separately ?
+#include "next_bidder.hpp"
 #include "mutation_rule.hpp"
 #include "common_mutation_rules.hpp"
 #include "combinators.hpp"

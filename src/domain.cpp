@@ -98,7 +98,8 @@ const object_type_info* domain::get_object_type_info(const mixin_type_info_vecto
     else
     {
         // create object type info
-        object_type_info* new_type = new object_type_info;
+        // use unique_ptr since fill_call_table might throw
+        std::unique_ptr<object_type_info> new_type(new object_type_info);
         new_type->_compact_mixins = mixins;
 
         for(size_t i=0; i<mixins.size(); ++i)
@@ -110,8 +111,8 @@ const object_type_info* domain::get_object_type_info(const mixin_type_info_vecto
 
         new_type->fill_call_table();
 
-        _object_type_infos.insert(make_pair(query, new_type));
-        return new_type;
+        _object_type_infos.insert(make_pair(query, new_type.get()));
+        return new_type.release();
     }
 }
 

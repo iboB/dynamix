@@ -253,14 +253,14 @@ void object::destroy_mixin(mixin_id id)
 
 bool object::implements_message(feature_id id) const
 {
-    return !!_type_info->_call_table[id].message_data;
+    return !!_type_info->_call_table[id].top_bid_message;
 }
 
 size_t object::message_num_implementers(feature_id id) const
 {
     auto& entry = _type_info->_call_table[id];
 
-    if (!entry.message_data)
+    if (!entry.top_bid_message)
     {
         return 0;
     }
@@ -271,7 +271,7 @@ size_t object::message_num_implementers(feature_id id) const
     }
     else
     {
-        return entry.multicast_end - entry.multicast_begin;
+        return entry.end - entry.begin;
     }
 }
 
