@@ -1,7 +1,22 @@
 /*! \page revisions Revision History
 
+DynaMix 1.2.0
+=============
+
+*(2017 Sep ??)*
+
+- Introduced a new feature: Message bids
+    - Overriding multicast functions is now possible
+    - Added `DYNAMIX_CALL_NEXT_BIDDER` which works for unicasts and multicasts
+    - Added bids tutorial
+- Dropped CMake 2.x support. Transition to modern CMake (3.2+)
+- Added copy_to function to help deal with slicing when copying types inherited
+from `object` and not using copy-construction or assignment operator.
+
 DynaMix 1.1.0
 =============
+
+*(2017 Mar 01)*
 
 - Dropped support for an obscure optimization feature which allowed for the same
 mixins and messages to be defined multiple times in multiple modules (i.e. in a
@@ -20,11 +35,15 @@ number of objects and mixins, respectively, of a given type.
 DynaMix 1.0.4
 =============
 
+*(2017 Feb 25)*
+
 - Added check for object copy safety.
 - Added two new common mutation rules `bundled_mixins` and `dependent_mixins`.
 
 DynaMix 1.0.3
 =============
+
+*(2017 Jan 26)*
 
 - Added a optional header with message macros with no arity. Its use is not
 recommended because it breaks all known code-completion tools.
@@ -37,6 +56,8 @@ message calls are about 12% faster.
 DynaMix 1.0.2
 =============
 
+*(2017 Jan 16)*
+
 - Added copying of objects
 - Added `num_implementers` to `object` to check the number of mixins which
 implement a message
@@ -45,6 +66,8 @@ implement a message
 DynaMix 1.0.1
 =============
 
+*(2016)*
+
 - Removed build tools other than CMake
 - Removed C++98/03 support. Switch to C++11 only.
 - Added default message implementations.
@@ -52,6 +75,8 @@ DynaMix 1.0.1
 
 DynaMix 1.0.0
 =============
+
+*(2013)*
 
 First official release of the library (as Boost.Mixin)
 

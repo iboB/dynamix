@@ -11,8 +11,6 @@ write it in their own free time, so concrete dates are hard to estimate)
     - Call mixin constructors when mutating object or constructing them via
     object type templates. Sample usage:
     `mutate(obj).add<mixin>("foo", param2).add<other_mixin>(42)`
-    - Message bids &ndash; allow mixins to "bid" for different messages (analogous to
-    `priority` for unicasts, but hides implementations on multicast messages)
     - Optimize mutation process: less allocations. Design special
     `mixin_collection` for the process, that can be preallocated (or that uses
     a buffer that's allocated only once) and has `reserve`. Allow reuse of
