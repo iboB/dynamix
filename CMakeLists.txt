@@ -6,7 +6,7 @@
 # https://opensource.org/licenses/MIT
 #
 
-cmake_minimum_required(VERSION 2.8.7)
+cmake_minimum_required(VERSION 3.2.2)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -38,26 +38,16 @@ option(DYNAMIX_BUILD_TUTORIALS "DynaMix: build tutorials" ON)
 option(DYNAMIX_BUILD_PERF "DynaMix: build performance tests (requires manual code generation step)" OFF)
 
 # config
-if(CMAKE_HOST_APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -stdlib=libc++")
-elseif(NOT MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}) # so executables are next to the dll
-
-set(DYNAMIX_INCLUDE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    CACHE STRING "DynaMix: include paths"
-)
-
-include_directories(${DYNAMIX_INCLUDE})
 
 # sources
 
 set(dynamix_sources) # list to be filled with the source files for the project
 
-set(inc_path ${DYNAMIX_INCLUDE}/dynamix)
+set(dynamix_include ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+set(inc_path ${dynamix_include}/dynamix)
 set(src_path ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 src_group(public dynamix_sources
@@ -111,13 +101,33 @@ src_group("private" dynamix_sources
 )
 
 if(DYNAMIX_SHARED_LIB)
-    add_definitions(-DDYNAMIX_DYNLIB)
     add_library(dynamix SHARED ${dynamix_sources})
+    target_compile_definitions(dynamix PUBLIC
+        -DDYNAMIX_DYNLIB
+    )
 else()
     add_library(dynamix STATIC ${dynamix_sources})
 endif()
 
 set_target_properties(dynamix PROPERTIES FOLDER dynamix)
+
+target_compile_features(dynamix PUBLIC
+    cxx_alias_templates
+    cxx_auto_type
+    cxx_decltype
+    cxx_delegating_constructors
+    cxx_final
+    cxx_lambdas
+    cxx_override
+    cxx_range_for
+    cxx_right_angle_brackets
+    cxx_rvalue_references
+    cxx_static_assert
+)
+
+target_include_directories(dynamix PUBLIC
+    ${dynamix_include}
+)
 
 # resolve options
 
