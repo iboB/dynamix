@@ -67,7 +67,8 @@ cleaner and easier to read, it's also a bit better in performance, because it
 will save you the indirections from getting to those features.
 
 Try using a mixin common to all objects only it these cases:
-- When it contains functionality which can be overriden by other mixins
+- When it contains functionality which can be overriden by other mixins (for
+such cases default message implementations is also something to consider).
 - When the functionality is not a core piece of the software but instead comes
 in an optional plug-in.
 
