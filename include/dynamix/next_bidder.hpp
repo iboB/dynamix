@@ -141,7 +141,7 @@ bool has_next_bidder(Mixin* mixin, Message* message)
 *  arguments of the current method.
 */
 #define DYNAMIX_CALL_NEXT_BIDDER(message_tag, ...) \
-    ::dynamix::call_next_bidder(this, message_tag, __VA_ARGS__)
+    ::dynamix::call_next_bidder(this, message_tag, ##__VA_ARGS__)
 
 /**
 * \brief Macro that checks if a bidder with a lower bid exists from a message
