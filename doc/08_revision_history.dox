@@ -10,8 +10,6 @@ DynaMix 1.2.0
     - Added `DYNAMIX_CALL_NEXT_BIDDER` which works for unicasts and multicasts
     - Added bids tutorial
 - Dropped CMake 2.x support. Transition to modern CMake (3.2+)
-- Added copy_to function to help deal with slicing when copying types inherited
-from `object` and not using copy-construction or assignment operator.
 
 DynaMix 1.1.0
 =============
