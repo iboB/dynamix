@@ -51,6 +51,77 @@ message implementations in an object, have your messages return `bool` and then
 use the `boolean_or` combinator. It will stop the message execution on the first
 `true`.
 
+Common features in objects
+--------------------------
+
+When developing software with DynaMix, you'll often find yourself needing some
+set of features added to every object. While adding the same mixin to all
+objects (be it manually or by a mutation rule) is an option, a much cleaner
+solution is to just use your own class for objects, which iherits from
+`dynamix::object`. For such a case consider adding your own versions of the
+`dm_this` and `dynamix::object_of` functions to return your own object type.
+
+Subclassing `dynamix::object` instead of having a mixin common to *all* objects
+is the preferred way to accomplish shared object features. Apart from it being
+cleaner and easier to read, it's also a bit better in performance, because it
+will save you the indirections from getting to those features.
+
+Try using a mixin common to all objects only it these cases:
+- When it contains functionality which can be overriden by other mixins
+- When the functionality is not a core piece of the software but instead comes
+in an optional plug-in.
+
+Here is an example solution:
+
+```
+class my_object : public dynamix::object
+{
+public:
+    // all objects in this software have id and name
+    std::string name;
+    int id;
+
+    // hide implementations from object to avoid slicing when copying
+    // copy your own data in these functions too
+    my_object copy() const;
+    void copy_from(const my_object& o);
+    void copy_matching_from(const my_object& o);
+};
+
+...
+
+template <typename Mixin>
+my_object* my_object_of(Mixin* m)
+{
+    return static_cast<my_object*>(dynamix::object_of(m));
+}
+
+template <typename Mixin>
+const my_object* my_object_of(const Mixin* m)
+{
+    return static_cast<const my_object*>(dynamix::object_of(m));
+}
+
+#define my_bm_this my_object_of(this)
+
+...
+
+my_object o;
+mutate o
+    .add<my_mixin>()
+    .add<other_mixin>();
+
+...
+
+void my_mixin::foo()
+{
+    int own_object_id = my_bm_this->id;
+    ...
+}
+
+```
+
+
 Mixins with a common parent {#common_mixin_parent}
 ---------------------------
 
