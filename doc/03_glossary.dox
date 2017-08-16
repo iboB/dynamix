@@ -83,13 +83,40 @@ cases it's only relevant when multiple mixins in an object implement the same
 message. The priority is a signed integer with default value: 0.
 
 For a unicast (regular) message, the mixin with the highest message priority
-will handle it. If multiple mixins have the same top priority, a runtime error
+will handle it. If multiple mixins have the same top priority (and bid), a runtime error
 will be triggered.
 
 For a multicast message, the order of the mixins that handle it will be *descending*
 by priority. The order between mixins with the same priority cannot
 be defined. It's related to both global object initialization and how the
 unstable `std::sort` handles equal values.
+
+Message bids {#bids}
+============
+
+Bids can be complementary or alternative to priority. Again it's only relevant
+when multiple mixins implement the same message. Like the priority it's a signed
+integer with default value 0.
+
+For unicast messages it works much like finer grain priority. If multiple mixins
+implement the same message with the same *top* priority, the one will the
+highest bid will be executed when calling the message. If multiple mixins have
+the same top priority and bid, a runtime error will be triggered. However, the
+whole point of using bids for unicasts is that the bidders for the top priority
+are preserved in the objects type info. This allows you to call the next bidder
+while executing a message, much like you can execute the superclass's
+implementation of a virtual function in the code of the overriding one. This
+happens by using the `DYNAMIX_CALL_NEXT_BIDDER` macro.
+
+For multicasts, messages are sorted first by bid and then by priority within the
+same bid value. When calling the message, only the implementators with the same
+top bid will be executed (in the order determined by their priority). Thus while
+calling the next bidder is allowed (and strange), the more useful application of
+bids for multicasts is to override them. Unicast priority allows you to override
+unicast messages (and thus hide the implementation when calling the message).
+The priority for multicasts determines the order only. It doesn't allow you to
+override. With bids you can override multicast messages by adding mixins which
+implement them with a higher bid.
 
 Multicast result combinators {#combinators}
 ============================
@@ -130,7 +157,7 @@ prevent a mixin to be added to an object or force one, even though the mutation
 wants to add it or doesn't mention it.
 
 A very common mutation rule is to have mutually exclusive mixins, where when you
-add one, the other is removed.
+add one, the other is automatically removed.
 
 The library offers some common mutation rules, but users can easily define their
 own custom ones.
