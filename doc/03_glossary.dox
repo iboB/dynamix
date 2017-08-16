@@ -15,7 +15,7 @@ or remove mixins from it via the object mutators.
 The particular set of mixins in an object defines its type. An object mutation
 (adding or removing mixins) changes the objects type.
 
-Now, "type", as mentioned above has nothing to do with the concept of type in
+Now, "type", as mentioned above, has nothing to do with the concept of type in
 C++. A `dynamix::object` naturally always is a `dynamix:object`. The
 object's type is a runtime concept, which is rarely (or never) used in a program.
 Instead, what's relevant for objects is their interface &ndash; which messages they
@@ -70,7 +70,7 @@ One key difference between messages and methods is the multicast mechanism,
 introduced by DynaMix. For example consider the case when you add several
 mixins that implement the same message to an object and then call this message.
 
-In the regular case one (based on priority) of those mixin will handle it. But if you
+In the regular case one (based on bid and priority) of those mixins will handle it. But if you
 define the message as a *multicast*, all of them will. This is very useful for
 cases such as information gathering (say with a message like `trace
 (std::ostream& out)`)
@@ -87,9 +87,12 @@ will handle it. If multiple mixins have the same top priority (and bid), a runti
 will be triggered.
 
 For a multicast message, the order of the mixins that handle it will be *descending*
-by priority. The order between mixins with the same priority cannot
-be defined. It's related to both global object initialization and how the
-unstable `std::sort` handles equal values.
+by priority. The order between mixins with the same priority is based on the
+lexicographical order of the messages names (ie message `amsg` will be executed
+before message `bmsg`, which in turn will be executed before `bzmsg`). The
+lexicographical order rule is there to ensure that even if the users don't add
+explicit priorities to messages, the order of their execution will be the same
+in all modules and on all platforms.
 
 Message bids {#bids}
 ============
