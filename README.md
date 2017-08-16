@@ -67,6 +67,17 @@ cache-locality for critical parts of the code
 modifying, or even rebuilding, the executable.
 * Thread safe message calls &ndash; as thread safe as the underlying methods.
 
+## Created with DynaMix
+
+The following projects are known to use DynaMix as a key piece of their software architecture:
+
+* [War Planet Online: Global Conquest](http://warplanetonline.com/) by Gameloft (Released 2017) - An MMORTS for Android and iOS.
+* [Blitz Brigade: Rival Tactics](http://www.rival-tactics.com/) by Gameloft (Released 2017) - A multiplayer RTS for Android, iOS, and Windows.
+* [Swords & Crossbones: An Epic Pirate Story](http://store.steampowered.com/app/383720/Swords__Crossbones_An_Epic_Pirate_Story/) by Epic Devs LLC (Released 2014) - A strategy/exploration game for Android, iOS, and PC.
+* [Earthrise](https://www.play-earthrise.com/) by Masthead Studios (Released 2011) - An MMORPG (no longer supported). Uses an early proprietary prototype version of the library with a similar interface and different implementation.
+
+*There are two more known mobile games in development which use it. They will be added to this list upon release.*
+
 ## Documentation
 
 The full documentation is available at the [GitHub page of the library](https://ibob.github.io/dynamix/)
