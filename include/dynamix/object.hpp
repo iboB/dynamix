@@ -58,6 +58,7 @@ public:
 #endif
 
     /// Explicit copy via move assignment
+    /// This function is not recommended as it wil slice the type if you have a class iherited from object
     object copy() const;
 
     /// Explicit assignment from existing object.
