@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -171,7 +171,6 @@ argument -- the message's name.
 
 DYNAMIX_DEFINE_MESSAGE(think);
 DYNAMIX_DEFINE_MESSAGE(set_mesh);
-DYNAMIX_DEFINE_MESSAGE(render);
 DYNAMIX_DEFINE_MESSAGE(trace);
 
 /*`
@@ -314,9 +313,50 @@ resume as before.
     render(enemy); // drawing a hostile enemy
 
 /*`
-And that concludes our tutorial on messages.
+Finally, in this tutorial we'll examine another type of object. An utility one.
+It has no rendering but is still a part of the scene. Let's say it's a spatial
+tigger of some sort:
 */
 
+    dynamix::object trigger;
+
+    dynamix::mutate(trigger)
+        .add<has_id>()
+        // ...also other mixins not relevant for this tutorial
+        ;
+
+/*`
+Now what would happen if we call `render` for this object. You might know that
+in such case an exception will be thrown: `dynamix::bad_message_call`. To
+prevent this from happening, we typically take special precautions that
+messages are never called for objects that don't implement them. For example we
+might maintain a list of all objects that do implement `render` only loop
+through it when we render the scene. This, among others, is a perfectly valid
+solution, but let's say that in our particular case the non-renderable objects
+are so few, that we would much rather pay the price of an empty message call
+than the one for maintaing a list of all renderable objects.
+
+A possible, and still valid, solution is to add a mixin to all non-renderable
+objects which implements `render` with something default (in our case nothing),
+but another one is to use default message implementations.
+
+You might have noticed that the `render` message wasn't defined when we talked
+about message definitions. This is not a mistake on our part but instead we
+kept it for later to define it another macro:
+*/
+
+//]
+
+//[tutorial_messages_D
+/*`
+Now we can safely call `render` for our trigger object:
+*/
+
+    render(trigger); // rendering nothing via a default message implementation
+
+/*`
+And that concludes our tutorial on messages.
+*/
 //]
 
     return 0;
@@ -388,8 +428,34 @@ void stunned_ai::trace(ostream& out) const
     cout << "\tthat is stunned" << endl;
 }
 
+//[tutorial_messages_C
+
+DYNAMIX_DEFINE_MESSAGE_0_WITH_DEFAULT_IMPL(void, render)
+{
+    cout << "Rendering nothing" << endl;
+}
+
+/*`
+`DYNAMIX_DEFINE_MESSAGE_N_WITH_DEFAULT_IMPL` where N is the number of arguments
+can be used to define messages in such a way that if they're called for an
+object that doesn't implemented, the default implementation will be called
+instead of an exception being thrown.
+
+Note that you will have to copy the signature so it matches the one in the
+message declaration macro. Thus you will also gain access to the arguments if
+such exist.
+
+The default implementation function, much like the implementation inside a
+mixin is a regular function. It can return values and have access to `dm_this`.
+The only thing to consider is that it will be discrarded if the object
+implements a message. For example while valid for a multicast, it won't be
+called if at least one mixin in the object implements it.
+*/
+//]
 
 //[tutorial_messages
 //` %{tutorial_messages_A}
 //` %{tutorial_messages_B}
+//` %{tutorial_messages_C}
+//` %{tutorial_messages_D}
 //]
