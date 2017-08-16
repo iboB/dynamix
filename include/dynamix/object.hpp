@@ -213,8 +213,9 @@ _dynamix_internal:
 
     size_t message_num_implementers(feature_id id) const;
 
-    // virtual mixin for default behavior
+    // virtual mixin for default message implementation
     // used only so as to not have a null pointer cast to the appropriate type for default implementations
+    // which could be treated as an error in some debuggers
     struct default_impl_virtual_mixin { void* unused; };
     struct default_impl_virtual_mixin_data_in_object
     {
