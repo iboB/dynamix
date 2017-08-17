@@ -7,6 +7,12 @@ notifications:
   email:
     on_success: change
     on_failure: always
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/d605a517fe78a18459bd
+    on_success: change
+    on_failure: always
+    on_start: never
 git:
   depth: 5
 
