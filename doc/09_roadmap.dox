@@ -4,9 +4,15 @@ Here is a list of planned features and events for the library: (The authors
 write it in their own free time, so concrete dates are hard to estimate)
 
 - Possibly soon
+    - Revise (and possibly redesign) allocators
+    - Create some library allocators: one with mem pages (vector memory), a
+    per-frame style allocator, object pool style `std::list` one.
     - Case-study: A demo project, that better illustrates the libraries
     functionalities in a "real life" scenario. Complete with a document which
     gives problems for motivation and their DynaMix solutions.
+    - Internal messsages: ways to notify mixins that their object was created
+    or mutated (when all mixins are constructed)
+    - Remove arity from message macros
 - Not soon, but with concrete idea of how to be done:
     - Call mixin constructors when mutating object or constructing them via
     object type templates. Sample usage:
@@ -15,8 +21,6 @@ write it in their own free time, so concrete dates are hard to estimate)
     `mixin_collection` for the process, that can be preallocated (or that uses
     a buffer that's allocated only once) and has `reserve`. Allow reuse of
     `single_object_mutator`.
-    - Create some library allocators: one with mem pages (vector memory), a
-    per-frame style allocator, object pool style `std::list` one.
     - private messages/mixins &ndash; messages/mixins that are not used outside of a
     module - leave more room for other messages/mixins
     - Add a new mixin feature `fact`. Facts are static const variables in a
@@ -24,10 +28,9 @@ write it in their own free time, so concrete dates are hard to estimate)
     - Reflection. Call messages by string.
     - "Static" mixins. As long as they're not mutated in or out, it provides a
     faster message execution.
-    - Make use of the fact that a BIG performance improvement can be made if
+    - Make use of the fact that a significant performance improvement can be made if
     a user has no mixins or messages defined in a dynamic library (and has no
     plans to add such)
-    - Reduce library memory footprint
     - Vectorized mixin/message memory: Instead of having a maximal number of
     them, grow the mixin_type_info/message_info buffers by that
     number. Might lead to slower mutations.
