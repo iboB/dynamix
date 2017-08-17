@@ -74,7 +74,7 @@ The following projects are known to use DynaMix as a key piece of their software
 * [War Planet Online: Global Conquest](http://warplanetonline.com/) by Gameloft (Released 2017) - An MMORTS for Android and iOS.
 * [Blitz Brigade: Rival Tactics](http://www.rival-tactics.com/) by Gameloft (Released 2017) - A multiplayer RTS for Android, iOS, and Windows.
 * [Swords & Crossbones: An Epic Pirate Story](http://store.steampowered.com/app/383720/Swords__Crossbones_An_Epic_Pirate_Story/) by Epic Devs LLC (Released 2014) - A strategy/exploration game for Android, iOS, and PC.
-* [Earthrise](https://www.play-earthrise.com/) by Masthead Studios (Released 2011) - An MMORPG (no longer supported). Uses an early proprietary prototype version of the library with a similar interface and different implementation.
+* [Earthrise](https://www.play-earthrise.com/) by Masthead Studios (Released 2011) - An MMORPG (no longer supported). Uses an early proprietary prototype version of the library with a similar interface and a different implementation.
 
 *There are two more known mobile games in development which use it. They will be added to this list upon release.*
 
@@ -88,11 +88,12 @@ Several small fully working annotated tutorial programs are provided with the li
 
 * [Basic](https://ibob.github.io/dynamix/basic.html) &ndash; a program which illustrates the basic usage of DynaMix. It's a tutorial on creating mixins and messages, and creating and modifying (or *mutating*) objects.
 * [Messages](https://ibob.github.io/dynamix/tutorials.html#messages) &ndash; a tutorial which takes a deeper look at creating and calling the various types of messages.
+    * [Message bids](https://ibob.github.io/dynamix/tutorials.html#message_bids) &ndash; a tutorial which takes a deeper look at calling and overriding messages.
 * [Mutation](https://ibob.github.io/dynamix/tutorials.html#obj_mutation) &ndash; a tutorial about the various ways by which objects can be created and mutated.
     * [Mutation rules](https://ibob.github.io/dynamix/tutorials.html#mut_rules) &ndash; a deeper look at the library's capabilities for automatic object mutation.
-* [Combinators](https://ibob.github.io/dynamix/tutorials.html#mult_combinators) a tutorial about handling the return type of multicast messages.
-* [Allocators](https://ibob.github.io/dynamix/advanced.html#using_allocators) a tutorial about using the library's mixin allocators.
-* [Serialization](https://ibob.github.io/dynamix/advanced.html#serializing) a tutorial which looks at the possibilities available for serializing objects.
+* [Combinators](https://ibob.github.io/dynamix/tutorials.html#mult_combinators) &ndash; a tutorial about handling the return type of multicast messages.
+* [Allocators](https://ibob.github.io/dynamix/advanced.html#using_allocators) &ndash; a tutorial about using the library's mixin allocators.
+* [Serialization](https://ibob.github.io/dynamix/advanced.html#serializing) &ndash; a tutorial which looks at the possibilities available for serializing objects.
 
 ## Building
 

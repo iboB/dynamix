@@ -97,18 +97,18 @@ polymorphic. They're unique for their specific classes so it's absolutely
 adequate to call them by `object.get<mixin>()->method(...)`.
 
 So, let's start with the simplest case. The one we already used in the
-[link dynamix.basic basic usage example].
+[basic usage example](basic.html).
 
 The declaration syntax is the familiar macro `DYNAMIX_MESSAGE_|N|`, where
 `|N|` stands for the number of arguments the message has. The macro's arguments
 are coma separated: return value, message/method name, argument 1 type, argument
 1 name, argument 2 type, argument 2 name, etc etc.
 
-This simple case is covered by the messages `think` and `set_mesh` [footnote
+This simple case is covered by the messages `think` and `set_mesh`.
 Although set_mesh is a message that can be handled by a single class in our
 example, in an actual product there would be other types of "model" mixins,
 which would make it polymorphic. That's why we're making it a message instead
-of a method to be called by `object.get<animated_model>()->set_mesh(somemesh)`]
+of a method to be called by `object.get<animated_model>()->set_mesh(somemesh)`
 */
 
 DYNAMIX_MESSAGE_0(void, think);
@@ -125,11 +125,11 @@ DYNAMIX_CONST_MESSAGE_0(void, render);
 
 /*`
 Lets see the `trace` method, that's present in all of our classes. If we declare
-a message for it in the way we talked above, only of the mixins within an object
+a message for it in the way we talked above, only one of the mixins within an object
 will be able to handle it. But when we `trace` an object's info, we obviously
 would like to have the info for all of its mixins. For cases like this: where
 more than one of the mixins in an object is supposed to handle a message,
-DynaMix introduces /multicast/ messages. You declare those by adding
+DynaMix introduces *multicast* messages. You declare those by adding
 `MULTICAST` to the macro (before `MESSAGE` but after `CONST` if it's a const
 one)
 */
@@ -438,7 +438,7 @@ DYNAMIX_DEFINE_MESSAGE_0_WITH_DEFAULT_IMPL(void, render)
 /*`
 `DYNAMIX_DEFINE_MESSAGE_N_WITH_DEFAULT_IMPL` where N is the number of arguments
 can be used to define messages in such a way that if they're called for an
-object that doesn't implemented, the default implementation will be called
+object that doesn't implement them, the default implementation will be called
 instead of an exception being thrown.
 
 Note that you will have to copy the signature so it matches the one in the

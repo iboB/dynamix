@@ -16,8 +16,8 @@ using namespace std;
 //[tutorial_bids_A
 /*`
 After we covered the basic features of messages: unicasts, multicasts,
-priorities, and default implementations, let's now delve a bit deeper. Let's
-focus on message bids.
+priorities, overloads, and default implementations, let's now delve a bit deeper.
+Let's focus on message bids.
 
 For this tutorial let's suppose we're writing an RPG game. Let's define a
 character mixin and some messages for it:

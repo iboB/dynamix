@@ -142,7 +142,7 @@ void built_in_combinators()
 /*`
 As you may have noticed, all of our messages are functions that have a return value.
 You may have tried making multicast messages with non-void functions and noticed
-that the generated message function /is/ void and doesn't return anything.
+that the generated message function is void and doesn't return anything.
 
 The things that will help us make use of the values returned from the messages
 are the multicast result combinators.
@@ -157,11 +157,11 @@ if at least one of its mixins is. To get this value we may use the combinator
 
 /*`
 That's it. Giving a combinator as an explicit template argument to a multicast
-message call, will call a function that /has/ a return value defined by the
+message call, will call a function that *has* a return value defined by the
 combinator. In this case `boolean_or` causes the message to return a `bool`
 which is true if at least one of the messages returns non-zero.
 
-Had we defined that an object is visible if /all/ of its mixins were visible,
+Had we defined that an object is visible if *all* of its mixins were visible,
 then we could have used the built-in combinator `boolean_and`.
 
 Now let's look at another built-in combinator -- `sum`. You may have guessed that it's
@@ -219,7 +219,7 @@ returns false on the first zero value it gets. Exactly as C++'s operators `||`
 and `&&` behave.
 
 So let's define our output parameter combinator that counts all mixins that have
-more than 1 element. Also, we /could/ call it for a single object, but let's
+more than 1 element. Also, we *could* call it for a single object, but let's
 make use of the fact that it's an output parameter and count all mixins with
 more than 1 element among all objects:
 

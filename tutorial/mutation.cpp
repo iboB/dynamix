@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -29,7 +29,7 @@ class opengl_rendering {};
 class directx_rendering {};
 
 /*`
-We won't concert ourselves with their concrete functionality, so we'll just
+We won't concern ourselves with their concrete functionality, so we'll just
 leave them with no messages.
 */
 DYNAMIX_DEFINE_MIXIN(game_object, dynamix::none);
