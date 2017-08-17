@@ -9,6 +9,14 @@ Messages {#messages}
 
 %{tutorial_messages}
 
+Message bids {#message_bids}
+============
+
+(For the complete, working source of this example see [bids.cpp](https://github.com/iboB/dynamix/blob/master/tutorial/bids.cpp))
+
+%{tutorial_bids}
+
+
 Object mutation {#obj_mutation}
 ===============
 
@@ -33,7 +41,7 @@ Multicast result combinators {#mult_combinators}
 Tips and tricks {#tips_tricks}
 ===============
 
-- When adding the same set of messages to multiple mixins, create a define of
+- When adding the same set of messages to multiple mixins, create a `define` for
 them all. Like: `#define transform_messages set_position_msg & set_orientation_msg`.
 Then use it like this `DYNAMIX_DEFINE_MIXIN(x, some_messages & transform_messages);`
 - Instead of using the long message declaration macros, consider defining your
@@ -108,7 +116,7 @@ const my_object* my_object_of(const Mixin* m)
 ...
 
 my_object o;
-mutate o
+mutate(o)
     .add<my_mixin>()
     .add<other_mixin>();
 
