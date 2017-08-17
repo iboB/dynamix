@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -157,8 +157,8 @@ Naturally we could also mutate the object by changing the media provider part:
 /*`
 And have "Black Dog" played through the existing mixin `speakers_output`.
 
-Compared to a classic approach to a similar problem: multiple inheritance this
-saves us a lot of classes -- in this case four for all the combinations of types
+Compared to a classic approach to a similar problem -- multiple inheritance -- this
+saves us a lot of classes; in this case four for all the combinations of types
 of media and types of speakers, which might not sound like much, but keep in
 mind that the library is appropriate for big systems, that may have hundreds or
 even thousands of possible combinations.
@@ -214,8 +214,9 @@ void mp3_reader::copy_mp3(const string& mp3)
 
 //[basic_C
 /*`
+
 The last thing we'll cover in this basic example is how the speakers-specific
-players knew what sound to play. Remember the message we defined earlier, that
+players "know" what sound to play. Remember the message we defined earlier, that
 was supposed to be used to retrieve the sound from the media-specific players --
 `get_sound`. It wasn't used before, but it is used by the speakers to obtain the
 sound polymorphically.

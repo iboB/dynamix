@@ -71,7 +71,7 @@ when is being called.
 Multi DLL {#multi_dll}
 =========
 
-The Multi DLL example (currently Windows only) is an example that shows how
+The Multi DLL example is an example that shows how
 multiple dynamic libraries can work together sharing mixins and messages.
 
 It has four modules:

@@ -5,7 +5,7 @@
 Abstract {#abstract}
 ========
 
-DynaMix is a library that allows the composition and modification of polymorphic objects
+DynaMix is a library which allows the composition and modification of polymorphic objects
 at run time. Objects are constructed from building blocks called
 "mixins" enabling an effect similar to multiple inheritance, while allowing the
 client code to remain oblivious to the actual composition of the objects.
@@ -146,17 +146,16 @@ Comparison with multiple inheritance {#multiple_inh}
 
 The closest thing to DynaMix that C++ can offer out of the box is multiple
 inheritance. A `dynamix::object` composed of some mixins, can be thought of
-as an empty class that's derived from these classes &ndash; the object's
+as an instance of an empty class that's derived from these classes &ndash; the object's
 interface will be equal to the union of the interfaces of its mixins, and it
 will internally instantiate them.
 
-We covered how much more than multiple inheritance the library is in the
-previous section, but in case you haven't inferred everything, here a
+Here's a
 comprehensive list of the most important differences between DynaMix and C++
 multiple inheritance:
 
 - **No combinatorial explosion of types**: you compose types at runtime, and
-don't need to explicitly list all possible combination of building-block types.
+don't need to explicitly list all possible combinations of building-block types.
 - **No type-bound interfaces**: since the interface is physically separated from
 the implementation (or type), you don't need to have a single class implement
 an interface. You could separate it between multiple classes or combine
@@ -239,6 +238,9 @@ component types (like the top level parent classes, for example).
 - Some entity-component-systems allow several entities to point to the same
 instance of a component. This is not possible in DynaMix. A mixin instance
 is bound to an object instance
+- Some entity-component-systems allow an entity to contain several instances of
+the same component type. This too is not possible in DynaMix. An object can have
+either zero or one instances of a given mixin type.
 
 Note that some data structures, sometimes called entity-component-systems, are
 not used to create and manage polymorphic objects, but instead are used to bind

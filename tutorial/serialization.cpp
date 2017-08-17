@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -22,7 +22,7 @@ you can serialize `dynamix::object`-s.
 The main issue would be how to convert the object's type information to a string
 and then use this string to create an object with the same type information. As
 for the concrete serialization of the data within the mixins, this example will
-only offer a very na\u00EFve approach. We don't recommend that you use such an
+only offer a very naive approach. We don't recommend that you use such an
 approach for your mixins as it is not safe, and not backward compatible. We only
 use it here because it's very easy to write and the focus of this example is on
 the object type information.

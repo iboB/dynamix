@@ -116,7 +116,7 @@ create such an allocator.
 First, a mixin instance allocator is not necessarily bound to a concrete mixin
 type. You can have the same instance of such an allocator set for many mixins
 (which would be a common use of a per-frame allocator), but for our example
-let's create one that /is/ bound to an instance. We will make it a template
+let's create one that *is* bound to an instance. We will make it a template
 class because the code for each mixin type will be the same.
 
 A mixin instance allocator needs to be derived from the class `mixin_allocator`.

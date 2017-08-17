@@ -40,8 +40,9 @@ Once you have mixins, you can combine them into objects. Adding or removing
 mixins to an object will internally instantiate them (via their default
 constructor) or destroy them. This means that a mixin instance is bound to an
 object instance. While it can be accessed via `dynamix::object::get`, the mixin instance
-cannot be "removed" from an object, while also preserving it. Objects cannot
-share mixin instances.
+cannot be "removed" from an object while also preserving it. Objects cannot
+share mixin instances and only a single instance of mixin can be bound to an
+object.
 
 You can think of mixins as the multiple parents of a class, when using multiple
 inheritance. Only in the case of DynaMix, they can be added and removed
@@ -60,13 +61,13 @@ The methods from your mixins, that will also become messages, cannot be inferred
 from the mixin class. There are macros that let you define a message's name
 and signature. Then, when defining the mixin (with its macro), you need to
 specify which messages it will implement. You will get a compilation error if
-the class, you've made into a mixin, doesn't have the method with the
+the class you've made into a mixin doesn't have the method with the
 appropriate name and signature.
 
 Multicast messages {#multicast}
 ------------------
 
-One key difference between messages and methods is the multicast mechanism,
+One key difference between messages and methods is the multicast mechanism
 introduced by DynaMix. For example consider the case when you add several
 mixins that implement the same message to an object and then call this message.
 
@@ -97,8 +98,8 @@ in all modules and on all platforms.
 Message bids {#bids}
 ============
 
-Bids can be complementary or alternative to priority. Again it's only relevant
-when multiple mixins implement the same message. Like the priority it's a signed
+Bids can be complementary or alternative to priority. Like priorities, bids are only relevant
+when multiple mixins implement the same message. Like the priority a bid is a signed
 integer with default value 0.
 
 For unicast messages it works much like finer grain priority. If multiple mixins
