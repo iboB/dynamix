@@ -7,7 +7,7 @@ DynaMix
 
 [![Meeting CPP Badge](https://raw.githubusercontent.com/iboB/dynamix/master/doc/img/meeting_cpp_badge-scaled.png)](https://meetingcpp.com/index.php/br/items/a-cpp-review-community.html)
 
-DynaMix (*Dynamic Mixins*) is a new take on polymorphism. It lets the user compose and modify types at run time in C++.
+DynaMix (*Dynamic Mixins*) is a new take on polymorphism. It lets the user compose and modify polymorphic objects at run time in C++.
 
 The library is a means to create a project's **architecture** rather than achieve its purpose. It focuses on **maximal performance** and **minimal memory overhead**.
 
