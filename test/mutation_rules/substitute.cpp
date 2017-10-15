@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -18,7 +18,7 @@ TEST_SUITE("mutation rules");
 
 TEST_CASE("substitute")
 {
-    add_new_mutation_rule(new substitute_mixin<a, c>());
+    add_mutation_rule(new substitute_mixin<a, c>());
 
     object o;
 

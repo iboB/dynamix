@@ -21,7 +21,7 @@ TEST_CASE("bundled")
     auto bundle = new bundled_mixins;
     bundle->add<a>();
     bundle->add<b>();
-    add_new_mutation_rule(bundle);
+    add_mutation_rule(bundle);
 
     object o;
 

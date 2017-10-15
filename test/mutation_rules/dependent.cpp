@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -21,7 +21,7 @@ TEST_CASE("dependent")
     auto rule = new dependent_mixins;
     rule->set_master<a>();
     rule->add<b>();
-    add_new_mutation_rule(rule);
+    add_mutation_rule(rule);
 
     object o;
 

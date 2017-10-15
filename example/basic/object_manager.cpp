@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -31,7 +31,7 @@ void object_manager::create_objects()
     rendering_mixins->add<d3d_renderer>();
     rendering_mixins->add<gl_renderer>();
 
-    add_new_mutation_rule(rendering_mixins);
+    add_mutation_rule(rendering_mixins);
 
     object_type_template type;
     type

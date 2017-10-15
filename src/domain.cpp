@@ -48,23 +48,60 @@ domain::~domain()
     {
         delete i.second;
     }
-
-    for (const mutation_rule* rule : _mutation_rules)
-    {
-        delete rule;
-    }
 }
 
-void domain::add_new_mutation_rule(mutation_rule* rule)
+mutation_rule_id domain::add_mutation_rule(mutation_rule* rule)
 {
-    _mutation_rules.push_back(rule);
+    std::shared_ptr<mutation_rule> ptr(rule);
+    return add_mutation_rule(ptr);
+}
+
+mutation_rule_id domain::add_mutation_rule(std::shared_ptr<mutation_rule> rule)
+{
+#if DYNAMIX_THREAD_SAFE_MUTATIONS
+    std::lock_guard<std::mutex> lock(_mutation_rules_mutex);
+#endif
+
+    // find free slot
+    for (mutation_rule_id i = 0; i < _mutation_rules.size(); ++i)
+    {
+        auto& r = _mutation_rules[i];
+        if (!r)
+        {
+            r = rule;
+            return i;
+        }
+    }
+
+    _mutation_rules.emplace_back(std::move(rule));
+    return _mutation_rules.size() - 1;
+}
+
+std::shared_ptr<mutation_rule> domain::remove_mutation_rule(mutation_rule_id id)
+{
+#if DYNAMIX_THREAD_SAFE_MUTATIONS
+    std::lock_guard<std::mutex> lock(_mutation_rules_mutex);
+#endif
+
+    if (id >= _mutation_rules.size()) return std::shared_ptr<mutation_rule>();
+
+    auto ret = _mutation_rules[id];
+    _mutation_rules[id].reset();
+    return ret;
 }
 
 void domain::apply_mutation_rules(object_type_mutation& mutation)
 {
-    for (mutation_rule* rule : _mutation_rules)
+#if DYNAMIX_THREAD_SAFE_MUTATIONS
+    std::lock_guard<std::mutex> lock(_mutation_rules_mutex);
+#endif
+
+    for (auto& rule : _mutation_rules)
     {
-        rule->apply_to(mutation);
+        if (rule)
+        {
+            rule->apply_to(mutation);
+        }
     }
 }
 
@@ -309,9 +346,24 @@ mixin_id domain::get_mixin_id_by_name(const char* mixin_name) const
 
 } // namespace internal
 
-void add_new_mutation_rule(mutation_rule* rule)
+mutation_rule_id add_new_mutation_rule(mutation_rule* rule)
 {
-    internal::domain::safe_instance().add_new_mutation_rule(rule);
+    return internal::domain::safe_instance().add_mutation_rule(rule);
+}
+
+mutation_rule_id add_mutation_rule(mutation_rule* rule)
+{
+    return internal::domain::safe_instance().add_mutation_rule(rule);
+}
+
+mutation_rule_id add_mutation_rule(std::shared_ptr<mutation_rule> rule)
+{
+    return internal::domain::safe_instance().add_mutation_rule(rule);
+}
+
+std::shared_ptr<mutation_rule> remove_mutation_rule(mutation_rule_id id)
+{
+    return internal::domain::safe_instance().remove_mutation_rule(id);
 }
 
 // set allocator to all domains
