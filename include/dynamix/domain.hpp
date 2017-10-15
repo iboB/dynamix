@@ -15,12 +15,12 @@
 #include <dynamix/message.hpp>
 
 #include <unordered_map>
+#include <memory>
 #include <type_traits> // alignment of
 
 #if DYNAMIX_THREAD_SAFE_MUTATIONS
 #include <mutex>
 #endif
-
 
 /**
  * \file
@@ -52,7 +52,9 @@ public:
     // no static variables, not safe to call globally
     static const domain& instance();
 
-    void add_new_mutation_rule(mutation_rule* rule);
+    mutation_rule_id add_mutation_rule(std::shared_ptr<mutation_rule> rule);
+    mutation_rule_id add_mutation_rule(mutation_rule* rule);
+    std::shared_ptr<mutation_rule> remove_mutation_rule(mutation_rule_id id);
     void apply_mutation_rules(object_type_mutation& mutation);
 
     size_t num_registered_mixins() const { return _num_registered_mixins; }
@@ -144,9 +146,13 @@ _dynamix_internal:
     typedef std::unordered_map<available_mixins_bitset, object_type_info*> object_type_info_map;
 
     object_type_info_map _object_type_infos;
-    std::mutex _object_type_infos_mutex;
 
-    std::vector<mutation_rule*> _mutation_rules;
+    std::vector<std::shared_ptr<mutation_rule>> _mutation_rules;
+
+#if DYNAMIX_THREAD_SAFE_MUTATIONS
+    std::mutex _object_type_infos_mutex;
+    std::mutex _mutation_rules_mutex;
+#endif
 
     // feature registration functions for the supported kinds of features
     void internal_register_feature(message_t& m);

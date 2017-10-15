@@ -1,5 +1,18 @@
 /*! \page revisions Revision History
 
+DynaMix 1.2.1
+=============
+
+Released: 2017 Oct 15
+
+- Improved mutation rules: They can now be added, removed and persisted via
+shared pointers
+- Added `object::has` and `object::get` with `const char*` to query mixins by
+name
+- `add_new_mutation_rule` is now deprecated
+- Fixed library version header
+
+
 DynaMix 1.2.0
 =============
 

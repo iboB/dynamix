@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -35,7 +35,9 @@ TEST_SUITE("mutation rules");
 
 TEST_CASE("mutation rules")
 {
-    add_new_mutation_rule(new custom_rule());
+    auto id = add_mutation_rule(new custom_rule());
+
+    CHECK(id == 0);
 
     object o;
 
@@ -53,4 +55,45 @@ TEST_CASE("mutation rules")
     CHECK(!o.has<a>());
     CHECK(!o.has<b>());
     CHECK(o.has<c>());
+
+    auto rule = remove_mutation_rule(id);
+
+    mutate(o)
+        .add<a>();
+
+    CHECK(o.has<a>());
+    CHECK(!o.has<b>());
+    CHECK(o.has<c>());
+
+    mutate(o)
+        .add<b>();
+
+    CHECK(o.has<a>());
+    CHECK(o.has<b>());
+    CHECK(o.has<c>());
+
+    id = add_mutation_rule(rule);
+    CHECK(id == 0);
+
+    auto depr = std::make_shared<deprecated_mixin<c>>();
+    id = add_mutation_rule(depr);
+    CHECK(id == 1);
+
+    mutate(o)
+        .remove<a>();
+
+    CHECK(o.empty());
+
+    CHECK(rule == remove_mutation_rule(0));
+
+    mutate(o)
+        .add<a>()
+        .add<c>();
+
+    CHECK(o.has<a>());
+    CHECK(!o.has<b>());
+    CHECK(!o.has<c>());
+
+    rule.reset();
+    CHECK(rule == remove_mutation_rule(123));
 }

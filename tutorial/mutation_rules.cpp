@@ -74,11 +74,11 @@ mixin `furniture`. That could be accomplished if we manually add it to all
 mutations we make but there is a simpler way to do it. By adding the
 `mandatory_mixin` mutation rule.
 
-All mutation rules should be added by calling `add_new_mutation_rule`. Since
+All mutation rules should be added by calling `add_mutation_rule`. Since
 `mandatory_mixin` is a mutation rule that the library provides, we can
 accomplish this with a single line of code:
 */
-    dynamix::add_new_mutation_rule(new dynamix::mandatory_mixin<furniture>);
+    dynamix::add_mutation_rule(new dynamix::mandatory_mixin<furniture>);
 /*`
 Now each mutation after this line will add `furniture` to the objects (even if
 it's not been explicitly added) and also if a mutation tries to remove the `furniture` mixin
@@ -102,14 +102,26 @@ prevent anybody from adding the mixin to an object. Basically the exact opposite
 of `mandatory_mixin`. This is the mutation rule `deprecated_mixin`
 */
 
-    dynamix::add_new_mutation_rule(new dynamix::deprecated_mixin<ofml_serialization>);
+    auto id = dynamix::add_mutation_rule(new dynamix::deprecated_mixin<ofml_serialization>);
+
 /*`
 After that line of code, any mutation that tries to add
 `ofml_serialization` won't be able to, and all mutations will try to remove it
 if it's present in an object. Again, as was the case before, if a mutation does
 many things, only the part from it, trying to add `ofml_serialization` will be
-silently ignored.
+silently ignored. Also, we will store the id of the newly added rule for the next example.
 
+Mutation rules are registered globally and they are ran on every mutation, inadvertedly
+slowing it down. Sometimes you will encounter the need to add a mutation rule which is needed
+or only makes sense for a limited amount of time. For example deprecating `ofml_serialization`
+from the source line above might only be needed when loading objects and then our code
+might never add it, rendering this rule useless for the majority of the program's run. In such
+cases we can remove a rule with `remove_mutation_rule` like so:
+*/
+
+    dynamix::remove_mutation_rule(id);
+
+/*`
 The last built-in rule in the library is `mutually_exclusive_mixins`.
 
 Since a piece of furniture has either wood frame or a metal frame and never
@@ -121,7 +133,7 @@ helps us do exactly that.
     dynamix::mutually_exclusive_mixins* rule = new dynamix::mutually_exclusive_mixins;
     rule->add<wood_frame>();
     rule->add<metal_frame>();
-    dynamix::add_new_mutation_rule(rule);
+    dynamix::add_mutation_rule(rule);
 
 /*`
 You may add as many mutually exclusive mixins as you wish. If you had, say,
@@ -164,7 +176,7 @@ Two rules are affected by this mutation. First it will implicitly add
 The mutually exclusive mixins will ensure that after this line the object won't
 have the `wood_frame` mixin.
 
-Having listed all built-in mutation rules, let's define a custom one.
+Having listed some built-in mutation rules, let's now define a custom one.
 
 Defining a custom rule is very easy. All you need to do is create a class
 derived from `dynamix::mutation_rule` and override its pure virtual method
@@ -199,7 +211,7 @@ is being removed and the object has doors.
 That's it. Now all we have to do is add our mutation rule and it will be
 active.
 */
-    dynamix::add_new_mutation_rule(new container_rule);
+    dynamix::add_mutation_rule(new container_rule);
 
     dynamix::mutate(o)
         .add<has_doors>();
@@ -219,12 +231,14 @@ its `has_doors` mixin removed.
 To see all ways in which you can change a mutation from the mutation rule,
 check out the documentation entry on `object_type_mutation`.
 
-Lastly, there are two important pieces of information about mutation rules
+Lastly, there are three more important pieces of information about mutation rules
 that you need to know.
 
-First, note that the library will be responsible for freeing the memory and
-destroying the rules you've added. All you need to do is call
-`add_new_mutation_rule` with a rule, allocated and constructed with `new`.
+In these examples we always added mutation rule pointers, allocated with `new`.
+In such case the library will take ownership of the pointer and will be
+responsible for destroying and deallocating the rules you've added. However
+you can also add mutation rules with `std::shared_ptr` and keep ownership even
+after they are removed (and potentially readd them).
 
 Second, you may have noticed that mutation rules can logically depend on
 each other. You may ask yourselves what does the library do about that?

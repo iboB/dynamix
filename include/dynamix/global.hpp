@@ -54,6 +54,7 @@ namespace dynamix
 {
     typedef size_t mixin_id;
     typedef size_t feature_id;
+    typedef size_t mutation_rule_id;
 
 namespace internal
 {
