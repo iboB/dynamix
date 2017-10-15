@@ -303,6 +303,12 @@ bool object::has(mixin_id id) const
     return internal_has_mixin(id);
 }
 
+bool object::has(const char* mixin_name) const
+{
+    auto id = domain::instance().get_mixin_id_by_name(mixin_name);
+    return has(id);
+}
+
 void* object::get(mixin_id id)
 {
     if (id >= DYNAMIX_MAX_MIXINS)
@@ -315,6 +321,18 @@ const void* object::get(mixin_id id) const
     if (id >= DYNAMIX_MAX_MIXINS)
         return nullptr;
     return internal_get_mixin(id);
+}
+
+void* object::get(const char* mixin_name)
+{
+    auto id = domain::instance().get_mixin_id_by_name(mixin_name);
+    return get(id);
+}
+
+const void* object::get(const char* mixin_name) const
+{
+    auto id = domain::instance().get_mixin_id_by_name(mixin_name);
+    return get(id);
 }
 
 void object::usurp(object&& o)
