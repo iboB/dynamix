@@ -116,15 +116,35 @@ public:
     /// Checks if the object has a specific mixin by id.
     bool has(mixin_id id) const;
 
+    /// Checks if the object has a specific mixin by mixin name (name of the class or
+    /// dynamix_mixin_name if `DYNAMIX_USE_TYPEID` is false).
+    bool has(const char* mixin_name) const;
+
     /// Gets a specific mixin by id from the object. Returns nullptr if the mixin
     /// isn't available. It is the user's responsibility to cast the returned
-    /// value to the appropriate type
+    /// value to the appropriate type.
     void* get(mixin_id id);
 
     /// Gets a specific mixin by id from the object. Returns nullptr if the mixin
     /// isn't available. It is the user's responsibility to cast the returned
-    /// value to the appropriate type
+    /// value to the appropriate type.
     const void* get(mixin_id id) const;
+
+    /// Gets a specific mixin by mixin name from the object. Returns nullptr if the mixin
+    /// isn't available. It is the user's responsibility to cast the returned
+    /// value to the appropriate type.
+    ///
+    /// The mixin name is the name of the actual mixin class or the result of
+    /// dynamix_mixin_name if `DYNAMIX_USE_TYPEID` is false.
+    void* get(const char* mixin_name);
+
+    /// Gets a specific mixin by mixin name from the object. Returns nullptr if the mixin
+    /// isn't available. It is the user's responsibility to cast the returned
+    /// value to the appropriate type.
+    ///
+    /// The mixin name is the name of the actual mixin class or the result of
+    /// dynamix_mixin_name if `DYNAMIX_USE_TYPEID` is false.
+    const void* get(const char* mixin_name) const;
     /////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////

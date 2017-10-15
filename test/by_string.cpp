@@ -99,6 +99,10 @@ TEST_CASE("mixin_names")
     CHECK(o.has<other_mixin>());
     CHECK(o.has<third>());
     CHECK(!o.has<unused>());
+    CHECK(o.has("mixin_a"));
+    CHECK(o.has("other_mixin"));
+    CHECK(o.has("third"));
+    CHECK(!o.has("unused"));
 
     single_object_mutator mutator(o);
 
@@ -115,4 +119,8 @@ TEST_CASE("mixin_names")
     CHECK(!o.has<other_mixin>());
     CHECK(!o.has<third>());
     CHECK(!o.has<unused>());
+    CHECK(o.has("mixin_a"));
+    CHECK(!o.has("other_mixin"));
+    CHECK(!o.has("third"));
+    CHECK(!o.has("unused"));
 }
