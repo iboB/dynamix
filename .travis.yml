@@ -33,7 +33,7 @@ matrix:
       compiler: gcc
       addons: &gcc5
         apt:
-          packages: ["g++-5",     "valgrind", "libc6-dbg"]
+          packages: ["g++-5",     "valgrind"]
           sources: *apt_sources
 
     # GCC 6
@@ -41,7 +41,7 @@ matrix:
       compiler: gcc
       addons: &gcc6
         apt:
-          packages: ["g++-6",     "valgrind", "g++-6-multilib",   "libc6-dbg"]
+          packages: ["g++-6",     "valgrind"]
           sources: *apt_sources
 
     # GCC 7
@@ -49,21 +49,21 @@ matrix:
       compiler: gcc
       addons: &gcc7
         apt:
-          packages: ["g++-7",     "valgrind", "g++-7-multilib",   "libc6-dbg"]
+          packages: ["g++-7",     "valgrind"]
           sources: *apt_sources
 
     # Clang 4.0
     - env: COMPILER=clang++-4.0
       addons: &clang40
         apt:
-          packages: ["clang-4.0", "valgrind", "g++-multilib", "libc6-dbg", "g++-6"]
+          packages: ["clang-4.0", "valgrind", "g++-6"]
           sources: *apt_sources
 
     # Clang 5.0
     - env: COMPILER=clang++-5.0
       addons: &clang50
         apt:
-          packages: ["clang-5.0", "valgrind", "g++-multilib", "libc6-dbg", "g++-6"]
+          packages: ["clang-5.0", "valgrind", "g++-6"]
           sources: *apt_sources
 
     # Xcode 8.3 Clang
@@ -104,14 +104,13 @@ before_script:
 
 script:
   - mkdir -p debug_build
-  #- export ASAN_OPTIONS=allow_addr2line=true:check_initialization_order=true:strict_init_order=true:strict_string_checks=true:detect_odr_violation=2:detect_stack_use_after_return=true:verbosity=2
   - cd debug_build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Debug #-DCMAKE_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
   - make -j2
-  - ctest --output-on-failure
+  - ASAN_OPTIONS=allow_addr2line=true:check_initialization_order=true:strict_init_order=true:strict_string_checks=true:detect_odr_violation=2:detect_stack_use_after_return=true:verbosity=2 ctest --output-on-failure
   - cd ..
   - mkdir -p release_build
   - cd release_build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Release #-DCMAKE_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
   - make -j2
-  - ctest --output-on_failure
+  - ASAN_OPTIONS=allow_addr2line=true:check_initialization_order=true:strict_init_order=true:strict_string_checks=true:detect_odr_violation=2:detect_stack_use_after_return=true:verbosity=2 ctest --output-on_failure
