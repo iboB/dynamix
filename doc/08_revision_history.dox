@@ -5,7 +5,7 @@ DynaMix 1.2.2
 
 Released: 2017 Oct 18
 
-- Fixed a bug which caused a memory corruption when moving an object into
+- Fixed a bug which caused a memory corruption when moving an empty object into
 another object
 
 
