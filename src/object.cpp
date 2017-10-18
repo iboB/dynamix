@@ -169,10 +169,13 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
         }
     }
 
-    // set the appropriate default message implementation virtual mixin
-    mixin_data_in_object& data = _mixin_data[object_type_info::DEFAULT_MSG_IMPL_INDEX];
-    data.set_buffer(reinterpret_cast<char*>(&_default_impl_virtual_mixin_data), sizeof(object*));
-    data.set_object(this);
+    if (!empty())
+    {
+        // set the appropriate default message implementation virtual mixin
+        mixin_data_in_object& data = _mixin_data[object_type_info::DEFAULT_MSG_IMPL_INDEX];
+        data.set_buffer(reinterpret_cast<char*>(&_default_impl_virtual_mixin_data), sizeof(object*));
+        data.set_object(this);
+    }
 }
 
 bool object::construct_mixin(mixin_id id, const void* source)
@@ -345,9 +348,12 @@ void object::usurp(object&& o)
         _mixin_data[i].set_object(this);
     }
 
-    mixin_data_in_object& data = _mixin_data[object_type_info::DEFAULT_MSG_IMPL_INDEX];
-    data.set_buffer(reinterpret_cast<char*>(&_default_impl_virtual_mixin_data), sizeof(object*));
-    data.set_object(this);
+    if (!empty())
+    {
+        mixin_data_in_object& data = _mixin_data[object_type_info::DEFAULT_MSG_IMPL_INDEX];
+        data.set_buffer(reinterpret_cast<char*>(&_default_impl_virtual_mixin_data), sizeof(object*));
+        data.set_object(this);
+    }
 
     // clear other object
     o._type_info = &object_type_info::null();
@@ -362,7 +368,7 @@ void object::copy_from(const object& o)
         return;
     }
 
-    if (o._type_info == &object_type_info::null())
+    if (o.empty())
     {
         clear();
         return;
