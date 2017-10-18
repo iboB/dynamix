@@ -21,7 +21,6 @@ addons:
     sources: &apt_sources
       - ubuntu-toolchain-r-test
       - llvm-toolchain-trusty
-      - llvm-toolchain-trusty-3.9
       - llvm-toolchain-trusty-4.0
       - llvm-toolchain-trusty-5.0
 
@@ -29,7 +28,7 @@ addons:
 matrix:
   include:
     # GCC 5
-    - env: COMPILER=g++-5
+    - env: COMPILER=g++-5 ADDITIONAL_CXX_FLAGS=" -fuse-ld=gold"
       compiler: gcc
       addons: &gcc5
         apt:
@@ -37,7 +36,7 @@ matrix:
           sources: *apt_sources
 
     # GCC 6
-    - env: COMPILER=g++-6
+    - env: COMPILER=g++-6 ADDITIONAL_CXX_FLAGS=" -fuse-ld=gold"
       compiler: gcc
       addons: &gcc6
         apt:
@@ -45,7 +44,7 @@ matrix:
           sources: *apt_sources
 
     # GCC 7
-    - env: COMPILER=g++-7
+    - env: COMPILER=g++-7 ADDITIONAL_CXX_FLAGS=" -fuse-ld=gold"
       compiler: gcc
       addons: &gcc7
         apt:
@@ -106,14 +105,12 @@ script:
   - export ASAN_OPTIONS=allow_addr2line=true:check_initialization_order=true:strict_init_order=true:strict_string_checks=true:detect_odr_violation=2:detect_stack_use_after_return=true:verbosity=2
   - mkdir -p debug_build
   - cd debug_build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Debug
-  - cmake .. -DCMAKE_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS} -g -fno-omit-frame-pointer -fsanitize=address,undefined"
   - make -j2
   - ctest --output-on-failure
   - cd ..
   - mkdir -p release_build
   - cd release_build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Release
-  - cmake .. -DCMAKE_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS} -g -fno-omit-frame-pointer -fsanitize=address,undefined"
   - make -j2
   - ctest --output-on_failure
