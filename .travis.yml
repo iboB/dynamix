@@ -102,8 +102,8 @@ before_script:
   - cmake --version
 
 script:
-  - export ASAN_OPTIONS=allow_addr2line=true:check_initialization_order=true:strict_init_order=true:strict_string_checks=true:detect_odr_violation=2:detect_stack_use_after_return=true:detect_leaks=1:verbosity=2
-  - export LSAN_OPTIONS=suppressions=tools/lsan.supp
+  - export ASAN_OPTIONS=allow_addr2line=true:check_initialization_order=true:strict_init_order=true:strict_string_checks=true:detect_odr_violation=2:detect_stack_use_after_return=true:verbosity=0
+  - export LSAN_OPTIONS=suppressions=../tools/lsan.supp
   - mkdir -p debug_build
   - cd debug_build
   - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS}"
