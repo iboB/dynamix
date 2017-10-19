@@ -76,7 +76,7 @@ matrix:
       os: osx
 
     # OSX GCC 5
-    - env: COMPILER=g++-5 ADDITIONAL_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
+    - env: COMPILER=g++-5
       compiler: gcc
       osx_image: xcode7.3
       os: osx
