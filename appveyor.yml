@@ -12,34 +12,37 @@ clone_depth: 5
 branches:
   only:
     - master
+    - dev
 
 matrix:
   fast_finish: false
 
 environment:
   matrix:
-  - platform: x86
-    configuration: Debug
-    arch: "Win32"
-    VS_GEN: "Visual Studio 14 2015"
-  - platform: x86
-    configuration: Release
-    arch: "Win32"
-    VS_GEN: "Visual Studio 14 2015"
-  - platform: x64
-    configuration: Debug
-    arch: "x64"
-    VS_GEN: "Visual Studio 14 2015 Win64"
-  - platform: x64
-    configuration: Release
-    arch: "x64"
-    VS_GEN: "Visual Studio 14 2015 Win64"
+  - gen: "Visual Studio 14 2015"
+  - gen: "Visual Studio 15 2017"
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
 
-before_build:
-  - if not exist vcbuild mkdir vcbuild
-  - cd vcbuild
-  - cmake .. -G "%VS_GEN%"
 build_script:
-  - msbuild dynamix.sln /p:Configuration=%Configuration%;Platform=%arch% /maxcpucount
-test_script:
-  - ctest -C %configuration% --output-on-failure
+  - if not exist vcbuild_x86 mkdir vcbuild_x86
+  - cd vcbuild_x86
+  - cmake .. -G "%gen%"
+  - msbuild dynamix.sln /p:Configuration=Debug;Platform=Win32 /maxcpucount
+  - ctest -C Debug --output-on-failure
+  - msbuild dynamix.sln /p:Configuration=Release;Platform=Win32 /maxcpucount
+  - ctest -C Release --output-on-failure
+  - cd ..
+  - if not exist vcbuild_x64 mkdir vcbuild_x64
+  - cd vcbuild_x64
+  - cmake .. -G "%gen% Win64"
+  - msbuild dynamix.sln /p:Configuration=Debug;Platform=x64 /maxcpucount
+  - ctest -C Debug --output-on-failure
+  - msbuild dynamix.sln /p:Configuration=Release;Platform=x64 /maxcpucount
+  - ctest -C Release --output-on-failure
+  - cd ..
+# static analysis
+  #~ - if "%gen%" == "Visual Studio 15 2017" mkdir vcbuild_analysis
+  #~ - if "%gen%" == "Visual Studio 15 2017" cd vcbuild_analysis
+  #~ - if "%gen%" == "Visual Studio 15 2017" cmake .. -G "%gen% Win64"
+  #~ - if "%gen%" == "Visual Studio 15 2017" msbuild dynamix.sln /p:Configuration=Debug;Platform=x64 /maxcpucount /p:RunCodeAnalysis=true /p:CodeAnalysisTreatWarningsAsErrors=true
+  #~ - if "%gen%" == "Visual Studio 15 2017" cd ..
