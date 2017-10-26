@@ -27,17 +27,17 @@ build_script:
   - if not exist vcbuild_x86 mkdir vcbuild_x86
   - cd vcbuild_x86
   - cmake .. -G "%gen%"
-  - msbuild dynamix.sln /p:Configuration=Debug;Platform=Win32 /maxcpucount
+  - msbuild dynamix.sln /p:Configuration=Debug;Platform=Win32 /maxcpucount /verbosity:minimal
   - ctest -C Debug --output-on-failure
-  - msbuild dynamix.sln /p:Configuration=Release;Platform=Win32 /maxcpucount
+  - msbuild dynamix.sln /p:Configuration=Release;Platform=Win32 /maxcpucount /verbosity:minimal
   - ctest -C Release --output-on-failure
   - cd ..
   - if not exist vcbuild_x64 mkdir vcbuild_x64
   - cd vcbuild_x64
   - cmake .. -G "%gen% Win64"
-  - msbuild dynamix.sln /p:Configuration=Debug;Platform=x64 /maxcpucount
+  - msbuild dynamix.sln /p:Configuration=Debug;Platform=x64 /maxcpucount /verbosity:minimal
   - ctest -C Debug --output-on-failure
-  - msbuild dynamix.sln /p:Configuration=Release;Platform=x64 /maxcpucount
+  - msbuild dynamix.sln /p:Configuration=Release;Platform=x64 /maxcpucount /verbosity:minimal
   - ctest -C Release --output-on-failure
   - cd ..
 # static analysis
