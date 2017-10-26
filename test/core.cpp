@@ -29,11 +29,18 @@ DYNAMIX_MULTICAST_MESSAGE_1(void, multi, int&, n)
 
 class no_messages
 {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "no_messages"; }
+#endif
 };
 
 class counter
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "counter"; }
+#endif
     counter()
         : _count(0)
     {}
@@ -57,6 +64,9 @@ private:
 class type_checker
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "type_checker"; }
+#endif
     const void* get_self() const
     {
         return this;

@@ -79,7 +79,9 @@ TEST_CASE("bids")
     bids_uni(o, sout);
     CHECK(sout.str() == "abc");
 
+#if DYNAMIX_USE_EXCEPTIONS
     CHECK_THROWS_AS(bids_bad_uni(o, sout), bad_next_bidder_call);
+#endif
 
     sout.str(string());
     bids_multi_override(o, sout);
@@ -93,7 +95,9 @@ TEST_CASE("bids")
         .remove<c>()
         .remove<d>();
 
+#if DYNAMIX_USE_EXCEPTIONS
     CHECK_THROWS_AS(bids_uni(o, sout), bad_next_bidder_call);
+#endif
 
     sout.str(string());
     bids_multi_override(o, sout);
@@ -107,6 +111,10 @@ TEST_CASE("bids")
 class a
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "a"; }
+#endif
+
     void trace(std::ostream& out)
     {
         out << "a";
@@ -145,6 +153,10 @@ public:
 class b
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "b"; }
+#endif
+
     void trace(std::ostream& out)
     {
         out << "b";
@@ -182,6 +194,10 @@ public:
 class c
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "c"; }
+#endif
+
     void trace(std::ostream& out)
     {
         out << "c";
@@ -212,6 +228,10 @@ public:
 class d
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "d"; }
+#endif
+
     void trace(std::ostream& out)
     {
         out << "d";

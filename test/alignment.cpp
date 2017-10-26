@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -57,6 +57,9 @@ TEST_CASE("aligned_mixin")
 class align_default
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "align_default"; }
+#endif
     void check_alignment()
     {
         CHECK(intptr_t(this) % std::alignment_of<align_default>::value == 0);
@@ -70,9 +73,12 @@ public:
 #endif
 
 
-class ALIGN(16) align_8
+class ALIGN(8) align_8
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "align_8"; }
+#endif
     void check_alignment()
     {
         CHECK(intptr_t(this) % 8 == 0);
@@ -82,6 +88,9 @@ public:
 class ALIGN(16) align_16
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "align_16"; }
+#endif
     void check_alignment()
     {
         CHECK(intptr_t(this) % 16 == 0);
@@ -91,6 +100,9 @@ public:
 class ALIGN(32) align_32
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "align_32"; }
+#endif
     void check_alignment()
     {
         CHECK(intptr_t(this) % 32 == 0);

@@ -17,6 +17,10 @@ using namespace dynamix;
 class a
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "a"; }
+#endif
+
     a() : val(10) {}
     int val;
 
@@ -28,6 +32,10 @@ public:
 class b
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "b"; }
+#endif
+
     b() : val(1) {}
     int val;
 

@@ -7,6 +7,8 @@
 //
 #include <dynamix/dynamix.hpp>
 
+#if DYNAMIX_USE_EXCEPTIONS
+
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest/doctest.h"
 
@@ -201,3 +203,11 @@ DYNAMIX_DEFINE_MESSAGE(m2);
 DYNAMIX_DEFINE_MESSAGE(u1);
 DYNAMIX_DEFINE_MESSAGE(u2);
 DYNAMIX_DEFINE_MESSAGE(unused);
+
+#else
+int main()
+{
+    // tests not applicalble for this case
+    return 0;
+}
+#endif

@@ -14,6 +14,7 @@
 
 #include "global.hpp"
 #include "assert.hpp"
+#include "preprocessor.hpp"
 
 #if DYNAMIX_USE_EXCEPTIONS
 

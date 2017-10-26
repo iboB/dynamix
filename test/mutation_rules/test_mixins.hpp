@@ -16,9 +16,24 @@ DYNAMIX_DECLARE_MIXIN(a);
 DYNAMIX_DECLARE_MIXIN(b);
 DYNAMIX_DECLARE_MIXIN(c);
 
-class a {};
-class b {};
-class c {};
+class a {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "a"; }
+#endif
+};
+class b {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "b"; }
+#endif
+};
+class c {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "c"; }
+#endif
+};
 
 DYNAMIX_DEFINE_MIXIN(a, dynamix::none);
 DYNAMIX_DEFINE_MIXIN(b, dynamix::none);

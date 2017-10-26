@@ -14,16 +14,36 @@ using namespace dynamix;
 
 TEST_SUITE("by string");
 
-class mixin_a {};
+class mixin_a {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "mixin_a"; }
+#endif
+};
 DYNAMIX_DEFINE_MIXIN(mixin_a, none);
 
-class other_mixin {};
+class other_mixin {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "other_mixin"; }
+#endif
+};
 DYNAMIX_DEFINE_MIXIN(other_mixin, none);
 
-class third {};
+class third {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "third"; }
+#endif
+};
 DYNAMIX_DEFINE_MIXIN(third, none);
 
-class unused {};
+class unused {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "unused"; }
+#endif
+};
 DYNAMIX_DEFINE_MIXIN(unused, none);
 
 TEST_CASE("mixin_ids")
@@ -56,8 +76,10 @@ TEST_CASE("mixin_ids")
     CHECK_NOTHROW(mut.add(omid));
     CHECK_NOTHROW(mut.add(tid));
 
+#if DYNAMIX_USE_EXCEPTIONS
     CHECK_THROWS_AS(mut.add(invalid), bad_mutation);
     CHECK_THROWS_AS(mut.add(1234), bad_mutation);
+#endif
 
     mut.apply();
 

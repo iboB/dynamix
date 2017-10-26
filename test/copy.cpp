@@ -18,6 +18,9 @@ using namespace dynamix;
 class trivial_copy
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "trivial_copy"; }
+#endif
     int i = 0;
 };
 
@@ -27,6 +30,9 @@ DYNAMIX_DEFINE_MIXIN(trivial_copy, none);
 class special_copy
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "special_copy"; }
+#endif
     special_copy() = default;
     special_copy(const special_copy& other)
         : i(other.i + 1)
@@ -49,6 +55,9 @@ DYNAMIX_DEFINE_MIXIN(special_copy, none);
 class no_copy
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "no_copy"; }
+#endif
     no_copy() = default;
     no_copy(const no_copy&) = delete;
     no_copy& operator=(const no_copy& other) = delete;
@@ -132,7 +141,9 @@ TEST_CASE("obj_copy_fail")
         .add<no_copy>();
 
     CHECK(!o1.copyable());
+#if DYNAMIX_USE_EXCEPTIONS
     CHECK_THROWS_AS(object foo = o1.copy(), bad_copy_construction);
+#endif
 
     object o2;
     mutate(o2)
@@ -141,7 +152,9 @@ TEST_CASE("obj_copy_fail")
         .add<no_copy>();
 
     CHECK(!o2.copyable());
+#if DYNAMIX_USE_EXCEPTIONS
     CHECK_THROWS_AS(o1.copy_from(o2), bad_copy_assignment);
+#endif
 
     object o3;
     mutate(o3)
@@ -149,7 +162,9 @@ TEST_CASE("obj_copy_fail")
         .add<no_copy>();
 
     CHECK(!o3.copyable());
+#if DYNAMIX_USE_EXCEPTIONS
     CHECK_THROWS_AS(o1.copy_from(o3), bad_copy_assignment);
+#endif
 
     object o4;
     mutate(o4)
@@ -158,6 +173,58 @@ TEST_CASE("obj_copy_fail")
     CHECK_NOTHROW(o1.copy_matching_from(o4));
     CHECK_NOTHROW(o4.copy_matching_from(o1));
 
+#if DYNAMIX_USE_EXCEPTIONS
     CHECK_THROWS_AS(o4.copy_from(o1), bad_copy_construction);
+#endif
 }
+
+#if DYNAMIX_OBJECT_IMPLICIT_COPY
+TEST_CASE("obj_copy_ctor")
+{
+    object osrc1;
+    mutate(osrc1)
+        .add<trivial_copy>()
+        .add<special_copy>();
+
+    osrc1.get<trivial_copy>()->i = 2;
+    osrc1.get<special_copy>()->i = 5;
+
+    CHECK(osrc1.copyable());
+
+    object c1 = osrc1;
+    CHECK(c1._type_info == osrc1._type_info);
+    CHECK(c1.get<trivial_copy>()->i == 2);
+    CHECK(c1.get<special_copy>()->i == 6);
+    CHECK(c1.get<special_copy>()->cc == 1);
+    CHECK(c1.get<special_copy>()->a == 0);
+
+    object osrc2;
+    mutate(osrc2)
+        .add<special_copy>();
+
+    osrc2.get<special_copy>()->i = 3;
+
+    CHECK(osrc2.copyable());
+
+    c1.copy_matching_from(osrc2);
+    CHECK(c1._type_info == osrc1._type_info);
+    CHECK(c1.get<trivial_copy>()->i == 2);
+    CHECK(c1.get<special_copy>()->i == 5);
+    CHECK(c1.get<special_copy>()->cc == 1);
+    CHECK(c1.get<special_copy>()->a == 1);
+
+    c1 = osrc2;
+    CHECK(c1._type_info == osrc2._type_info);
+    CHECK(c1.get<special_copy>()->i == 5);
+    CHECK(c1.get<special_copy>()->cc == 1);
+    CHECK(c1.get<special_copy>()->a == 2);
+
+    c1 = osrc1;
+    CHECK(c1._type_info == osrc1._type_info);
+    CHECK(c1.get<trivial_copy>()->i == 2);
+    CHECK(c1.get<special_copy>()->i == 7);
+    CHECK(c1.get<special_copy>()->cc == 1);
+    CHECK(c1.get<special_copy>()->a == 3);
+}
+#endif
 

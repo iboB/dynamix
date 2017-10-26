@@ -7,6 +7,8 @@
 //
 #include <dynamix/dynamix.hpp>
 
+#if DYNAMIX_ADDITIONAL_METRICS
+
 #include "mutation_rules/test_mixins.hpp"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
@@ -80,3 +82,10 @@ TEST_CASE("metrics")
 
 }
 
+#else
+int main()
+{
+    // tests not applicalble for this case
+    return 0;
+}
+#endif

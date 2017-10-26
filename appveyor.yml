@@ -40,6 +40,14 @@ build_script:
   - msbuild dynamix.sln /p:Configuration=Release;Platform=x64 /maxcpucount /verbosity:minimal
   - ctest -C Release --output-on-failure
   - cd ..
+  - if not exist vcbuild_cc mkdir vcbuild_cc
+  - cd vcbuild_cc
+  - cmake .. -DDYNAMIX_BUILD_PERF=0 -DDYNAMIX_BUILD_EXAMPLES=0 -DDYNAMIX_BUILD_TUTORIALS=0 -DDYNAMIX_BUILD_SCRATCH=0 -DDYNAMIX_CUSTOM_CONFIG_FILE="\"%cd%\..\..\..\test\custom_config\custom_config.hpp\"" -G "%gen% Win64"
+  - msbuild dynamix.sln /p:Configuration=Debug;Platform=x64 /maxcpucount /verbosity:minimal
+  - ctest -C Debug --output-on-failure
+  - msbuild dynamix.sln /p:Configuration=Release;Platform=x64 /maxcpucount /verbosity:minimal
+  - ctest -C Release --output-on-failure
+  - cd ..
 # static analysis
   #~ - if "%gen%" == "Visual Studio 15 2017" mkdir vcbuild_analysis
   #~ - if "%gen%" == "Visual Studio 15 2017" cd vcbuild_analysis

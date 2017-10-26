@@ -1,5 +1,14 @@
 /*! \page revisions Revision History
 
+DynaMix 1.2.3
+=============
+
+Released: 2017 Oct 28
+
+- Added possibility to change the library configuration via a custom config
+header file without editing `config.hpp` in the source
+
+
 DynaMix 1.2.2
 =============
 

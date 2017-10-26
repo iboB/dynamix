@@ -20,8 +20,8 @@
 #include <cstring> // for memset
 
 // getting a type's name
-#if DYNAMIX_USE_TYPEID // using typeid: tested for msvc and gcc
-#   if defined(__GNUC__)
+#if DYNAMIX_USE_TYPEID // using typeid: tested for msvc, gcc and clang
+#   if defined(__GNUC__) // __GNUC__ is defined with clang
         // use cxxabi to unmangle the gcc typeid name
 #       include <cxxabi.h>
         namespace dynamix { namespace internal { extern DYNAMIX_API int cxa_demangle_status; } }
@@ -30,7 +30,7 @@
         // msvc typeid names are "class x" instead of "x", remove the "class " by adding 6
 #       define DYNAMIX_MIXIN_TYPE_NAME(type) (typeid(type).name() + 6)
 #   else
-#       error "getting typenames with typeid hasn't been tested on compilers other than gcc and msvc"
+#       error "getting typenames with typeid hasn't been tested on compilers other than gcc, clang, and msvc"
 #   endif
 #else // safer but more inconvenient way
 #   define DYNAMIX_MIXIN_TYPE_NAME(type) type::dynamix_mixin_name()

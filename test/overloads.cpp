@@ -67,6 +67,10 @@ TEST_CASE("overloads")
 class has_unio1_multio1
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "has_unio1_multio1"; }
+#endif
+
     int uni() { return 0; }
     int multi(int& out) { return out += 0; }
 };
@@ -74,6 +78,10 @@ public:
 class has_unio2_multio2
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "has_unio2_multio2"; }
+#endif
+
     int uni(int a) { return a; }
     int multi(int& out, int a) { return out += a; }
 };
@@ -81,6 +89,10 @@ public:
 class has_unio3_multio1
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "has_unio3_multio1"; }
+#endif
+
     int uni(int a1, int a2) { return a1 + a2; }
     int multi(int& out) { return out += 1; }
 };
@@ -88,6 +100,10 @@ public:
 class has_unio4_multio2
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "has_unio4_multio2"; }
+#endif
+
     int uni(int a1, int a2, int a3) { return a1 + a2 + a3; }
     int multi(int& out, int a) { return out += a + 1; }
 };

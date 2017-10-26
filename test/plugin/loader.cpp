@@ -119,7 +119,9 @@ TEST_CASE("plugin")
     ClosePlugin(p, o);
 
     CHECK(dl_a_multicast<sum>(o) == 24);
+#if DYNAMIX_USE_EXCEPTIONS
     CHECK_THROWS_AS(dl_a_exported(o), bad_message_call);
+#endif
 
     // apparently dlclose with gnuc doesn't consider unloading the plugin so file
     // this test works with MSVC and clang
@@ -154,6 +156,9 @@ TEST_CASE("shared")
 class exe_mixin
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "exe_mixin"; }
+#endif
     int dl_a_multicast()
     {
         return 1;

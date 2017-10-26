@@ -55,6 +55,10 @@ TEST_CASE("message_move_semantics")
 class receive_rvalue
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "receive_rvalue"; }
+#endif
+
     void i_like(movable&& m)
     {
         movable here_now = std::move(m);

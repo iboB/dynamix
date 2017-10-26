@@ -28,6 +28,10 @@ DYNAMIX_DEFINE_MESSAGE(plugin_a_local);
 class mixin_a
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "mixin_a"; }
+#endif
+
     int dl_a_exported()
     {
         return -::dl_a_multicast<combinators::sum>(*dm_this);

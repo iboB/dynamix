@@ -150,12 +150,42 @@ TEST_CASE("allocators")
     CHECK(alloc_counter<custom_alloc_var>::data_allocations == 0);
 }
 
-class normal_a {};
-class normal_b {};
-class custom_1 {};
-class custom_2_a {};
-class custom_2_b {};
-class custom_own_var {};
+class normal_a {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "normal_a"; }
+#endif
+};
+class normal_b {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "normal_b"; }
+#endif
+};
+class custom_1 {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "normal_1"; }
+#endif
+};
+class custom_2_a {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "normal_2_a"; }
+#endif
+};
+class custom_2_b {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "normal_2_b"; }
+#endif
+};
+class custom_own_var {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "normal_own_var"; }
+#endif
+};
 
 DYNAMIX_DEFINE_MIXIN(normal_a, dynamix::none);
 DYNAMIX_DEFINE_MIXIN(normal_b, dynamix::none);

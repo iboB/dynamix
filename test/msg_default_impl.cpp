@@ -47,8 +47,12 @@ TEST_CASE("basic_msgs")
 {
     object o;
 
+    CHECK(!o.implements(basic_def_msg));
+
+#if DYNAMIX_USE_EXCEPTIONS
     // empty objects don't implement default implementations
     CHECK_THROWS_AS(basic_def(o), bad_message_call);
+#endif
 
     mutate(o)
         .add<mix_a>()
@@ -117,6 +121,9 @@ TEST_CASE("multi")
 class mix_a
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "mix_a"; }
+#endif
     int basic()
     {
         return 100;
@@ -131,6 +138,10 @@ public:
 class mix_b
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "mix_b"; }
+#endif
+
     int basic_1(int x)
     {
         return n + x;
@@ -152,6 +163,10 @@ public:
 class mix_c
 {
 public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "mix_c"; }
+#endif
+
     int basic_def()
     {
         return 1000;

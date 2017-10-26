@@ -110,6 +110,12 @@ else()
     add_library(dynamix STATIC ${dynamix_sources})
 endif()
 
+if(DYNAMIX_CUSTOM_CONFIG_FILE)
+    target_compile_definitions(dynamix PUBLIC
+        -DDYNAMIX_CUSTOM_CONFIG_FILE=${DYNAMIX_CUSTOM_CONFIG_FILE}
+    )
+endif()
+
 set_target_properties(dynamix PROPERTIES FOLDER dynamix)
 
 target_compile_features(dynamix PUBLIC
