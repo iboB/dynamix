@@ -87,7 +87,7 @@ namespace internal
 
 char* default_allocator::alloc_mixin_data(size_t count)
 {
-#if defined(DYNAMIX_DEBUG)
+#if DYNAMIX_DEBUG
     _has_allocated = true;
 #endif
     return allocate_mixin_data(count);
@@ -95,7 +95,7 @@ char* default_allocator::alloc_mixin_data(size_t count)
 
 void default_allocator::dealloc_mixin_data(char* ptr)
 {
-#if defined(DYNAMIX_DEBUG)
+#if DYNAMIX_DEBUG
     DYNAMIX_ASSERT(_has_allocated); // what? deallocate without ever allocating?
 #endif
     deallocate_mixin_data(ptr);
@@ -103,7 +103,7 @@ void default_allocator::dealloc_mixin_data(char* ptr)
 
 void default_allocator::alloc_mixin(size_t mixin_size, size_t mixin_alignment, char*& out_buffer, size_t& out_mixin_offset)
 {
-#if defined(DYNAMIX_DEBUG)
+#if DYNAMIX_DEBUG
     _has_allocated = true;
 #endif
 
@@ -118,7 +118,7 @@ void default_allocator::alloc_mixin(size_t mixin_size, size_t mixin_alignment, c
 
 void default_allocator::dealloc_mixin(char* ptr)
 {
-#if defined(DYNAMIX_DEBUG)
+#if DYNAMIX_DEBUG
     DYNAMIX_ASSERT(_has_allocated); // what? deallocate without ever allocating?
 #endif
     delete[] ptr;

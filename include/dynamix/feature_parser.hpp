@@ -108,7 +108,7 @@ private:
     template <typename Message>
     void parse_message(mixin_type_info& mixin_info, Message& msg, int bid, int priority)
     {
-#if defined(DYNAMIX_DEBUG)
+#if DYNAMIX_DEBUG
         // check for duplicate entries
         for (const message_for_mixin& msg_info : mixin_info.message_infos)
         {

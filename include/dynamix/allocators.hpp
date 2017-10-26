@@ -99,7 +99,7 @@ public:
     /// mixin data in `alloc_mixin_data`
     static constexpr size_t mixin_data_size = sizeof(internal::mixin_data_in_object);
 
-#if defined(DYNAMIX_DEBUG)
+#if DYNAMIX_DEBUG
     // checks to see if an allocator is changed after it has already started allocating
     // it could be a serious bug to allocate from one and deallocate from another
 

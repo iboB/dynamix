@@ -27,7 +27,7 @@ void mutually_exclusive_mixins::apply_to(object_type_mutation& mutation)
         {
             DYNAMIX_ASSERT_MSG(adding == INVALID_MIXIN_ID, "mutation breaking a mutually exclusive mixin rule");
             adding = mixin_info->id;
-#if !defined(DYNAMIX_DEBUG)
+#if !DYNAMIX_DEBUG
             // in debug mode continue the loop, to check for other rule breaking
             // otherwise break for faster execution
             break;

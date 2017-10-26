@@ -19,8 +19,9 @@
 //     * mixins must add static const char* dynamix_mixin_name() { return <mixin class name>; }
 #define DYNAMIX_USE_TYPEID 1
 
+// enable various debug checks and assertions
 #if !defined(NDEBUG)
-#   define DYNAMIX_DEBUG // define this for ease of use
+#   define DYNAMIX_DEBUG 1
 #endif
 
 // maximum number of registered mixins
@@ -68,6 +69,7 @@
 #   pragma warning (disable: 4251)
 #endif
 
+// dynamic library interface
 #if defined(DYNAMIX_DYNLIB)
 
 // dynamic link macros

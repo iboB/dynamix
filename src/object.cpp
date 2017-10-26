@@ -190,7 +190,7 @@ bool object::construct_mixin(mixin_id id, const void* source)
 
     char* buffer;
     size_t mixin_offset;
-#if defined(DYNAMIX_DEBUG)
+#if DYNAMIX_DEBUG
     buffer = nullptr;
     mixin_offset = 0;
 #endif
