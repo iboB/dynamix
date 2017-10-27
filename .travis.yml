@@ -120,3 +120,15 @@ script:
   - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS}"
   - make -j2
   - ctest --output-on_failure
+  - cd ..
+  - mkdir -p cc_debug
+  - cd cc_debug
+  - cmake .. -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS} -fno-rtti" -DDYNAMIX_BUILD_PERF=0 -DDYNAMIX_BUILD_EXAMPLES=0 -DDYNAMIX_BUILD_TUTORIALS=0 -DDYNAMIX_BUILD_SCRATCH=0 -DDYNAMIX_CUSTOM_CONFIG_FILE="\"$PWD/../test/custom_config/custom_config.hpp\""
+  - make -j2
+  - ctest --output-on_failure
+  - cd ..
+  - mkdir -p cc_release
+  - cd cc_release
+  - cmake .. -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS} -fno-rtti" -DDYNAMIX_BUILD_PERF=0 -DDYNAMIX_BUILD_EXAMPLES=0 -DDYNAMIX_BUILD_TUTORIALS=0 -DDYNAMIX_BUILD_SCRATCH=0 -DDYNAMIX_CUSTOM_CONFIG_FILE="\"$PWD/../test/custom_config/custom_config.hpp\""
+  - make -j2
+  - ctest --output-on_failure
