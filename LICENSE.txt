@@ -1,3 +1,5 @@
+MIT License
+
 DynaMix
 Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
 
