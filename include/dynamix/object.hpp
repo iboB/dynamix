@@ -28,7 +28,7 @@ class DYNAMIX_API object
 {
 public:
     /// Constructs an empty object - no mixins.
-    object();
+    object() noexcept;
 
     /// Constructs an object from a specific type template.
     explicit object(const object_type_template& type_template);
@@ -36,10 +36,10 @@ public:
     ~object();
 
     /// Move constructor from an existing object
-    object(object&& o);
+    object(object&& o) noexcept;
 
     /// Move assignment
-    object& operator=(object&& o);
+    object& operator=(object&& o) noexcept;
 
 #if DYNAMIX_OBJECT_IMPLICIT_COPY
     /// Copy constructor
@@ -79,14 +79,14 @@ public:
     /// Returns false if either is missing from at least one of its mixins
     /// (note that there might be cases where copy_from or copy_matching_from won't throw
     /// even though this function returns false).
-    bool copyable() const;
+    bool copyable() const noexcept;
 
     /////////////////////////////////////////////////////////////////
     // mixin info
 
     /// Checks if the object has a specific mixin.
     template <typename Mixin>
-    bool has() const
+    bool has() const noexcept
     {
         const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
         // intentionally disregarding the actual info
@@ -96,7 +96,7 @@ public:
     /// Gets a specific mixin from the object. Returns nullptr if the mixin
     /// isn't available.
     template <typename Mixin>
-    Mixin* get()
+    Mixin* get() noexcept
     {
         const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
         // intentionally disregarding the actual info
@@ -106,7 +106,7 @@ public:
     /// Gets a specific mixin from the object. Returns nullptr if the mixin
     /// isn't available.
     template <typename Mixin>
-    const Mixin* get() const
+    const Mixin* get() const noexcept
     {
         const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
         // intentionally disregarding the actual info
@@ -114,21 +114,21 @@ public:
     }
 
     /// Checks if the object has a specific mixin by id.
-    bool has(mixin_id id) const;
+    bool has(mixin_id id) const noexcept;
 
     /// Checks if the object has a specific mixin by mixin name (name of the class or
     /// dynamix_mixin_name if `DYNAMIX_USE_TYPEID` is false).
-    bool has(const char* mixin_name) const;
+    bool has(const char* mixin_name) const noexcept;
 
     /// Gets a specific mixin by id from the object. Returns nullptr if the mixin
     /// isn't available. It is the user's responsibility to cast the returned
     /// value to the appropriate type.
-    void* get(mixin_id id);
+    void* get(mixin_id id) noexcept;
 
     /// Gets a specific mixin by id from the object. Returns nullptr if the mixin
     /// isn't available. It is the user's responsibility to cast the returned
     /// value to the appropriate type.
-    const void* get(mixin_id id) const;
+    const void* get(mixin_id id) const noexcept;
 
     /// Gets a specific mixin by mixin name from the object. Returns nullptr if the mixin
     /// isn't available. It is the user's responsibility to cast the returned
@@ -136,7 +136,7 @@ public:
     ///
     /// The mixin name is the name of the actual mixin class or the result of
     /// dynamix_mixin_name if `DYNAMIX_USE_TYPEID` is false.
-    void* get(const char* mixin_name);
+    void* get(const char* mixin_name) noexcept;
 
     /// Gets a specific mixin by mixin name from the object. Returns nullptr if the mixin
     /// isn't available. It is the user's responsibility to cast the returned
@@ -144,7 +144,7 @@ public:
     ///
     /// The mixin name is the name of the actual mixin class or the result of
     /// dynamix_mixin_name if `DYNAMIX_USE_TYPEID` is false.
-    const void* get(const char* mixin_name) const;
+    const void* get(const char* mixin_name) const noexcept;
     /////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////
@@ -152,7 +152,7 @@ public:
 
     /// Checks if the mixin implements a feature.
     template <typename Feature>
-    bool implements(const Feature*) const
+    bool implements(const Feature*) const noexcept
     {
         const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
         DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
@@ -163,7 +163,7 @@ public:
 
     /// Returns the number of mixins in the object which implement a feature.
     template <typename Feature>
-    size_t num_implementers(const Feature*) const
+    size_t num_implementers(const Feature*) const noexcept
     {
         const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
         DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
@@ -176,10 +176,10 @@ public:
 
     /// Destroys all mixins within an object and resets its type info
     // (sets null type info)
-    void clear();
+    void clear() noexcept;
 
     /// Returns true if the object is empty - has no mixins
-    bool empty() const;
+    bool empty() const noexcept;
 
     /////////////////////////////////////////////////////////////////
     // logging and diagnostics
@@ -205,7 +205,7 @@ _dynamix_internal:
 
     // performs the move from one object source to this
     // can only be performed on empty objects
-    void usurp(object&& o);
+    void usurp(object&& o) noexcept;
 
     // constructs mixin with optional source to copy from
     // will return false if source is provided but no copy constructor exists

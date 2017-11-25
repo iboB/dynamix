@@ -24,7 +24,7 @@ using namespace internal;
 // check or crashing
 static mixin_data_in_object null_mixin_data;
 
-object::object()
+object::object() noexcept
     : _type_info(&object_type_info::null())
     , _mixin_data(&null_mixin_data)
 {
@@ -42,12 +42,12 @@ object::~object()
     clear();
 }
 
-object::object(object&& o)
+object::object(object&& o) noexcept
 {
     usurp(std::move(o));
 }
 
-object& object::operator=(object&& o)
+object& object::operator=(object&& o) noexcept
 {
     clear();
     usurp(std::move(o));
@@ -92,7 +92,7 @@ bool object::internal_has_mixin(mixin_id id) const
     return _type_info->has(id);
 }
 
-void object::clear()
+void object::clear() noexcept
 {
     for (const mixin_type_info* mixin_info : _type_info->_compact_mixins)
     {
@@ -113,7 +113,7 @@ void object::clear()
     _type_info = &object_type_info::null();
 }
 
-bool object::empty() const
+bool object::empty() const noexcept
 {
     return _type_info == &object_type_info::null();
 }
@@ -299,46 +299,46 @@ void object::get_mixin_names(std::vector<const char*>& out_mixin_names) const
     }
 }
 
-bool object::has(mixin_id id) const
+bool object::has(mixin_id id) const noexcept
 {
     if (id >= DYNAMIX_MAX_MIXINS)
         return false;
     return internal_has_mixin(id);
 }
 
-bool object::has(const char* mixin_name) const
+bool object::has(const char* mixin_name) const noexcept
 {
     auto id = domain::instance().get_mixin_id_by_name(mixin_name);
     return has(id);
 }
 
-void* object::get(mixin_id id)
+void* object::get(mixin_id id) noexcept
 {
     if (id >= DYNAMIX_MAX_MIXINS)
         return nullptr;
     return internal_get_mixin(id);
 }
 
-const void* object::get(mixin_id id) const
+const void* object::get(mixin_id id) const noexcept
 {
     if (id >= DYNAMIX_MAX_MIXINS)
         return nullptr;
     return internal_get_mixin(id);
 }
 
-void* object::get(const char* mixin_name)
+void* object::get(const char* mixin_name) noexcept
 {
     auto id = domain::instance().get_mixin_id_by_name(mixin_name);
     return get(id);
 }
 
-const void* object::get(const char* mixin_name) const
+const void* object::get(const char* mixin_name) const noexcept
 {
     auto id = domain::instance().get_mixin_id_by_name(mixin_name);
     return get(id);
 }
 
-void object::usurp(object&& o)
+void object::usurp(object&& o) noexcept
 {
     _type_info = o._type_info;
     _mixin_data = o._mixin_data;
@@ -478,7 +478,7 @@ void object::copy_matching_from(const object& o)
     }
 }
 
-bool object::copyable() const
+bool object::copyable() const noexcept
 {
     for (const mixin_type_info* info : _type_info->_compact_mixins)
     {
