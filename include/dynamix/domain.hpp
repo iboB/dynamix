@@ -35,7 +35,7 @@ namespace dynamix
 
 class mutation_rule;
 class object_type_mutation;
-class global_allocator;
+class domain_allocator;
 
 namespace internal
 {
@@ -116,8 +116,8 @@ public:
     }
 
     // sets the current domain allocator
-    void set_allocator(global_allocator* allocator);
-    global_allocator* allocator() const { return _allocator; }
+    void set_allocator(domain_allocator* allocator);
+    domain_allocator* allocator() const { return _allocator; }
 
     // get mixin id by name string
     mixin_id get_mixin_id_by_name(const char* mixin_name) const;
@@ -160,7 +160,7 @@ _dynamix_internal:
 
 
     // allocators
-    global_allocator* _allocator;
+    domain_allocator* _allocator;
 
 private:
     static const domain& _instance; // used for the fast version of the instance getter
@@ -171,6 +171,6 @@ private:
 // allocator functions
 
 /// Sets an global allocator for all mixins.
-void DYNAMIX_API set_global_allocator(global_allocator* allocator);
+void DYNAMIX_API set_global_allocator(domain_allocator* allocator);
 
 } // namespace dynamix

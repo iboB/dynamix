@@ -305,7 +305,7 @@ void domain::unregister_mixin_type(const mixin_type_info& info)
     }
 }
 
-void domain::set_allocator(global_allocator* allocator)
+void domain::set_allocator(domain_allocator* allocator)
 {
     DYNAMIX_ASSERT(!_allocator || !_allocator->has_allocated());
 
@@ -367,7 +367,7 @@ std::shared_ptr<mutation_rule> remove_mutation_rule(mutation_rule_id id)
 }
 
 // set allocator to all domains
-void set_global_allocator(global_allocator* allocator)
+void set_global_allocator(domain_allocator* allocator)
 {
     internal::domain::safe_instance().set_allocator(allocator);
 }

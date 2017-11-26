@@ -39,24 +39,25 @@ const object_type_info& object_type_info::null()
     return null_type_info;
 };
 
-mixin_data_in_object* object_type_info::alloc_mixin_data() const
+mixin_data_in_object* object_type_info::alloc_mixin_data(const object* obj) const
 {
-    size_t num_to_allocate = _compact_mixins.size() + MIXIN_INDEX_OFFSET;
+    const size_t num_to_allocate = _compact_mixins.size() + MIXIN_INDEX_OFFSET;
 
-    char* memory = domain::instance().allocator()->alloc_mixin_data(num_to_allocate);
+    char* memory = domain::instance().allocator()->alloc_mixin_data(num_to_allocate, obj);
     mixin_data_in_object* ret = new (memory) mixin_data_in_object[num_to_allocate];
 
     return ret;
 }
 
-void object_type_info::dealloc_mixin_data(mixin_data_in_object* data) const
+void object_type_info::dealloc_mixin_data(mixin_data_in_object* data, const object* obj) const
 {
-    for (size_t i = MIXIN_INDEX_OFFSET; i < _compact_mixins.size() + MIXIN_INDEX_OFFSET; ++i)
+    const size_t num_mixins = _compact_mixins.size() + MIXIN_INDEX_OFFSET;
+    for (size_t i = MIXIN_INDEX_OFFSET; i < num_mixins; ++i)
     {
         data[i].~mixin_data_in_object();
     }
 
-    domain::instance().allocator()->dealloc_mixin_data(reinterpret_cast<char*>(data));
+    domain::instance().allocator()->dealloc_mixin_data(reinterpret_cast<char*>(data), num_mixins, obj);
 }
 
 void object_type_info::fill_call_table()

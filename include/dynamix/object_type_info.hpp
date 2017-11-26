@@ -48,8 +48,8 @@ public:
 
     static const object_type_info& null();
 
-    mixin_data_in_object* alloc_mixin_data() const;
-    void dealloc_mixin_data(mixin_data_in_object* data) const;
+    mixin_data_in_object* alloc_mixin_data(const object* obj) const;
+    void dealloc_mixin_data(mixin_data_in_object* data, const object* obj) const;
 
 _dynamix_internal:
     using mixin_collection::_mixins;

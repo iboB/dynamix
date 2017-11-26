@@ -38,7 +38,7 @@ To create a global allocator, you need to create a class derived from
 `global_allocator` and override its virtual methods.
 */
 
-class custom_allocator : public dynamix::global_allocator
+class custom_allocator : public dynamix::domain_allocator
 {
 
 /*`
@@ -47,13 +47,16 @@ object has pointers to its mixins within it. This is the array of such
 pointers. The class `global_allocator` has a static constant member --
 `mixin_data_size` -- which you should use to see the size of a single
 element in that array.
+
+The methods also have arguments referring to the object for which the mixin
+data is being allocated. We won't be using it in this simple example.
 */
-    virtual char* alloc_mixin_data(size_t count) override
+    virtual char* alloc_mixin_data(size_t count, const dynamix::object*) override
     {
         return allocate(count * mixin_data_size);
     }
 
-    virtual void dealloc_mixin_data(char* ptr) override
+    virtual void dealloc_mixin_data(char* ptr, size_t, const dynamix::object*) override
     {
         deallocate(ptr);
     }
@@ -68,7 +71,7 @@ used by the mixin instance.
 That's why this function is not as simple as the one for the mixin data
 array. It has to conform to the mixin (and also `object` pointer) alignment.
 */
-    virtual void alloc_mixin(size_t mixin_size, size_t mixin_alignment, char*& out_buffer, size_t& out_mixin_offset) override
+    virtual std::pair<char*, size_t> alloc_mixin(dynamix::mixin_id, size_t mixin_size, size_t mixin_alignment, const dynamix::object*) override
     {
 /*`
 The users are strongly advised to use the static method
@@ -78,11 +81,11 @@ there is enough room at the beginning for the pointer to the owning
 object and the memory alignment is respected.
 */
         size_t size = calculate_mem_size_for_mixin(mixin_size, mixin_alignment);
-        out_buffer = allocate(size);
+        char* buffer = allocate(size);
 
 /*`
-After you allocate the buffer you should take care of the other output
-parameter - the mixin offset. It calculates the offset of the actual
+After you allocate the buffer you should take care of the other return
+value - the mixin offset. It calculates the offset of the actual
 mixin instance memory within the buffer, such that there is room for
 the owning object pointer in before it and all alignments are
 respected.
@@ -90,13 +93,15 @@ respected.
 You are encouraged to use the static method
 `global_allocator::calculate_mixin_offset` for this purpose.
 */
-        out_mixin_offset = calculate_mixin_offset(out_buffer, mixin_alignment);
+        size_t mixin_offset = calculate_mixin_offset(buffer, mixin_alignment);
+
+        return std::make_pair(buffer, mixin_offset);
     }
 
 /*`
 The mixin instance deallocation method can be trivial
 */
-    virtual void dealloc_mixin(char* ptr) override
+    virtual void dealloc_mixin(char* ptr, size_t, dynamix::mixin_id, size_t mixin_size, size_t mixin_alignment, const dynamix::object*) override
     {
         deallocate(ptr);
     }
@@ -164,7 +169,7 @@ public:
         _page_byte_index = 0;
     }
 
-    virtual void alloc_mixin(size_t mixin_class_size, size_t mixin_alignment, char*& out_buffer, size_t& out_mixin_offset) override
+    virtual std::pair<char*, size_t> alloc_mixin(dynamix::mixin_id, size_t mixin_size, size_t mixin_alignment, const dynamix::object*) override
     {
         if(_page_byte_index == NUM_IN_PAGE)
         {
@@ -172,16 +177,18 @@ public:
             new_memory_page();
         }
 
-        out_buffer = _pages.back() + _page_byte_index * mixin_buf_size;
+        char* buffer = _pages.back() + _page_byte_index * mixin_buf_size;
 
         // again calculate the offset using this static member function
-        out_mixin_offset = calculate_mixin_offset(out_buffer, mixin_alignment);
+        size_t mixin_offset = calculate_mixin_offset(buffer, mixin_alignment);
 
         ++_page_byte_index;
         ++_num_allocations;
+
+        return std::make_pair(buffer, mixin_offset);
     }
 
-    virtual void dealloc_mixin(char* buf) override
+    virtual void dealloc_mixin(char* buf, size_t, dynamix::mixin_id, size_t mixin_size, size_t mixin_alignment, const dynamix::object*) override
     {
 #if !defined(NDEBUG)
         // in debug mode check if the mixin is within any of our pages

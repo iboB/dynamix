@@ -14,6 +14,8 @@
 #include <dynamix/object_type_template.hpp>
 #include <dynamix/exception.hpp>
 
+#include <tuple>
+
 namespace dynamix
 {
 
@@ -101,7 +103,7 @@ void object::clear() noexcept
 
     if(_mixin_data != &null_mixin_data)
     {
-        _type_info->dealloc_mixin_data(_mixin_data);
+        _type_info->dealloc_mixin_data(_mixin_data, this);
         _mixin_data = &null_mixin_data;
 
 #if DYNAMIX_ADDITIONAL_METRICS
@@ -122,7 +124,7 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
 {
     const object_type_info* old_type = _type_info;
     mixin_data_in_object* old_mixin_data = _mixin_data;
-    mixin_data_in_object* new_mixin_data = new_type->alloc_mixin_data();
+    mixin_data_in_object* new_mixin_data = new_type->alloc_mixin_data(this);
 
     for (const mixin_type_info* mixin_info : old_type->_compact_mixins)
     {
@@ -139,7 +141,7 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
 
     if(old_mixin_data != &null_mixin_data)
     {
-        old_type->dealloc_mixin_data(old_mixin_data);
+        old_type->dealloc_mixin_data(old_mixin_data, this);
     }
 
 #if DYNAMIX_ADDITIONAL_METRICS
@@ -190,11 +192,7 @@ bool object::construct_mixin(mixin_id id, const void* source)
 
     char* buffer;
     size_t mixin_offset;
-#if DYNAMIX_DEBUG
-    buffer = nullptr;
-    mixin_offset = 0;
-#endif
-    mixin_info.allocator->alloc_mixin(mixin_info.size, mixin_info.alignment, buffer, mixin_offset);
+    std::tie(buffer, mixin_offset) = mixin_info.allocator->alloc_mixin(mixin_info.id, mixin_info.size, mixin_info.alignment, this);
 
     DYNAMIX_ASSERT(buffer);
     DYNAMIX_ASSERT(mixin_offset >= sizeof(object*)); // we should have room for an object pointer
@@ -244,7 +242,8 @@ void object::destroy_mixin(mixin_id id)
     mixin_info.destructor(data.mixin());
 
     // dealocate mixin
-    mixin_info.allocator->dealloc_mixin(data.buffer());
+    mixin_info.allocator->dealloc_mixin(data.buffer(), 
+        size_t(reinterpret_cast<char*>(data.mixin()) - data.buffer()), mixin_info.id, mixin_info.size, mixin_info.alignment, this);
 
 #if DYNAMIX_ADDITIONAL_METRICS
     DYNAMIX_ASSERT(mixin_info.num_mixins > 0);
@@ -385,7 +384,7 @@ void object::copy_from(const object& o)
 
     const object_type_info* old_type = _type_info;
     mixin_data_in_object* old_mixin_data = _mixin_data;
-    mixin_data_in_object* new_mixin_data = o._type_info->alloc_mixin_data();
+    mixin_data_in_object* new_mixin_data = o._type_info->alloc_mixin_data(this);
 
     auto& dom = domain::instance();
 
@@ -420,7 +419,7 @@ void object::copy_from(const object& o)
 
     if (old_mixin_data != &null_mixin_data)
     {
-        old_type->dealloc_mixin_data(old_mixin_data);
+        old_type->dealloc_mixin_data(old_mixin_data, this);
     }
 
 #if DYNAMIX_ADDITIONAL_METRICS

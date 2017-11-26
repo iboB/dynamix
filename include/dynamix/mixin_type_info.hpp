@@ -21,7 +21,7 @@
 namespace dynamix
 {
 
-class global_allocator;
+class domain_allocator;
 
 static const mixin_id INVALID_MIXIN_ID = ~mixin_id(0);
 
@@ -62,7 +62,7 @@ public:
 
     // used to allocate memory for instances of this mixin
     // usually equal to the allocator of the domain
-    global_allocator* allocator;
+    domain_allocator* allocator;
 
 #if DYNAMIX_ADDITIONAL_METRICS
     // number of living mixins of this type

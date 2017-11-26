@@ -20,13 +20,13 @@ TEST_CASE("sub_ptr_align")
     for(size_t i=1; i<=ptr_size; ++i)
     {
         CHECK(2 * ptr_size ==
-            global_allocator::calculate_mem_size_for_mixin(i, 1));
+            domain_allocator::calculate_mem_size_for_mixin(i, 1));
     }
 
     for(size_t i=2; i<=ptr_size; i+=2)
     {
         CHECK(2 * ptr_size ==
-            global_allocator::calculate_mem_size_for_mixin(i, 2));
+            domain_allocator::calculate_mem_size_for_mixin(i, 2));
     }
 }
 

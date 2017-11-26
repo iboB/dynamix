@@ -44,28 +44,28 @@ template <typename T>
 struct custom_allocator : public mixin_allocator, public alloc_counter<T>
 {
     // allocate memory for count mixin_data_in_object instances
-    virtual char* alloc_mixin_data(size_t count) override
+    virtual char* alloc_mixin_data(size_t count, const object* obj) override
     {
         ++alloc_counter<T>::data_allocations;
         return new char[count * mixin_data_size];
     }
 
-    virtual void dealloc_mixin_data(char* ptr) override
+    virtual void dealloc_mixin_data(char* ptr, size_t count, const object* obj) override
     {
         ++alloc_counter<T>::data_deallocations;
         delete[] ptr;
     }
 
-    virtual void alloc_mixin(size_t mixin_size, size_t mixin_alignment, char*& out_buffer, size_t& out_mixin_offset) override
+    virtual std::pair<char*, size_t> alloc_mixin(mixin_id id, size_t mixin_size, size_t mixin_alignment, const object* obj) override
     {
         ++alloc_counter<T>::mixin_allocations;
-        _dda.alloc_mixin(mixin_size, mixin_alignment, out_buffer, out_mixin_offset);
+        return _dda.alloc_mixin(id, mixin_size, mixin_alignment, obj);
     }
 
-    virtual void dealloc_mixin(char* ptr) override
+    virtual void dealloc_mixin(char* ptr, size_t mixin_offset, mixin_id id, size_t mixin_size, size_t mixin_alignment, const object* obj) override
     {
         ++alloc_counter<T>::mixin_deallocations;
-        _dda.dealloc_mixin(ptr);
+        _dda.dealloc_mixin(ptr, mixin_offset, id, mixin_size, mixin_alignment, obj);
     }
 
     internal::default_allocator _dda;

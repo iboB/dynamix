@@ -22,7 +22,7 @@ static size_t ceil_scale(size_t a, size_t b)
     return result;
 }
 
-size_t global_allocator::calculate_mem_size_for_mixin(size_t mixin_size, size_t mixin_alignment)
+size_t domain_allocator::calculate_mem_size_for_mixin(size_t mixin_size, size_t mixin_alignment)
 {
     // normally alignof(x) + sizeof(x) is enough for an aligned allocation
     // but in this case we want to have an object* before that and the alignment
@@ -41,7 +41,7 @@ size_t global_allocator::calculate_mem_size_for_mixin(size_t mixin_size, size_t 
     return mem_size;
 }
 
-size_t global_allocator::calculate_mixin_offset(const char* buffer, size_t mixin_alignment)
+size_t domain_allocator::calculate_mixin_offset(const char* buffer, size_t mixin_alignment)
 {
     // now malloc (or new) should make sure to give us memory that's word aligned
     // that means that buffer should be aligned to sizeof(ptr)
@@ -61,7 +61,7 @@ size_t global_allocator::calculate_mixin_offset(const char* buffer, size_t mixin
 
 static inline char* allocate_mixin_data(size_t count)
 {
-    DYNAMIX_ASSERT(global_allocator::mixin_data_size == sizeof(internal::mixin_data_in_object));
+    DYNAMIX_ASSERT(domain_allocator::mixin_data_size == sizeof(internal::mixin_data_in_object));
     return new char[sizeof(internal::mixin_data_in_object) * count];
 }
 
@@ -70,13 +70,13 @@ static inline void deallocate_mixin_data(char* ptr)
     delete[] ptr;
 }
 
-char* mixin_allocator::alloc_mixin_data(size_t count)
+char* mixin_allocator::alloc_mixin_data(size_t count, const object*)
 {
     DYNAMIX_ASSERT(false); // a mixin allocator should never have to allocate mixin data
     return allocate_mixin_data(count);
 }
 
-void mixin_allocator::dealloc_mixin_data(char* ptr)
+void mixin_allocator::dealloc_mixin_data(char* ptr, size_t, const object*)
 {
     DYNAMIX_ASSERT(false); // a mixin allocator should never have do deallocate mixin data
     deallocate_mixin_data(ptr);
@@ -85,7 +85,7 @@ void mixin_allocator::dealloc_mixin_data(char* ptr)
 namespace internal
 {
 
-char* default_allocator::alloc_mixin_data(size_t count)
+char* default_allocator::alloc_mixin_data(size_t count, const object*)
 {
 #if DYNAMIX_DEBUG
     _has_allocated = true;
@@ -93,7 +93,7 @@ char* default_allocator::alloc_mixin_data(size_t count)
     return allocate_mixin_data(count);
 }
 
-void default_allocator::dealloc_mixin_data(char* ptr)
+void default_allocator::dealloc_mixin_data(char* ptr, size_t, const object*)
 {
 #if DYNAMIX_DEBUG
     DYNAMIX_ASSERT(_has_allocated); // what? deallocate without ever allocating?
@@ -101,7 +101,7 @@ void default_allocator::dealloc_mixin_data(char* ptr)
     deallocate_mixin_data(ptr);
 }
 
-void default_allocator::alloc_mixin(size_t mixin_size, size_t mixin_alignment, char*& out_buffer, size_t& out_mixin_offset)
+std::pair<char*, size_t> default_allocator::alloc_mixin(mixin_id, size_t mixin_size, size_t mixin_alignment, const object*)
 {
 #if DYNAMIX_DEBUG
     _has_allocated = true;
@@ -109,14 +109,15 @@ void default_allocator::alloc_mixin(size_t mixin_size, size_t mixin_alignment, c
 
     size_t mem_size = calculate_mem_size_for_mixin(mixin_size, mixin_alignment);
 
-    out_buffer = new char[mem_size];
+    auto buffer = new char[mem_size];
+    auto mixin_offset = calculate_mixin_offset(buffer, mixin_alignment);
 
-    out_mixin_offset = calculate_mixin_offset(out_buffer, mixin_alignment);
+    DYNAMIX_ASSERT(mixin_offset + mixin_size <= mem_size); // we should have room for the mixin
 
-    DYNAMIX_ASSERT(out_mixin_offset + mixin_size <= mem_size); // we should have room for the mixin
+    return std::make_pair(buffer, mixin_offset);
 }
 
-void default_allocator::dealloc_mixin(char* ptr)
+void default_allocator::dealloc_mixin(char* ptr, size_t, mixin_id, size_t, size_t, const object*)
 {
 #if DYNAMIX_DEBUG
     DYNAMIX_ASSERT(_has_allocated); // what? deallocate without ever allocating?
