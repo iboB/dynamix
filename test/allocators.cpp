@@ -56,16 +56,16 @@ struct custom_allocator : public mixin_allocator, public alloc_counter<T>
         delete[] ptr;
     }
 
-    virtual std::pair<char*, size_t> alloc_mixin(mixin_id id, size_t mixin_size, size_t mixin_alignment, const object* obj) override
+    virtual std::pair<char*, size_t> alloc_mixin(const basic_mixin_type_info& info, const object* obj) override
     {
         ++alloc_counter<T>::mixin_allocations;
-        return _dda.alloc_mixin(id, mixin_size, mixin_alignment, obj);
+        return _dda.alloc_mixin(info, obj);
     }
 
-    virtual void dealloc_mixin(char* ptr, size_t mixin_offset, mixin_id id, size_t mixin_size, size_t mixin_alignment, const object* obj) override
+    virtual void dealloc_mixin(char* ptr, size_t offset, const basic_mixin_type_info& info, const object* obj) override
     {
         ++alloc_counter<T>::mixin_deallocations;
-        _dda.dealloc_mixin(ptr, mixin_offset, id, mixin_size, mixin_alignment, obj);
+        _dda.dealloc_mixin(ptr, offset, info, obj);
     }
 
     internal::default_allocator _dda;

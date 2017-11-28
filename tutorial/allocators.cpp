@@ -71,7 +71,7 @@ used by the mixin instance.
 That's why this function is not as simple as the one for the mixin data
 array. It has to conform to the mixin (and also `object` pointer) alignment.
 */
-    virtual std::pair<char*, size_t> alloc_mixin(dynamix::mixin_id, size_t mixin_size, size_t mixin_alignment, const dynamix::object*) override
+    virtual std::pair<char*, size_t> alloc_mixin(const dynamix::basic_mixin_type_info& info, const dynamix::object*) override
     {
 /*`
 The users are strongly advised to use the static method
@@ -80,7 +80,7 @@ calculate how much memory is needed for the mixin instance such that
 there is enough room at the beginning for the pointer to the owning
 object and the memory alignment is respected.
 */
-        size_t size = calculate_mem_size_for_mixin(mixin_size, mixin_alignment);
+        size_t size = calculate_mem_size_for_mixin(info.size, info.alignment);
         char* buffer = allocate(size);
 
 /*`
@@ -93,7 +93,7 @@ respected.
 You are encouraged to use the static method
 `global_allocator::calculate_mixin_offset` for this purpose.
 */
-        size_t mixin_offset = calculate_mixin_offset(buffer, mixin_alignment);
+        size_t mixin_offset = calculate_mixin_offset(buffer, info.alignment);
 
         return std::make_pair(buffer, mixin_offset);
     }
@@ -101,7 +101,7 @@ You are encouraged to use the static method
 /*`
 The mixin instance deallocation method can be trivial
 */
-    virtual void dealloc_mixin(char* ptr, size_t, dynamix::mixin_id, size_t mixin_size, size_t mixin_alignment, const dynamix::object*) override
+    virtual void dealloc_mixin(char* ptr, size_t, const dynamix::basic_mixin_type_info&, const dynamix::object*) override
     {
         deallocate(ptr);
     }
@@ -169,7 +169,7 @@ public:
         _page_byte_index = 0;
     }
 
-    virtual std::pair<char*, size_t> alloc_mixin(dynamix::mixin_id, size_t mixin_size, size_t mixin_alignment, const dynamix::object*) override
+    virtual std::pair<char*, size_t> alloc_mixin(const dynamix::basic_mixin_type_info& info, const dynamix::object*) override
     {
         if(_page_byte_index == NUM_IN_PAGE)
         {
@@ -180,7 +180,7 @@ public:
         char* buffer = _pages.back() + _page_byte_index * mixin_buf_size;
 
         // again calculate the offset using this static member function
-        size_t mixin_offset = calculate_mixin_offset(buffer, mixin_alignment);
+        size_t mixin_offset = calculate_mixin_offset(buffer, info.alignment);
 
         ++_page_byte_index;
         ++_num_allocations;
@@ -188,7 +188,7 @@ public:
         return std::make_pair(buffer, mixin_offset);
     }
 
-    virtual void dealloc_mixin(char* buf, size_t, dynamix::mixin_id, size_t mixin_size, size_t mixin_alignment, const dynamix::object*) override
+    virtual void dealloc_mixin(char* buf, size_t, const dynamix::basic_mixin_type_info& info, const dynamix::object*) override
     {
 #if !defined(NDEBUG)
         // in debug mode check if the mixin is within any of our pages

@@ -49,7 +49,7 @@ public:
     /// Pure virtual.
     /// Should free the memory that has
     /// been obtained via a call to `alloc_mixin_data`.
-    /// The number of elements to dealocate will correspond to the number of 
+    /// The number of elements to dealocate will correspond to the number of
     /// elements used to allocated the buffer
     virtual void dealloc_mixin_data(char* ptr, size_t count, const object* obj) = 0;
 
@@ -79,20 +79,21 @@ public:
     ///
     /// \par Example:
     /// \code
-    /// std::pair<char*, size_t> your_allocator::alloc_mixin(mixin_id, size_t mixin_size, size_t mixin_alignment, const object*)
+    /// std::pair<char*, size_t> your_allocator::alloc_mixin(const basic_mixin_type_info& info, const object*)
     /// {
-    ///     size_t mem_size = calculate_mem_size_for_mixin(mixin_size, mixin_alignment);
+    ///     size_t mem_size = calculate_mem_size_for_mixin(info.size, info.alignment);
     ///     auto buffer = new char[mem_size];
-    ///     return make_pair(buffer, calculate_mixin_offset(buffer, mixin_alignment));
+    ///     return make_pair(buffer, calculate_mixin_offset(buffer, info.alignment));
     /// }
     /// \endcode
-    virtual std::pair<char*, size_t> alloc_mixin(mixin_id id, size_t mixin_size, size_t mixin_alignment, const object* obj) = 0;
+    virtual std::pair<char*, size_t> alloc_mixin(const basic_mixin_type_info& info, const object* obj) = 0;
 
     /// Pure virtual.
     /// Should free the memory that has
     /// been obtained via a call to `alloc_mixin`.
-    /// The library will call the method wit the same arguments which were used to allocate it previously.
-    virtual void dealloc_mixin(char* ptr, size_t mixin_offset, mixin_id id, size_t mixin_size, size_t mixin_alignment, const object* obj) = 0;
+    /// The library will call the method with the same mixin type info which was used to allocate it previously
+    /// and also with the offset which was returned by the allocation.
+    virtual void dealloc_mixin(char* ptr, size_t mixin_offset, const basic_mixin_type_info& info, const object* obj) = 0;
 
     /// Size of `mixin_data_in_object`
     ///
@@ -148,9 +149,9 @@ public:
     /// \internal
     virtual void dealloc_mixin_data(char* ptr, size_t count, const object* obj) override;
     /// \internal
-    virtual std::pair<char*, size_t> alloc_mixin(mixin_id id, size_t mixin_size, size_t mixin_alignment, const object* obj) override;
+    virtual std::pair<char*, size_t> alloc_mixin(const basic_mixin_type_info& info, const object* obj) override;
     /// \internal
-    virtual void dealloc_mixin(char* ptr, size_t mixin_offset, mixin_id id, size_t mixin_size, size_t mixin_alignment, const object* obj) override;
+    virtual void dealloc_mixin(char* ptr, size_t mixin_offset, const basic_mixin_type_info& info, const object* obj) override;
 };
 
 

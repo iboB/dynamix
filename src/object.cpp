@@ -192,7 +192,7 @@ bool object::construct_mixin(mixin_id id, const void* source)
 
     char* buffer;
     size_t mixin_offset;
-    std::tie(buffer, mixin_offset) = mixin_info.allocator->alloc_mixin(mixin_info.id, mixin_info.size, mixin_info.alignment, this);
+    std::tie(buffer, mixin_offset) = mixin_info.allocator->alloc_mixin(mixin_info, this);
 
     DYNAMIX_ASSERT(buffer);
     DYNAMIX_ASSERT(mixin_offset >= sizeof(object*)); // we should have room for an object pointer
@@ -242,8 +242,8 @@ void object::destroy_mixin(mixin_id id)
     mixin_info.destructor(data.mixin());
 
     // dealocate mixin
-    mixin_info.allocator->dealloc_mixin(data.buffer(), 
-        size_t(reinterpret_cast<char*>(data.mixin()) - data.buffer()), mixin_info.id, mixin_info.size, mixin_info.alignment, this);
+    mixin_info.allocator->dealloc_mixin(data.buffer(),
+        size_t(reinterpret_cast<char*>(data.mixin()) - data.buffer()), mixin_info, this);
 
 #if DYNAMIX_ADDITIONAL_METRICS
     DYNAMIX_ASSERT(mixin_info.num_mixins > 0);

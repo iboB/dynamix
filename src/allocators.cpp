@@ -101,23 +101,23 @@ void default_allocator::dealloc_mixin_data(char* ptr, size_t, const object*)
     deallocate_mixin_data(ptr);
 }
 
-std::pair<char*, size_t> default_allocator::alloc_mixin(mixin_id, size_t mixin_size, size_t mixin_alignment, const object*)
+std::pair<char*, size_t> default_allocator::alloc_mixin(const basic_mixin_type_info& info, const object*)
 {
 #if DYNAMIX_DEBUG
     _has_allocated = true;
 #endif
 
-    size_t mem_size = calculate_mem_size_for_mixin(mixin_size, mixin_alignment);
+    size_t mem_size = calculate_mem_size_for_mixin(info.size, info.alignment);
 
     auto buffer = new char[mem_size];
-    auto mixin_offset = calculate_mixin_offset(buffer, mixin_alignment);
+    auto mixin_offset = calculate_mixin_offset(buffer, info.alignment);
 
-    DYNAMIX_ASSERT(mixin_offset + mixin_size <= mem_size); // we should have room for the mixin
+    DYNAMIX_ASSERT(mixin_offset + info.size <= mem_size); // we should have room for the mixin
 
     return std::make_pair(buffer, mixin_offset);
 }
 
-void default_allocator::dealloc_mixin(char* ptr, size_t, mixin_id, size_t, size_t, const object*)
+void default_allocator::dealloc_mixin(char* ptr, size_t, const basic_mixin_type_info&, const object*)
 {
 #if DYNAMIX_DEBUG
     DYNAMIX_ASSERT(_has_allocated); // what? deallocate without ever allocating?

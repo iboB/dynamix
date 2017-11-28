@@ -42,7 +42,7 @@ struct custom_allocator : public mixin_allocator
         mixin_index = 0;
     }
 
-    virtual std::pair<char*, size_t> alloc_mixin(mixin_id, size_t mixin_size, size_t mixin_alignment, const object*) override
+    virtual std::pair<char*, size_t> alloc_mixin(const dynamix::basic_mixin_type_info& info, const object*) override
     {
         if(mixin_index == NUM_IN_PAGE)
         {
@@ -52,12 +52,12 @@ struct custom_allocator : public mixin_allocator
         auto buffer = mixin_block.back() + mixin_index * mixin_unit_size;
         ++mixin_index;
 
-        auto mixin_offset = calculate_mixin_offset(buffer, mixin_alignment);
+        auto mixin_offset = calculate_mixin_offset(buffer, info.alignment);
 
         return make_pair(buffer, mixin_offset);
     }
 
-    virtual void dealloc_mixin(char*, size_t, mixin_id, size_t, size_t, const object*) override
+    virtual void dealloc_mixin(char*, size_t, const dynamix::basic_mixin_type_info&, const object*) override
     {
     }
 };
