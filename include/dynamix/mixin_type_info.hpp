@@ -25,6 +25,49 @@ class domain_allocator;
 
 static const mixin_id INVALID_MIXIN_ID = ~mixin_id(0);
 
+/**
+* Public mixin type info. Contains a slice of the type info data
+* which can be viewed by the library's users
+* for all mixin allocation
+*/
+class DYNAMIX_API basic_mixin_type_info : public internal::noncopyable
+{
+public:
+    /// The mixin's id
+    mixin_id id;
+
+    /// Shows whether this is as initialized mixin type
+    bool is_valid() const { return id != INVALID_MIXIN_ID; }
+
+    /// The mixin name: The class name or, in case `DYNAMIX_USE_TYPEID` is false,
+    /// the name returned from `dynamix_mixin_name`.
+    const char* name;
+
+    /// Size of the mixin type
+    size_t size;
+
+    /// Alignment of the mixin type
+    size_t alignment;
+
+    /// Allocator associated with this mixin type.
+    /// If no special one was provided this will be equal to the allocator of the domain.
+    domain_allocator* allocator;
+
+#if DYNAMIX_ADDITIONAL_METRICS
+    /// Number of "living" mixins of this type.
+    mutable size_t num_mixins;
+#endif
+
+protected:
+    // users shouldn't be able to construct or destroy this
+
+    basic_mixin_type_info(mixin_id i)
+        : id(i)
+        // since this is always static, other members will be initialized with 0
+    {}
+    ~basic_mixin_type_info() {}
+};
+
 namespace internal
 {
 
@@ -33,15 +76,9 @@ typedef void (*mixin_copy_proc)(void* memory, const void* source);
 typedef void (*mixin_destructor_proc)(void* memory);
 
 // this struct contains information for a given mixin
-class DYNAMIX_API mixin_type_info : public noncopyable
+class DYNAMIX_API mixin_type_info : public basic_mixin_type_info
 {
 public:
-    mixin_id id; // the mixin's id
-
-    const char* name; // mixin name = name of the actual class
-
-    size_t size; // size of the mixin object
-    size_t alignment; // alignment of the mixin type
 
     // procedures, obtained from the mixin definition that makes the actual
     // construction and destruction
@@ -54,23 +91,11 @@ public:
     // might be left null for mixins which aren't copy-assignable
     mixin_copy_proc copy_assignment;
 
-    // shows whether this is as initialized mixin
-    bool is_valid() const { return id != INVALID_MIXIN_ID; }
-
     // list of all the message infos for the messages this mixin supports
     std::vector<message_for_mixin> message_infos;
 
-    // used to allocate memory for instances of this mixin
-    // usually equal to the allocator of the domain
-    domain_allocator* allocator;
-
-#if DYNAMIX_ADDITIONAL_METRICS
-    // number of living mixins of this type
-    mutable size_t num_mixins;
-#endif
-
     mixin_type_info()
-        : id(INVALID_MIXIN_ID)
+        : basic_mixin_type_info(INVALID_MIXIN_ID)
         // since this is always static, other members will be initialized with 0
     {
     }
