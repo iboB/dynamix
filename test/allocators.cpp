@@ -39,6 +39,7 @@ size_t alloc_counter<T>::mixin_allocations;
 template <typename T>
 size_t alloc_counter<T>::mixin_deallocations;
 
+const object* the_object = nullptr;
 
 template <typename T>
 struct custom_allocator : public mixin_allocator, public alloc_counter<T>
@@ -46,24 +47,29 @@ struct custom_allocator : public mixin_allocator, public alloc_counter<T>
     // allocate memory for count mixin_data_in_object instances
     virtual char* alloc_mixin_data(size_t count, const object* obj) override
     {
+        CHECK(obj == the_object);
         ++alloc_counter<T>::data_allocations;
         return new char[count * mixin_data_size];
     }
 
     virtual void dealloc_mixin_data(char* ptr, size_t count, const object* obj) override
     {
+        CHECK((!the_object || obj == the_object));
         ++alloc_counter<T>::data_deallocations;
         delete[] ptr;
     }
 
     virtual std::pair<char*, size_t> alloc_mixin(const basic_mixin_type_info& info, const object* obj) override
     {
+        CHECK(obj == the_object);
         ++alloc_counter<T>::mixin_allocations;
         return _dda.alloc_mixin(info, obj);
     }
 
     virtual void dealloc_mixin(char* ptr, size_t offset, const basic_mixin_type_info& info, const object* obj) override
     {
+        CHECK(offset == calculate_mixin_offset(ptr, info.alignment));
+        CHECK((!the_object || obj == the_object));
         ++alloc_counter<T>::mixin_deallocations;
         _dda.dealloc_mixin(ptr, offset, info, obj);
     }
@@ -72,7 +78,44 @@ struct custom_allocator : public mixin_allocator, public alloc_counter<T>
 };
 
 class global_alloc : public custom_allocator<global_alloc> {};
-class custom_alloc_1 : public custom_allocator<custom_alloc_1> {};
+
+class custom_alloc_1 : public custom_allocator<custom_alloc_1>
+{
+public:
+    using super = custom_allocator<custom_alloc_1>;
+
+    custom_alloc_1()
+        : m_info(_dynamix_get_mixin_type_info((custom_1*)nullptr))
+    {
+    }
+
+    // allocate memory for count mixin_data_in_object instances
+    virtual char* alloc_mixin_data(size_t, const object*) override
+    {
+        CHECK(false);
+        return nullptr;
+    }
+
+    virtual void dealloc_mixin_data(char*, size_t, const object*) override
+    {
+        CHECK(false);
+    }
+
+    virtual std::pair<char*, size_t> alloc_mixin(const basic_mixin_type_info& info, const object* obj) override
+    {
+        CHECK(&info == &m_info);
+        return super::alloc_mixin(info, obj);
+    }
+
+    virtual void dealloc_mixin(char* ptr, size_t offset, const basic_mixin_type_info& info, const object* obj) override
+    {
+        CHECK(&info == &m_info);
+        super::dealloc_mixin(ptr, offset, info, obj);
+    }
+
+    const basic_mixin_type_info& m_info;
+};
+
 class custom_alloc_2 : public custom_allocator<custom_alloc_2> {};
 class custom_alloc_var : public custom_allocator<custom_alloc_var> {} the_allocator;
 
@@ -83,6 +126,7 @@ TEST_CASE("allocators")
 
     {
         object o;
+        the_object = &o;
         mutate(o)
             .add<normal_a>()
             .add<normal_b>()
@@ -106,22 +150,26 @@ TEST_CASE("allocators")
 
     {
         object o1;
+        the_object = &o1;
         mutate(o1)
             .add<normal_a>()
             .add<custom_1>()
             .add<custom_2_a>();
 
         object o2;
+        the_object = &o2;
         mutate(o2)
             .add<normal_a>()
             .add<custom_1>()
             .add<custom_2_a>();
 
         object o3;
+        the_object = &o3;
         mutate(o3)
             .add<normal_b>()
             .add<custom_2_b>();
 
+        the_object = &o1;
         mutate(o1)
             .remove<normal_a>()
             .add<normal_b>()
@@ -135,6 +183,8 @@ TEST_CASE("allocators")
         CHECK(alloc_counter<custom_alloc_1>::mixin_allocations == 3); // 1 + 3
         CHECK(alloc_counter<custom_alloc_2>::mixin_allocations == 6); // 2 + 4
         CHECK(alloc_counter<custom_alloc_var>::mixin_allocations == 1); // 1 + 0
+
+        the_object = nullptr;
     }
 
     CHECK(alloc_counter<global_alloc>::data_deallocations == 5);
