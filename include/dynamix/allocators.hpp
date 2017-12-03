@@ -118,9 +118,9 @@ protected:
 /**
  * The class should be the parent to your custom
  * mixin allocators, i.e. allocators that are set to mixins
- * mixin as features.
+ * as features.
  *
- * It's derived from `allocator`, and the difference
+ * It's derived from `domain_allocator`, and the difference
  * between the two is that `mixin_allocator`, hides `alloc_mixin_data` and
  * `dealloc_mixin_data`.
  */
@@ -131,6 +131,59 @@ private:
     virtual char* alloc_mixin_data(size_t count, const object* obj) override;
     /// \internal
     virtual void dealloc_mixin_data(char* ptr, size_t count, const object* obj) override;
+};
+
+/**
+* The class should be the parent to your custom
+* object allocators, i.e. allocators that are set to objects.
+*
+* It's derived from `domain_allocator` and provides a number of
+* additional virtual methods a user can override.
+*/
+class DYNAMIX_API object_allocator : public domain_allocator
+{
+public:
+    /// Called when an allocator is set to an object.
+    /// This happens in the following cases:
+    /// * When the object is constructed with an allocator
+    /// * When the object is copy-constructed from another object and
+    /// `on_copy_construct` returns non-null
+    /// * When an object is moved onto another and `on_move` return non-null
+    /// (This could lead to `on_set_to_object` being called multiple times
+    /// for the same allocator and different objects)
+    ///
+    /// The default implementation is empty
+    virtual void on_set_to_object(object& owner);
+
+    /// Override this if you want to provide some custom release logic
+    /// to an object allocator. It will be called when the object allocator
+    /// for a given object should logically be destroyed.
+    ///
+    /// If multiple objects have the same allocator, this would be a good
+    /// spot to decrement a reference counter.
+    ///
+    /// The default implementation is empty
+    virtual void release() noexcept;
+
+    /// Called when an object is copy-constructed from the owner object
+    /// Use it to provide custom logic so as to create an allocator for the target
+    ///
+    /// WARNING: Cases which count as copy construction are also ones where
+    /// an object is copied onto an empty one. This can happen with `object::copy_from`
+    /// or the equality operator if it exists
+    ///
+    /// The default implementation returns nullptr
+    virtual object_allocator* on_copy_construct(object& target, const object& source);
+
+    /// Called when an object is moved from the owner object
+    /// Use it to provide custom logic so as to create an allocator for the terget.
+    ///
+    /// After this function is called the sources allocator will be set to nullptr
+    /// *without* `release` being called for it. If you want to return a different allocator
+    /// for the target object, you need to release the one from source here.
+    ///
+    /// The default implementation returns `this` (ie the allocator of `source`)
+    virtual object_allocator* on_move(object& target, object& source) noexcept;
 };
 
 namespace internal

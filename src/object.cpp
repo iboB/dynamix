@@ -32,9 +32,19 @@ object::object() noexcept
 {
 }
 
-object::object(const object_type_template& type)
+object::object(object_allocator* allocator)
     : _type_info(&object_type_info::null())
     , _mixin_data(&null_mixin_data)
+    , _allocator(allocator)
+{
+    if (_allocator)
+    {
+        _allocator->on_set_to_object(*this);
+    }
+}
+
+object::object(const object_type_template& type, object_allocator* allocator /*= nullptr*/)
+    : object(allocator)
 {
     type.apply_to(*this);
 }
@@ -42,6 +52,10 @@ object::object(const object_type_template& type)
 object::~object()
 {
     clear();
+    if (_allocator)
+    {
+        _allocator->release();
+    }
 }
 
 object::object(object&& o) noexcept
@@ -339,6 +353,22 @@ const void* object::get(const char* mixin_name) const noexcept
 
 void object::usurp(object&& o) noexcept
 {
+    if (_allocator)
+    {
+        _allocator->release();
+        _allocator = nullptr;
+    }
+
+    if (o._allocator)
+    {
+        _allocator = o._allocator->on_move(*this, o);
+        if (_allocator)
+        {
+            _allocator->on_set_to_object(*this);
+        }
+        o._allocator = nullptr;
+    }
+
     _type_info = o._type_info;
     _mixin_data = o._mixin_data;
 
@@ -365,6 +395,22 @@ void object::copy_from(const object& o)
     {
         // check for self usurp
         return;
+    }
+
+    if (empty())
+    {
+        if (o._allocator)
+        {
+            if (_allocator)
+            {
+                _allocator->release();
+            }
+            _allocator = o._allocator->on_copy_construct(*this, o);
+            if (_allocator)
+            {
+                _allocator->on_set_to_object(*this);
+            }
+        }
     }
 
     if (o.empty())

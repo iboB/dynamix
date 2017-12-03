@@ -9,6 +9,10 @@
 
 #include <dynamix/allocators.hpp>
 
+#if DYNAMIX_DEBUG
+#include <dynamix/object.hpp>
+#endif
+
 namespace dynamix
 {
 
@@ -80,6 +84,24 @@ void mixin_allocator::dealloc_mixin_data(char* ptr, size_t, const object*)
 {
     DYNAMIX_ASSERT(false); // a mixin allocator should never have do deallocate mixin data
     deallocate_mixin_data(ptr);
+}
+
+void object_allocator::on_set_to_object(object& owner)
+{}
+
+void object_allocator::release() noexcept
+{}
+
+object_allocator* object_allocator::on_copy_construct(object& target, const object& source)
+{
+    DYNAMIX_ASSERT(source.allocator() == this);
+    return nullptr;
+}
+
+object_allocator* object_allocator::on_move(object& target, object& source) noexcept
+{
+    DYNAMIX_ASSERT(source.allocator() == this);
+    return this;
 }
 
 namespace internal

@@ -22,6 +22,7 @@ namespace internal
 }
 
 class object_type_template;
+class object_allocator;
 
 /// The main object class.
 class DYNAMIX_API object
@@ -30,8 +31,10 @@ public:
     /// Constructs an empty object - no mixins.
     object() noexcept;
 
+    /// Constructs an object with an object allocator
+    explicit object(object_allocator* allocator);
     /// Constructs an object from a specific type template.
-    explicit object(const object_type_template& type_template);
+    explicit object(const object_type_template& type_template, object_allocator* allocator = nullptr);
 
     ~object();
 
@@ -80,6 +83,9 @@ public:
     /// (note that there might be cases where copy_from or copy_matching_from won't throw
     /// even though this function returns false).
     bool copyable() const noexcept;
+
+    /// Returns the allcator associated with this object (may be `nullptr`)
+    object_allocator* allocator() const { return _allocator; }
 
     /////////////////////////////////////////////////////////////////
     // mixin info
@@ -232,6 +238,9 @@ _dynamix_internal:
     }
 
     size_t message_num_implementers(feature_id id) const;
+
+    // optional allocator for this object
+    object_allocator* _allocator = nullptr;
 
     // virtual mixin for default message implementation
     // used only so as to not have a null pointer cast to the appropriate type for default implementations
