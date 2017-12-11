@@ -71,6 +71,7 @@ public:
         info.destructor = &call_mixin_destructor<Mixin>;
         info.copy_constructor = get_mixin_copy_constructor<Mixin>();
         info.copy_assignment = get_mixin_copy_assignment<Mixin>();
+        info.move_constructor = get_mixin_move_constructor<Mixin>();
         info.allocator = _allocator;
 
         internal_register_mixin_type(info);

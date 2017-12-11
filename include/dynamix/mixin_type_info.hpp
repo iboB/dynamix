@@ -17,6 +17,7 @@
 #include "global.hpp"
 #include "message.hpp"
 #include <type_traits>
+#include <utility>
 
 namespace dynamix
 {
@@ -73,6 +74,7 @@ namespace internal
 
 typedef void (*mixin_constructor_proc)(void* memory);
 typedef void (*mixin_copy_proc)(void* memory, const void* source);
+typedef void (*mixin_move_proc)(void* memory, void* source);
 typedef void (*mixin_destructor_proc)(void* memory);
 
 // this struct contains information for a given mixin
@@ -90,6 +92,9 @@ public:
 
     // might be left null for mixins which aren't copy-assignable
     mixin_copy_proc copy_assignment;
+
+    // might be left null for mixin which aren't move-constructible
+    mixin_move_proc move_constructor;
 
     // list of all the message infos for the messages this mixin supports
     std::vector<message_for_mixin> message_infos;
@@ -178,6 +183,26 @@ typename std::enable_if<std::is_copy_assignable<Mixin>::value,
 template <typename Mixin>
 typename std::enable_if<!std::is_copy_assignable<Mixin>::value,
     mixin_copy_proc>::type get_mixin_copy_assignment()
+{
+    return nullptr;
+}
+
+template <typename Mixin>
+void call_mixin_move_constructor(void* memory, void* source)
+{
+    new (memory) Mixin(std::move(*reinterpret_cast<Mixin*>(source)));
+}
+
+template <typename Mixin>
+typename std::enable_if<std::is_move_constructible<Mixin>::value,
+    mixin_move_proc>::type get_mixin_move_constructor()
+{
+    return call_mixin_move_constructor<Mixin>;
+}
+
+template <typename Mixin>
+typename std::enable_if<!std::is_move_constructible<Mixin>::value,
+    mixin_move_proc>::type get_mixin_move_constructor()
 {
     return nullptr;
 }
