@@ -55,6 +55,10 @@ class bad_copy_assignment : public exception {};
 /// Thrown by DYNAMIX_CALL_NEXT_BIDDER if no next bidder is available
 class bad_next_bidder_call : public exception {};
 
+/// Thrown by `object::move_mixin` or `object::reallocate_mixins`
+/// when a mixin is to be moved but a mixin doesn't have a move_constructor.
+class bad_move_construction : public exception {};
+
 }
 
 /// A macro that throws an exception if `DYNAMIX_USE_EXCEPTIONS`

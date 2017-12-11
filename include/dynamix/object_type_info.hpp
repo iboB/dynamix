@@ -147,6 +147,11 @@ public:
     void* mixin() { return _mixin; }
     const char* buffer() const { return _buffer; }
     const void* mixin() const { return _mixin; }
+
+    size_t mixin_offset() const
+    {
+        return _mixin - _buffer;
+    }
 private:
     char* _buffer;
     char* _mixin;

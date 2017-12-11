@@ -84,9 +84,6 @@ public:
     /// even though this function returns false).
     bool copyable() const noexcept;
 
-    /// Returns the allcator associated with this object (may be `nullptr`)
-    object_allocator* allocator() const { return _allocator; }
-
     /////////////////////////////////////////////////////////////////
     // mixin info
 
@@ -180,12 +177,31 @@ public:
     }
     /////////////////////////////////////////////////////////////////
 
+    /////////////////////////////////////////////////////////////////
+    // memory and mixin management
+
     /// Destroys all mixins within an object and resets its type info
     // (sets null type info)
     void clear() noexcept;
 
     /// Returns true if the object is empty - has no mixins
     bool empty() const noexcept;
+
+    /// Returns the allcator associated with this object (may be `nullptr`)
+    object_allocator* allocator() const { return _allocator; }
+
+    /// Moves a mixin to the designated buffer, by invocating its move constructor.
+    /// Throws an exception if the mixin is not movable.
+    /// Returns the old mixin buffer and offset.
+    std::pair<char*, size_t> move_mixin(mixin_id id, char* buffer, size_t mixin_offset);
+
+    /// Replaces a mixin's buffer with another. Returns the old buffer and offset.
+    std::pair<char*, size_t> replace_mixin(mixin_id id, char* buffer, size_t mixin_offset) noexcept;
+
+    /// Allocates buffers for all mixins and deallocates the old ones. Suitable to call
+    /// from object allocators which keep a single mixin buffer per object.
+    void reallocate_mixins();
+    /////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////
     // logging and diagnostics

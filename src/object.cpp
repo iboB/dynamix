@@ -257,7 +257,7 @@ void object::destroy_mixin(mixin_id id)
 
     // dealocate mixin
     mixin_info.allocator->dealloc_mixin(data.buffer(),
-        size_t(reinterpret_cast<char*>(data.mixin()) - data.buffer()), mixin_info, this);
+        data.mixin_offset(), mixin_info, this);
 
 #if DYNAMIX_ADDITIONAL_METRICS
     DYNAMIX_ASSERT(mixin_info.num_mixins > 0);
@@ -532,6 +532,51 @@ bool object::copyable() const noexcept
     }
 
     return true;
+}
+
+std::pair<char*, size_t> object::move_mixin(mixin_id id, char* buffer, size_t mixin_offset)
+{
+    if (id >= DYNAMIX_MAX_MIXINS)
+        return std::pair<char*, size_t>(nullptr, 0);
+
+    auto& dom = domain::instance();
+    const auto& mixin_info = dom.mixin_info(id);
+    DYNAMIX_THROW_UNLESS(mixin_info.move_constructor, bad_move_construction);
+
+    auto& data = _mixin_data[_type_info->mixin_index(id)];
+    if(!data.mixin())
+        return std::pair<char*, size_t>(nullptr, 0);
+
+    auto ret = std::make_pair(data.buffer(), data.mixin_offset());
+
+    auto old_mixin = data.mixin();
+
+    data.set_buffer(buffer, mixin_offset);
+    data.set_object(this);
+
+    mixin_info.move_constructor(data.mixin(), old_mixin);
+
+    return ret;
+}
+
+std::pair<char*, size_t> object::replace_mixin(mixin_id id, char* buffer, size_t mixin_offset) noexcept
+{
+    DYNAMIX_ASSERT(id >= DYNAMIX_MAX_MIXINS);
+    auto& data = _mixin_data[_type_info->mixin_index(id)];
+    DYNAMIX_ASSERT(data.mixin());
+
+    auto ret = std::make_pair(data.buffer(), data.mixin_offset());
+    data.set_buffer(buffer, mixin_offset);
+
+    // not needed yet. It must be the user's responsibility
+    // data.set_object(this);
+
+    return ret;
+}
+
+void object::reallocate_mixins()
+{
+
 }
 
 } // dynamix
