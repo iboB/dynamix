@@ -200,6 +200,130 @@ TEST_CASE("allocators")
     CHECK(alloc_counter<custom_alloc_var>::data_allocations == 0);
 }
 
+DYNAMIX_CONST_MESSAGE_0(int, get_i);
+DYNAMIX_MESSAGE_0(int, get_x);
+
+class custom_1 {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "normal_1"; }
+#endif
+
+    int get_i() const
+    {
+        return i;
+    }
+
+    int i = 7;
+};
+
+class custom_own_var {
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "normal_own_var"; }
+#endif
+
+    int get_x()
+    {
+        return x;
+    }
+
+    int x = 53;
+};
+
+
+#if DYNAMIX_OBJECT_REPLACE_MIXIN
+TEST_CASE("mixin replacement")
+{
+    CHECK(alloc_counter<custom_alloc_1>::mixin_allocations == alloc_counter<custom_alloc_1>::mixin_deallocations);
+    alloc_counter<custom_alloc_1>::mixin_allocations = 0;
+    alloc_counter<custom_alloc_1>::mixin_deallocations = 0;
+    alloc_counter<custom_alloc_var>::mixin_allocations = 0;
+    alloc_counter<custom_alloc_var>::mixin_deallocations = 0;
+
+    object o;
+    the_object = &o;
+
+    mutate(o)
+        .add<normal_a>()
+        .add<normal_b>()
+        .add<custom_1>()
+        .add<custom_own_var>();
+
+    auto& a_custom_1 = allocator<custom_alloc_1>();
+
+    auto c1 = o.get<custom_1>();
+    CHECK(c1->i == 7);
+    c1->i = 123;
+    auto& c1_info = _dynamix_get_mixin_type_info((custom_1*)nullptr);
+
+    char* c1_new_buf;
+    size_t c1_new_offset;
+    std::tie(c1_new_buf, c1_new_offset) = a_custom_1.alloc_mixin(c1_info, &o);
+
+    char* c1_old_buf;
+    size_t c1_old_offset;
+    std::tie(c1_old_buf, c1_old_offset) = o.move_mixin(c1_info.id, c1_new_buf, c1_new_offset);
+
+    CHECK(c1_old_offset == c1_new_offset);
+    // casting to intptr_t otherwise doctest will compare strings
+    CHECK(reinterpret_cast<intptr_t>(c1_old_buf) != reinterpret_cast<intptr_t>(c1_new_buf));
+
+    CHECK(reinterpret_cast<intptr_t>(c1_old_buf + c1_old_offset) == reinterpret_cast<intptr_t>(c1));
+
+    auto c1_new = o.get<custom_1>();
+    CHECK(c1_new != c1);
+    CHECK(reinterpret_cast<intptr_t>(c1_new_buf + c1_new_offset) == reinterpret_cast<intptr_t>(c1_new));
+    CHECK(c1_new->i == 123);
+    CHECK(object_of(c1_new) == &o);
+
+    CHECK(alloc_counter<custom_alloc_1>::mixin_allocations == 2);
+    // mixin must not be deallocated
+    CHECK(alloc_counter<custom_alloc_1>::mixin_deallocations == 0);
+
+    a_custom_1.dealloc_mixin(c1_old_buf, c1_old_offset, c1_info, &o);
+
+    CHECK(get_i(o) == 123);
+
+    auto cov = o.get<custom_own_var>();
+    cov->x = 401;
+    auto& cov_info = _dynamix_get_mixin_type_info((custom_own_var*)nullptr);
+    char* cov_new_buf;
+    size_t cov_new_offset;
+    std::tie(cov_new_buf, cov_new_offset) = the_allocator.alloc_mixin(cov_info, &o);
+
+    memset(cov_new_buf, 0, sizeof(object*));
+
+    new (cov_new_buf + cov_new_offset) custom_own_var();
+
+    char* cov_old_buf;
+    size_t cov_old_offset;
+    std::tie(cov_old_buf, cov_old_offset) = o.replace_mixin(cov_info.id, cov_new_buf, cov_new_offset);
+
+    CHECK(cov_old_offset == cov_new_offset);
+    // casting to intptr_t otherwise doctest will compare strings
+    CHECK(reinterpret_cast<intptr_t>(cov_old_buf) != reinterpret_cast<intptr_t>(cov_new_buf));
+
+    CHECK(reinterpret_cast<intptr_t>(cov_old_buf + cov_old_offset) == reinterpret_cast<intptr_t>(cov));
+
+    auto cov_new = o.get<custom_own_var>();
+    CHECK(cov_new != cov);
+    CHECK(reinterpret_cast<intptr_t>(cov_new_buf + cov_new_offset) == reinterpret_cast<intptr_t>(cov_new));
+    CHECK(cov_new->x == 53);
+    CHECK((object_of(cov_new) == nullptr));
+
+    CHECK(alloc_counter<custom_alloc_var>::mixin_allocations == 2);
+    // mixin must not be deallocated
+    CHECK(alloc_counter<custom_alloc_var>::mixin_deallocations == 0);
+
+    the_allocator.dealloc_mixin(cov_old_buf, cov_old_offset, cov_info, &o);
+
+    CHECK(get_x(o) == 53);
+
+    the_object = nullptr;
+}
+#endif
+
 class normal_a {
 public:
 #if !DYNAMIX_USE_TYPEID
@@ -210,12 +334,6 @@ class normal_b {
 public:
 #if !DYNAMIX_USE_TYPEID
     static const char* dynamix_mixin_name() { return "normal_b"; }
-#endif
-};
-class custom_1 {
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "normal_1"; }
 #endif
 };
 class custom_2_a {
@@ -230,16 +348,13 @@ public:
     static const char* dynamix_mixin_name() { return "normal_2_b"; }
 #endif
 };
-class custom_own_var {
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "normal_own_var"; }
-#endif
-};
 
 DYNAMIX_DEFINE_MIXIN(normal_a, dynamix::none);
 DYNAMIX_DEFINE_MIXIN(normal_b, dynamix::none);
-DYNAMIX_DEFINE_MIXIN(custom_1, dynamix::allocator<custom_alloc_1>());
+DYNAMIX_DEFINE_MIXIN(custom_1, dynamix::allocator<custom_alloc_1>() & get_i_msg);
 DYNAMIX_DEFINE_MIXIN(custom_2_a, dynamix::allocator<custom_alloc_2>());
 DYNAMIX_DEFINE_MIXIN(custom_2_b, dynamix::allocator<custom_alloc_2>());
-DYNAMIX_DEFINE_MIXIN(custom_own_var, the_allocator);
+DYNAMIX_DEFINE_MIXIN(custom_own_var, the_allocator & get_x_msg);
+
+DYNAMIX_DEFINE_MESSAGE(get_i);
+DYNAMIX_DEFINE_MESSAGE(get_x);
