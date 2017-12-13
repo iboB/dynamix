@@ -89,6 +89,15 @@
 #   define DYNAMIX_ADDITIONAL_METRICS 1
 #endif
 
+// setting this to true will enable the compilation of object::replace_mixin and object::move_mixin
+// they can be dangerous as clients which keep pointers to mixins within objects can have them
+// invalidated without a way to be notified about this
+// however those functions can be quite useful for complex allocation strategies which try to
+// keep some mixins in a congiguous block of memory
+#if !defined(DYNAMIX_OBJECT_REPLACE_MIXIN)
+#   define DYNAMIX_OBJECT_REPLACE_MIXIN 1
+#endif
+
 // there is warning push/pop about this in the main header
 #if defined(_MSC_VER)
 // msvc complains that template classes don't have a dll interface (they shouldn't).

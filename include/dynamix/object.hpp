@@ -190,6 +190,7 @@ public:
     /// Returns the allcator associated with this object (may be `nullptr`)
     object_allocator* allocator() const { return _allocator; }
 
+#if DYNAMIX_OBJECT_REPLACE_MIXIN
     /// Moves a mixin to the designated buffer, by invocating its move constructor.
     /// Throws an exception if the mixin is not movable.
     /// Returns the old mixin buffer and offset.
@@ -201,6 +202,7 @@ public:
     /// Allocates buffers for all mixins and deallocates the old ones. Suitable to call
     /// from object allocators which keep a single mixin buffer per object.
     void reallocate_mixins();
+#endif
     /////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////

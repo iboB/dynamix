@@ -534,6 +534,8 @@ bool object::copyable() const noexcept
     return true;
 }
 
+#if DYNAMIX_OBJECT_REPLACE_MIXIN
+
 std::pair<char*, size_t> object::move_mixin(mixin_id id, char* buffer, size_t mixin_offset)
 {
     if (id >= DYNAMIX_MAX_MIXINS)
@@ -561,7 +563,7 @@ std::pair<char*, size_t> object::move_mixin(mixin_id id, char* buffer, size_t mi
 
 std::pair<char*, size_t> object::replace_mixin(mixin_id id, char* buffer, size_t mixin_offset) noexcept
 {
-    DYNAMIX_ASSERT(id >= DYNAMIX_MAX_MIXINS);
+    DYNAMIX_ASSERT(id < DYNAMIX_MAX_MIXINS);
     auto& data = _mixin_data[_type_info->mixin_index(id)];
     DYNAMIX_ASSERT(data.mixin());
 
@@ -578,5 +580,7 @@ void object::reallocate_mixins()
 {
 
 }
+
+#endif // DYNAMIX_OBJECT_REPLACE_MIXIN
 
 } // dynamix
