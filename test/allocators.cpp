@@ -354,7 +354,10 @@ TEST_CASE("mixin replacement")
 
     mutate(o)
         .add<custom_2_a>();
+
+#if DYNAMIX_USE_EXCEPTIONS
     CHECK_THROWS_AS(o.move_mixin(c2a_info.id, nullptr, 0), bad_mixin_move);
+#endif
 
     the_object = nullptr;
 }
