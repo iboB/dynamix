@@ -126,6 +126,15 @@ TEST_CASE("allocators")
 
     {
         object o;
+    }
+    CHECK(alloc_counter<global_alloc>::data_allocations == 0);
+    CHECK(alloc_counter<global_alloc>::mixin_allocations == 0);
+    CHECK(alloc_counter<custom_alloc_1>::mixin_allocations == 0);
+    CHECK(alloc_counter<custom_alloc_2>::mixin_allocations == 0);
+    CHECK(alloc_counter<custom_alloc_var>::mixin_allocations == 0);
+
+    {
+        object o;
         the_object = &o;
         mutate(o)
             .add<normal_a>()
@@ -194,7 +203,7 @@ TEST_CASE("allocators")
     CHECK(alloc_counter<custom_alloc_2>::mixin_allocations == 6); // 2 + 4
     CHECK(alloc_counter<custom_alloc_var>::mixin_allocations == 1); // 1 + 0
 
-    // none of these should have had data allocations
+                                                                    // none of these should have had data allocations
     CHECK(alloc_counter<custom_alloc_1>::data_allocations == 0);
     CHECK(alloc_counter<custom_alloc_2>::data_allocations == 0);
     CHECK(alloc_counter<custom_alloc_var>::data_allocations == 0);
@@ -231,7 +240,6 @@ public:
     int x = 53;
 };
 
-
 #if DYNAMIX_OBJECT_REPLACE_MIXIN
 TEST_CASE("mixin replacement")
 {
@@ -263,6 +271,16 @@ TEST_CASE("mixin replacement")
 
     char* c1_old_buf;
     size_t c1_old_offset;
+
+    std::tie(c1_old_buf, c1_old_offset) = o.move_mixin(DYNAMIX_MAX_MIXINS, c1_new_buf, c1_new_offset);
+    CHECK(!c1_old_buf);
+    CHECK(c1_old_offset == 0);
+
+    auto& c2a_info = _dynamix_get_mixin_type_info((custom_2_a*)nullptr);
+    std::tie(c1_old_buf, c1_old_offset) = o.move_mixin(c2a_info.id, c1_new_buf, c1_new_offset);
+    CHECK(!c1_old_buf);
+    CHECK(c1_old_offset == 0);
+
     std::tie(c1_old_buf, c1_old_offset) = o.move_mixin(c1_info.id, c1_new_buf, c1_new_offset);
 
     CHECK(c1_old_offset == c1_new_offset);
@@ -298,7 +316,7 @@ TEST_CASE("mixin replacement")
 
     char* cov_old_buf;
     size_t cov_old_offset;
-    std::tie(cov_old_buf, cov_old_offset) = o.replace_mixin(cov_info.id, cov_new_buf, cov_new_offset);
+    std::tie(cov_old_buf, cov_old_offset) = o.hard_replace_mixin(cov_info.id, cov_new_buf, cov_new_offset);
 
     CHECK(cov_old_offset == cov_new_offset);
     // casting to intptr_t otherwise doctest will compare strings
@@ -320,9 +338,85 @@ TEST_CASE("mixin replacement")
 
     CHECK(get_x(o) == 53);
 
+    o.reallocate_mixins();
+
+    CHECK(alloc_counter<custom_alloc_var>::mixin_allocations == 3);
+    CHECK(alloc_counter<custom_alloc_var>::mixin_deallocations == 2);
+    CHECK(alloc_counter<custom_alloc_1>::mixin_allocations == 3);
+    CHECK(alloc_counter<custom_alloc_1>::mixin_deallocations == 2);
+
+    CHECK(get_x(o) == 53);
+    CHECK(get_i(o) == 123);
+    CHECK(object_of(o.get<normal_a>()) == &o);
+    CHECK(object_of(o.get<normal_b>()) == &o);
+    CHECK(object_of(o.get<custom_1>()) == &o);
+    CHECK(object_of(o.get<custom_own_var>()) == &o);
+
+    mutate(o)
+        .add<custom_2_a>();
+    CHECK_THROWS_AS(o.move_mixin(c2a_info.id, nullptr, 0), bad_mixin_move);
+
     the_object = nullptr;
 }
 #endif
+
+class object_allocator_a : public object_allocator
+{
+public:
+    static size_t data_allocations;
+    static size_t data_deallocations;
+    static size_t mixin_allocations;
+    static size_t mixin_deallocations;
+
+    // allocate memory for count mixin_data_in_object instances
+    virtual char* alloc_mixin_data(size_t count, const object* obj) override
+    {
+        CHECK(obj == the_object);
+        ++data_allocations;
+        return _dda.alloc_mixin_data(count, obj);
+    }
+
+    virtual void dealloc_mixin_data(char* ptr, size_t count, const object* obj) override
+    {
+        CHECK((obj == the_object));
+        ++data_deallocations;
+        _dda.dealloc_mixin_data(ptr, count, obj);
+    }
+
+    virtual std::pair<char*, size_t> alloc_mixin(const basic_mixin_type_info& info, const object* obj) override
+    {
+        CHECK(obj == the_object);
+        ++mixin_allocations;
+        return _dda.alloc_mixin(info, obj);
+    }
+
+    virtual void dealloc_mixin(char* ptr, size_t offset, const basic_mixin_type_info& info, const object* obj) override
+    {
+        CHECK(offset == calculate_mixin_offset(ptr, info.alignment));
+        CHECK((obj == the_object));
+        ++mixin_deallocations;
+        _dda.dealloc_mixin(ptr, offset, info, obj);
+    }
+
+    internal::default_allocator _dda;
+};
+
+size_t object_allocator_a::data_allocations;
+size_t object_allocator_a::data_deallocations;
+size_t object_allocator_a::mixin_allocations;
+size_t object_allocator_a::mixin_deallocations;
+
+TEST_CASE("object allocator")
+{
+    {
+        object_allocator_a alloc;
+        object o(&alloc);
+    }
+
+    CHECK(object_allocator_a::data_allocations == 0);
+    CHECK(object_allocator_a::mixin_allocations == 0);
+
+}
 
 class normal_a {
 public:
@@ -338,6 +432,9 @@ public:
 };
 class custom_2_a {
 public:
+    custom_2_a() = default;
+    custom_2_a(custom_2_a&&) = delete;
+
 #if !DYNAMIX_USE_TYPEID
     static const char* dynamix_mixin_name() { return "normal_2_a"; }
 #endif

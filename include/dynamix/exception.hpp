@@ -57,7 +57,7 @@ class bad_next_bidder_call : public exception {};
 
 /// Thrown by `object::move_mixin` or `object::reallocate_mixins`
 /// when a mixin is to be moved but a mixin doesn't have a move_constructor.
-class bad_move_construction : public exception {};
+class bad_mixin_move : public exception {};
 
 }
 

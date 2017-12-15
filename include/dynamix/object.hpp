@@ -92,7 +92,6 @@ public:
     bool has() const noexcept
     {
         const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
-        // intentionally disregarding the actual info
         return internal_has_mixin(info.id);
     }
 
@@ -102,7 +101,6 @@ public:
     Mixin* get() noexcept
     {
         const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
-        // intentionally disregarding the actual info
         return reinterpret_cast<Mixin*>(internal_get_mixin(info.id));
     }
 
@@ -112,7 +110,6 @@ public:
     const Mixin* get() const noexcept
     {
         const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
-        // intentionally disregarding the actual info
         return reinterpret_cast<const Mixin*>(internal_get_mixin(info.id));
     }
 
@@ -193,14 +190,18 @@ public:
 #if DYNAMIX_OBJECT_REPLACE_MIXIN
     /// Moves a mixin to the designated buffer, by invocating its move constructor.
     /// Throws an exception if the mixin is not movable.
-    /// Returns the old mixin buffer and offset.
+    /// Returns the old mixin buffer and offset or {nullptr, 0} if the object doesn't have such mixin
     std::pair<char*, size_t> move_mixin(mixin_id id, char* buffer, size_t mixin_offset);
 
     /// Replaces a mixin's buffer with another. Returns the old buffer and offset.
-    std::pair<char*, size_t> replace_mixin(mixin_id id, char* buffer, size_t mixin_offset) noexcept;
+    /// WARNING: if the Mixin is not part of the object, this function will crash!
+    /// Will not touch the new buffer. It's the user's responsibility to set the appropriate
+    /// object inside.
+    std::pair<char*, size_t> hard_replace_mixin(mixin_id id, char* buffer, size_t mixin_offset) noexcept;
 
     /// Allocates buffers for all mixins and deallocates the old ones. Suitable to call
-    /// from object allocators which keep a single mixin buffer per object.
+    /// from object allocators which keep a single mixin buffer per object. The order is
+    /// for each mixin: { allocate new; deallocate old; }
     void reallocate_mixins();
 #endif
     /////////////////////////////////////////////////////////////////
