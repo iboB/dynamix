@@ -54,7 +54,7 @@ object::~object()
     clear();
     if (_allocator)
     {
-        _allocator->release();
+        _allocator->release(*this);
     }
 }
 
@@ -112,7 +112,7 @@ void object::clear() noexcept
 {
     for (const mixin_type_info* mixin_info : _type_info->_compact_mixins)
     {
-        destroy_mixin(mixin_info->id);
+        delete_mixin(mixin_info->id);
     }
 
     if(_mixin_data != &null_mixin_data)
@@ -149,7 +149,7 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
         }
         else if(manage_mixins)
         {
-            destroy_mixin(id);
+            delete_mixin(id);
         }
     }
 
@@ -180,7 +180,7 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
             size_t index = new_type->mixin_index(mixin_info->id);
             if(!new_mixin_data[index].buffer())
             {
-                construct_mixin(mixin_info->id, nullptr);
+                make_mixin(mixin_info->id, nullptr);
             }
         }
     }
@@ -194,7 +194,7 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
     }
 }
 
-bool object::construct_mixin(mixin_id id, const void* source)
+bool object::make_mixin(mixin_id id, const void* source)
 {
     DYNAMIX_ASSERT(_type_info->has(id));
     mixin_data_in_object& data = _mixin_data[_type_info->mixin_index(id)];
@@ -204,7 +204,7 @@ bool object::construct_mixin(mixin_id id, const void* source)
 
     const mixin_type_info& mixin_info = dom.mixin_info(id);
 
-    domain_allocator* alloc = _allocator ? _allocator : mixin_info.allocator;
+    mixin_allocator* alloc = _allocator ? _allocator : mixin_info.allocator;
     char* buffer;
     size_t mixin_offset;
     std::tie(buffer, mixin_offset) = alloc->alloc_mixin(mixin_info, this);
@@ -221,12 +221,11 @@ bool object::construct_mixin(mixin_id id, const void* source)
 
     if (!source)
     {
-        dom.mixin_info(id).constructor(data.mixin());
+        alloc->construct_mixin(mixin_info, data.mixin());
     }
     else
     {
-        auto cc = dom.mixin_info(id).copy_constructor;
-        if (!cc)
+        if (!alloc->copy_construct_mixin(mixin_info, data.mixin(), source))
         {
             // so... we now have a problem
             // some mixins are constructed and some are not, while this cannot be constructed
@@ -235,29 +234,26 @@ bool object::construct_mixin(mixin_id id, const void* source)
             // for now, though, use a quick and dirty fix and default construct and then return false
             // thus we will have a valid object, but the non-copyable mixins won't be copied
             // finally throw after the object construction is complete
-            dom.mixin_info(id).constructor(data.mixin());
+            alloc->construct_mixin(mixin_info, data.mixin());
             return false;
-        }
-        else
-        {
-            cc(data.mixin(), source);
         }
     }
 
     return true;
 }
 
-void object::destroy_mixin(mixin_id id)
+void object::delete_mixin(mixin_id id)
 {
     DYNAMIX_ASSERT(_type_info->has(id));
     mixin_data_in_object& data = _mixin_data[_type_info->mixin_index(id)];
 
     const mixin_type_info& mixin_info = domain::instance().mixin_info(id);
 
-    mixin_info.destructor(data.mixin());
+    mixin_allocator* alloc = _allocator ? _allocator : mixin_info.allocator;
+
+    alloc->destroy_mixin(mixin_info, data.mixin());
 
     // dealocate mixin
-    domain_allocator* alloc = _allocator ? _allocator : mixin_info.allocator;
     alloc->dealloc_mixin(data.buffer(),
         data.mixin_offset(), mixin_info, this);
 
@@ -357,7 +353,7 @@ void object::usurp(object&& o) noexcept
 {
     if (_allocator)
     {
-        _allocator->release();
+        _allocator->release(*this);
         _allocator = nullptr;
     }
 
@@ -405,7 +401,7 @@ void object::copy_from(const object& o)
         {
             if (_allocator)
             {
-                _allocator->release();
+                _allocator->release(*this);
             }
             _allocator = o._allocator->on_copy_construct(*this, o);
             if (_allocator)
@@ -461,7 +457,7 @@ void object::copy_from(const object& o)
         }
         else
         {
-            destroy_mixin(id);
+            delete_mixin(id);
         }
     }
 
@@ -491,7 +487,7 @@ void object::copy_from(const object& o)
         size_t index = _type_info->mixin_index(id);
         if (!new_mixin_data[index].buffer())
         {
-            if (!construct_mixin(id, o._mixin_data[index].mixin()))
+            if (!make_mixin(id, o._mixin_data[index].mixin()))
             {
                 copy_fail = bad_copy_construct;
             }
@@ -587,7 +583,7 @@ void object::reallocate_mixins()
         auto old_data = data;
         DYNAMIX_ASSERT(data.buffer());
 
-        domain_allocator* alloc = _allocator ? _allocator : mixin_info->allocator;
+        mixin_allocator* alloc = _allocator ? _allocator : mixin_info->allocator;
 
         auto new_buf = alloc->alloc_mixin(*mixin_info, this);
 

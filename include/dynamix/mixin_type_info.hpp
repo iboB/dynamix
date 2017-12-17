@@ -22,9 +22,13 @@
 namespace dynamix
 {
 
-class domain_allocator;
+class mixin_allocator;
 
 static const mixin_id INVALID_MIXIN_ID = ~mixin_id(0);
+
+typedef void(*mixin_constructor_proc)(void* memory);
+typedef void(*mixin_copy_proc)(void* memory, const void* source);
+typedef void(*mixin_destructor_proc)(void* memory);
 
 /**
 * Public mixin type info. Contains a slice of the type info data
@@ -52,7 +56,18 @@ public:
 
     /// Allocator associated with this mixin type.
     /// If no special one was provided this will be equal to the allocator of the domain.
-    domain_allocator* allocator;
+    mixin_allocator* allocator;
+
+    /// Procedure which calls the default constructor of a mixin.
+    /// Might be left null if the mixin is not default-constructible.
+    mixin_constructor_proc constructor;
+
+    /// Procedure which calls the destructor of a mixin. Never null.
+    mixin_destructor_proc destructor;
+
+    /// Procedutre which calls the copy-constructor of a mixin.
+    /// Might be left null for mixins which aren't copy-constructible
+    mixin_copy_proc copy_constructor;
 
 #if DYNAMIX_ADDITIONAL_METRICS
     /// Number of "living" mixins of this type.
@@ -72,24 +87,12 @@ protected:
 namespace internal
 {
 
-typedef void (*mixin_constructor_proc)(void* memory);
-typedef void (*mixin_copy_proc)(void* memory, const void* source);
 typedef void (*mixin_move_proc)(void* memory, void* source);
-typedef void (*mixin_destructor_proc)(void* memory);
 
 // this struct contains information for a given mixin
 class DYNAMIX_API mixin_type_info : public basic_mixin_type_info
 {
 public:
-
-    // procedures, obtained from the mixin definition that makes the actual
-    // construction and destruction
-    mixin_constructor_proc constructor;
-    mixin_destructor_proc destructor;
-
-    // might be left null for mixins which aren't copy-constructible
-    mixin_copy_proc copy_constructor;
-
     // might be left null for mixins which aren't copy-assignable
     mixin_copy_proc copy_assignment;
 

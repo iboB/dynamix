@@ -7,6 +7,8 @@
 //
 #include <dynamix/dynamix.hpp>
 
+#include <set>
+
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "../../test/doctest/doctest.h"
 
@@ -42,7 +44,7 @@ size_t alloc_counter<T>::mixin_deallocations;
 const object* the_object = nullptr;
 
 template <typename T>
-struct custom_allocator : public mixin_allocator, public alloc_counter<T>
+struct custom_allocator : public domain_allocator, public alloc_counter<T>
 {
     // allocate memory for count mixin_data_in_object instances
     virtual char* alloc_mixin_data(size_t count, const object* obj) override
@@ -354,7 +356,10 @@ TEST_CASE("mixin replacement")
 
     mutate(o)
         .add<custom_2_a>();
+
+#if DYNAMIX_USE_EXCEPTIONS
     CHECK_THROWS_AS(o.move_mixin(c2a_info.id, nullptr, 0), bad_mixin_move);
+#endif
 
     the_object = nullptr;
 }
@@ -406,16 +411,176 @@ size_t object_allocator_a::data_deallocations;
 size_t object_allocator_a::mixin_allocations;
 size_t object_allocator_a::mixin_deallocations;
 
+class object_allocator_b : public object_allocator_a
+{
+public:
+    ~object_allocator_b()
+    {
+        CHECK(ref_count == 0);
+        CHECK(objects.empty());
+    }
+
+    virtual void on_set_to_object(object& owner) override
+    {
+        ++ref_count;
+        CHECK(objects.find(&owner) == objects.end());
+        objects.insert(&owner);
+        CHECK(objects.size() == ref_count);
+    }
+
+    virtual void release(object& owner) noexcept override
+    {
+        CHECK(objects.find(&owner) != objects.end());
+        objects.erase(&owner);
+        --ref_count;
+        CHECK(objects.size() == ref_count);
+    }
+
+    virtual object_allocator* on_copy_construct(object& target, const object& source) override
+    {
+        CHECK(objects.find(&source) != objects.end());
+        CHECK(source.allocator() == this);
+        return this;
+    }
+
+    virtual object_allocator* on_move(object& target, object& source) noexcept override
+    {
+        CHECK(source.allocator() == this);
+        auto f = objects.find(&source);
+        CHECK(f != objects.end());
+        objects.erase(f);
+        CHECK(objects.find(&target) == objects.end());
+        --ref_count;
+        return this;
+    }
+
+    std::set<const object*> objects;
+    size_t ref_count = 0;
+};
+
 TEST_CASE("object allocator")
 {
+    CHECK(alloc_counter<custom_alloc_1>::mixin_allocations == alloc_counter<custom_alloc_1>::mixin_deallocations);
+    alloc_counter<custom_alloc_1>::mixin_allocations = 0;
+    alloc_counter<custom_alloc_1>::mixin_deallocations = 0;
+    alloc_counter<custom_alloc_var>::mixin_allocations = 0;
+    alloc_counter<custom_alloc_var>::mixin_deallocations = 0;
+
     {
         object_allocator_a alloc;
         object o(&alloc);
+        CHECK(o.allocator() == &alloc);
     }
 
     CHECK(object_allocator_a::data_allocations == 0);
     CHECK(object_allocator_a::mixin_allocations == 0);
 
+    {
+        object_allocator_a alloc;
+        object o(&alloc);
+        the_object = &o;
+
+        mutate(o)
+            .add<normal_a>()
+            .add<custom_1>()
+            .add<custom_own_var>();
+
+        CHECK(get_i(o) == 7);
+        CHECK(get_x(o) == 53);
+
+        mutate(o)
+            .remove<normal_a>()
+            .add<normal_b>();
+    }
+
+    CHECK(object_allocator_a::data_allocations == 2);
+    CHECK(object_allocator_a::data_deallocations == 2);
+    CHECK(object_allocator_a::mixin_allocations == 4);
+    CHECK(object_allocator_a::mixin_deallocations == 4);
+    CHECK(alloc_counter<custom_alloc_var>::mixin_allocations == 0);
+    CHECK(alloc_counter<custom_alloc_var>::mixin_deallocations == 0);
+    CHECK(alloc_counter<custom_alloc_1>::mixin_allocations == 0);
+    CHECK(alloc_counter<custom_alloc_1>::mixin_deallocations == 0);
+
+    {
+        object_allocator_a alloc;
+        object o1(&alloc);
+        the_object = &o1;
+
+        mutate(o1)
+            .add<normal_a>()
+            .add<normal_b>()
+            .add<custom_1>()
+            .add<custom_own_var>();
+
+        object o2 = std::move(o1);
+        the_object = &o2;
+
+        CHECK(o1.empty());
+        CHECK(!o1.allocator());
+
+        CHECK(o2.allocator() == &alloc);
+
+        {
+            object o3;
+            the_object = &o3;
+
+            o3.copy_from(o2);
+            CHECK(!o3.allocator());
+            CHECK(o2.allocator() == &alloc);
+        }
+
+        the_object = &o2;
+    }
+
+    CHECK(object_allocator_a::data_allocations == 3);
+    CHECK(object_allocator_a::data_deallocations == 3);
+    CHECK(object_allocator_a::mixin_allocations == 8);
+    CHECK(object_allocator_a::mixin_deallocations == 8);
+    CHECK(alloc_counter<custom_alloc_var>::mixin_allocations == 1);
+    CHECK(alloc_counter<custom_alloc_var>::mixin_deallocations == 1);
+    CHECK(alloc_counter<custom_alloc_1>::mixin_allocations == 1);
+    CHECK(alloc_counter<custom_alloc_1>::mixin_deallocations == 1);
+
+    object_allocator_b alloc_b;
+    {
+        object o1(&alloc_b);
+        the_object = &o1;
+
+        mutate(o1)
+            .add<normal_a>()
+            .add<normal_b>()
+            .add<custom_1>()
+            .add<custom_own_var>();
+
+        object o2 = std::move(o1);
+        the_object = &o2;
+
+        CHECK(o1.empty());
+        CHECK(!o1.allocator());
+
+        CHECK(o2.allocator() == &alloc_b);
+
+        {
+            object o3;
+            the_object = &o3;
+
+            o3.copy_from(o2);
+            CHECK(o3.allocator() == &alloc_b);
+            CHECK(o2.allocator() == &alloc_b);
+        }
+
+        object o4(&alloc_b);
+
+        the_object = &o2;
+    }
+    CHECK(alloc_b.ref_count == 0);
+    CHECK(alloc_b.objects.empty());
+
+    CHECK(alloc_counter<custom_alloc_var>::mixin_allocations == 1);
+    CHECK(alloc_counter<custom_alloc_var>::mixin_deallocations == 1);
+    CHECK(alloc_counter<custom_alloc_1>::mixin_allocations == 1);
+    CHECK(alloc_counter<custom_alloc_1>::mixin_deallocations == 1);
 }
 
 class normal_a {

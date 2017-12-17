@@ -16,17 +16,19 @@
 namespace dynamix
 {
 
+static_assert(domain_allocator::mixin_data_size == sizeof(internal::mixin_data_in_object), "Error in domain_allocator::mixin_data_size definition");
+
 // ceil(a/b)*b with integers
 // scales a so an exact number of b will fit in it
 static size_t ceil_scale(size_t a, size_t b)
 {
-    size_t result = (a+b-1)/b;
-    result*=b;
+    size_t result = (a + b - 1) / b; // division rounding up
+    result *= b; // scale
 
     return result;
 }
 
-size_t domain_allocator::calculate_mem_size_for_mixin(size_t mixin_size, size_t mixin_alignment)
+size_t mixin_allocator::calculate_mem_size_for_mixin(size_t mixin_size, size_t mixin_alignment)
 {
     // normally alignof(x) + sizeof(x) is enough for an aligned allocation
     // but in this case we want to have an object* before that and the alignment
@@ -45,7 +47,7 @@ size_t domain_allocator::calculate_mem_size_for_mixin(size_t mixin_size, size_t 
     return mem_size;
 }
 
-size_t domain_allocator::calculate_mixin_offset(const char* buffer, size_t mixin_alignment)
+size_t mixin_allocator::calculate_mixin_offset(const char* buffer, size_t mixin_alignment)
 {
     // now malloc (or new) should make sure to give us memory that's word aligned
     // that means that buffer should be aligned to sizeof(ptr)
@@ -62,34 +64,27 @@ size_t domain_allocator::calculate_mixin_offset(const char* buffer, size_t mixin
     return mixin_pos - uintptr_t(buffer);
 }
 
-
-static inline char* allocate_mixin_data(size_t count)
+void mixin_allocator::construct_mixin(const basic_mixin_type_info& info, void* ptr)
 {
-    DYNAMIX_ASSERT(domain_allocator::mixin_data_size == sizeof(internal::mixin_data_in_object));
-    return new char[sizeof(internal::mixin_data_in_object) * count];
+    info.constructor(ptr);
 }
 
-static inline void deallocate_mixin_data(char* ptr)
+bool mixin_allocator::copy_construct_mixin(const basic_mixin_type_info& info, void* ptr, const void* source)
 {
-    delete[] ptr;
+    if (!info.copy_constructor) return false;
+    info.copy_constructor(ptr, source);
+    return true;
 }
 
-char* mixin_allocator::alloc_mixin_data(size_t count, const object*)
+void mixin_allocator::destroy_mixin(const basic_mixin_type_info& info, void* ptr) noexcept
 {
-    DYNAMIX_ASSERT(false); // a mixin allocator should never have to allocate mixin data
-    return allocate_mixin_data(count);
+    info.destructor(ptr);
 }
 
-void mixin_allocator::dealloc_mixin_data(char* ptr, size_t, const object*)
-{
-    DYNAMIX_ASSERT(false); // a mixin allocator should never have do deallocate mixin data
-    deallocate_mixin_data(ptr);
-}
-
-void object_allocator::on_set_to_object(object& owner)
+void object_allocator::on_set_to_object(object&)
 {}
 
-void object_allocator::release() noexcept
+void object_allocator::release(object&) noexcept
 {}
 
 object_allocator* object_allocator::on_copy_construct(object& target, const object& source)
@@ -112,7 +107,7 @@ char* default_allocator::alloc_mixin_data(size_t count, const object*)
 #if DYNAMIX_DEBUG
     _has_allocated = true;
 #endif
-    return allocate_mixin_data(count);
+    return new char[sizeof(internal::mixin_data_in_object) * count];
 }
 
 void default_allocator::dealloc_mixin_data(char* ptr, size_t, const object*)
@@ -120,7 +115,7 @@ void default_allocator::dealloc_mixin_data(char* ptr, size_t, const object*)
 #if DYNAMIX_DEBUG
     DYNAMIX_ASSERT(_has_allocated); // what? deallocate without ever allocating?
 #endif
-    deallocate_mixin_data(ptr);
+    delete[] ptr;
 }
 
 std::pair<char*, size_t> default_allocator::alloc_mixin(const basic_mixin_type_info& info, const object*)

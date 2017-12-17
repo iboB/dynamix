@@ -232,10 +232,13 @@ _dynamix_internal:
     // can only be performed on empty objects
     void usurp(object&& o) noexcept;
 
+    // allocates memory and
     // constructs mixin with optional source to copy from
     // will return false if source is provided but no copy constructor exists
-    bool construct_mixin(mixin_id id, const void* source);
-    void destroy_mixin(mixin_id id);
+    bool make_mixin(mixin_id id, const void* source);
+
+    // destroys mixin and deallocates memory
+    void delete_mixin(mixin_id id);
 
     const internal::object_type_info* _type_info;
 

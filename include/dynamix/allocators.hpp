@@ -21,37 +21,14 @@ namespace dynamix
 {
 
 /**
- * The class should be the parent to your custom
- * allocators, i.e. allocators that are set
- * for all mixin allocation
- */
-class DYNAMIX_API domain_allocator
+* This class should be the parent to your custom
+* mixin allocators, i.e. allocators that are set to mixins
+* as features.
+*/
+class DYNAMIX_API mixin_allocator
 {
 public:
-    virtual ~domain_allocator() {}
-
-    /// Pure virtual.
-    /// Should return a valid pointer to an array with the size of \c count
-    /// `mixin_data_in_object` instances.
-    ///
-    /// Use the static constant `mixin_data_size` to get the size of a single
-    /// `mixin_data_in_object`
-    ///
-    /// \par Example:
-    /// \code
-    /// char* my_allocator::alloc_mixin_data(size_t count, const object*)
-    /// {
-    ///     return new char[count * mixin_data_size];
-    /// }
-    /// \endcode
-    virtual char* alloc_mixin_data(size_t count, const object* obj) = 0;
-
-    /// Pure virtual.
-    /// Should free the memory that has
-    /// been obtained via a call to `alloc_mixin_data`.
-    /// The number of elements to dealocate will correspond to the number of
-    /// elements used to allocated the buffer
-    virtual void dealloc_mixin_data(char* ptr, size_t count, const object* obj) = 0;
+    virtual ~mixin_allocator() {}
 
     /// Calculates appropriate size for a mixin buffer
     /// so as to satisfy the requirements of mixin size and alignment
@@ -95,18 +72,25 @@ public:
     /// and also with the offset which was returned by the allocation.
     virtual void dealloc_mixin(char* ptr, size_t mixin_offset, const basic_mixin_type_info& info, const object* obj) = 0;
 
-    /// Size of `mixin_data_in_object`
-    ///
-    /// Use this to determine how many bytes you'll allocate for single
-    /// mixin data in `alloc_mixin_data`
-    static constexpr size_t mixin_data_size = sizeof(internal::mixin_data_in_object);
+    /// Virtual function, which constructs a mixin within a memory buffer.
+    /// The default implementation calls the default constructor.
+    virtual void construct_mixin(const basic_mixin_type_info& info, void* ptr);
+
+    /// Virtual function, which copy-constructs a mixin within a memory buffer, from a given source.
+    /// Should return false if the copy-construction failed.
+    /// The default implementation calls the default copy constructor and returns false if none exists.
+    virtual bool copy_construct_mixin(const basic_mixin_type_info& info, void* ptr, const void* source);
+
+    /// Virtual function, which destroys a mixin from a given buffer.
+    /// The default implementation calls the destructor.
+    virtual void destroy_mixin(const basic_mixin_type_info& info, void* ptr) noexcept;
 
 #if DYNAMIX_DEBUG
     // checks to see if an allocator is changed after it has already started allocating
     // it could be a serious bug to allocate from one and deallocate from another
 
     // users are encouraged to make use of this when debugging
-    domain_allocator() : _has_allocated(false) {}
+    mixin_allocator() : _has_allocated(false) {}
 
     bool has_allocated() const { return _has_allocated; }
 
@@ -116,21 +100,42 @@ protected:
 };
 
 /**
- * The class should be the parent to your custom
- * mixin allocators, i.e. allocators that are set to mixins
- * as features.
- *
- * It's derived from `domain_allocator`, and the difference
- * between the two is that `mixin_allocator`, hides `alloc_mixin_data` and
- * `dealloc_mixin_data`.
- */
-class DYNAMIX_API mixin_allocator : public domain_allocator
+* This class is a domain allocator. Inherit from it so you can set
+* your custom allocator to the domain.
+*/
+class DYNAMIX_API domain_allocator : public mixin_allocator
 {
-private:
-    /// \internal
-    virtual char* alloc_mixin_data(size_t count, const object* obj) override;
-    /// \internal
-    virtual void dealloc_mixin_data(char* ptr, size_t count, const object* obj) override;
+public:
+
+    /// Pure virtual.
+    /// Should return a valid pointer to an array with the size of \c count
+    /// `mixin_data_in_object` instances.
+    ///
+    /// Use the static constant `mixin_data_size` to get the size of a single
+    /// `mixin_data_in_object`
+    ///
+    /// \par Example:
+    /// \code
+    /// char* my_allocator::alloc_mixin_data(size_t count, const object*)
+    /// {
+    ///     return new char[count * mixin_data_size];
+    /// }
+    /// \endcode
+    virtual char* alloc_mixin_data(size_t count, const object* obj) = 0;
+
+    /// Pure virtual.
+    /// Should free the memory that has
+    /// been obtained via a call to `alloc_mixin_data`.
+    /// The number of elements to dealocate will correspond to the number of
+    /// elements used to allocated the buffer
+    virtual void dealloc_mixin_data(char* ptr, size_t count, const object* obj) = 0;
+
+
+    /// Size of `mixin_data_in_object`
+    ///
+    /// Use this to determine how many bytes you'll allocate for single
+    /// mixin data in `alloc_mixin_data`
+    static constexpr size_t mixin_data_size = sizeof(internal::mixin_data_in_object);
 };
 
 /**
@@ -163,7 +168,7 @@ public:
     /// spot to decrement a reference counter.
     ///
     /// The default implementation is empty
-    virtual void release() noexcept;
+    virtual void release(object& owner) noexcept;
 
     /// Called when an object is copy-constructed from the owner object
     /// Use it to provide custom logic so as to create an allocator for the target
