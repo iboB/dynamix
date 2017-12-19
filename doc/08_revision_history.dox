@@ -1,5 +1,22 @@
 /*! \page revisions Revision History
 
+DynaMix 1.3.0
+=============
+
+Released: 2017 Dec 20
+
+- Redesign of allocators. *The new allocators are not backwards compatible.*
+    - Added per-object allocators which can allocate mixins for a specific
+    object. This can be useful if you want all mixins for an object to be in a
+    single contiguous memory block.
+    - New allocators have much more flexibility as they receive more information
+    when allocating, including a pointer to the associated object
+    - New allocators can construct and destroy mixins
+- Added methods to `object` which allow users to replace mixins within objects
+- Split `mixin_type_info` into a public and private part
+- Added `noexcept` specifiers to some methods where appropriate
+
+
 DynaMix 1.2.3
 =============
 

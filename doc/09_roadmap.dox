@@ -4,7 +4,6 @@ Here is a list of planned features and events for the library: (The authors
 write it in their own free time, so concrete dates are hard to estimate)
 
 - Possibly soon
-    - Revise (and possibly redesign) allocators
     - Create some library allocators: one with mem pages (vector memory), a
     per-frame style allocator, object pool style `std::list` one.
     - Case-study: A demo project, that better illustrates the libraries
@@ -14,9 +13,6 @@ write it in their own free time, so concrete dates are hard to estimate)
     or mutated (when all mixins are constructed)
     - Remove arity from message macros
 - Not soon, but with concrete idea of how to be done:
-    - Call mixin constructors when mutating object or constructing them via
-    object type templates. Sample usage:
-    `mutate(obj).add<mixin>("foo", param2).add<other_mixin>(42)`
     - Optimize mutation process: less allocations. Design special
     `mixin_collection` for the process, that can be preallocated (or that uses
     a buffer that's allocated only once) and has `reserve`. Allow reuse of
@@ -26,8 +22,6 @@ write it in their own free time, so concrete dates are hard to estimate)
     - Add a new mixin feature `fact`. Facts are static const variables in a
     mixin. No multicasts. No virtual tables.
     - Reflection. Call messages by string.
-    - "Static" mixins. As long as they're not mutated in or out, it provides a
-    faster message execution.
     - Make use of the fact that a significant performance improvement can be made if
     a user has no mixins or messages defined in a dynamic library (and has no
     plans to add such)
@@ -38,9 +32,7 @@ write it in their own free time, so concrete dates are hard to estimate)
     can be garbage collected, saving up to a kilobyte of memory.
     - Create a preprocessing tool (like Qt's moc) that can be used instead of
     the macros for mixin and message definition.
-    - Allow allocators to move mixins.
 - When humankind becomes a Kardashev type two civilization:
-    - A way to mutate static mixins in and out. Slight mutation execution penalty.
 	- Mixin/Message domains &ndash; sets of mixins and messages that cannot be mixed.
 	Will throw a runtime error when trying to combine certain mixins or messages.
 
