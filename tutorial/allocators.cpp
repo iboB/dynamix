@@ -75,12 +75,12 @@ array. It has to conform to the mixin (and also `object` pointer) alignment.
     {
 /*`
 The users are strongly advised to use the static method
-`global_allocator::calculate_mem_size_for_mixin`. It will appropriately
+`global_allocator::mem_size_for_mixin`. It will appropriately
 calculate how much memory is needed for the mixin instance such that
 there is enough room at the beginning for the pointer to the owning
 object and the memory alignment is respected.
 */
-        size_t size = calculate_mem_size_for_mixin(info.size, info.alignment);
+        size_t size = mem_size_for_mixin(info.size, info.alignment);
         char* buffer = allocate(size);
 
 /*`
@@ -91,11 +91,11 @@ the owning object pointer in before it and all alignments are
 respected.
 
 You are encouraged to use the static method
-`global_allocator::calculate_mixin_offset` for this purpose.
+`global_allocator::mixin_offset` for this purpose.
 */
-        size_t mixin_offset = calculate_mixin_offset(buffer, info.alignment);
+        size_t offset = mixin_offset(buffer, info.alignment);
 
-        return std::make_pair(buffer, mixin_offset);
+        return std::make_pair(buffer, offset);
     }
 
 /*`
@@ -154,7 +154,7 @@ public:
     per_frame_allocator()
         : _num_allocations(0)
         , mixin_buf_size(
-            calculate_mem_size_for_mixin(
+            mem_size_for_mixin(
                 sizeof(Mixin),
                 std::alignment_of<Mixin>::value))
         , page_size(mixin_buf_size * NUM_IN_PAGE)
@@ -180,12 +180,12 @@ public:
         char* buffer = _pages.back() + _page_byte_index * mixin_buf_size;
 
         // again calculate the offset using this static member function
-        size_t mixin_offset = calculate_mixin_offset(buffer, info.alignment);
+        size_t offset = mixin_offset(buffer, info.alignment);
 
         ++_page_byte_index;
         ++_num_allocations;
 
-        return std::make_pair(buffer, mixin_offset);
+        return std::make_pair(buffer, offset);
     }
 
     virtual void dealloc_mixin(char* buf, size_t, const dynamix::basic_mixin_type_info& info, const dynamix::object*) override

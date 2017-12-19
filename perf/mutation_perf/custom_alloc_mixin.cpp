@@ -28,7 +28,7 @@ struct custom_allocator : public mixin_allocator
 
     custom_allocator()
         : mixin_unit_size(
-            calculate_mem_size_for_mixin(
+            mem_size_for_mixin(
                 sizeof(custom_alloc_mixin),
                 std::alignment_of<custom_alloc_mixin>::value))
     {
@@ -52,9 +52,9 @@ struct custom_allocator : public mixin_allocator
         auto buffer = mixin_block.back() + mixin_index * mixin_unit_size;
         ++mixin_index;
 
-        auto mixin_offset = calculate_mixin_offset(buffer, info.alignment);
+        auto offset = mixin_offset(buffer, info.alignment);
 
-        return make_pair(buffer, mixin_offset);
+        return make_pair(buffer, offset);
     }
 
     virtual void dealloc_mixin(char*, size_t, const dynamix::basic_mixin_type_info&, const object*) override

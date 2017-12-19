@@ -20,6 +20,16 @@
 namespace dynamix
 {
 
+namespace internal
+{
+    // rounds s up to the nearest multiple of n
+    inline constexpr size_t next_multiple(size_t s, size_t n)
+    {            
+        return ((s + n - 1) / n) // divide rounding up
+            * n;  // and scale
+    }
+}
+
 /**
 * This class should be the parent to your custom
 * mixin allocators, i.e. allocators that are set to mixins
@@ -36,7 +46,7 @@ public:
     ///
     /// You may use it in your overrides of `alloc_mixin` to determine
     /// the appropriate memory size.
-    static size_t calculate_mem_size_for_mixin(size_t mixin_size, size_t mixin_alignment);
+    static size_t mem_size_for_mixin(size_t mixin_size, size_t mixin_alignment);
 
     /// Calculates the appropriate offset of the mixin in the buffer
     /// so as to satisfy the requirements of its alignment
@@ -44,23 +54,23 @@ public:
     ///
     /// You may use it in your overrides of `alloc_mixin` to determine
     /// the correct mixin_offset.
-    static size_t calculate_mixin_offset(const char* buffer, size_t mixin_alignment);
+    static size_t mixin_offset(const char* buffer, size_t mixin_alignment);
 
     /// Pure virtual.
     /// Returns a buffer of memory and the offset of the mixin within it
     /// (according to the alignment)
     /// BUT IN SUCH A WAY AS TO ALLOW A POINTER TO BE PLACED IN FRONT
     ///
-    /// You may use `calculate_mem_size_for_mixin` and `calculate_mixin_offset`
+    /// You may use `mem_size_for_mixin` and `mixin_offset`
     /// if you're not sure what to do.
     ///
     /// \par Example:
     /// \code
     /// std::pair<char*, size_t> your_allocator::alloc_mixin(const basic_mixin_type_info& info, const object*)
     /// {
-    ///     size_t mem_size = calculate_mem_size_for_mixin(info.size, info.alignment);
+    ///     size_t mem_size = mem_size_for_mixin(info.size, info.alignment);
     ///     auto buffer = new char[mem_size];
-    ///     return make_pair(buffer, calculate_mixin_offset(buffer, info.alignment));
+    ///     return make_pair(buffer, mixin_offset(buffer, info.alignment));
     /// }
     /// \endcode
     virtual std::pair<char*, size_t> alloc_mixin(const basic_mixin_type_info& info, const object* obj) = 0;
@@ -98,6 +108,47 @@ protected:
     bool _has_allocated;
 #endif
 };
+
+// inline so compilers can optimize it away
+// to be constexpr when we support c++14
+inline size_t mixin_allocator::mem_size_for_mixin(size_t mixin_size, size_t mixin_alignment)
+{
+    // normally alignof(x) + sizeof(x) is enough for an aligned allocation
+    // but in this case we want to have an object* before that and the alignment
+    // could be smaller than sizeof(object*) - especially on 64 bit platforms
+    size_t mem_size = internal::next_multiple(sizeof(object*), mixin_alignment);
+    mem_size += mixin_size;
+
+    // now it could be the case that the mixin alignment doesn't match the pointer alignment
+    // and allocations from a consecutive allocator may end my misaligning the memory for
+    // our object* pointer
+    // the case could be such if the mixin class doesn't have any data members or has data members,
+    // smaller than uintptr_t
+    // so, we perform another division rounding up for the final memory size
+    mem_size = internal::next_multiple(mem_size, sizeof(object*));
+
+    return mem_size;
+}
+
+// inline so compilers can optimize it away
+// to be constexpr when we support c++14
+inline size_t mixin_allocator::mixin_offset(const char* buffer, size_t mixin_alignment)
+{
+    // now malloc (or new) should make sure to give us memory that's word aligned
+    // that means that buffer should be aligned to sizeof(ptr)
+
+    // WARNING: if you don't have a custom allocator and this assert fails
+    // this means that memory not-aligned to the pointer size was allocated
+    // This platform is strange and creepy and is not supported by the default allocator
+    // you should write your own, that allocates properly aligned memory
+    DYNAMIX_ASSERT_MSG(uintptr_t(buffer) % sizeof(object*) == 0,
+        "allocators should always return memory aligned to sizeof(void*)");
+
+    uintptr_t mixin_pos = internal::next_multiple(uintptr_t(buffer + sizeof(object*)), mixin_alignment);
+
+    return mixin_pos - uintptr_t(buffer);
+}
+
 
 /**
 * This class is a domain allocator. Inherit from it so you can set

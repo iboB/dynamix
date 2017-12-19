@@ -70,7 +70,7 @@ struct custom_allocator : public domain_allocator, public alloc_counter<T>
 
     virtual void dealloc_mixin(char* ptr, size_t offset, const basic_mixin_type_info& info, const object* obj) override
     {
-        CHECK(offset == calculate_mixin_offset(ptr, info.alignment));
+        CHECK(offset == mixin_offset(ptr, info.alignment));
         CHECK((!the_object || obj == the_object));
         ++alloc_counter<T>::mixin_deallocations;
         _dda.dealloc_mixin(ptr, offset, info, obj);
@@ -397,7 +397,7 @@ public:
 
     virtual void dealloc_mixin(char* ptr, size_t offset, const basic_mixin_type_info& info, const object* obj) override
     {
-        CHECK(offset == calculate_mixin_offset(ptr, info.alignment));
+        CHECK(offset == mixin_offset(ptr, info.alignment));
         CHECK((obj == the_object));
         ++mixin_deallocations;
         _dda.dealloc_mixin(ptr, offset, info, obj);
