@@ -191,17 +191,23 @@ public:
     /// Moves a mixin to the designated buffer, by invocating its move constructor.
     /// Throws an exception if the mixin is not movable.
     /// Returns the old mixin buffer and offset or {nullptr, 0} if the object doesn't have such mixin
+    /// The library never calls this function internally. Unless the user calls it, an object's mixins will always
+    /// have the same addresses
     std::pair<char*, size_t> move_mixin(mixin_id id, char* buffer, size_t mixin_offset);
 
     /// Replaces a mixin's buffer with another. Returns the old buffer and offset.
     /// WARNING: if the Mixin is not part of the object, this function will crash!
     /// Will not touch the new buffer. It's the user's responsibility to set the appropriate
     /// object inside.
+    /// The library never calls this function internally. Unless the user calls it, an object's mixins will always
+    /// have the same addresses
     std::pair<char*, size_t> hard_replace_mixin(mixin_id id, char* buffer, size_t mixin_offset) noexcept;
 
     /// Allocates buffers for all mixins and deallocates the old ones. Suitable to call
     /// from object allocators which keep a single mixin buffer per object. The order is
     /// for each mixin: { allocate new; deallocate old; }
+    /// The library never calls this function internally. Unless the user calls it, an object's mixins will always
+    /// have the same addresses
     void reallocate_mixins();
 #endif
     /////////////////////////////////////////////////////////////////
