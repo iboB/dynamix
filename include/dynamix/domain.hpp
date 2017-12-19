@@ -171,7 +171,7 @@ private:
 
 // allocator functions
 
-/// Sets an global allocator for all mixins.
+/// Sets an global allocator for all mixins and datas.
 void DYNAMIX_API set_global_allocator(domain_allocator* allocator);
 
 } // namespace dynamix

@@ -35,7 +35,7 @@ void deallocate(char* buffer);
 
 /*`
 To create a global allocator, you need to create a class derived from
-`global_allocator` and override its virtual methods.
+`domain_allocator` and override its virtual methods.
 */
 
 class custom_allocator : public dynamix::domain_allocator
@@ -44,7 +44,7 @@ class custom_allocator : public dynamix::domain_allocator
 /*`
 The first two methods allocate a buffer for the mixin data pointers. Every
 object has pointers to its mixins within it. This is the array of such
-pointers. The class `global_allocator` has a static constant member --
+pointers. The class `domain_allocator` has a static constant member --
 `mixin_data_size` -- which you should use to see the size of a single
 element in that array.
 
@@ -75,7 +75,7 @@ array. It has to conform to the mixin (and also `object` pointer) alignment.
     {
 /*`
 The users are strongly advised to use the static method
-`global_allocator::mem_size_for_mixin`. It will appropriately
+`domain_allocator::mem_size_for_mixin`. It will appropriately
 calculate how much memory is needed for the mixin instance such that
 there is enough room at the beginning for the pointer to the owning
 object and the memory alignment is respected.
@@ -91,7 +91,7 @@ the owning object pointer in before it and all alignments are
 respected.
 
 You are encouraged to use the static method
-`global_allocator::mixin_offset` for this purpose.
+`domain_allocator::mixin_offset` for this purpose.
 */
         size_t offset = mixin_offset(buffer, info.alignment);
 
@@ -126,7 +126,7 @@ class because the code for each mixin type will be the same.
 
 A mixin instance allocator needs to be derived from the class `mixin_allocator`.
 You then need to overload its two virtual methods which are exactly the same
-as the mixin instance allocation/deallocation methods in `global_allocator`.
+as the mixin instance allocation/deallocation methods in `domain_allocator`.
 */
 
 template <typename Mixin>
