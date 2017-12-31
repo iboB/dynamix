@@ -5,58 +5,197 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include "perf.hpp"
-using namespace std;
-
-#include "timer.hpp"
 
 // compare an unicast mixin message to
-// regular functions
-// virtual method
-// std::function
+// virtual method and std::function
 //
 // make sure link time optimizations are turned of
 // gcc with no -flto
 // msvc with no link time code generation
+#include "perf.hpp"
 
-#define PERF(name, func) \
-    srand(10); \
-    t.start(name); \
-    for(size_t i=0; i<A_LOT; ++i) \
-    { \
-        func; \
-    } \
-    t.avg(A_LOT)
+#define PICOBENCH_IMPLEMENT
+#include "picobench.hpp"
 
-#define PERF_SUM(name, func, getter) \
-    PERF(name, func); \
-    thesum = 0; \
-    for(int i=0; i<OBJ_NUM; ++i) \
-    { \
-        thesum += getter; \
-    } \
-    cout << "sanity check: " << boolalpha << (thesum == A_LOT) << endl \
+#include <cstdlib>
 
+using namespace std;
 
-int main(int argc, char**)
+PICOBENCH_SUITE("noop");
+
+static void virtual_noop(picobench::state& s)
 {
-    initialize_globals();
-    size_t thesum = 0;
+    vector<abstract_class*> data;
+    data.reserve(s.iterations());
+    for (int i = 0; i < s.iterations(); ++i)
+    {
+        data.push_back(new_abstract_class(rand()));
+    }
 
-    timer t;
+    int cnt = 0;
+    for (auto _ : s)
+    {
+        data[cnt++]->noop();
+    }
 
-    #define access i%OBJ_NUM
-    //#define access rand() % OBJ_NUM
+    for (auto ptr : data)
+    {
+        delete ptr;
+    }
+}
+PICOBENCH(virtual_noop);
 
-    PERF_SUM("simple", regular_objects[access].add(argc), regular_objects[i].sum());
-    PERF_SUM("virtual", ac_instances[access]->add(argc), ac_instances[i]->sum());
-    PERF_SUM("std::func", f_add[access](argc), f_sum[i]());
-    PERF_SUM("DynaMix", add(dm_objects[access], argc), sum(dm_objects[i]));
+static void std_func_noop(picobench::state& s)
+{
+    vector<std_func_object> data;
+    data.reserve(s.iterations());
+    for (int i = 0; i < s.iterations(); ++i)
+    {
+        data.push_back(new_std_func(rand()));
+    }
 
-    PERF("simple noop", regular_objects[access].noop());
-    PERF("virtual noop", ac_instances[access]->noop());
-    PERF("std_func noop", f_noop[access]());
-    PERF("DynaMix noop", noop(dm_objects[access]));
+    int cnt = 0;
+    for (auto _ : s)
+    {
+        data[cnt++].noop();
+    }
 
+    for (auto elem : data)
+    {
+        elem.release();
+    }
+}
+PICOBENCH(std_func_noop).baseline();
+
+
+static void msg_noop(picobench::state& s)
+{
+    vector<dynamix::object> data;
+    data.reserve(s.iterations());
+    for (int i = 0; i < s.iterations(); ++i)
+    {
+        data.emplace_back(new_object(rand()));
+    }
+
+    int cnt = 0;
+    for (auto _ : s)
+    {
+        noop(data[cnt++]);
+    }
+}
+PICOBENCH(msg_noop);
+
+PICOBENCH_SUITE("setter");
+
+static void virtual_setter(picobench::state& s)
+{
+    vector<abstract_class*> data;
+    data.reserve(s.iterations());
+    for (int i = 0; i < s.iterations(); ++i)
+    {
+        data.push_back(new_abstract_class(rand()));
+    }
+
+    vector<int> ints;
+    ints.reserve(s.iterations());
+    for (int i = 0; i < s.iterations(); ++i)
+    {
+        ints.push_back(rand());
+    }
+
+    int cnt = 0;
+    for (auto _ : s)
+    {
+        data[cnt]->add(ints[cnt]);
+        ++cnt;
+    }
+
+    int sum_i = 0, sum_v = 0;
+    for (int i = 0; i < s.iterations(); ++i)
+    {
+        sum_i += ints[i];
+        sum_v += data[i]->sum();
+        delete data[i];
+    }
+
+    assert(sum_i == sum_v);
+}
+PICOBENCH(virtual_setter);
+
+static void std_func_setter(picobench::state& s)
+{
+    vector<std_func_object> data;
+    data.reserve(s.iterations());
+    for (int i = 0; i < s.iterations(); ++i)
+    {
+        data.push_back(new_std_func(rand()));
+    }
+
+    vector<int> ints;
+    ints.reserve(s.iterations());
+    for (int i = 0; i < s.iterations(); ++i)
+    {
+        ints.push_back(rand());
+    }
+
+    int cnt = 0;
+    for (auto _ : s)
+    {
+        data[cnt].add(ints[cnt]);
+        ++cnt;
+    }
+
+    int sum_i = 0, sum_v = 0;
+    for (int i = 0; i < s.iterations(); ++i)
+    {
+        sum_i += ints[i];
+        sum_v += data[i].sum();
+        data[i].release();
+    }
+
+    assert(sum_i == sum_v);
+}
+PICOBENCH(std_func_setter).baseline();
+
+static void msg_setter(picobench::state& s)
+{
+    vector<dynamix::object> data;
+    data.reserve(s.iterations());
+    for (int i = 0; i < s.iterations(); ++i)
+    {
+        data.emplace_back(new_object(rand()));
+    }
+
+    vector<int> ints;
+    ints.reserve(s.iterations());
+    for (int i = 0; i < s.iterations(); ++i)
+    {
+        ints.push_back(rand());
+    }
+
+    int cnt = 0;
+    for (auto _ : s)
+    {
+        add(data[cnt], ints[cnt]);
+        ++cnt;
+    }
+
+    int sum_i = 0, sum_v = 0;
+    for (int i = 0; i < s.iterations(); ++i)
+    {
+        sum_i += ints[i];
+        sum_v += sum(data[i]);
+    }
+
+    assert(sum_i == sum_v);
+}
+PICOBENCH(msg_setter);
+
+int main(int argc, char* argv[])
+{
+    picobench::runner r;
+    r.set_default_state_iterations({ 20000, 50000 });
+    auto report = r.run_benchmarks();
+    report.to_text(std::cout);
     return 0;
 }

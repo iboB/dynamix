@@ -8,7 +8,7 @@
 
 cmake_minimum_required(VERSION 3.2.2)
 
-include_directories(common)
+include_directories(common picobench)
 
 set(common_sources)
 src_group(common common_sources
@@ -24,7 +24,6 @@ src_group(perf message_perf_sources
 )
 
 add_executable(message_perf
-    ${common_sources}
     ${message_perf_sources}
 )
 

@@ -7,19 +7,8 @@
 //
 #include "perf.hpp"
 
-size_t A_LOT = 10000000;
-
-int OBJ_NUM = 100000;
-
 using namespace dynamix;
 using namespace std;
-
-abstract_class** ac_instances;
-std::function<void(int)>* f_add;
-std::function<int()>* f_sum;
-std::function<void()>* f_noop;
-dynamix::object** dm_objects;
-regular_class* regular_objects;
 
 DYNAMIX_DECLARE_MIXIN(regular_class);
 DYNAMIX_DECLARE_MIXIN(regular_class2);
@@ -64,6 +53,33 @@ public:
     int _sum;
 };
 
+abstract_class* new_abstract_class(int id)
+{
+    switch (id % 2)
+    {
+    case 0:
+        return new abstract_instance;
+    case 1:
+        return new abstract_instance2;
+    }
+    assert(false);
+    return nullptr;
+}
+
+class regular_class
+{
+public:
+    regular_class() : _sum(0) {}
+
+    void add(int i);
+    int sum() const;
+
+    void noop() const;
+
+private:
+    int _sum;
+};
+
 class regular_class2
 {
 public:
@@ -79,54 +95,62 @@ private:
     int _sum;
 };
 
+//////////////////////////////////////////////////////
 
-extern void initialize_globals()
+template <typename T>
+static void release_rc(T* r)
 {
-    // don't care about memory leaks
+    delete r;
+}
 
-    regular_objects = new regular_class[OBJ_NUM];
+template <typename T>
+std_func_object new_std_func_object()
+{
+    auto instance = new T;
 
-    ac_instances = new abstract_class*[OBJ_NUM];
+    std_func_object ret;
+    ret.add = std::bind(&T::add, instance, placeholders::_1);
+    ret.sum = std::bind(&T::sum, instance);
+    ret.noop = std::bind(&T::noop, instance);
+    ret.release = std::bind(release_rc<T>, instance);
 
-    f_add = new std::function<void(int)>[OBJ_NUM];
-    f_sum = new std::function<int()>[OBJ_NUM];
-    f_noop = new std::function<void()>[OBJ_NUM];
-    regular_class* objs = new regular_class[OBJ_NUM];
-    regular_class2* objs2 = new regular_class2[OBJ_NUM];
+    return ret;
+}
 
-    dm_objects = new object*[OBJ_NUM];
-
-    for(int i=0; i<OBJ_NUM; ++i)
+std_func_object new_std_func(int id)
+{
+    switch (id % 2)
     {
-        abstract_class* c;
-        dm_objects[i] = new object;
-
-        if(rand()%2)
-        {
-            c = new abstract_instance;
-
-            f_add[i] = std::bind(&regular_class::add, objs + i, placeholders::_1);
-            f_sum[i] = std::bind(&regular_class::sum, objs + i);
-            f_noop[i] = std::bind(&regular_class::noop, objs + i);
-
-            mutate(dm_objects[i]).add<regular_class>();
-        }
-        else
-        {
-            c = new abstract_instance2;
-
-            f_add[i] = std::bind(&regular_class2::add, objs2 + i, placeholders::_1);
-            f_sum[i] = std::bind(&regular_class2::sum, objs2 + i);
-            f_noop[i] = std::bind(&regular_class2::noop, objs2 + i);
-
-            mutate(dm_objects[i]).add<regular_class2>();
-        }
-
-        ac_instances[i] = c;
+    case 0:
+        return new_std_func_object<regular_class>();
+    case 1:
+        return new_std_func_object<regular_class2>();
     }
+    assert(false);
+    return std_func_object();
+}
+
+
+//////////////////////////////////////////////////////
+
+object new_object(int id)
+{
+    object ret;
+    switch (id % 2)
+    {
+    case 0:
+        mutate(ret).add<regular_class>();
+        break;
+    case 1:
+        mutate(ret).add<regular_class2>();
+        break;
+    }
+    return ret;
 }
 
 //////////////////////////////////////////////////////
+
+
 
 void regular_class::add(int i)
 {
