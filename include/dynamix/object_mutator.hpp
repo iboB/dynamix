@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -67,6 +67,9 @@ public:
     void cancel();
 
     void create();
+
+    const object_type_mutation& mutation() const { return _mutation; }
+
 protected:
     void apply_to(object& obj) const;
 

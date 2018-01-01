@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -30,6 +30,7 @@ public:
     using internal::object_mutator::add;
     // does the actual creation of the type template
     using internal::object_mutator::create;
+    using internal::object_mutator::mutation;
 
     // hiding the parent function, not using it
     void apply_to(object& o) const;
