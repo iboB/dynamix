@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -95,7 +95,7 @@ void object_mutator::create()
 
     if(_target_type_info->as_mixin_collection() == _mutation._source)
     {
-        // since we allow adding of existing mixins it could be that this new type is
+        // since we allow adding of existing mixins, it could be that this new type is
         // actually the mutatee's type
         _target_type_info = nullptr;
         return;
@@ -104,7 +104,10 @@ void object_mutator::create()
 
 void object_mutator::apply_to(object& obj) const
 {
+    // if this fails, the mutator is not created/ready
+    // typically a type template for which the explicit .create() hasn't been called
     DYNAMIX_THROW_UNLESS(_is_created, bad_mutation);
+
     DYNAMIX_ASSERT(_mutation._source);
 
     // we need to mutate only objects of the same type
