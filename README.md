@@ -109,9 +109,9 @@ Contributions in the form of issues and pull requests are welcome.
 
 This software is distributed under the MIT Software License.
 
-See accompanying file LICENSE.txt or copy [here](https://opensource.org/licenses/MIT).
+See accompanying file LICENSE or copy [here](https://opensource.org/licenses/MIT).
 
-Copyright &copy; 2013-2017 [Borislav Stanimirov](http://github.com/iboB), [Zahary Karadjov](http://github.com/zah)
+Copyright &copy; 2013-2018 [Borislav Stanimirov](http://github.com/iboB), [Zahary Karadjov](http://github.com/zah)
 
 ## Boost.Mixin
 
