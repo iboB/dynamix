@@ -107,20 +107,32 @@ before_script:
   - cmake --version
 
 script:
+  # sanitizer options
   - export ASAN_OPTIONS=allow_addr2line=true:check_initialization_order=true:strict_init_order=true:strict_string_checks=true:detect_odr_violation=2:detect_stack_use_after_return=true:verbosity=0
   - export LSAN_OPTIONS=suppressions=../tools/lsan.supp
+  # prepare generated code for mutation performance test
+  - cd perf/mutation_perf
+  - ruby generate.rb
+  - cd ../..
+  # build all in debug and release
+  # run unit tests and performance tests
   - mkdir -p debug_build
   - cd debug_build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS}"
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS}" -DDYNAMIX_BUILD_PERF=1
   - make -j2
   - ctest --output-on-failure
+  - ./message_perf
+  - ./mutation_perf
   - cd ..
   - mkdir -p release_build
   - cd release_build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS}"
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS}" -DDYNAMIX_BUILD_PERF=1
   - make -j2
   - ctest --output-on_failure
+  - ./message_perf
+  - ./mutation_perf
   - cd ..
+  # build tests only with a custom config file
   - mkdir -p cc_debug
   - cd cc_debug
   - cmake .. -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS} -fno-rtti" -DDYNAMIX_BUILD_PERF=0 -DDYNAMIX_BUILD_EXAMPLES=0 -DDYNAMIX_BUILD_TUTORIALS=0 -DDYNAMIX_BUILD_SCRATCH=0 -DDYNAMIX_CUSTOM_CONFIG_FILE="\"$PWD/../test/custom_config/custom_config.hpp\""
