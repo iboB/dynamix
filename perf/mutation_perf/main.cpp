@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -8,136 +8,160 @@
 #include "common.hpp"
 #include "generated.hpp"
 
-#include "custom_alloc_mixin.hpp"
+#define PICOBENCH_IMPLEMENT
+#include "picobench.hpp"
+
+#include "fast_allocator.hpp"
 
 #include <iostream>
-
-#include "../common/timer.hpp"
 
 using namespace std;
 using namespace dynamix;
 
-const size_t NUM_TO_MUTATE = 100000;
+PICOBENCH_SUITE("Type creation");
 
-int main(int argc, char**)
+void new_type(picobench::state& s)
 {
-    std::vector<object_type_template*> templates;
-    templates.reserve(2000);
+    s.start_timer();
+    auto& templates = get_type_templates();
+    s.stop_timer();
+    assert(s.iterations() == templates.size());
+}
+PICOBENCH(new_type).samples(1).iterations({ 1023 });
 
-    timer t;
+PICOBENCH_SUITE("Object creation");
 
-    create_type_templates(templates);
+void create_mutate(picobench::state& s)
+{
+    auto& mutators = get_type_mutators();
+    vector<object> objects(s.iterations());
+    int i = 0;
 
-    const size_t num_tmpl = templates.size();
-
-    vector<object*> objects(num_tmpl);
-
-    for(size_t i=0; i<num_tmpl; ++i)
+    for (auto _ : s)
     {
-        objects[i] = new object;
+        mutators[i % mutators.size()](objects[i]);
+        ++i;
+    }
+}
+PICOBENCH(create_mutate);
+
+void type_template(picobench::state& s)
+{
+    auto& templates = get_type_templates();
+    vector<object> objects(s.iterations());
+    int i = 0;
+
+    for (auto _ : s)
+    {
+        templates[i % templates.size()]->apply_to(objects[i]);
+        ++i;
+    }
+}
+PICOBENCH(type_template);
+
+void type_template_alloc(picobench::state& s)
+{
+    fast_allocator alloc;
+    auto& templates = get_type_templates();
+    vector<object> objects;
+    objects.reserve(s.iterations());
+    for (int i = 0; i < s.iterations(); ++i)
+    {
+        objects.emplace_back(&alloc);
     }
 
-    // create objects from type templates
-    t.start("New type");
-        for(size_t i=0; i<num_tmpl; ++i)
-        {
-            templates[i]->apply_to(*objects[i]);
-        }
-    t.avg(num_tmpl);
-
-    vector<object_type_template*> changable_templates;
-
-    // collect all type templates which create object that
-    // would change from such a mutation
-    for(size_t i=0; i<num_tmpl; ++i)
+    int i = 0;
+    for (auto _ : s)
     {
-        const object* o = objects[i];
-
-        if(!o->has<mixin_1>() || !o->has<mixin_2>() || o->has<mixin_3>())
-        {
-            changable_templates.push_back(templates[i]);
-        }
+        templates[i % templates.size()]->apply_to(objects[i]);
+        ++i;
     }
+}
+PICOBENCH(type_template_alloc);
 
-    // create a huge amount of objects
-    vector<object*> to_mutate(NUM_TO_MUTATE);
-    for(size_t i=0; i<NUM_TO_MUTATE; ++i)
-    {
-        to_mutate[i] = new object;
-    }
+PICOBENCH_SUITE("Object mutation");
 
-    // create objects of existing types
-    t.start("Existing type");
-        for(size_t i=0; i<NUM_TO_MUTATE; ++i)
-        {
-            changable_templates[i%changable_templates.size()]->apply_to(*to_mutate[i]);
-        }
-    t.avg(NUM_TO_MUTATE);
-
-
-    // mutate them
-    // mutating objects
-    t.start("Mutate");
-        for(size_t i=0; i<NUM_TO_MUTATE; ++i)
-        {
-            mutate(to_mutate[i])
-                .add<mixin_1>()
-                .add<mixin_2>()
-                .remove<mixin_3>();
-
-            mutate(to_mutate[i])
-                .remove<mixin_1>()
-                .add<mixin_3>();
-        }
-    t.avg(NUM_TO_MUTATE * 2);
-
-    // create 1 million objects of the same type
-    object_type_template tmpl;
-    tmpl
+vector<object> create_objects(int n, object_allocator* a = nullptr)
+{
+    object_type_template t;
+    t
         .add<mixin_3>()
         .add<mixin_4>()
-        .add<mixin_5>()
+        .add<mixin_6>()
+        .add<mixin_7>()
+        .add<mixin_9>()
+        .add<mixin_10>()
         .create();
 
-    vector<object*> same_type_objs(NUM_TO_MUTATE);
-    for(size_t i=0; i<NUM_TO_MUTATE; ++i)
+    vector<object> ret;
+    ret.reserve(n);
+    for (int i = 0; i < n; ++i)
     {
-        same_type_objs[i] = new object(tmpl);
+        ret.emplace_back(t, a);
     }
+    return ret;
+}
 
-    same_type_mutator stm;
-    stm
-        .add<mixin_1>()
-        .add<mixin_2>()
-        .remove<mixin_3>();
+void mutation(picobench::state& s)
+{
+    auto objects = create_objects(s.iterations());
 
-    // mutating objects of the same type
-    t.start("Same type mutate");
-        for(size_t i=0; i<NUM_TO_MUTATE; ++i)
-        {
-            stm.apply_to(*same_type_objs[i]);
-        }
-    t.avg(NUM_TO_MUTATE);
+    int i = 0;
+    for (auto _ : s)
+    {
+        mutate(objects[i])
+            .add<mixin_5>()
+            .add<mixin_8>()
+            .remove<mixin_9>();
+        ++i;
+    }
+}
+PICOBENCH(mutation);
 
-    // adding a mixin which has a custom allocator to the objects
-    t.start("Custom allocator");
-        for(size_t i=0; i<NUM_TO_MUTATE; ++i)
-        {
-            mutate(to_mutate[i])
-                .add<custom_alloc_mixin>();
-        }
-    t.avg(NUM_TO_MUTATE);
+void mutation_same_type_mutator(picobench::state& s)
+{
+    auto objects = create_objects(s.iterations());
 
-    same_type_mutator stm_custom_alloc;
-    stm_custom_alloc.add<custom_alloc_mixin>();
+    same_type_mutator mutator;
+    mutator
+        .add<mixin_5>()
+        .add<mixin_8>()
+        .remove<mixin_9>();
 
-    // adding a mixin with custom allocator to the objects of same type
-    t.start("Same type alloc");
-        for(size_t i=0; i<NUM_TO_MUTATE; ++i)
-        {
-            stm_custom_alloc.apply_to(*same_type_objs[i]);
-        }
-    t.avg(NUM_TO_MUTATE);
+    int i = 0;
+    for (auto _ : s)
+    {
+        mutator.apply_to(objects[i]);
+        ++i;
+    }
+}
+PICOBENCH(mutation_same_type_mutator).label("same_type_mutator");
 
+void same_type_mutator_alloc(picobench::state& s)
+{
+    fast_allocator alloc;
+    auto objects = create_objects(s.iterations(), &alloc);
+
+    same_type_mutator mutator;
+    mutator
+        .add<mixin_5>()
+        .add<mixin_8>()
+        .remove<mixin_9>();
+
+    int i = 0;
+    for (auto _ : s)
+    {
+        mutator.apply_to(objects[i]);
+        ++i;
+    }
+}
+PICOBENCH(same_type_mutator_alloc);
+
+int main(int argc, char* argv[])
+{
+    picobench::runner r;
+    r.set_default_state_iterations({ 5000, 10000 });
+    auto report = r.run_benchmarks();
+    report.to_text(std::cout);
     return 0;
 }

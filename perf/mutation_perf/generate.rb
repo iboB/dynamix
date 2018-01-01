@@ -1,5 +1,5 @@
 # DynaMix
-# Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+# Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 #
 # Distributed under the MIT Software License
 # See accompanying file LICENSE.txt or copy at
@@ -8,14 +8,13 @@
 
 # generates some mixins for the mutation performance tests
 
-
 HEADER_FILE = 'generated.hpp'
 COMPILE_FILE = 'generated.cpp'
 NUM_MIXINS = 10
 
 h_out = <<DATA
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -32,7 +31,7 @@ c_out += "#include \"common.hpp\"\n"
 c_out += "#include \"#{HEADER_FILE}\"\n"
 c_out += "using namespace dynamix;\n"
 
-FDATA = [:type_templates, :mixins]
+FDATA = [:type_templates, :mutators, :mixins]
 
 class FileData
   FDATA.each do |sym|
@@ -54,6 +53,7 @@ end
 ############################################################
 
 H_MIXIN_ENTRY = <<DATA
+DYNAMIX_MESSAGE_0(void, message_%{mixin_name});
 DYNAMIX_DECLARE_MIXIN(%{mixin_name});
 DATA
 
@@ -61,9 +61,12 @@ C_MIXIN_ENTRY = <<DATA
 
 class %{mixin_name}
 {
+public:
+  void message_%{mixin_name}() {}
   int %{members};
 };
-DYNAMIX_DEFINE_MIXIN(%{mixin_name}, none);
+DYNAMIX_DEFINE_MIXIN(%{mixin_name}, message_%{mixin_name}_msg);
+DYNAMIX_DEFINE_MESSAGE(message_%{mixin_name});
 DATA
 
 declare = FileData.new
@@ -84,11 +87,24 @@ end
 
 ############################################################
 
-declare.type_templates = 'void create_type_templates(std::vector<dynamix::object_type_template*>& v)'
+declare.type_templates = 'const std::vector<std::unique_ptr<dynamix::object_type_template>>& get_type_templates()'
 define.type_templates = declare.type_templates.clone
 
 declare.type_templates  += ";\n"
 define.type_templates += "\n{\n"
+define.type_templates += "  static std::vector<std::unique_ptr<dynamix::object_type_template>> v;\n"
+define.type_templates += "  if (!v.empty()) return v;\n"
+define.type_templates += "  v.reserve(1024);\n"
+
+declare.mutators = 'const std::vector<void (*)(dynamix::object&)>& get_type_mutators()'
+define.mutators = declare.mutators.clone
+
+declare.mutators  += ";\n"
+define.mutators += "\n{\n"
+define.mutators += "  static std::vector<void (*)(dynamix::object&)> v;\n"
+define.mutators += "  if (!v.empty()) return v;\n"
+define.mutators += "  v.reserve(1024);\n"
+
 
 C_TMPL_ENTRY = <<DATA
   {
@@ -98,7 +114,18 @@ C_TMPL_ENTRY = <<DATA
       %{adds}
       .create();
 
-    v.push_back(t);
+    v.emplace_back(t);
+  }
+DATA
+
+C_MUT_ENTRY = <<DATA
+  {
+    auto mut = [](object& o)
+    {
+      mutate(o).
+        %{adds};
+    };
+    v.emplace_back(mut);
   }
 DATA
 
@@ -111,10 +138,15 @@ DATA
     params = { :adds => adds.join('.') }
 
     define.type_templates += C_TMPL_ENTRY % params
+    define.mutators += C_MUT_ENTRY % params
   end
 end
 
+define.type_templates += "  return v;\n"
 define.type_templates += "}"
+
+define.mutators += "  return v;\n"
+define.mutators += "}"
 
 ############################################################
 

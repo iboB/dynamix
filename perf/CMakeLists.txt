@@ -8,13 +8,7 @@
 
 cmake_minimum_required(VERSION 3.2.2)
 
-include_directories(common picobench)
-
-set(common_sources)
-src_group(common common_sources
-    common/timer.cpp
-    common/timer.hpp
-)
+include_directories(picobench)
 
 set(message_perf_sources)
 src_group(perf message_perf_sources
@@ -34,14 +28,13 @@ set(mutation_perf_sources)
 src_group(perf mutation_perf_sources
     mutation_perf/common.hpp
     mutation_perf/main.cpp
-    mutation_perf/custom_alloc_mixin.cpp
-    mutation_perf/custom_alloc_mixin.hpp
+    mutation_perf/fast_allocator.cpp
+    mutation_perf/fast_allocator.hpp
     mutation_perf/generated.cpp
     mutation_perf/generated.hpp
 )
 
 add_executable(mutation_perf
-    ${common_sources}
     ${mutation_perf_sources}
 )
 
