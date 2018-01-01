@@ -24,6 +24,7 @@ environment:
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
 
 build_script:
+  # build and run tests for 32 and 64 bit
   - if not exist vcbuild_x86 mkdir vcbuild_x86
   - cd vcbuild_x86
   - cmake .. -G "%gen%"
@@ -40,6 +41,7 @@ build_script:
   - msbuild dynamix.sln /p:Configuration=Release;Platform=x64 /maxcpucount /verbosity:minimal
   - ctest -C Release --output-on-failure
   - cd ..
+  # build and run tests for custom config file (64-bit only)
   - if not exist vcbuild_cc mkdir vcbuild_cc
   - cd vcbuild_cc
   - cmake .. -DDYNAMIX_BUILD_PERF=0 -DDYNAMIX_BUILD_EXAMPLES=0 -DDYNAMIX_BUILD_TUTORIALS=0 -DDYNAMIX_BUILD_SCRATCH=0 -DDYNAMIX_CUSTOM_CONFIG_FILE="\"%cd%\..\test\custom_config\custom_config.hpp\"" -G "%gen% Win64"
