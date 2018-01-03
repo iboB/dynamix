@@ -194,7 +194,15 @@ PICOBENCH(msg_setter);
 int main(int argc, char* argv[])
 {
     picobench::runner r;
+
+#if defined(NDEBUG)
+    r.set_default_samples(3);
     r.set_default_state_iterations({ 20000, 50000 });
+#else
+    r.set_default_samples(1);
+    r.set_default_state_iterations({ 5000, 10000 });
+#endif
+
     auto report = r.run_benchmarks();
     report.to_text(std::cout);
     return 0;

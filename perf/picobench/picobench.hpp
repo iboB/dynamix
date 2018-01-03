@@ -1,11 +1,11 @@
-// picobench v0.01
+// picobench v1.01
 // https://github.com/iboB/picobench
 //
 // A micro microbenchmarking library in a single header file
 //
 // MIT License
 //
-// Copyright(c) 2017 Borislav Stanimirov
+// Copyright(c) 2017-2018 Borislav Stanimirov
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -29,13 +29,10 @@
 //                  VERSION HISTORY
 //
 //  0.01 (2017-12-28) Initial prototype release
-//
-//
-//                  DOCUMENTATION
-//
-// Simply include this file wherever you need.
-// Define PICOBENCH_IMPLEMENT or define PICOBENCH_IMPLEMENT in one compilation
-// unit to have the implementation compiled there.
+//  1.00 (2018-01-01) Initial release
+//  1.01 (2018-01-03) * Only taking the fastest sample into account
+//                    * Set default number of samples to 2
+//                    * Added CSV output
 //
 //
 //                  EXAMPLE
@@ -53,14 +50,35 @@
 // PICOBENCH(benchmark_my_function);
 //
 //
-//                  TESTING
+//                  BASIC DOCUMENTATION
 //
-// Some basic tests are included in this header file and use doctest (https://github.com/onqtam/doctest).
-// To run them, define PICOBENCH_TEST_WITH_DOCTEST before including
-// the header in a file which has doctest.h already included.
+// A very brief usage guide follows. For more detailed documentation see the
+// README here: https://github.com/iboB/picobench/blob/master/README.md
 //
-// More complex tests, which are not suitable for a single file are available
-// in picobench's official repo: https://github.com/iboB/picobench
+// Simply include this file wherever you need.
+// You need to define PICOBENCH_IMPLEMENT_WITH_MAIN (or PICOBENCH_IMPLEMENT if
+// you want to write your own main function) in one compilation unit to have 
+// the implementation compiled there.
+//
+// The benchmark code must be a `void (picobench::state&)` function which 
+// you have written. Benchmarks are registered using the `PICOBENCH` macro 
+// where the only argument is the function's name.
+//
+// You can have multiple benchmarks in multiple files. All will be run when the
+// executable starts.
+//
+// Typically a benchmark has a loop. To run the loop use the state argument in
+// a range-based for loop in your function. The time spent looping is measured 
+// for the benchmark. You can have initialization/deinitialization code outside
+// of the loop and it won't be measured.
+//
+//
+//                  TESTS
+//
+// Tests for the main features are included in this header file and use doctest 
+// (https://github.com/onqtam/doctest). To run them, define 
+// PICOBENCH_TEST_WITH_DOCTEST before including the header in a file which has
+// doctest.h already included.
 #pragma once
 
 #include <cstdint>
@@ -268,6 +286,7 @@ public:
 #include <unordered_map>
 #include <map>
 #include <memory>
+#include <cstring>
 
 namespace picobench
 {
@@ -278,7 +297,7 @@ struct report
     {
         int dimension; // number of iterations for the problem space
         int samples; // number of samples taken
-        int64_t total_time_ns; // average time per sample!!!
+        int64_t total_time_ns; // fastest sample!!!
     };
     struct benchmark
     {
@@ -350,6 +369,7 @@ struct report
                     }
                     else
                     {
+                        // no baseline to compare to
                         out << "    ??? |";
                     }
 
@@ -437,8 +457,63 @@ struct report
         }
     }
 
-    void to_csv(std::ostream& out) const
-    {}
+    void to_csv(std::ostream& out, bool header = true) const
+    {
+        using namespace std;
+
+        if (header)
+        {
+            out << "Suite,Benchmark,b,D,S,\"Total ns\",\"ns/op\",Baseline\n";
+        }
+
+        for (auto& suite : suites)
+        {
+            const benchmark* baseline = nullptr;
+            for (auto& bm : suite.benchmarks)
+            {
+                if (bm.is_baseline)
+                {
+                    baseline = &bm;
+                    break;
+                }
+            }
+            _PICOBENCH_ASSERT(baseline);
+
+            for (auto& bm : suite.benchmarks)
+            {
+                for (auto& d : bm.data)
+                {
+                    if (suite.name)
+                    {
+                        out << '"' << suite.name << '"';;
+                    }
+                    out << ",\"" << bm.name << "\",";
+                    if (&bm == baseline)
+                    {
+                        out << '*';
+                    }
+                    out << ','
+                        << d.dimension << ','
+                        << d.samples << ','
+                        << d.total_time_ns << ','
+                        << (d.total_time_ns / d.dimension) << ',';
+                    
+                    if (baseline)
+                    {
+                        for (auto& bd : baseline->data)
+                        {
+                            if (bd.dimension == d.dimension)
+                            {
+                                out << fixed << setprecision(3) << (double(d.total_time_ns) / double(bd.total_time_ns));
+                            }
+                        }
+                    }
+
+                    out << '\n';
+                }
+            }
+        }
+    }
 
 private:
 
@@ -452,7 +527,7 @@ private:
     {
         const char* name;
         bool is_baseline;
-        int64_t total_time_ns; // average time per sample!!!
+        int64_t total_time_ns; // fastest sample!!!
     };
 
     static std::map<int, std::vector<problem_space_benchmark>> get_problem_space_view(const suite& s)
@@ -490,7 +565,7 @@ class runner
 public:
     runner()
         : _default_state_iterations({ 8, 64, 512, 4096, 8196 })
-        , _default_samples(1)
+        , _default_samples(2)
     {}
 
     report run_benchmarks(int random_seed = -1)
@@ -607,18 +682,21 @@ public:
                     {
                         if (state.iterations() == d.dimension)
                         {
-                            d.total_time_ns += state.duration_ns();
+                            if (d.total_time_ns == 0 || d.total_time_ns > state.duration_ns())
+                            {
+                                d.total_time_ns = state.duration_ns();
+                            }
                             ++d.samples;
                         }
                     }
                 }
 
-                // average-out samples
+#if defined(PICOBENCH_DEBUG)
                 for (auto& d : rpt_benchmark->data)
                 {
                     _PICOBENCH_ASSERT(d.samples == b->_samples);
-                    d.total_time_ns /= d.samples;
                 }
+#endif
 
                 ++rpt_benchmark;
             }
@@ -669,6 +747,9 @@ private:
         for (auto& s : ss)
         {
             if (s.name == cur_suite_name)
+                return s.benchmarks;
+            
+            if(s.name && cur_suite_name && strcmp(s.name, cur_suite_name) == 0)
                 return s.benchmarks;
         }
         ss.push_back({ cur_suite_name, {} });
@@ -731,6 +812,7 @@ int main(int argc, char* argv[])
     auto report = r.run_benchmarks();
     report.to_text(std::cout);
     //report.to_text_concise(std::cout);
+    //report.to_csv(std::cout);
     return 0;
 }
 #endif
@@ -741,29 +823,31 @@ int main(int argc, char* argv[])
 namespace picobench
 {
 
-struct fake_time
-{
-    uint64_t now;
-};
-
-fake_time the_time;
-
-high_res_clock::time_point high_res_clock::now()
-{
-    auto ret = time_point(duration(the_time.now));
-    return ret;
-}
-
-void this_thread_sleep_for_ns(uint64_t ns)
-{
-    the_time.now += ns;
-}
+void this_thread_sleep_for_ns(uint64_t ns);
 
 template <class Rep, class Period>
 void this_thread_sleep_for(const std::chrono::duration<Rep, Period>& duration)
 {
     this_thread_sleep_for_ns(std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count());
 }
+
+#if defined PICOBENCH_IMPLEMENT
+static struct fake_time
+{
+    uint64_t now;
+} the_time;
+
+void this_thread_sleep_for_ns(uint64_t ns)
+{
+    the_time.now += ns;
+}
+
+high_res_clock::time_point high_res_clock::now()
+{
+    auto ret = time_point(duration(the_time.now));
+    return ret;
+}
+#endif
 
 }
 
@@ -788,21 +872,29 @@ static void a_a(picobench::state& s)
 }
 PICOBENCH(a_a);
 
+map<int, int> a_b_samples;
 static void a_b(picobench::state& s)
 {
+    uint64_t time = 11;
+    if (a_b_samples.find(s.iterations()) == a_b_samples.end())
+    {
+        // slower first time
+        time = 32;
+    }
+
+    ++a_b_samples[s.iterations()];
     for (auto _ : s)
     {
-        this_thread_sleep_for_ns(11);
+        this_thread_sleep_for_ns(time);
     }
 }
 PICOBENCH(a_b);
 
 static void a_c(picobench::state& s)
 {
-    for (auto _ : s)
-    {
-        this_thread_sleep_for_ns(20);
-    }
+    s.start_timer();
+    this_thread_sleep_for_ns(s.iterations() * 20);
+    s.stop_timer();
 }
 PICOBENCH(a_c);
 
@@ -820,12 +912,20 @@ static void b_a(picobench::state& s)
 PICOBENCH(b_a)
     .iterations({ 20, 30, 50 });
 
+map<int, int> b_b_samples;
+
 static void b_b(picobench::state& s)
 {
-    for (auto _ : s)
+    uint64_t time = 111;
+    if (b_b_samples.find(s.iterations()) == b_b_samples.end())
     {
-        this_thread_sleep_for_ns(100);
+        // faster first time
+        time = 100;
     }
+
+    ++b_b_samples[s.iterations()];
+    picobench::scope scope(s);
+    this_thread_sleep_for_ns(s.iterations() * time);
 }
 PICOBENCH(b_b)
     .baseline()
@@ -845,9 +945,29 @@ const report::suite& find_suite(const string& s, const report& r)
     return r.suites.front(); // to avoid noreturn warning
 }
 
+TEST_CASE("[picobench] clock test")
+{
+    auto start = high_res_clock::now();
+    this_thread_sleep_for_ns(1234);
+    auto end = high_res_clock::now();
+
+    auto duration = end - start;
+    CHECK(duration == std::chrono::nanoseconds(1234));
+
+    start = high_res_clock::now();
+    this_thread_sleep_for(std::chrono::milliseconds(987));
+    end = high_res_clock::now();
+    duration = end - start;
+    CHECK(duration == std::chrono::milliseconds(987));
+}
+
 TEST_CASE("[picobench] test")
 {
     runner r;
+    const vector<int> iters = { 8, 64, 512, 4096, 8196 };
+    CHECK(r._default_state_iterations == iters);
+    CHECK(r._default_samples == 2);
+
     auto report = r.run_benchmarks();
 
     CHECK(report.suites.size() == 2);
@@ -880,6 +1000,13 @@ TEST_CASE("[picobench] test")
         CHECK(d.dimension == r._default_state_iterations[i]);
         CHECK(d.samples == r._default_samples);
         CHECK(d.total_time_ns == d.dimension * 11);
+    }
+    size_t j = 0;
+    for (auto& elem : a_b_samples)
+    {
+        CHECK(elem.first == iters[j]);
+        CHECK(elem.second == r._default_samples);
+        ++j;
     }
 
     auto& ac = a.benchmarks[2];
@@ -927,6 +1054,14 @@ TEST_CASE("[picobench] test")
         CHECK(d.total_time_ns == d.dimension * 100);
     }
 
+    j = 0;
+    for (auto& elem : b_b_samples)
+    {
+        CHECK(elem.first == state_iters_b[j]);
+        CHECK(elem.second == 15);
+        ++j;
+    }
+
     ostringstream sout;
     report.to_text_concise(sout);
     const char* concise =
@@ -948,7 +1083,7 @@ TEST_CASE("[picobench] test")
 
     CHECK(sout.str() == concise);
 
-    const char* txt =
+    const char* txt = 
         "test a:\n"
         "===============================================================================\n"
         "   Name (baseline is *)   |   Dim   |  Total ms |  ns/op  |Baseline| Ops/second\n"
@@ -984,5 +1119,33 @@ TEST_CASE("[picobench] test")
     sout.str(string());
     report.to_text(sout);
     CHECK(sout.str() == txt);
+
+    const char* csv =
+        "Suite,Benchmark,b,D,S,\"Total ns\",\"ns/op\",Baseline\n"
+        "\"test a\",\"a_a\",*,8,2,80,10,1.000\n"
+        "\"test a\",\"a_a\",*,64,2,640,10,1.000\n"
+        "\"test a\",\"a_a\",*,512,2,5120,10,1.000\n"
+        "\"test a\",\"a_a\",*,4096,2,40960,10,1.000\n"
+        "\"test a\",\"a_a\",*,8196,2,81960,10,1.000\n"
+        "\"test a\",\"a_b\",,8,2,88,11,1.100\n"
+        "\"test a\",\"a_b\",,64,2,704,11,1.100\n"
+        "\"test a\",\"a_b\",,512,2,5632,11,1.100\n"
+        "\"test a\",\"a_b\",,4096,2,45056,11,1.100\n"
+        "\"test a\",\"a_b\",,8196,2,90156,11,1.100\n"
+        "\"test a\",\"a_c\",,8,2,160,20,2.000\n"
+        "\"test a\",\"a_c\",,64,2,1280,20,2.000\n"
+        "\"test a\",\"a_c\",,512,2,10240,20,2.000\n"
+        "\"test a\",\"a_c\",,4096,2,81920,20,2.000\n"
+        "\"test a\",\"a_c\",,8196,2,163920,20,2.000\n"
+        "\"test b\",\"b_a\",,20,2,1500,75,0.750\n"
+        "\"test b\",\"b_a\",,30,2,2250,75,0.750\n"
+        "\"test b\",\"b_a\",,50,2,3750,75,\n"
+        "\"test b\",\"something else\",*,10,15,1000,100,1.000\n"
+        "\"test b\",\"something else\",*,20,15,2000,100,1.000\n"
+        "\"test b\",\"something else\",*,30,15,3000,100,1.000\n";
+
+    sout.str(string());
+    report.to_csv(sout);
+    CHECK(sout.str() == csv);
 }
 #endif
