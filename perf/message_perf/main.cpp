@@ -110,7 +110,7 @@ static void virtual_setter(picobench::state& s)
         ++cnt;
     }
 
-    int sum_i = 0, sum_v = 0;
+    unsigned sum_i = 0, sum_v = 0;
     for (int i = 0; i < s.iterations(); ++i)
     {
         sum_i += ints[i];
@@ -145,7 +145,7 @@ static void std_func_setter(picobench::state& s)
         ++cnt;
     }
 
-    int sum_i = 0, sum_v = 0;
+    unsigned sum_i = 0, sum_v = 0;
     for (int i = 0; i < s.iterations(); ++i)
     {
         sum_i += ints[i];
@@ -180,7 +180,7 @@ static void msg_setter(picobench::state& s)
         ++cnt;
     }
 
-    int sum_i = 0, sum_v = 0;
+    unsigned sum_i = 0, sum_v = 0;
     for (int i = 0; i < s.iterations(); ++i)
     {
         sum_i += ints[i];
