@@ -157,6 +157,8 @@ void same_type_mutator_alloc(picobench::state& s)
 }
 PICOBENCH(same_type_mutator_alloc);
 
+#include "regression_tester.inl"
+
 int main(int argc, char* argv[])
 {
     picobench::runner r;
@@ -171,5 +173,32 @@ int main(int argc, char* argv[])
 
     auto report = r.run_benchmarks();
     report.to_text(std::cout);
+
+    if (argc != 2 || strcmp(argv[1], "--test-perf-regression"))
+        return 0;
+
+    cout << "\n";
+
+    bool b = true;
+
+    try
+    {
+        b &= test_regression(report, "Object creation", "type_template", 0.5);
+        b &= test_regression(report, "Object creation", "type_template_alloc", 0.3);
+        b &= test_regression(report, "Object mutation", "same_type_mutator", 0.5);
+        b &= test_regression(report, "Object mutation", "same_type_mutator_alloc", 0.3);
+    }
+    catch (std::exception& ex)
+    {
+        cout << "Performance regression test error: " << ex.what() << "\n";
+        return 1;
+    }
+
+    if (!b)
+    {
+        cerr << "Some performance regression tests failed!\n";
+        return 1;
+    }
+
     return 0;
 }

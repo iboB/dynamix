@@ -191,6 +191,8 @@ static void msg_setter(picobench::state& s)
 }
 PICOBENCH(msg_setter);
 
+#include "regression_tester.inl"
+
 int main(int argc, char* argv[])
 {
     picobench::runner r;
@@ -204,6 +206,31 @@ int main(int argc, char* argv[])
 #endif
 
     auto report = r.run_benchmarks();
+
     report.to_text(std::cout);
+
+    if (argc != 2 || strcmp(argv[1], "--test-perf-regression"))
+        return 0;
+
+    cout << "\n";
+
+    bool b = true;
+
+    try
+    {
+        b &= test_regression(report, "setter", "msg_setter");
+    }
+    catch (std::exception& ex)
+    {
+        cout << "Performance regression test error: " << ex.what() << "\n";
+        return 1;
+    }
+
+    if (!b)
+    {
+        cerr << "Some performance regression tests failed!\n";
+        return 1;
+    }
+    
     return 0;
 }
