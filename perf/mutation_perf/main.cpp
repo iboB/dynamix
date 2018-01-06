@@ -163,6 +163,7 @@ int main(int argc, char* argv[])
 {
     picobench::runner r;
 
+    // set some defaults in case there are not cmd-line arguments
 #if defined(NDEBUG)
     r.set_default_samples(3);
     r.set_default_state_iterations({ 5000, 10000 });
@@ -171,12 +172,27 @@ int main(int argc, char* argv[])
     r.set_default_state_iterations({ 1000, 2000 });
 #endif
 
+    r.parse_cmd_line(argc, argv, "--pb");
+
+    if(!r.should_run())
+    {
+        return r.error();
+    }
+
     auto report = r.run_benchmarks();
+
     report.to_text(std::cout);
 
-    if (argc != 2 || strcmp(argv[1], "--test-perf-regression"))
-        return 0;
+    int i;
+    for(i=1; i<argc; ++i)
+    {
+        if(strcmp(argv[i], "--test-perf-regression"))
+        {
+            break;
+        }
+    }
 
+    if(i == argc) return 0; // no regression test required
     cout << "\n";
 
     bool b = true;
