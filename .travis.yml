@@ -121,8 +121,8 @@ script:
   - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS}" -DDYNAMIX_BUILD_PERF=1
   - make -j2
   - ctest --output-on-failure
-  - ./message_perf --test-perf-regression
-  - ./mutation_perf --test-perf-regression
+  - ./message_perf
+  - ./mutation_perf
   - cd ..
   - mkdir -p release_build
   - cd release_build
