@@ -20,6 +20,8 @@ src_group(perf message_perf_sources
     message_perf/main.cpp
     message_perf/perf.cpp
     message_perf/perf.hpp
+    message_perf/unicast.cpp
+    message_perf/multicast.cpp
 )
 
 add_executable(message_perf

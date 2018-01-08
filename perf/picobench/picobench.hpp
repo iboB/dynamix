@@ -781,9 +781,19 @@ public:
         _default_state_iterations = data;
     }
 
+    const std::vector<int>& default_state_iterations() const
+    {
+        return _default_state_iterations;
+    }
+
     void set_default_samples(int n)
     {
         _default_samples = n;
+    }
+
+    int set_default_samples() const
+    {
+        return _default_samples;
     }
 
     // returns false if there were errors parsing the command line
