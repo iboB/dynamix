@@ -11,7 +11,7 @@ To build the performance tests, you need to manually execute `generate.rb` in `m
 OS: Ubuntu 16.04
 CPU: AMD FX X8 8150
 Compiler: gcc 5.4.0
-Compiler arguments: -O3
+Compiler arguments: `-O3`
 
 |   Name (baseline is *)   |   Dim   |  Total ms |  ns/op  |Baseline| Ops/second|
 |--------------------------|---------|-----------|---------|--------|-----------|
@@ -32,7 +32,7 @@ Compiler arguments: -O3
 OS: Ubuntu 16.04
 CPU: AMD FX X8 8150
 Compiler: clang 4.0
-Compiler arguments: -O3
+Compiler arguments: `-O3`
 
 |   Name (baseline is *)   |   Dim   |  Total ms |  ns/op  |Baseline| Ops/second|
 |--------------------------|---------|-----------|---------|--------|-----------|
@@ -48,4 +48,24 @@ Compiler arguments: -O3
 |               mutation * |   10000 |     7.999 |     799 |      - |  1250161.9|
 |        same_type_mutator |   10000 |     2.948 |     294 |  0.369 |  3392561.8|
 |  same_type_mutator_alloc |   10000 |     1.518 |     151 |  0.190 |  6588986.9|
+
+OS: Windows 10
+CPU: Intel Core i7 @ 2.3GHz
+Compiler: Visual C++ 14 (2015) Update 3
+Compiler arguments: `/O2 /Ob2 /MD`
+
+|   Name (baseline is *)   |   Dim   |  Total ms |  ns/op  |Baseline| Ops/second|
+|--------------------------|---------|-----------|---------|--------|-----------|
+|             virtual_noop |  200000 |     0.930 |       4 |  0.204 |215059082.1|
+|          std_func_noop * |  200000 |     4.549 |      22 |      - | 43965397.5|
+|                 msg_noop |  200000 |     2.841 |      14 |  0.625 | 70391577.8|
+|           virtual_setter |  200000 |     1.212 |       6 |  0.146 |165015820.9|
+|        std_func_setter * |  200000 |     8.302 |      41 |      - | 24089393.8|
+|               msg_setter |  200000 |     4.561 |      22 |  0.549 | 43853542.3|
+|          create_mutate * |   10000 |    16.103 |    1610 |      - |   620993.2|
+|            type_template |   10000 |     5.468 |     546 |  0.340 |  1828722.2|
+|      type_template_alloc |   10000 |     2.749 |     274 |  0.171 |  3637850.5|
+|               mutation * |   10000 |    10.333 |    1033 |      - |   967747.5|
+|        same_type_mutator |   10000 |     3.648 |     364 |  0.353 |  2741181.5|
+|  same_type_mutator_alloc |   10000 |     1.688 |     168 |  0.163 |  5923647.7|
 
