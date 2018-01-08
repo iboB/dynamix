@@ -74,17 +74,17 @@ class abstract_instance2 : public abstract_class
 public:
     abstract_instance2() : _sum(0) {}
 
-    void add(int i)
+    void add(int i) override
     {
         _sum+=i;
     }
 
-    int sum() const
+    int sum() const override
     {
         return _sum;
     }
 
-    void noop() const {}
+    void noop() const override {}
 
     void multi_add(int i) override
     {
