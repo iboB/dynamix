@@ -213,6 +213,10 @@ TEST_CASE("type_template")
         .add<no_messages>()
         .create();
 
+    auto& mut = type.mutation();
+    CHECK(mut.is_adding<counter>());
+    CHECK(mut.is_adding<no_messages>());
+
     object o1(type);
     CHECK(o1.has<no_messages>());
     CHECK(o1.get<no_messages>());
