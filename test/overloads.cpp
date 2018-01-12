@@ -17,15 +17,16 @@ using namespace dynamix;
 DYNAMIX_DECLARE_MIXIN(has_unio1_multio1);
 DYNAMIX_DECLARE_MIXIN(has_unio2_multio2);
 DYNAMIX_DECLARE_MIXIN(has_unio3_multio1);
-DYNAMIX_DECLARE_MIXIN(has_unio4_multio2);
+DYNAMIX_DECLARE_MIXIN(has_unio4_multio1_multio2);
+DYNAMIX_DECLARE_MIXIN(has_unio1_unio2);
 
-DYNAMIX_MULTICAST_MESSAGE_1_OVERLOAD(multi_1_overload_1, int, multi, int&, out);
-DYNAMIX_MULTICAST_MESSAGE_2_OVERLOAD(multi_1_overload_2, int, multi, int&, out, int, a1);
+DYNAMIX_MULTICAST_MESSAGE_1_OVERLOAD(multioverload_1, int, multi, int&, out);
+DYNAMIX_MULTICAST_MESSAGE_2_OVERLOAD(multioverload_2, int, multi, int&, out, int, a1);
 
-DYNAMIX_MESSAGE_0_OVERLOAD(uni_1_overload_1, int, uni);
-DYNAMIX_MESSAGE_1_OVERLOAD(uni_1_overload_2, int, uni, int, a1);
-DYNAMIX_MESSAGE_2_OVERLOAD(uni_1_overload_3, int, uni, int, a1, int, a2);
-DYNAMIX_MESSAGE_3_OVERLOAD(uni_1_overload_4, int, uni, int, a1, int, a2, int, a3);
+DYNAMIX_MESSAGE_0_OVERLOAD(unioverload_1, int, uni);
+DYNAMIX_MESSAGE_1_OVERLOAD(unioverload_2, int, uni, int, a1);
+DYNAMIX_MESSAGE_2_OVERLOAD(unioverload_3, int, uni, int, a1, int, a2);
+DYNAMIX_MESSAGE_3_OVERLOAD(unioverload_4, int, uni, int, a1, int, a2, int, a3);
 
 TEST_CASE("overloads")
 {
@@ -34,7 +35,7 @@ TEST_CASE("overloads")
         .add<has_unio1_multio1>()
         .add<has_unio2_multio2>()
         .add<has_unio3_multio1>()
-        .add<has_unio4_multio2>();
+        .add<has_unio4_multio1_multio2>();
 
     int a1 = 1, a2 = 2, a3 = 3;
 
@@ -46,7 +47,7 @@ TEST_CASE("overloads")
     int out = 0;
 
     multi(o, out);
-    CHECK(out == 1); // 0 + 1
+    CHECK(out == 2); // 0 + 1 + 1
     out = 0;
 
     multi(o, out, a1);
@@ -56,12 +57,20 @@ TEST_CASE("overloads")
     combinators::sum<int> s;
 
     multi(o, out, s);
-    CHECK(s.result() == 1); // 0 + 0 + 1
+    CHECK(s.result() == 3); // 0 + 0 + 1 + ((0 + 0 + 1) + 1)
     s.reset();
     out = 0;
 
     multi(o, out, a1, s);
     CHECK(s.result() == 4); // a1 + (a1 + a1 + 1)
+
+    mutate(o)
+        .remove<has_unio1_multio1>()
+        .remove<has_unio2_multio2>()
+        .add<has_unio1_unio2>();
+
+    CHECK(uni(o) == 55);
+    CHECK(uni(o, a1) == 81);
 }
 
 class has_unio1_multio1
@@ -97,26 +106,39 @@ public:
     int multi(int& out) { return out += 1; }
 };
 
-class has_unio4_multio2
+class has_unio4_multio1_multio2
 {
 public:
 #if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "has_unio4_multio2"; }
+    static const char* dynamix_mixin_name() { return "has_unio4_multio1_multio2"; }
 #endif
 
     int uni(int a1, int a2, int a3) { return a1 + a2 + a3; }
+    int multi(int& out) { return out += 1; }
     int multi(int& out, int a) { return out += a + 1; }
 };
 
-// this order should be important if the messages aren't sorted by mixin name
-DYNAMIX_DEFINE_MIXIN(has_unio1_multio1, uni_1_overload_1_msg & multi_1_overload_1_msg);
-DYNAMIX_DEFINE_MIXIN(has_unio2_multio2, uni_1_overload_2_msg & multi_1_overload_2_msg);
-DYNAMIX_DEFINE_MIXIN(has_unio3_multio1, uni_1_overload_3_msg & multi_1_overload_1_msg);
-DYNAMIX_DEFINE_MIXIN(has_unio4_multio2, uni_1_overload_4_msg & multi_1_overload_2_msg);
+class has_unio1_unio2
+{
+public:
+#if !DYNAMIX_USE_TYPEID
+    static const char* dynamix_mixin_name() { return "has_unio1_unio2"; }
+#endif
 
-DYNAMIX_DEFINE_MESSAGE(multi_1_overload_1);
-DYNAMIX_DEFINE_MESSAGE(multi_1_overload_2);
-DYNAMIX_DEFINE_MESSAGE(uni_1_overload_1);
-DYNAMIX_DEFINE_MESSAGE(uni_1_overload_2);
-DYNAMIX_DEFINE_MESSAGE(uni_1_overload_3);
-DYNAMIX_DEFINE_MESSAGE(uni_1_overload_4);
+    int uni() { return 55; }
+    int uni(int a1) { return a1 + 80; }
+};
+
+// this order should be important if the messages aren't sorted by mixin name
+DYNAMIX_DEFINE_MIXIN(has_unio1_multio1, unioverload_1_msg & multioverload_1_msg);
+DYNAMIX_DEFINE_MIXIN(has_unio2_multio2, unioverload_2_msg & multioverload_2_msg);
+DYNAMIX_DEFINE_MIXIN(has_unio3_multio1, unioverload_3_msg & multioverload_1_msg);
+DYNAMIX_DEFINE_MIXIN(has_unio4_multio1_multio2, unioverload_4_msg & multioverload_1_msg & multioverload_2_msg);
+DYNAMIX_DEFINE_MIXIN(has_unio1_unio2, unioverload_1_msg & unioverload_2_msg);
+
+DYNAMIX_DEFINE_MESSAGE(multioverload_1);
+DYNAMIX_DEFINE_MESSAGE(multioverload_2);
+DYNAMIX_DEFINE_MESSAGE(unioverload_1);
+DYNAMIX_DEFINE_MESSAGE(unioverload_2);
+DYNAMIX_DEFINE_MESSAGE(unioverload_3);
+DYNAMIX_DEFINE_MESSAGE(unioverload_4);
