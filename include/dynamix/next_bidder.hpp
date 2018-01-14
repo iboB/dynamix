@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -46,7 +46,8 @@ auto call_next_bidder(Mixin* mixin, Message* message, Args&&... args)
         // for unicasts the next message for mixin (pointed by ptr) must be the one
         // we want to execute (with the next bid)
         const internal::message_for_mixin* msg_data = *ptr;
-        auto data = _DYNAMIX_GET_MIXIN_DATA((*obj), msg_data->_mixin_id);
+        auto data =
+			reinterpret_cast<char*>(const_cast<void*>(obj->_mixin_data[obj->_type_info->_mixin_indices[msg_data->_mixin_id]].mixin()));
 
         auto func = reinterpret_cast<typename Message::caller_func>(msg_data->caller);
         return func(data, std::forward<Args>(args)...);
@@ -81,7 +82,8 @@ auto call_next_bidder(Mixin* mixin, Message* message, Args&&... args)
         for (;;)
         {
             const internal::message_for_mixin* msg_data = *ptr;
-            auto data = _DYNAMIX_GET_MIXIN_DATA((*obj), msg_data->_mixin_id);
+            auto data =
+				reinterpret_cast<char*>(const_cast<void*>(obj->_mixin_data[obj->_type_info->_mixin_indices[msg_data->_mixin_id]].mixin()));
             auto func = reinterpret_cast<typename Message::caller_func>(msg_data->caller);
             ++ptr;
             // check next message data

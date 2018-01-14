@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -13,24 +13,17 @@
     /* mechanism shows whether it's a multicast or unicast */ \
     \
     /* step 1: define the message struct */ \
-    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::message_t \
+    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism) \
+        <_DYNAMIX_MESSAGE_STRUCT_NAME(message_name), constness ::dynamix::object, return_type > \
     { \
-        /* define the actual caller func */ \
-        template <typename Mixin, typename Ret, Ret (Mixin::*Method)() constness> \
-        static Ret caller(void* _d_ptr ) \
-        { \
-            Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
-            return (_d_m->*Method)(); \
-        } \
-        typedef return_type (*caller_func)(void* ); \
         _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
-            : ::dynamix::internal::message_t(_DYNAMIX_PP_STRINGIZE(message_name), message_mechanism, false) \
+            : _DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
         template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<Mixin, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -50,22 +43,12 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj ) \
     {\
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
-        const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
-        /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-        char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-        /* forward unicast arguments since some of them might be rvalue references */ \
-        return _d_func(_d_mixin_data ); \
+        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj ); \
     }\
     /* also define a pointer function */ \
     inline return_type method_name(constness ::dynamix::object* _d_obj ) \
     {\
-        return method_name(*_d_obj ); \
+        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj ); \
     }\
 
 #define _DYNAMIX_MESSAGE0_MULTI(export, message_name, method_name, return_type, constness ) \
@@ -75,66 +58,26 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj , Combinator& _d_combinator) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
-        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
-        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        DYNAMIX_ASSERT(_d_end); \
-        ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
-        { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-            if(!_d_combinator.add_result(_d_func(_d_mixin_data ))) \
-            { \
-                return; \
-            } \
-        } \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator ); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj ) \
     { \
         Combinator<return_type> _d_combinator; \
-        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        method_name(_d_obj , _d_combinator); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator ); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj ) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
-        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
-        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        DYNAMIX_ASSERT(_d_end); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
-        { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-            _d_func(_d_mixin_data ); \
-        } \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj ); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj ) \
     {\
-        method_name(*_d_obj ); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj ); \
     }\
 
 #define DYNAMIX_MESSAGE_0(return_type, message ) \
@@ -233,24 +176,17 @@
     /* mechanism shows whether it's a multicast or unicast */ \
     \
     /* step 1: define the message struct */ \
-    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::message_t \
+    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism) \
+        <_DYNAMIX_MESSAGE_STRUCT_NAME(message_name), constness ::dynamix::object, return_type , arg0_type> \
     { \
-        /* define the actual caller func */ \
-        template <typename Mixin, typename Ret, Ret (Mixin::*Method)(arg0_type) constness> \
-        static Ret caller(void* _d_ptr , arg0_type a0) \
-        { \
-            Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
-            return (_d_m->*Method)(std::forward<arg0_type>(a0)); \
-        } \
-        typedef return_type (*caller_func)(void* , arg0_type); \
         _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
-            : ::dynamix::internal::message_t(_DYNAMIX_PP_STRINGIZE(message_name), message_mechanism, false) \
+            : _DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
         template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<Mixin, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -270,22 +206,12 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0) \
     {\
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
-        const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
-        /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-        char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-        /* forward unicast arguments since some of them might be rvalue references */ \
-        return _d_func(_d_mixin_data , std::forward<arg0_type>(a0)); \
+        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0)); \
     }\
     /* also define a pointer function */ \
     inline return_type method_name(constness ::dynamix::object* _d_obj , arg0_type a0) \
     {\
-        return method_name(*_d_obj , std::forward<arg0_type>(a0)); \
+        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0)); \
     }\
 
 #define _DYNAMIX_MESSAGE1_MULTI(export, message_name, method_name, return_type, constness , arg0_type, a0) \
@@ -295,66 +221,26 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, Combinator& _d_combinator) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
-        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
-        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        DYNAMIX_ASSERT(_d_end); \
-        ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
-        { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-            if(!_d_combinator.add_result(_d_func(_d_mixin_data , a0))) \
-            { \
-                return; \
-            } \
-        } \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0)); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0) \
     { \
         Combinator<return_type> _d_combinator; \
-        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        method_name(_d_obj , a0, _d_combinator); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0)); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
-        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
-        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        DYNAMIX_ASSERT(_d_end); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
-        { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-            _d_func(_d_mixin_data , a0); \
-        } \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0)); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj , arg0_type a0) \
     {\
-        method_name(*_d_obj , std::forward<arg0_type>(a0)); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0)); \
     }\
 
 #define DYNAMIX_MESSAGE_1(return_type, message , arg0_type, a0) \
@@ -453,24 +339,17 @@
     /* mechanism shows whether it's a multicast or unicast */ \
     \
     /* step 1: define the message struct */ \
-    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::message_t \
+    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism) \
+        <_DYNAMIX_MESSAGE_STRUCT_NAME(message_name), constness ::dynamix::object, return_type , arg0_type, arg1_type> \
     { \
-        /* define the actual caller func */ \
-        template <typename Mixin, typename Ret, Ret (Mixin::*Method)(arg0_type, arg1_type) constness> \
-        static Ret caller(void* _d_ptr , arg0_type a0, arg1_type a1) \
-        { \
-            Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
-            return (_d_m->*Method)(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
-        } \
-        typedef return_type (*caller_func)(void* , arg0_type, arg1_type); \
         _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
-            : ::dynamix::internal::message_t(_DYNAMIX_PP_STRINGIZE(message_name), message_mechanism, false) \
+            : _DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
         template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<Mixin, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -490,22 +369,12 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1) \
     {\
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
-        const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
-        /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-        char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-        /* forward unicast arguments since some of them might be rvalue references */ \
-        return _d_func(_d_mixin_data , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
+        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
     }\
     /* also define a pointer function */ \
     inline return_type method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1) \
     {\
-        return method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
+        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
     }\
 
 #define _DYNAMIX_MESSAGE2_MULTI(export, message_name, method_name, return_type, constness , arg0_type, a0, arg1_type, a1) \
@@ -515,66 +384,26 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, Combinator& _d_combinator) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
-        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
-        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        DYNAMIX_ASSERT(_d_end); \
-        ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
-        { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-            if(!_d_combinator.add_result(_d_func(_d_mixin_data , a0, a1))) \
-            { \
-                return; \
-            } \
-        } \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1) \
     { \
         Combinator<return_type> _d_combinator; \
-        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        method_name(_d_obj , a0, a1, _d_combinator); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
-        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
-        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        DYNAMIX_ASSERT(_d_end); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
-        { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-            _d_func(_d_mixin_data , a0, a1); \
-        } \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1) \
     {\
-        method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
     }\
 
 #define DYNAMIX_MESSAGE_2(return_type, message , arg0_type, a0, arg1_type, a1) \
@@ -673,24 +502,17 @@
     /* mechanism shows whether it's a multicast or unicast */ \
     \
     /* step 1: define the message struct */ \
-    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::message_t \
+    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism) \
+        <_DYNAMIX_MESSAGE_STRUCT_NAME(message_name), constness ::dynamix::object, return_type , arg0_type, arg1_type, arg2_type> \
     { \
-        /* define the actual caller func */ \
-        template <typename Mixin, typename Ret, Ret (Mixin::*Method)(arg0_type, arg1_type, arg2_type) constness> \
-        static Ret caller(void* _d_ptr , arg0_type a0, arg1_type a1, arg2_type a2) \
-        { \
-            Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
-            return (_d_m->*Method)(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
-        } \
-        typedef return_type (*caller_func)(void* , arg0_type, arg1_type, arg2_type); \
         _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
-            : ::dynamix::internal::message_t(_DYNAMIX_PP_STRINGIZE(message_name), message_mechanism, false) \
+            : _DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
         template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<Mixin, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -710,22 +532,12 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2) \
     {\
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
-        const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
-        /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-        char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-        /* forward unicast arguments since some of them might be rvalue references */ \
-        return _d_func(_d_mixin_data , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
+        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
     }\
     /* also define a pointer function */ \
     inline return_type method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2) \
     {\
-        return method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
+        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
     }\
 
 #define _DYNAMIX_MESSAGE3_MULTI(export, message_name, method_name, return_type, constness , arg0_type, a0, arg1_type, a1, arg2_type, a2) \
@@ -735,66 +547,26 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, Combinator& _d_combinator) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
-        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
-        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        DYNAMIX_ASSERT(_d_end); \
-        ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
-        { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-            if(!_d_combinator.add_result(_d_func(_d_mixin_data , a0, a1, a2))) \
-            { \
-                return; \
-            } \
-        } \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2) \
     { \
         Combinator<return_type> _d_combinator; \
-        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        method_name(_d_obj , a0, a1, a2, _d_combinator); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
-        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
-        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        DYNAMIX_ASSERT(_d_end); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
-        { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-            _d_func(_d_mixin_data , a0, a1, a2); \
-        } \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2) \
     {\
-        method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
     }\
 
 #define DYNAMIX_MESSAGE_3(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2) \
@@ -893,24 +665,17 @@
     /* mechanism shows whether it's a multicast or unicast */ \
     \
     /* step 1: define the message struct */ \
-    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::message_t \
+    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism) \
+        <_DYNAMIX_MESSAGE_STRUCT_NAME(message_name), constness ::dynamix::object, return_type , arg0_type, arg1_type, arg2_type, arg3_type> \
     { \
-        /* define the actual caller func */ \
-        template <typename Mixin, typename Ret, Ret (Mixin::*Method)(arg0_type, arg1_type, arg2_type, arg3_type) constness> \
-        static Ret caller(void* _d_ptr , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
-        { \
-            Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
-            return (_d_m->*Method)(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
-        } \
-        typedef return_type (*caller_func)(void* , arg0_type, arg1_type, arg2_type, arg3_type); \
         _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
-            : ::dynamix::internal::message_t(_DYNAMIX_PP_STRINGIZE(message_name), message_mechanism, false) \
+            : _DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
         template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<Mixin, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -930,22 +695,12 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
     {\
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
-        const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
-        /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-        char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-        /* forward unicast arguments since some of them might be rvalue references */ \
-        return _d_func(_d_mixin_data , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
+        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
     }\
     /* also define a pointer function */ \
     inline return_type method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
     {\
-        return method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
+        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
     }\
 
 #define _DYNAMIX_MESSAGE4_MULTI(export, message_name, method_name, return_type, constness , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3) \
@@ -955,66 +710,26 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, Combinator& _d_combinator) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
-        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
-        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        DYNAMIX_ASSERT(_d_end); \
-        ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
-        { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-            if(!_d_combinator.add_result(_d_func(_d_mixin_data , a0, a1, a2, a3))) \
-            { \
-                return; \
-            } \
-        } \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
     { \
         Combinator<return_type> _d_combinator; \
-        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        method_name(_d_obj , a0, a1, a2, a3, _d_combinator); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
-        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
-        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        DYNAMIX_ASSERT(_d_end); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
-        { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-            _d_func(_d_mixin_data , a0, a1, a2, a3); \
-        } \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
     {\
-        method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
     }\
 
 #define DYNAMIX_MESSAGE_4(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3) \
@@ -1113,24 +828,17 @@
     /* mechanism shows whether it's a multicast or unicast */ \
     \
     /* step 1: define the message struct */ \
-    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::message_t \
+    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism) \
+        <_DYNAMIX_MESSAGE_STRUCT_NAME(message_name), constness ::dynamix::object, return_type , arg0_type, arg1_type, arg2_type, arg3_type, arg4_type> \
     { \
-        /* define the actual caller func */ \
-        template <typename Mixin, typename Ret, Ret (Mixin::*Method)(arg0_type, arg1_type, arg2_type, arg3_type, arg4_type) constness> \
-        static Ret caller(void* _d_ptr , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
-        { \
-            Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
-            return (_d_m->*Method)(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
-        } \
-        typedef return_type (*caller_func)(void* , arg0_type, arg1_type, arg2_type, arg3_type, arg4_type); \
         _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
-            : ::dynamix::internal::message_t(_DYNAMIX_PP_STRINGIZE(message_name), message_mechanism, false) \
+            : _DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
         template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<Mixin, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -1150,22 +858,12 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
     {\
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
-        const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
-        /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-        char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-        /* forward unicast arguments since some of them might be rvalue references */ \
-        return _d_func(_d_mixin_data , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
+        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
     }\
     /* also define a pointer function */ \
     inline return_type method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
     {\
-        return method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
+        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
     }\
 
 #define _DYNAMIX_MESSAGE5_MULTI(export, message_name, method_name, return_type, constness , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
@@ -1175,66 +873,26 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, Combinator& _d_combinator) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
-        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
-        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        DYNAMIX_ASSERT(_d_end); \
-        ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
-        { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-            if(!_d_combinator.add_result(_d_func(_d_mixin_data , a0, a1, a2, a3, a4))) \
-            { \
-                return; \
-            } \
-        } \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
     { \
         Combinator<return_type> _d_combinator; \
-        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        method_name(_d_obj , a0, a1, a2, a3, a4, _d_combinator); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
-        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
-        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        DYNAMIX_ASSERT(_d_end); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
-        { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-            _d_func(_d_mixin_data , a0, a1, a2, a3, a4); \
-        } \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
     {\
-        method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
     }\
 
 #define DYNAMIX_MESSAGE_5(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
@@ -1333,24 +991,17 @@
     /* mechanism shows whether it's a multicast or unicast */ \
     \
     /* step 1: define the message struct */ \
-    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::message_t \
+    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism) \
+        <_DYNAMIX_MESSAGE_STRUCT_NAME(message_name), constness ::dynamix::object, return_type , arg0_type, arg1_type, arg2_type, arg3_type, arg4_type, arg5_type> \
     { \
-        /* define the actual caller func */ \
-        template <typename Mixin, typename Ret, Ret (Mixin::*Method)(arg0_type, arg1_type, arg2_type, arg3_type, arg4_type, arg5_type) constness> \
-        static Ret caller(void* _d_ptr , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
-        { \
-            Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
-            return (_d_m->*Method)(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
-        } \
-        typedef return_type (*caller_func)(void* , arg0_type, arg1_type, arg2_type, arg3_type, arg4_type, arg5_type); \
         _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
-            : ::dynamix::internal::message_t(_DYNAMIX_PP_STRINGIZE(message_name), message_mechanism, false) \
+            : _DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
         template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<constness Mixin, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<Mixin, &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -1370,22 +1021,12 @@
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
     {\
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
-        const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
-        /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-        char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-        /* forward unicast arguments since some of them might be rvalue references */ \
-        return _d_func(_d_mixin_data , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
+        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
     }\
     /* also define a pointer function */ \
     inline return_type method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
     {\
-        return method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
+        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
     }\
 
 #define _DYNAMIX_MESSAGE6_MULTI(export, message_name, method_name, return_type, constness , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
@@ -1395,66 +1036,26 @@
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, Combinator& _d_combinator) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
-        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
-        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        DYNAMIX_ASSERT(_d_end); \
-        ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
-        { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-            if(!_d_combinator.add_result(_d_func(_d_mixin_data , a0, a1, a2, a3, a4, a5))) \
-            { \
-                return; \
-            } \
-        } \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
     { \
         Combinator<return_type> _d_combinator; \
-        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        method_name(_d_obj , a0, a1, a2, a3, a4, a5, _d_combinator); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
     { \
-        const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
-        DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
-        typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
-        const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        DYNAMIX_ASSERT(_d_end); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
-        { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = _DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
-            _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
-            /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-            _d_func(_d_mixin_data , a0, a1, a2, a3, a4, a5); \
-        } \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
     {\
-        method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
     }\
 
 #define DYNAMIX_MESSAGE_6(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
