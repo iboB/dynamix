@@ -81,6 +81,10 @@ matrix:
     #  osx_image: xcode7.3
     #  os: osx
 
+  allow_failures:
+    - env: COMPILER=clang++-4.0 ADDITIONAL_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
+    - env: COMPILER=clang++-5.0 ADDITIONAL_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
+
 install:
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
