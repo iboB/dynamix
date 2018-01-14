@@ -23,7 +23,8 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<Mixin, &Mixin::method_name>; \
+            /* also use explicit type of method, so it would match the exact overload */ \
+            static caller_func the_caller = caller<Mixin, (return_type (Mixin::*)() constness) &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -186,7 +187,8 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<Mixin, &Mixin::method_name>; \
+            /* also use explicit type of method, so it would match the exact overload */ \
+            static caller_func the_caller = caller<Mixin, (return_type (Mixin::*)(arg0_type a0) constness) &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -349,7 +351,8 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<Mixin, &Mixin::method_name>; \
+            /* also use explicit type of method, so it would match the exact overload */ \
+            static caller_func the_caller = caller<Mixin, (return_type (Mixin::*)(arg0_type a0, arg1_type a1) constness) &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -512,7 +515,8 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<Mixin, &Mixin::method_name>; \
+            /* also use explicit type of method, so it would match the exact overload */ \
+            static caller_func the_caller = caller<Mixin, (return_type (Mixin::*)(arg0_type a0, arg1_type a1, arg2_type a2) constness) &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -675,7 +679,8 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<Mixin, &Mixin::method_name>; \
+            /* also use explicit type of method, so it would match the exact overload */ \
+            static caller_func the_caller = caller<Mixin, (return_type (Mixin::*)(arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) constness) &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -838,7 +843,8 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<Mixin, &Mixin::method_name>; \
+            /* also use explicit type of method, so it would match the exact overload */ \
+            static caller_func the_caller = caller<Mixin, (return_type (Mixin::*)(arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) constness) &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -1001,7 +1007,8 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<Mixin, &Mixin::method_name>; \
+            /* also use explicit type of method, so it would match the exact overload */ \
+            static caller_func the_caller = caller<Mixin, (return_type (Mixin::*)(arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) constness) &Mixin::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
