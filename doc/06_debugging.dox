@@ -93,26 +93,14 @@ If you know which method in a mixin class will be called for a message it is a
 good idea to run to its first line (or place a breakpoint there) in order to
 skip the macro steps.
 
-If you don't know, you will have to step into the macro. Since there's no
-debugger that we're aware of which will allow you to actually see the macro code
-as you're stepping through it, you most likely will have to spend some steps on
-the line `DYNAMIX_xxx_MESSAGE_N` for the given message. And due to the fact
-that different IDEs and debuggers handle the stepping through macros
-differently, it's also hard to tell how many steps you need to spend there. It
-will be between 4 and 8 for unicasts and 5 and 14 for multicasts (plus 1 to 3
-more if you're using a multicast combinator).
-
-Your best approach is to experiment and write down how many steps (and what
-kind) you need to  make on the macro line for your particular case of compiler
-and debugger. Initially stepping into everything until you reach the mixin class
-method.
-
-For example, for Visual Studio 2012, in a Debug compilation, the pattern we use
-for a unicast message is 6 times step, 2 times step into.
-
-Naturally, you might alternatively use a custom external preprocessor to expand
-the macro line (or expand it manually), for a message that you need to step into
-very often.
+If you don't know, you will have to step into the macro. The macro generates
+a one-liner function so you need to step it macro once to get to the `make_call`
+function in the appropriate caller class (`msg_unicast` or `msg_multicast`).
+There, towards the end of the function, you'll see a call to `func` (possibly
+within a loop for multicasts). You need to step into it to go the appropriate
+instantiated proxy `msg_caller::caller`. The last line there is the call to the
+underlying function of your code. You need to step into it as well to go to your
+code.
 
 Tracing/Logging information with code {#tracing_logging}
 =====================================

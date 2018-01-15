@@ -1,5 +1,17 @@
 /*! \page revisions Revision History
 
+DynaMix 1.3.1
+=============
+
+Released: 2018 Jan 16
+
+- Reduced macro-generated code by message declaration macros. Messages are now
+easier to debug with only a single line in the macro when stepping.
+- Fixed a bug which didn't allow message overloads on constness alone
+- Added a getter for the mutation from mutator classes
+- Imrpoved performance tests
+
+
 DynaMix 1.3.0
 =============
 

@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -14,7 +14,7 @@
 
 #define DYNAMIX_VERSION_MAJOR 1
 #define DYNAMIX_VERSION_MINOR 3
-#define DYNAMIX_VERSION_SUB_MINOR 0
+#define DYNAMIX_VERSION_SUB_MINOR 1
 
 /// The library's version.
 ///

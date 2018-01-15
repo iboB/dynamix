@@ -141,7 +141,7 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 	}
 
 	// the folowing copy-pasted overload will be obsolete with c++17
-	// it's only point is to support void multicast messages
+	// its only point is to support void multicast messages
 	// otherwise we would be able to use a combinator like this for all
 	// struct noop_combinator
 	// {
