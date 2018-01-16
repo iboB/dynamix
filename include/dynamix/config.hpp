@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -102,6 +102,10 @@
 #if defined(_MSC_VER)
 // msvc complains that template classes don't have a dll interface (they shouldn't).
 #   pragma warning (disable: 4251)
+#endif
+
+#if !defined(DYNAMIX_CLANG_35971_WORKAROUND)
+#   define DYNAMIX_CLANG_35971_WORKAROUND 1
 #endif
 
 // dynamic library interface

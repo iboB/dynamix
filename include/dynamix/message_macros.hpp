@@ -211,6 +211,13 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 /// \internal
 #define _DYNAMIX_VA_ARGS_PROXY(MACRO, args) MACRO args
 
+// workaround for issue: https://bugs.llvm.org/show_bug.cgi?id=35971
+#if defined(__clang__) && DYNAMIX_CLANG_35971_WORKAROUND
+#   define _DYNAMIX_CAST_METHOD(...)
+#else
+#   define _DYNAMIX_CAST_METHOD(t) t
+#endif
+
 #if defined(DYNAMIX_DOXYGEN)
 // use these macros for the docs only
 
