@@ -26,6 +26,7 @@ DYNAMIX_MESSAGE_0(void, dummy);
 DYNAMIX_CONST_MESSAGE_0(const void*, get_self);
 DYNAMIX_MESSAGE_0(void, unused);
 DYNAMIX_MULTICAST_MESSAGE_1(void, multi, int&, n)
+DYNAMIX_MESSAGE_0(int, inherited);
 
 class no_messages
 {
@@ -35,7 +36,16 @@ public:
 #endif
 };
 
-class counter
+// issue 20 test
+struct parent
+{
+    int inherited()
+    {
+        return 22;
+    }
+};
+
+class counter : public parent
 {
 public:
 #if !DYNAMIX_USE_TYPEID
@@ -56,6 +66,12 @@ public:
     {
         ++n;
     }
+
+    int inherited()
+    {
+        return parent::inherited();
+    }
+
 
 private:
     int _count;
@@ -245,10 +261,11 @@ TEST_CASE("type_template")
 }
 
 DYNAMIX_DEFINE_MIXIN(no_messages, none);
-DYNAMIX_DEFINE_MIXIN(counter, dummy_msg & multi_msg);
+DYNAMIX_DEFINE_MIXIN(counter, dummy_msg & multi_msg & inherited_msg);
 DYNAMIX_DEFINE_MIXIN(type_checker, get_self_msg & multi_msg);
 
 DYNAMIX_DEFINE_MESSAGE(dummy);
 DYNAMIX_DEFINE_MESSAGE(get_self);
 DYNAMIX_DEFINE_MESSAGE(unused);
 DYNAMIX_DEFINE_MESSAGE(multi);
+DYNAMIX_DEFINE_MESSAGE(inherited);

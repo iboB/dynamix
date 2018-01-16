@@ -46,10 +46,15 @@ struct msg_caller
 		return (m->*Method)(std::forward<Args>(args)...);
 	}
 
+	// we need this silly-named alternative because there is no standard way to
+	// distiguish between constness-based overloads when providing a member function
+	// as a template argument
+	// because of this the macro which instantiates the template also constructs this
+	// function's name based on the message constness
 	template <typename Mixin, Ret (Mixin::*Method)(Args...) const>
-	static Ret caller(void* mixin, Args... args)
+	static Ret callerconst(void* mixin, Args... args)
 	{
-		auto m = reinterpret_cast<Mixin*>(mixin);
+		auto m = reinterpret_cast<const Mixin*>(mixin);
 		return (m->*Method)(std::forward<Args>(args)...);
 	}
 };
@@ -195,6 +200,10 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 /// \internal
 #define _DYNAMIX_MESSAGE_CALLER_STRUCT(mechanism) _DYNAMIX_PP_CAT(msg_, mechanism)
 
+// construct the appropriate caller name, based on the message constness
+/// \internal
+#define _DYNAMIX_CALLER_NAME(...) _DYNAMIX_PP_CAT(caller, __VA_ARGS__)
+
 // default impl helper macros
 
 // name of default implementation struct
@@ -210,13 +219,6 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 // a workaround to a visaul c issue which doesn't expand __VA_ARGS__ but inead gives them as a single argument
 /// \internal
 #define _DYNAMIX_VA_ARGS_PROXY(MACRO, args) MACRO args
-
-// workaround for issue: https://bugs.llvm.org/show_bug.cgi?id=35971
-#if defined(__clang__) && DYNAMIX_CLANG_35971_WORKAROUND
-#   define _DYNAMIX_CAST_METHOD(...)
-#else
-#   define _DYNAMIX_CAST_METHOD(t) t
-#endif
 
 #if defined(DYNAMIX_DOXYGEN)
 // use these macros for the docs only

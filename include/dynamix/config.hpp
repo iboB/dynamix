@@ -104,10 +104,6 @@
 #   pragma warning (disable: 4251)
 #endif
 
-#if !defined(DYNAMIX_CLANG_35971_WORKAROUND)
-#   define DYNAMIX_CLANG_35971_WORKAROUND 1
-#endif
-
 // dynamic library interface
 #if defined(DYNAMIX_DYNLIB)
 
