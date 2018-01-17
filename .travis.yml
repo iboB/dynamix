@@ -65,15 +65,10 @@ matrix:
           packages: ["clang-5.0", "valgrind", "g++-6"]
           sources: *apt_sources
 
-    # Xcode 8.3 Clang
-    #- env: COMPILER=clang++ ADDITIONAL_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
-    #  osx_image: xcode8.3
-    #  os: osx
-
-    # Xcode 9.1 Clang
-    #- env: COMPILER=clang++ ADDITIONAL_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
-    #  osx_image: xcode9.1
-    #  os: osx
+    # Xcode 9.2 Clang
+    - env: COMPILER=clang++ ADDITIONAL_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
+      osx_image: xcode9.2
+      os: osx
 
     # OSX GCC 5
     #- env: COMPILER=g++-5

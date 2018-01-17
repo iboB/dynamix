@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -38,8 +38,11 @@ inline DynamicLib LoadDynamicLib(const char* lib)
 {
     std::string l = "lib";
     l += lib;
+#if defined(__APPLE__)
+    l += ".dylib";
+#else
     l += ".so";
-
+#endif
     return dlopen(l.c_str(), RTLD_NOW);
 }
 #define CloseDynamicLib dlclose
@@ -81,10 +84,10 @@ TEST_CASE("lib")
 DynamicLib LoadPlugin(const char* name, object& o)
 {
     auto plugin = LoadDynamicLib(name);
-    CHECK(plugin);
+    REQUIRE(plugin);
 
     auto modify = reinterpret_cast<plugin_proc>(GetProc(plugin, "modify_object"));
-    CHECK(modify);
+    REQUIRE(modify);
 
     modify(&o);
 
@@ -94,7 +97,7 @@ DynamicLib LoadPlugin(const char* name, object& o)
 void ClosePlugin(DynamicLib plugin, object& o)
 {
     auto release = reinterpret_cast<plugin_proc>(GetProc(plugin, "release_object"));
-    CHECK(release);
+    REQUIRE(release);
 
     release(&o);
 
