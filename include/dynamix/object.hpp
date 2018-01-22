@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -162,7 +162,7 @@ public:
     }
 
     /// Checks if the object implements a feature by a mixin.
-    /// Note that on `false` the object might still implement the feature but with a default implementation)
+    /// Note that on `false` the object might still implement the feature but with a default implementation.
     template <typename Feature>
     bool implements_by_mixin(const Feature*) const noexcept
     {
@@ -174,7 +174,7 @@ public:
     }
 
     /// Checks if the object implements a feature with a default implementation 
-    /// (`false` meansthat it either does not implement it at all, or it's implemented by a mixin)
+    /// (`false` means that it either does not implement it at all, or it's implemented by a mixin)
     template <typename Feature>
     bool implements_with_default(const Feature*) const noexcept
     {

@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -47,10 +47,12 @@ TEST_CASE("basic_msgs")
 {
     object o;
 
+    // empty objects implement no messages, even ones with a default implementation
     CHECK(!o.implements(basic_def_msg));
+    CHECK(!o.implements_by_mixin(basic_def_msg));    
+    CHECK(!o.implements_with_default(basic_def_no_impl_msg));
 
 #if DYNAMIX_USE_EXCEPTIONS
-    // empty objects don't implement default implementations
     CHECK_THROWS_AS(basic_def(o), bad_message_call);
 #endif
 
