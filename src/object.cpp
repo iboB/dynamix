@@ -270,6 +270,21 @@ bool object::implements_message(feature_id id) const
     return !!_type_info->_call_table[id].top_bid_message;
 }
 
+bool object::implements_message_by_mixin(feature_id id) const
+{
+    auto& entry = _type_info->_call_table[id];
+
+    if (!entry.top_bid_message)
+    {
+        // doesn't implement it at all
+        return false;
+    }
+
+    const auto msg_data = domain::instance()._messages[id];
+
+    return entry.top_bid_message != msg_data->default_impl_data;
+}
+
 size_t object::message_num_implementers(feature_id id) const
 {
     auto& entry = _type_info->_call_table[id];

@@ -150,7 +150,7 @@ public:
     /////////////////////////////////////////////////////////////////
     // feature info
 
-    /// Checks if the mixin implements a feature.
+    /// Checks if the object implements a feature.
     template <typename Feature>
     bool implements(const Feature*) const noexcept
     {
@@ -159,6 +159,32 @@ public:
         // intentionally disregarding the actual feature,
         // because of potential multiple implementations
         return internal_implements(f.id, typename Feature::feature_tag());
+    }
+
+    /// Checks if the object implements a feature by a mixin.
+    /// Note that on `false` the object might still implement the feature but with a default implementation)
+    template <typename Feature>
+    bool implements_by_mixin(const Feature*) const noexcept
+    {
+        const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
+        DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
+        // intentionally disregarding the actual feature,
+        // because of potential multiple implementations
+        return internal_implements_by_mixin(f.id, typename Feature::feature_tag());
+    }
+
+    /// Checks if the object implements a feature with a default implementation 
+    /// (`false` meansthat it either does not implement it at all, or it's implemented by a mixin)
+    template <typename Feature>
+    bool implements_with_default(const Feature*) const noexcept
+    {
+        const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
+        DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
+        // intentionally disregarding the actual feature,
+        // because of potential multiple implementations
+        return 
+            internal_implements(f.id, typename Feature::feature_tag())
+            && !internal_implements_by_mixin(f.id, typename Feature::feature_tag());
     }
 
     /// Returns the number of mixins in the object which implement a feature.
@@ -259,6 +285,13 @@ _dynamix_internal:
     }
 
     bool implements_message(feature_id id) const;
+
+    bool internal_implements_by_mixin(feature_id id, const internal::message_feature_tag&) const
+    {
+        return implements_message_by_mixin(id);
+    }
+
+    bool implements_message_by_mixin(feature_id id) const;
 
     size_t internal_num_implementers(feature_id id, const internal::message_feature_tag&) const
     {
