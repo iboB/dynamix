@@ -1,5 +1,5 @@
 language: cpp
-sudo: false
+sudo: true # travis-ci/travis-ci#9033
 os: linux
 compiler: gcc
 
