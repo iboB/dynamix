@@ -1,5 +1,13 @@
 /*! \page revisions Revision History
 
+DynaMix 1.3.3
+=============
+
+Released: 2018 Feb 06
+
+- Added checks whether a message is implemented by a default implementation
+
+
 DynaMix 1.3.2
 =============
 
