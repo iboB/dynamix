@@ -16,6 +16,16 @@ notifications:
     on_start: never
 git:
   depth: 5
+  
+cache:
+  directories:
+    - .mtime_cache
+    - debug_build
+    - release_build
+    - cc_debug
+    - cc_release
+    - static_debug
+    - static_release
 
 addons:
   apt:
@@ -105,6 +115,8 @@ script:
   - cd perf/mutation_perf
   - ruby generate.rb
   - cd ../..
+  # mtime_cache for faster builds
+  - ruby tools/mtime_cache **/*.{%{cpp}} -c .mtime_cache/cache.json
   # build all in debug and release
   # run unit tests and performance tests
   - mkdir -p debug_build

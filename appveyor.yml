@@ -13,6 +13,13 @@ branches:
   only:
     - master
     - dev
+    
+cache:
+  - .mtime_cache
+  - vcbuild_x86
+  - vcbuild_x64
+  - vcbuild_cc
+  - vcbuild_static
 
 matrix:
   fast_finish: false
@@ -24,6 +31,8 @@ environment:
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
 
 build_script:
+  # mtime_cache for faster builds
+  - ruby tools/mtime_cache **/*.{%{cpp}} -c .mtime_cache/cache.json
   # build and run tests for 32 and 64 bit
   - if not exist vcbuild_x86 mkdir vcbuild_x86
   - cd vcbuild_x86
