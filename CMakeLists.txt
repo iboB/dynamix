@@ -20,7 +20,6 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/build/macros
 )
 
-include(precompiled_header)
 include(src_group)
 
 option(DYNAMIX_SHARED_LIB "DynaMix: build as a shared library" ON)
