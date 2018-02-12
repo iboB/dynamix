@@ -50,6 +50,15 @@ build_script:
   - msbuild dynamix.sln /p:Configuration=Release;Platform=x64 /maxcpucount /verbosity:minimal
   - ctest -C Release --output-on-failure
   - cd ..
+  # build and run tests for DynaMix as a static lib (64-bit only)
+  - if not exist vcbuild_static mkdir vcbuild_static
+  - cd vcbuild_static
+  - cmake .. -DDYNAMIX_SHARED_LIB=0 -DDYNAMIX_BUILD_EXAMPLES=0 -DDYNAMIX_BUILD_TUTORIALS=0 -DDYNAMIX_BUILD_SCRATCH=0 -G "%gen% Win64"
+  - msbuild dynamix.sln /p:Configuration=Debug;Platform=x64 /maxcpucount /verbosity:minimal
+  - ctest -C Debug --output-on-failure
+  - msbuild dynamix.sln /p:Configuration=Release;Platform=x64 /maxcpucount /verbosity:minimal
+  - ctest -C Release --output-on-failure
+  - cd ..
 # static analysis
   #~ - if "%gen%" == "Visual Studio 15 2017" mkdir vcbuild_analysis
   #~ - if "%gen%" == "Visual Studio 15 2017" cd vcbuild_analysis

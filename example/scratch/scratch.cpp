@@ -7,144 +7,165 @@
 //
 #include <dynamix/dynamix.hpp>
 
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "../../test/doctest/doctest.h"
+#include <iostream>
 
-TEST_SUITE("overloads");
+using namespace std;
 
-using namespace dynamix;
+struct Point { int x, y; };
+ostream& operator<<(ostream& o, const Point&) { return o; }
 
-DYNAMIX_DECLARE_MIXIN(has_unio1_multio1);
-DYNAMIX_DECLARE_MIXIN(has_unio2_multio2);
-DYNAMIX_DECLARE_MIXIN(has_unio3_multio1);
-DYNAMIX_DECLARE_MIXIN(has_unio4_multio1_multio2);
-DYNAMIX_DECLARE_MIXIN(has_unio1_c_unio2);
-
-DYNAMIX_MULTICAST_MESSAGE_1_OVERLOAD(multioverload_1, int, multi, int&, out);
-DYNAMIX_MULTICAST_MESSAGE_2_OVERLOAD(multioverload_2, int, multi, int&, out, int, a1);
-
-DYNAMIX_MESSAGE_0_OVERLOAD(unioverload_1, int, uni);
-DYNAMIX_CONST_MESSAGE_0_OVERLOAD(unioverload_1c, int, uni);
-DYNAMIX_MESSAGE_1_OVERLOAD(unioverload_2, int, uni, int, a1);
-DYNAMIX_MESSAGE_2_OVERLOAD(unioverload_3, int, uni, int, a1, int, a2);
-DYNAMIX_MESSAGE_3_OVERLOAD(unioverload_4, int, uni, int, a1, int, a2, int, a3);
-
-TEST_CASE("overloads")
+enum class Terrain
 {
-    object o;
-    mutate(o)
-        .add<has_unio1_multio1>()
-        .add<has_unio2_multio2>()
-        .add<has_unio3_multio1>()
-        .add<has_unio4_multio1_multio2>();
+    Snow,
+    Grass
+};
 
-    int a1 = 1, a2 = 2, a3 = 3;
+class World
+{
+public:
+    bool hasObstaclesBetween(const Point& a, const Point& b) const
+    {
+        return true;
+    }
 
-    CHECK(uni(o) == 0);
-    CHECK(uni(o, a1) == 1);
-    CHECK(uni(o, a1, a2) == 3);
-    CHECK(uni(o, a1, a2, a3) == 6);
+    Terrain terrainAt(const Point&) const
+    {
+        return Terrain::Snow;
+    }
+};
 
-    int out = 0;
+DYNAMIX_CONST_MESSAGE_0(const char*, name);
+DYNAMIX_CONST_MESSAGE_0(const World&, world);
+DYNAMIX_CONST_MESSAGE_0(Point, position);
+DYNAMIX_CONST_MESSAGE_0(Point, decideTarget);
 
-    multi(o, out);
-    CHECK(out == 2); // 0 + 1 + 1
-    out = 0;
+DYNAMIX_MESSAGE_1(void, moveTo, const Point&, target);
+DYNAMIX_CONST_MESSAGE_1(bool, canMoveTo, const Point&, target);
 
-    multi(o, out, a1);
-    CHECK(out == 3); // a1 + a1 + 1
-    out = 0;
+class WalkingCreature
+{
+public:
+    void moveTo(const Point& t) {
+        cout << name(dm_this) << " walking to " << t << "\n";
+    }
+    bool canMoveTo(const Point& t) const {
+        return !world(dm_this).hasObstaclesBetween(position(dm_this), t);
+    }
+};
 
-    combinators::sum<int> s;
+DYNAMIX_DEFINE_MIXIN(WalkingCreature, moveTo_msg & canMoveTo_msg);
 
-    multi(o, out, s);
-    CHECK(s.result() == 3); // 0 + 0 + 1 + ((0 + 0 + 1) + 1)
-    s.reset();
-    out = 0;
+class FlyingCreature
+{
+public:
+    void moveTo(const Point& t) {
+        cout << name(dm_this) << " flying to " << t << "\n";
+    }
+    bool canMoveTo(const Point& t) const {
+        return true;
+    }
+};
 
-    multi(o, out, a1, s);
-    CHECK(s.result() == 4); // a1 + (a1 + a1 + 1)
+DYNAMIX_DEFINE_MIXIN(FlyingCreature, moveTo_msg & canMoveTo_msg);
 
-    mutate(o)
-        .remove<has_unio1_multio1>()
-        .remove<has_unio2_multio2>()
-        .add<has_unio1_c_unio2>();
+class KeyboardControl
+{
+public:
+    const char* name() const { return "hero"; }
+    const World& world() const { static World w; return w; }
+    Point position() const { return{ 1, 2 }; }
+    Point decideTarget() const { return{ 1, 2 }; }
+};
 
-    CHECK(uni(o) == 55);
-    CHECK(uni(o, a1) == 81);
+DYNAMIX_DEFINE_MIXIN(KeyboardControl, name_msg & world_msg & position_msg & decideTarget_msg);
 
-	const auto& co = o;
-	CHECK(uni(co) == 33);
+class EnemyAI
+{
+public:
+    const char* name() const { return "dragon"; }
+    const World& world() const { static World w; return w; }
+    Point position() const { return{ 1, 2 }; }
+    Point decideTarget() const { return{ 1, 2 }; }
+};
+
+DYNAMIX_DEFINE_MIXIN(EnemyAI, name_msg & world_msg & position_msg & decideTarget_msg);
+
+class FriendAI
+{
+public:
+    const char* name() const { return "friendly dragon"; }
+    const World& world() const { static World w; return w; }
+    Point position() const { return{ 1, 2 }; }
+    Point decideTarget() const { return{ 1, 2 }; }
+};
+
+DYNAMIX_DEFINE_MIXIN(FriendAI, name_msg & world_msg & position_msg & decideTarget_msg);
+
+class AfraidOfSnow
+{
+public:
+    bool canMoveTo(const Point& t) const {
+        return world(dm_this).terrainAt(t) != Terrain::Snow;
+    }
+};
+
+DYNAMIX_DEFINE_MIXIN(AfraidOfSnow, priority(1, canMoveTo_msg));
+
+int main()
+{
+    vector<unique_ptr<dynamix::object>> objects;
+
+    auto mainLoopIteration = [&objects]()
+    {
+        for (auto& obj : objects)
+        {
+            auto target = decideTarget(*obj);
+            if (canMoveTo(*obj, target))
+            {
+                moveTo(*obj, target);
+            }
+        }
+    };
+
+    auto hero = new dynamix::object;
+    dynamix::mutate(hero)
+        .add<WalkingCreature>()
+        .add<KeyboardControl>();
+    objects.emplace_back(hero);
+
+    auto dragon = new dynamix::object;
+    dynamix::mutate(dragon)
+        .add<FlyingCreature>()
+        .add<EnemyAI>();
+    objects.emplace_back(dragon);
+
+    mainLoopIteration();
+
+    dynamix::mutate(hero)
+        .remove<WalkingCreature>()
+        .add<FlyingCreature>();
+    mainLoopIteration();
+
+    dynamix::mutate(dragon)
+        .remove<EnemyAI>()
+        .add<FriendAI>();
+    mainLoopIteration();
+
+    dynamix::mutate(dragon)
+        .add<AfraidOfSnow>();
+    mainLoopIteration();
+
+    dynamix::mutate(dragon)
+        .remove<AfraidOfSnow>();
+    mainLoopIteration();
+
+    return 0;
 }
 
-class has_unio1_multio1
-{
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "has_unio1_multio1"; }
-#endif
 
-    int uni() { return 0; }
-    int multi(int& out) { return out += 0; }
-};
-
-class has_unio2_multio2
-{
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "has_unio2_multio2"; }
-#endif
-
-    int uni(int a) { return a; }
-    int multi(int& out, int a) { return out += a; }
-};
-
-class has_unio3_multio1
-{
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "has_unio3_multio1"; }
-#endif
-
-    int uni(int a1, int a2) { return a1 + a2; }
-    int multi(int& out) { return out += 1; }
-};
-
-class has_unio4_multio1_multio2
-{
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "has_unio4_multio1_multio2"; }
-#endif
-
-    int uni(int a1, int a2, int a3) { return a1 + a2 + a3; }
-    int multi(int& out) { return out += 1; }
-    int multi(int& out, int a) { return out += a + 1; }
-};
-
-class has_unio1_c_unio2
-{
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "has_unio1_c_unio2"; }
-#endif
-
-    int uni() { return 55; }
-	int uni() const { return 33; }
-    int uni(int a1) { return a1 + 80; }
-};
-
-// this order should be important if the messages aren't sorted by mixin name
-DYNAMIX_DEFINE_MIXIN(has_unio1_multio1, unioverload_1_msg & multioverload_1_msg);
-DYNAMIX_DEFINE_MIXIN(has_unio2_multio2, unioverload_2_msg & multioverload_2_msg);
-DYNAMIX_DEFINE_MIXIN(has_unio3_multio1, unioverload_3_msg & multioverload_1_msg);
-DYNAMIX_DEFINE_MIXIN(has_unio4_multio1_multio2, unioverload_4_msg & multioverload_1_msg & multioverload_2_msg);
-DYNAMIX_DEFINE_MIXIN(has_unio1_c_unio2, unioverload_1_msg & unioverload_1c_msg & unioverload_2_msg);
-
-DYNAMIX_DEFINE_MESSAGE(multioverload_1);
-DYNAMIX_DEFINE_MESSAGE(multioverload_2);
-DYNAMIX_DEFINE_MESSAGE(unioverload_1);
-DYNAMIX_DEFINE_MESSAGE(unioverload_1c);
-DYNAMIX_DEFINE_MESSAGE(unioverload_2);
-DYNAMIX_DEFINE_MESSAGE(unioverload_3);
-DYNAMIX_DEFINE_MESSAGE(unioverload_4);
+DYNAMIX_DEFINE_MESSAGE(moveTo);
+DYNAMIX_DEFINE_MESSAGE(canMoveTo);
+DYNAMIX_DEFINE_MESSAGE(name);
+DYNAMIX_DEFINE_MESSAGE(world);
+DYNAMIX_DEFINE_MESSAGE(position);
+DYNAMIX_DEFINE_MESSAGE(decideTarget);

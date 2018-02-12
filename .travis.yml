@@ -123,7 +123,7 @@ script:
   - ./message_perf --test-perf-regression
   - ./mutation_perf --test-perf-regression
   - cd ..
-  # build tests only with a custom config file
+  # build and run only unit tests with a custom config file
   - mkdir -p cc_debug
   - cd cc_debug
   - cmake .. -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS} -fno-rtti" -DDYNAMIX_BUILD_PERF=0 -DDYNAMIX_BUILD_EXAMPLES=0 -DDYNAMIX_BUILD_TUTORIALS=0 -DDYNAMIX_BUILD_SCRATCH=0 -DDYNAMIX_CUSTOM_CONFIG_FILE="\"$PWD/../test/custom_config/custom_config.hpp\""
@@ -133,5 +133,18 @@ script:
   - mkdir -p cc_release
   - cd cc_release
   - cmake .. -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS} -fno-rtti" -DDYNAMIX_BUILD_PERF=0 -DDYNAMIX_BUILD_EXAMPLES=0 -DDYNAMIX_BUILD_TUTORIALS=0 -DDYNAMIX_BUILD_SCRATCH=0 -DDYNAMIX_CUSTOM_CONFIG_FILE="\"$PWD/../test/custom_config/custom_config.hpp\""
+  - make -j2
+  - ctest --output-on_failure
+  - cd ..
+  # build and run only unit tests with DynaMix as a static lib
+  - mkdir -p static_debug
+  - cd static_debug
+  - cmake .. -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS}" -DDYNAMIX_SHARED_LIB=0 -DDYNAMIX_BUILD_EXAMPLES=0 -DDYNAMIX_BUILD_TUTORIALS=0 -DDYNAMIX_BUILD_SCRATCH=0
+  - make -j2
+  - ctest --output-on_failure
+  - cd ..
+  - mkdir -p static_release
+  - cd static_release
+  - cmake .. -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS}" -DDYNAMIX_SHARED_LIB=0 -DDYNAMIX_BUILD_EXAMPLES=0 -DDYNAMIX_BUILD_TUTORIALS=0 -DDYNAMIX_BUILD_SCRATCH=0
   - make -j2
   - ctest --output-on_failure
