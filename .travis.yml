@@ -109,7 +109,7 @@ script:
   # run unit tests and performance tests
   - mkdir -p debug_build
   - cd debug_build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS}" -DDYNAMIX_BUILD_PERF=1
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS} -fvisibility=hidden" -DDYNAMIX_BUILD_PERF=1
   - make -j2
   - ctest --output-on-failure
   - ./message_perf
@@ -117,7 +117,7 @@ script:
   - cd ..
   - mkdir -p release_build
   - cd release_build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS}" -DDYNAMIX_BUILD_PERF=1
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS} -fvisibility=hidden" -DDYNAMIX_BUILD_PERF=1
   - make -j2
   - ctest --output-on_failure
   - ./message_perf --test-perf-regression
