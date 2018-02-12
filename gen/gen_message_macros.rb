@@ -11,6 +11,7 @@
 MAX_ARITY = File.open('arity').read.strip.to_i + 1
 OUT_FILE = '../include/dynamix/gen/message_macros.hpp'
 NO_ARITY_OUT_FILE = '../include/dynamix/gen/no_arity_message_macros.hpp'
+SHORT_OUT_FILE = '../include/dynamix/gen/short_message_macros.hpp'
 
 HEADER = <<DATA
 // DynaMix
@@ -94,6 +95,51 @@ end
 
 File.open(NO_ARITY_OUT_FILE, 'w') do |f|
   f.write(HEADER)
+  f.puts('#pragma once')
+  f.puts
   f.write(output.join("\n"))
-  f.write("\n")
+  f.puts
+end
+
+#########################
+# short macros
+
+shorten = {
+  'DYNAMIX_' => '',
+  'MESSAGE' => 'MSG',
+  'CONST' => 'C',
+  'MULTICAST' => 'MULTI',
+  'EXPORTED' => 'X',
+  'OVERLOAD' => 'OVLD',
+  'WITH_DEFAULT_IMPL' => 'IMPL',
+  'DEFINE' => 'DEF',
+}
+
+output = []
+
+File.open('short_message_macros_template', 'r').each_line do |line|
+  next if line.strip!.length == 0
+  short = line.clone
+
+  shorten.each do |k, v|
+    short[k] = v if short[k]
+  end
+  
+  line['%{arity}'] = '_%{arity}'
+  
+  out = "#define #{short} #{line}"
+  
+  MAX_ARITY.times do |i|
+    output << out % { :arity => i }
+  end
+end
+
+output << '#define DYNAMIX_DEFINE_MESSAGE DEF_MSG'
+
+File.open(SHORT_OUT_FILE, 'w') do |f|
+  f.write(HEADER)
+  f.puts('#pragma once')
+  f.puts
+  f.write(output.join("\n"))
+  f.puts
 end
