@@ -160,6 +160,7 @@
             DYNAMIX_MAX_MIXINS, \
             reinterpret_cast<::dynamix::internal::func_ptr>(&DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::caller), \
             ::std::numeric_limits<int>::min(), \
+            ::std::numeric_limits<int>::min(), \
         }; \
         msg.default_impl_data = &default_impl; \
     } \
@@ -323,6 +324,7 @@
             &msg, \
             DYNAMIX_MAX_MIXINS, \
             reinterpret_cast<::dynamix::internal::func_ptr>(&DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::caller), \
+            ::std::numeric_limits<int>::min(), \
             ::std::numeric_limits<int>::min(), \
         }; \
         msg.default_impl_data = &default_impl; \
@@ -488,6 +490,7 @@
             DYNAMIX_MAX_MIXINS, \
             reinterpret_cast<::dynamix::internal::func_ptr>(&DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::caller), \
             ::std::numeric_limits<int>::min(), \
+            ::std::numeric_limits<int>::min(), \
         }; \
         msg.default_impl_data = &default_impl; \
     } \
@@ -651,6 +654,7 @@
             &msg, \
             DYNAMIX_MAX_MIXINS, \
             reinterpret_cast<::dynamix::internal::func_ptr>(&DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::caller), \
+            ::std::numeric_limits<int>::min(), \
             ::std::numeric_limits<int>::min(), \
         }; \
         msg.default_impl_data = &default_impl; \
@@ -816,6 +820,7 @@
             DYNAMIX_MAX_MIXINS, \
             reinterpret_cast<::dynamix::internal::func_ptr>(&DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::caller), \
             ::std::numeric_limits<int>::min(), \
+            ::std::numeric_limits<int>::min(), \
         }; \
         msg.default_impl_data = &default_impl; \
     } \
@@ -980,6 +985,7 @@
             DYNAMIX_MAX_MIXINS, \
             reinterpret_cast<::dynamix::internal::func_ptr>(&DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::caller), \
             ::std::numeric_limits<int>::min(), \
+            ::std::numeric_limits<int>::min(), \
         }; \
         msg.default_impl_data = &default_impl; \
     } \
@@ -1143,6 +1149,7 @@
             &msg, \
             DYNAMIX_MAX_MIXINS, \
             reinterpret_cast<::dynamix::internal::func_ptr>(&DYNAMIX_DEFAULT_IMPL_STRUCT(message_name)::caller), \
+            ::std::numeric_limits<int>::min(), \
             ::std::numeric_limits<int>::min(), \
         }; \
         msg.default_impl_data = &default_impl; \
