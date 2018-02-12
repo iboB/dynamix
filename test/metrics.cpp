@@ -9,7 +9,7 @@
 
 #if DYNAMIX_ADDITIONAL_METRICS
 
-#include "mutation_rules/test_mixins.hpp"
+#include "test_mixins.hpp"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest/doctest.h"
