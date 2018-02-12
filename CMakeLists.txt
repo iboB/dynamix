@@ -8,7 +8,10 @@
 
 cmake_minimum_required(VERSION 3.2.2)
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    # if DynaMix is built as root, activate folders
+    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+endif()
 
 project(dynamix)
 
