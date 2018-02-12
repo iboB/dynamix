@@ -1,4 +1,4 @@
-// picobench v1.03
+// picobench v1.04
 // https://github.com/iboB/picobench
 //
 // A micro microbenchmarking library in a single header file
@@ -28,6 +28,11 @@
 //
 //                  VERSION HISTORY
 //
+//  1.04 (2018-02-06) * User data for benchmarks, which can be seen from states
+//                    * `add_custom_duration` to states so the user can modify time
+//                    * Text table format fixes
+//                    * Custom cmd opts in runner
+//                    * --version CLI command
 //  1.03 (2018-01-05) Added helper methods for easier browsing of reports
 //  1.02 (2018-01-04) Added parsing of command line
 //  1.01 (2018-01-03) * Only taking the fastest sample into account
@@ -87,13 +92,12 @@
 #include <chrono>
 #include <vector>
 
-#define PICOBENCH_VERSION 1.03
-#define PICOBENCH_VERSION_STR "1.03"
+#define PICOBENCH_VERSION 1.04
+#define PICOBENCH_VERSION_STR "1.04"
 
 #if defined(PICOBENCH_TEST_WITH_DOCTEST)
 #   define PICOBENCH_TEST
 #   define PICOBENCH_IMPLEMENT
-#   define private public
 #endif
 
 #if defined(PICOBENCH_DEBUG)
@@ -132,8 +136,9 @@ typedef std::chrono::high_resolution_clock high_res_clock;
 class state
 {
 public:
-    state(int num_iterations)
+    explicit state(int num_iterations, uintptr_t user_data = 0)
         : _iterations(num_iterations)
+        , _user_data(user_data)
     {
         _PICOBENCH_ASSERT(_iterations > 0);
     }
@@ -141,6 +146,9 @@ public:
     int iterations() const { return _iterations; }
 
     int64_t duration_ns() const { return _duration_ns; }
+    void add_custom_duration(int64_t duration_ns) { _duration_ns += duration_ns; }
+
+    uintptr_t user_data() const { return _user_data; }
 
     void start_timer()
     {
@@ -212,6 +220,7 @@ public:
 private:
     high_res_clock::time_point _start;
     int64_t _duration_ns = 0;
+    uintptr_t _user_data;
     int _iterations;
 };
 
@@ -244,6 +253,7 @@ public:
     benchmark& samples(int n) { _samples = n; return *this; }
     benchmark& label(const char* label) { _name = label; return *this; }
     benchmark& baseline(bool b = true) { _baseline = b; return *this; }
+    benchmark& user_data(uintptr_t data) { _user_data = data; return *this; }
 
 protected:
     friend class runner;
@@ -256,6 +266,7 @@ protected:
 
     std::vector<int> _state_iterations;
     int _samples = 0;
+    uintptr_t _user_data = 0;
 };
 
 class registry
@@ -395,14 +406,31 @@ public:
 
                     out << " |"
                         << setw(8) << ps.first << " |"
-                        << setw(10) << fixed << setprecision(3) << double(bm.total_time_ns) / 1000000.0 << " |"
-                        << setw(8) << (bm.total_time_ns / ps.first) << " |";
+                        << setw(10) << fixed << setprecision(3) << double(bm.total_time_ns) / 1000000.0 << " |";
+
+                    auto ns_op = (bm.total_time_ns / ps.first);
+                    if (ns_op > 99999999)
+                    {
+                        int e = 0;
+                        while (ns_op > 999999)
+                        {
+                            ++e;
+                            ns_op /= 10;
+                        }
+                        out << ns_op << 'e' << e;
+                    }
+                    else
+                    {
+                        out << setw(8) << ns_op;
+                    }
+
+                    out << " |";
 
                     if (baseline == &bm)
                     {
                         out << "      - |";
                     }
-                    else if(baseline)
+                    else if (baseline)
                     {
                         out << setw(7) << fixed << setprecision(3)
                             << double(bm.total_time_ns) / double(baseline->total_time_ns) << " |";
@@ -537,7 +565,7 @@ public:
                         << d.samples << ','
                         << d.total_time_ns << ','
                         << (d.total_time_ns / d.dimension) << ',';
-                    
+
                     if (baseline)
                     {
                         for (auto& bd : baseline->data)
@@ -690,7 +718,7 @@ public:
                 {
                     auto index = rnd() % (b->_states.size() + 1);
                     auto pos = b->_states.begin() + index;
-                    b->_states.emplace(pos, iters);
+                    b->_states.emplace(pos, iters, b->_user_data);
                 }
             }
 
@@ -729,7 +757,7 @@ public:
             rpt_suite->benchmarks.resize(suite.benchmarks.size());
             auto rpt_benchmark = rpt_suite->benchmarks.begin();
 
-            for(auto& b : suite.benchmarks)
+            for (auto& b : suite.benchmarks)
             {
                 rpt_benchmark->name = b->_name;
                 rpt_benchmark->is_baseline = b->_baseline;
@@ -791,9 +819,21 @@ public:
         _default_samples = n;
     }
 
-    int set_default_samples() const
+    int default_samples() const
     {
         return _default_samples;
+    }
+
+    void add_cmd_opt(const char* cmd, const char* arg_desc, const char* cmd_desc, bool(*handler)(uintptr_t, const char*), uintptr_t user_data = 0)
+    {
+        cmd_line_option opt;
+        opt.cmd = picostring(cmd);
+        opt.arg_desc = picostring(arg_desc);
+        opt.desc = cmd_desc;
+        opt.handler = nullptr;
+        opt.user_data = user_data;
+        opt.user_handler = handler;
+        _opts.push_back(opt);
     }
 
     // returns false if there were errors parsing the command line
@@ -805,13 +845,13 @@ public:
         _stdout = &out;
         _stderr = &err;
 
-        if (_opts.empty())
+        if (!_has_opts)
         {
-            _opts.emplace_back("-iters=", "<n1,n2,n3,...>", 
-                "Sets default iterations for benchmarks", 
+            _opts.emplace_back("-iters=", "<n1,n2,n3,...>",
+                "Sets default iterations for benchmarks",
                 &runner::cmd_iters);
-            _opts.emplace_back("-samples=", "<n>", 
-                "Sets default number of samples for benchmarks", 
+            _opts.emplace_back("-samples=", "<n>",
+                "Sets default number of samples for benchmarks",
                 &runner::cmd_samples);
             _opts.emplace_back("-out-fmt=", "<txt|con|csv>",
                 "Outputs text or concise or csv",
@@ -822,9 +862,13 @@ public:
             _opts.emplace_back("-no-run", "",
                 "Doesn't run benchmarks",
                 &runner::cmd_no_run);
-            _opts.emplace_back("-help", "", 
-                "Prints help", 
+            _opts.emplace_back("-version", "",
+                "Show version info",
+                &runner::cmd_version);
+            _opts.emplace_back("-help", "",
+                "Prints help",
                 &runner::cmd_help);
+            _has_opts = true;
         }
 
         for (int i = 1; i < argc; ++i)
@@ -840,7 +884,17 @@ public:
                 if (opt.cmd.cmp(arg))
                 {
                     found = true;
-                    bool success = (this->*opt.handler)(arg + opt.cmd.len);
+                    bool success = false;
+                    if (opt.handler)
+                    {
+                        success = (this->*opt.handler)(arg + opt.cmd.len);
+                    }
+                    else
+                    {
+                        _PICOBENCH_ASSERT(opt.user_handler);
+                        success = opt.user_handler(opt.user_data, arg + opt.cmd.len);
+                    }
+
                     if (!success)
                     {
                         err << "Error: Bad command-line argument: " << argv[i] << "\n";
@@ -901,8 +955,8 @@ private:
         {
             if (s.name == cur_suite_name)
                 return s.benchmarks;
-            
-            if(s.name && cur_suite_name && strcmp(s.name, cur_suite_name) == 0)
+
+            if (s.name && cur_suite_name && strcmp(s.name, cur_suite_name) == 0)
                 return s.benchmarks;
         }
         ss.push_back({ cur_suite_name, {} });
@@ -927,28 +981,34 @@ private:
     picostring _cmd_prefix;
     std::ostream* _stdout = nullptr;
     std::ostream* _stderr = nullptr;
-    typedef bool (runner::*cmd_handler)(const char*);
+    typedef bool (runner::*cmd_handler)(const char*); // internal handler
+    typedef bool(*ext_handler)(uintptr_t user_data, const char* cmd_line); // external (user) handler
     struct cmd_line_option
-    {        
+    {
         cmd_line_option() = default;
         cmd_line_option(const char* c, const char* a, const char* d, cmd_handler h)
             : cmd(c)
             , arg_desc(a)
             , desc(d)
             , handler(h)
+            , user_data(0)
+            , user_handler(nullptr)
         {}
         picostring cmd;
         picostring arg_desc;
         const char* desc;
-        cmd_handler handler;
+        cmd_handler handler; // may be nullptr for external handlers
+        uintptr_t user_data; // passed as an argument to user handlers
+        ext_handler user_handler;
     };
+    bool _has_opts = false; // have opts been added to list
     std::vector<cmd_line_option> _opts;
 
     bool cmd_iters(const char* line)
     {
         std::vector<int> iters;
         auto p = line;
-        while(true)
+        while (true)
         {
             auto i = int(strtoul(p, nullptr, 10));
             if (i <= 0) return false;
@@ -977,11 +1037,19 @@ private:
         return true;
     }
 
+    bool cmd_version(const char* line)
+    {
+        if (*line) return false;
+        *_stdout << "picobench " PICOBENCH_VERSION_STR << "\n";
+        _should_run = false;
+        return true;
+    }
+
     bool cmd_help(const char* line)
     {
         if (*line) return false;
+        cmd_version(line);
         auto& cout = *_stdout;
-        cout << "picobench " PICOBENCH_VERSION_STR << "\n";
         for (auto& opt : _opts)
         {
             cout << ' ' << _cmd_prefix.str << opt.cmd.str << opt.arg_desc.str;
@@ -1185,8 +1253,10 @@ PICOBENCH(a_b);
 static void a_c(picobench::state& s)
 {
     s.start_timer();
-    this_thread_sleep_for_ns(s.iterations() * 20);
+    this_thread_sleep_for_ns((s.iterations() - 1) * 20);
     s.stop_timer();
+
+    s.add_custom_duration(20);
 }
 PICOBENCH(a_c);
 
@@ -1196,13 +1266,15 @@ PICOBENCH_SUITE("test b");
 
 static void b_a(picobench::state& s)
 {
+    CHECK(s.user_data() == 9088);
     for (auto _ : s)
     {
         this_thread_sleep_for_ns(75);
     }
 }
 PICOBENCH(b_a)
-    .iterations({ 20, 30, 50 });
+    .iterations({ 20, 30, 50 })
+    .user_data(9088);
 
 map<int, int> b_b_samples;
 
@@ -1274,8 +1346,8 @@ TEST_CASE("[picobench] cmd line")
         CHECK(b);
         CHECK(r.should_run());
         CHECK(r.error() == 0);
-        CHECK(r._default_state_iterations == default_iters);
-        CHECK(r._default_samples == default_samples);
+        CHECK(r.default_state_iterations() == default_iters);
+        CHECK(r.default_samples() == default_samples);
         CHECK(!r.preferred_output_filename());
         CHECK(r.preferred_output_format() == report_output_format::text);
     }
@@ -1293,28 +1365,28 @@ TEST_CASE("[picobench] cmd line")
     }
 
     {
-        runner r;        
+        runner r;
         const char* cmd_line[] = { "", "--no-run", "--iters=1,2,3", "--samples=54", "--out-fmt=con", "--output=stdout" };
         bool b = r.parse_cmd_line(cntof(cmd_line), cmd_line);
         CHECK(b);
         CHECK(!r.should_run());
         CHECK(r.error() == 0);
-        CHECK(r._default_samples == 54);
-        CHECK(r._default_state_iterations == vector<int>({ 1, 2, 3 }));
+        CHECK(r.default_samples() == 54);
+        CHECK(r.default_state_iterations() == vector<int>({ 1, 2, 3 }));
         CHECK(!r.preferred_output_filename());
         CHECK(r.preferred_output_format() == report_output_format::concise_text);
     }
 
     {
         runner r;
-        const char* cmd_line[] = { "", "--pb-no-run", "--pb-iters=1000,2000,3000", "-other-cmd1", "--pb-samples=54", 
+        const char* cmd_line[] = { "", "--pb-no-run", "--pb-iters=1000,2000,3000", "-other-cmd1", "--pb-samples=54",
             "-other-cmd2", "--pb-out-fmt=csv", "--pb-output=foo.csv" };
         bool b = r.parse_cmd_line(cntof(cmd_line), cmd_line, "--pb");
         CHECK(b);
         CHECK(!r.should_run());
         CHECK(r.error() == 0);
-        CHECK(r._default_samples == 54);
-        CHECK(r._default_state_iterations == vector<int>({ 1000, 2000, 3000 }));
+        CHECK(r.default_samples() == 54);
+        CHECK(r.default_state_iterations() == vector<int>({ 1000, 2000, 3000 }));
         CHECK(r.preferred_output_filename() == "foo.csv");
         CHECK(r.preferred_output_format() == report_output_format::csv);
 
@@ -1330,7 +1402,7 @@ TEST_CASE("[picobench] cmd line")
         CHECK(!b);
         CHECK(!r.should_run());
         CHECK(r.error() == 1);
-        CHECK(r._default_samples == default_samples);
+        CHECK(r.default_samples() == default_samples);
     }
 
     {
@@ -1343,7 +1415,7 @@ TEST_CASE("[picobench] cmd line")
         CHECK(!b);
         CHECK(!r.should_run());
         CHECK(r.error() == 1);
-        CHECK(r._default_state_iterations == default_iters);
+        CHECK(r.default_state_iterations() == default_iters);
     }
 
     {
@@ -1359,15 +1431,35 @@ TEST_CASE("[picobench] cmd line")
         CHECK(r.preferred_output_format() == report_output_format::text);
     }
 
+#define PB_VERSION_INFO "picobench " PICOBENCH_VERSION_STR "\n"
+
+    {
+        const char* v = PB_VERSION_INFO;
+
+        runner r;
+        ostringstream sout, serr;
+        const char* cmd_line[] = { "", "--pb-version" };
+        bool b = r.parse_cmd_line(cntof(cmd_line), cmd_line, "--pb", sout, serr);
+        CHECK(sout.str() == v);
+        CHECK(serr.str().empty());
+        CHECK(b);
+        CHECK(!r.should_run());
+        CHECK(r.error() == 0);
+    }
+
+#define PB_HELP \
+        " --pb-iters=<n1,n2,n3,...>  Sets default iterations for benchmarks\n" \
+        " --pb-samples=<n>           Sets default number of samples for benchmarks\n" \
+        " --pb-out-fmt=<txt|con|csv> Outputs text or concise or csv\n" \
+        " --pb-output=<filename>     Sets output filename or `stdout`\n" \
+        " --pb-no-run                Doesn't run benchmarks\n" \
+        " --pb-version               Show version info\n" \
+        " --pb-help                  Prints help\n"
+
     {
         const char* help =
-            "picobench " PICOBENCH_VERSION_STR "\n"
-            " --pb-iters=<n1,n2,n3,...>  Sets default iterations for benchmarks\n"
-            " --pb-samples=<n>           Sets default number of samples for benchmarks\n"
-            " --pb-out-fmt=<txt|con|csv> Outputs text or concise or csv\n"
-            " --pb-output=<filename>     Sets output filename or `stdout`\n"
-            " --pb-no-run                Doesn't run benchmarks\n"
-            " --pb-help                  Prints help\n";
+            PB_VERSION_INFO
+            PB_HELP;
 
         runner r;
         ostringstream sout, serr;
@@ -1379,13 +1471,59 @@ TEST_CASE("[picobench] cmd line")
         CHECK(!r.should_run());
         CHECK(r.error() == 0);
     }
+
+    {
+        const char* help =
+            PB_VERSION_INFO
+            " --pb-cmd-hi                Custom help\n"
+            " --pb-cmd-bi=123            More custom help\n"
+            PB_HELP;
+
+        runner r;
+
+        auto handler_hi = [](uintptr_t data, const char* cmd) -> bool {
+            CHECK(data == 123);
+            CHECK(*cmd == 0);
+            return true;
+        };
+
+        r.add_cmd_opt("-cmd-hi", "", "Custom help", handler_hi, 123);
+
+        auto handler_bi = [](uintptr_t data, const char* cmd) -> bool {
+            CHECK(data == 98);
+            CHECK(cmd == "123");
+            return true;
+        };
+
+        r.add_cmd_opt("-cmd-bi=", "123", "More custom help", handler_bi, 98);
+
+        ostringstream sout, serr;
+        const char* cmd_line[] = { "", "--pb-help" };
+        bool b = r.parse_cmd_line(cntof(cmd_line), cmd_line, "--pb", sout, serr);
+        CHECK(sout.str() == help);
+        CHECK(serr.str().empty());
+        CHECK(b);
+        CHECK(!r.should_run());
+        CHECK(r.error() == 0);
+
+        sout.str(std::string());
+        serr.str(std::string());
+
+        const char* cmd_line2[] = { "",  "--zz-cmd-bi=123", "--zz-cmd-hi" };
+        b = r.parse_cmd_line(cntof(cmd_line2), cmd_line2, "--zz", sout, serr);
+
+        CHECK(sout.str().empty());
+        CHECK(serr.str().empty());
+        CHECK(b);
+        CHECK(r.error() == 0);
+    }
 }
 
 TEST_CASE("[picobench] test")
 {
     runner r;
-    CHECK(r._default_state_iterations == default_iters);
-    CHECK(r._default_samples == default_samples);
+    CHECK(r.default_state_iterations() == default_iters);
+    CHECK(r.default_samples() == default_samples);
 
     auto report = r.run_benchmarks();
 
@@ -1402,13 +1540,13 @@ TEST_CASE("[picobench] test")
     CHECK(a.find_benchmark("a_a") == &aa);
     CHECK(aa.name == "a_a");
     CHECK(aa.is_baseline);
-    CHECK(aa.data.size() == r._default_state_iterations.size());
+    CHECK(aa.data.size() == r.default_state_iterations().size());
 
     for (size_t i = 0; i<aa.data.size(); ++i)
     {
         auto& d = aa.data[i];
-        CHECK(d.dimension == r._default_state_iterations[i]);
-        CHECK(d.samples == r._default_samples);
+        CHECK(d.dimension == r.default_state_iterations()[i]);
+        CHECK(d.samples == r.default_samples());
         CHECK(d.total_time_ns == d.dimension * 10);
     }
 
@@ -1416,20 +1554,20 @@ TEST_CASE("[picobench] test")
     CHECK(a.find_benchmark("a_b") == &ab);
     CHECK(ab.name == "a_b");
     CHECK(!ab.is_baseline);
-    CHECK(ab.data.size() == r._default_state_iterations.size());
+    CHECK(ab.data.size() == r.default_state_iterations().size());
 
-    for (size_t i=0; i<ab.data.size(); ++i)
+    for (size_t i = 0; i<ab.data.size(); ++i)
     {
         auto& d = ab.data[i];
-        CHECK(d.dimension == r._default_state_iterations[i]);
-        CHECK(d.samples == r._default_samples);
+        CHECK(d.dimension == r.default_state_iterations()[i]);
+        CHECK(d.samples == r.default_samples());
         CHECK(d.total_time_ns == d.dimension * 11);
     }
     size_t j = 0;
     for (auto& elem : a_b_samples)
     {
         CHECK(elem.first == default_iters[j]);
-        CHECK(elem.second == r._default_samples);
+        CHECK(elem.second == r.default_samples());
         ++j;
     }
 
@@ -1437,13 +1575,13 @@ TEST_CASE("[picobench] test")
     CHECK(a.find_benchmark("a_c") == &ac);
     CHECK(ac.name == "a_c");
     CHECK(!ac.is_baseline);
-    CHECK(ac.data.size() == r._default_state_iterations.size());
+    CHECK(ac.data.size() == r.default_state_iterations().size());
 
     for (size_t i = 0; i<ac.data.size(); ++i)
     {
         auto& d = ac.data[i];
-        CHECK(d.dimension == r._default_state_iterations[i]);
-        CHECK(d.samples == r._default_samples);
+        CHECK(d.dimension == r.default_state_iterations()[i]);
+        CHECK(d.samples == r.default_samples());
         CHECK(d.total_time_ns == d.dimension * 20);
     }
 
@@ -1462,7 +1600,7 @@ TEST_CASE("[picobench] test")
     {
         auto& d = ba.data[i];
         CHECK(d.dimension == state_iters_a[i]);
-        CHECK(d.samples == r._default_samples);
+        CHECK(d.samples == r.default_samples());
         CHECK(d.total_time_ns == d.dimension * 75);
     }
 
@@ -1511,7 +1649,7 @@ TEST_CASE("[picobench] test")
 
     CHECK(sout.str() == concise);
 
-    const char* txt = 
+    const char* txt =
         "test a:\n"
         "===============================================================================\n"
         "   Name (baseline is *)   |   Dim   |  Total ms |  ns/op  |Baseline| Ops/second\n"
