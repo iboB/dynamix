@@ -22,42 +22,42 @@ namespace dynamix
 {
 
 /// Parent class of all DynaMix exceptions.
-class exception : public ::std::exception {};
+class DYNAMIX_API exception {};
 
 /// Thrown when an attempt is made to mutate an object with an incomplete mutation
 ///
 /// Currently the only way you could have an incomplete mutation is trying to
 /// apply an `object_type_template` for which `create` hasn't been called.
-class bad_mutation : public exception {};
+class DYNAMIX_API bad_mutation : public exception {};
 
 /// Thrown when an attempt is made to mutate an object whose type doesn't correspond
 /// to the expected source type of the mutation (the one to mutate *from*).
 ///
 /// The most likely cause is when using a `same_type_mutator` on objects that are
 /// not of the same type
-class bad_mutation_source : public exception {};
+class DYNAMIX_API bad_mutation_source : public exception {};
 
 /// Thrown when a message is called on a object that doesn't implement it.
-class bad_message_call : public exception {};
+class DYNAMIX_API bad_message_call : public exception {};
 
 /// Thrown when an object type is created which has mixins that implement
 /// the same unicast message with the same priority
-class unicast_clash : public exception {};
+class DYNAMIX_API unicast_clash : public exception {};
 
 /// Thrown when a copy construction is performed from an object which has a
 /// non-copy-constructioble mixin
-class bad_copy_construction : public exception {};
+class DYNAMIX_API bad_copy_construction : public exception {};
 
 /// Thrown when a copy assignment is performed from an object which has a
 /// non-copy-assignable mixin
-class bad_copy_assignment : public exception {};
+class DYNAMIX_API bad_copy_assignment : public exception {};
 
 /// Thrown by DYNAMIX_CALL_NEXT_BIDDER if no next bidder is available
-class bad_next_bidder_call : public exception {};
+class DYNAMIX_API bad_next_bidder_call : public exception {};
 
 /// Thrown by `object::move_mixin` or `object::reallocate_mixins`
 /// when a mixin is to be moved but a mixin doesn't have a move_constructor.
-class bad_mixin_move : public exception {};
+class DYNAMIX_API bad_mixin_move : public exception {};
 
 }
 
