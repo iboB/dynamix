@@ -49,7 +49,7 @@ TEST_CASE("basic_msgs")
 
     // empty objects implement no messages, even ones with a default implementation
     CHECK(!o.implements(basic_def_msg));
-    CHECK(!o.implements_by_mixin(basic_def_msg));    
+    CHECK(!o.implements_by_mixin(basic_def_msg));
     CHECK(!o.implements_with_default(basic_def_no_impl_msg));
 
 #if DYNAMIX_USE_EXCEPTIONS
@@ -181,21 +181,25 @@ public:
 
     int basic_def()
     {
+		CHECK(!DYNAMIX_HAS_NEXT_BIDDER(basic_def_no_impl_msg));
         return 1000;
     }
 
     int basic_1_def(int x)
     {
+		CHECK(!DYNAMIX_HAS_NEXT_BIDDER(basic_def_no_impl_msg));
         return basic_1(dm_this, x);
     }
 
     int basic_2_def(int x, int y) const
     {
+		CHECK(!DYNAMIX_HAS_NEXT_BIDDER(basic_def_no_impl_msg));
         return x + y;
     }
 
     int basic_2_def(const string& str)
     {
+		CHECK(!DYNAMIX_HAS_NEXT_BIDDER(basic_def_no_impl_msg));
         return int(str.length());
     }
 };
