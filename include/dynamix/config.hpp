@@ -113,7 +113,7 @@
 #       define DYNAMIX_SYMBOL_IMPORT __declspec(dllimport)
 #   else
 #       define DYNAMIX_SYMBOL_EXPORT __attribute__((__visibility__("default")))
-#       define DYNAMIX_SYMBOL_IMPORT
+#       define DYNAMIX_SYMBOL_IMPORT __attribute__((__visibility__("default")))
     // other compilers ?
 #   endif
 
