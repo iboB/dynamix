@@ -73,8 +73,8 @@ TEST_CASE("overloads")
     CHECK(uni(o) == 55);
     CHECK(uni(o, a1) == 81);
 
-	const auto& co = o;
-	CHECK(uni(co) == 33);
+    const auto& co = o;
+    CHECK(uni(co) == 33);
 }
 
 class has_unio1_multio1
@@ -130,7 +130,7 @@ public:
 #endif
 
     int uni() { return 55; }
-	int uni() const { return 33; }
+    int uni() const { return 33; }
     int uni(int a1) { return a1 + 80; }
 };
 

@@ -181,25 +181,25 @@ public:
 
     int basic_def()
     {
-		CHECK(!DYNAMIX_HAS_NEXT_BIDDER(basic_def_no_impl_msg));
+        CHECK(!DYNAMIX_HAS_NEXT_BIDDER(basic_def_no_impl_msg));
         return 1000;
     }
 
     int basic_1_def(int x)
     {
-		CHECK(!DYNAMIX_HAS_NEXT_BIDDER(basic_def_no_impl_msg));
+        CHECK(!DYNAMIX_HAS_NEXT_BIDDER(basic_def_no_impl_msg));
         return basic_1(dm_this, x);
     }
 
     int basic_2_def(int x, int y) const
     {
-		CHECK(!DYNAMIX_HAS_NEXT_BIDDER(basic_def_no_impl_msg));
+        CHECK(!DYNAMIX_HAS_NEXT_BIDDER(basic_def_no_impl_msg));
         return x + y;
     }
 
     int basic_2_def(const string& str)
     {
-		CHECK(!DYNAMIX_HAS_NEXT_BIDDER(basic_def_no_impl_msg));
+        CHECK(!DYNAMIX_HAS_NEXT_BIDDER(basic_def_no_impl_msg));
         return int(str.length());
     }
 };

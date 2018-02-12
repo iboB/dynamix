@@ -36,27 +36,27 @@ message_registrator<Message>::~message_registrator()
 template <typename Ret, typename... Args>
 struct msg_caller
 {
-	using caller_func = Ret (*)(void*, Args...);
+    using caller_func = Ret (*)(void*, Args...);
 
-	// makes the actual method call
-	template <typename Mixin, Ret (Mixin::*Method)(Args...)>
-	static Ret caller(void* mixin, Args... args)
-	{
-		auto m = reinterpret_cast<Mixin*>(mixin);
-		return (m->*Method)(std::forward<Args>(args)...);
-	}
+    // makes the actual method call
+    template <typename Mixin, Ret (Mixin::*Method)(Args...)>
+    static Ret caller(void* mixin, Args... args)
+    {
+        auto m = reinterpret_cast<Mixin*>(mixin);
+        return (m->*Method)(std::forward<Args>(args)...);
+    }
 
-	// we need this silly-named alternative because there is no standard way to
-	// distiguish between constness-based overloads when providing a member function
-	// as a template argument
-	// because of this the macro which instantiates the template also constructs this
-	// function's name based on the message constness
-	template <typename Mixin, Ret (Mixin::*Method)(Args...) const>
-	static Ret callerconst(void* mixin, Args... args)
-	{
-		auto m = reinterpret_cast<const Mixin*>(mixin);
-		return (m->*Method)(std::forward<Args>(args)...);
-	}
+    // we need this silly-named alternative because there is no standard way to
+    // distiguish between constness-based overloads when providing a member function
+    // as a template argument
+    // because of this the macro which instantiates the template also constructs this
+    // function's name based on the message constness
+    template <typename Mixin, Ret (Mixin::*Method)(Args...) const>
+    static Ret callerconst(void* mixin, Args... args)
+    {
+        auto m = reinterpret_cast<const Mixin*>(mixin);
+        return (m->*Method)(std::forward<Args>(args)...);
+    }
 };
 
 // instead of adding the multi and unicast calls in the same struct, we split it in two
@@ -69,32 +69,32 @@ struct msg_caller
 template <typename Derived, typename Object, typename Ret, typename... Args>
 struct msg_unicast : public message_t, public msg_caller<Ret, Args...>
 {
-	msg_unicast(const char* message_name)
-		: message_t(message_name, unicast, false)
-	{}
+    msg_unicast(const char* message_name)
+        : message_t(message_name, unicast, false)
+    {}
 
-	static Ret make_call(Object& obj, Args&&... args)
-	{
-		const ::dynamix::feature& self = _dynamix_get_mixin_feature_fast(static_cast<Derived*>(nullptr));
-		DYNAMIX_ASSERT(static_cast<const message_t&>(self).mechanism
-			== message_t::unicast);
+    static Ret make_call(Object& obj, Args&&... args)
+    {
+        const ::dynamix::feature& self = _dynamix_get_mixin_feature_fast(static_cast<Derived*>(nullptr));
+        DYNAMIX_ASSERT(static_cast<const message_t&>(self).mechanism
+            == message_t::unicast);
 
-		const object_type_info::call_table_entry& call_entry =
-			obj._type_info->_call_table[self.id];
+        const object_type_info::call_table_entry& call_entry =
+            obj._type_info->_call_table[self.id];
 
-		const message_for_mixin* msg_data = call_entry.top_bid_message;
-		DYNAMIX_MSG_THROW_UNLESS(msg_data, ::dynamix::bad_message_call);
+        const message_for_mixin* msg_data = call_entry.top_bid_message;
+        DYNAMIX_MSG_THROW_UNLESS(msg_data, ::dynamix::bad_message_call);
 
-		// unfortunately we can't assert(msg_data->message == &self); since the data might come from a different module
+        // unfortunately we can't assert(msg_data->message == &self); since the data might come from a different module
 
-		char* mixin_data =
-			// skipping several function calls, which greatly improves build time
-			reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[obj._type_info->_mixin_indices[msg_data->_mixin_id]].mixin()));
+        char* mixin_data =
+            // skipping several function calls, which greatly improves build time
+            reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[obj._type_info->_mixin_indices[msg_data->_mixin_id]].mixin()));
 
-		auto func = reinterpret_cast<typename msg_caller<Ret, Args...>::caller_func>(msg_data->caller);
+        auto func = reinterpret_cast<typename msg_caller<Ret, Args...>::caller_func>(msg_data->caller);
 
-		return func(mixin_data, std::forward<Args>(args)...);
-	}
+        return func(mixin_data, std::forward<Args>(args)...);
+    }
 };
 
 // caller struct instantiated by message macros
@@ -104,87 +104,87 @@ struct msg_unicast : public message_t, public msg_caller<Ret, Args...>
 template <typename Derived, typename Object, typename Ret, typename... Args>
 struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 {
-	msg_multicast(const char* message_name)
-		: message_t(message_name, message_t::multicast, false)
-	{}
+    msg_multicast(const char* message_name)
+        : message_t(message_name, message_t::multicast, false)
+    {}
 
-	template <typename Combinator>
-	static void make_combinator_call(Object& obj, Combinator& combinator, Args&&... args)
-	{
-		const ::dynamix::feature& self = _dynamix_get_mixin_feature_fast(static_cast<Derived*>(nullptr));
-		DYNAMIX_ASSERT(static_cast<const message_t&>(self).mechanism
-			== message_t::multicast);
+    template <typename Combinator>
+    static void make_combinator_call(Object& obj, Combinator& combinator, Args&&... args)
+    {
+        const ::dynamix::feature& self = _dynamix_get_mixin_feature_fast(static_cast<Derived*>(nullptr));
+        DYNAMIX_ASSERT(static_cast<const message_t&>(self).mechanism
+            == message_t::multicast);
 
-		const object_type_info::call_table_entry& call_entry =
-			obj._type_info->_call_table[self.id];
+        const object_type_info::call_table_entry& call_entry =
+            obj._type_info->_call_table[self.id];
 
-		auto begin = call_entry.begin;
-		auto end = call_entry.end;
+        auto begin = call_entry.begin;
+        auto end = call_entry.end;
 
-		DYNAMIX_MSG_THROW_UNLESS(begin, ::dynamix::bad_message_call);
-		DYNAMIX_ASSERT(end);
+        DYNAMIX_MSG_THROW_UNLESS(begin, ::dynamix::bad_message_call);
+        DYNAMIX_ASSERT(end);
 
-		set_num_results_for(combinator, size_t(end - begin));
-		for (auto iter = begin; iter != end; ++iter)
-		{
-			auto msg_data = *iter;
-			DYNAMIX_ASSERT(msg_data);
+        set_num_results_for(combinator, size_t(end - begin));
+        for (auto iter = begin; iter != end; ++iter)
+        {
+            auto msg_data = *iter;
+            DYNAMIX_ASSERT(msg_data);
 
-			// unfortunately we can't assert(msg_data->message == &self); since the data might come from a different module
+            // unfortunately we can't assert(msg_data->message == &self); since the data might come from a different module
 
-			char* mixin_data =
-				// skipping several function calls, which greatly improves build time
-				reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[obj._type_info->_mixin_indices[msg_data->_mixin_id]].mixin()));
+            char* mixin_data =
+                // skipping several function calls, which greatly improves build time
+                reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[obj._type_info->_mixin_indices[msg_data->_mixin_id]].mixin()));
 
-			auto func = reinterpret_cast<typename msg_caller<Ret, Args...>::caller_func>(msg_data->caller);
+            auto func = reinterpret_cast<typename msg_caller<Ret, Args...>::caller_func>(msg_data->caller);
 
-			if (!combinator.add_result(func(mixin_data, std::forward<Args>(args)...)))
-			{
-				return;
-			}
-		}
-	}
+            if (!combinator.add_result(func(mixin_data, std::forward<Args>(args)...)))
+            {
+                return;
+            }
+        }
+    }
 
-	// the folowing copy-pasted overload will be obsolete with c++17
-	// its only point is to support void multicast messages
-	// otherwise we would be able to use a combinator like this for all
-	// struct noop_combinator
-	// {
-	// 	template <typename R>
-	// 	constexpr bool add_result(R&& r) const { return true; }
-	// };
-	// with c++17 we would be able to add if constexpr(is_same(void, Ret)) to make it work
-	static void make_call(Object& obj, Args&&... args)
-	{
-		const ::dynamix::feature& self = _dynamix_get_mixin_feature_fast(static_cast<Derived*>(nullptr));
-		DYNAMIX_ASSERT(static_cast<const message_t&>(self).mechanism
-			== message_t::multicast);
+    // the folowing copy-pasted overload will be obsolete with c++17
+    // its only point is to support void multicast messages
+    // otherwise we would be able to use a combinator like this for all
+    // struct noop_combinator
+    // {
+    //     template <typename R>
+    //     constexpr bool add_result(R&& r) const { return true; }
+    // };
+    // with c++17 we would be able to add if constexpr(is_same(void, Ret)) to make it work
+    static void make_call(Object& obj, Args&&... args)
+    {
+        const ::dynamix::feature& self = _dynamix_get_mixin_feature_fast(static_cast<Derived*>(nullptr));
+        DYNAMIX_ASSERT(static_cast<const message_t&>(self).mechanism
+            == message_t::multicast);
 
-		const object_type_info::call_table_entry& call_entry =
-			obj._type_info->_call_table[self.id];
+        const object_type_info::call_table_entry& call_entry =
+            obj._type_info->_call_table[self.id];
 
-		auto begin = call_entry.begin;
-		auto end = call_entry.end;
+        auto begin = call_entry.begin;
+        auto end = call_entry.end;
 
-		DYNAMIX_MSG_THROW_UNLESS(begin, ::dynamix::bad_message_call);
-		DYNAMIX_ASSERT(end);
+        DYNAMIX_MSG_THROW_UNLESS(begin, ::dynamix::bad_message_call);
+        DYNAMIX_ASSERT(end);
 
-		for (auto iter = begin; iter != end; ++iter)
-		{
-			auto msg_data = *iter;
-			DYNAMIX_ASSERT(msg_data);
+        for (auto iter = begin; iter != end; ++iter)
+        {
+            auto msg_data = *iter;
+            DYNAMIX_ASSERT(msg_data);
 
-			// unfortunately we can't assert(msg_data->message == &self); since the data might come from a different module
+            // unfortunately we can't assert(msg_data->message == &self); since the data might come from a different module
 
-			char* mixin_data =
-				// skipping several function calls, which greatly improves build time
-				reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[obj._type_info->_mixin_indices[msg_data->_mixin_id]].mixin()));
+            char* mixin_data =
+                // skipping several function calls, which greatly improves build time
+                reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[obj._type_info->_mixin_indices[msg_data->_mixin_id]].mixin()));
 
-			auto func = reinterpret_cast<typename msg_caller<Ret, Args...>::caller_func>(msg_data->caller);
+            auto func = reinterpret_cast<typename msg_caller<Ret, Args...>::caller_func>(msg_data->caller);
 
-			func(mixin_data, std::forward<Args>(args)...);
-		}
-	}
+            func(mixin_data, std::forward<Args>(args)...);
+        }
+    }
 };
 }
 }
