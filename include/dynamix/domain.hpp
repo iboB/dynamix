@@ -7,12 +7,12 @@
 //
 #pragma once
 
-#include <dynamix/global.hpp>
-#include <dynamix/mixin_type_info.hpp>
-#include <dynamix/object_type_info.hpp>
-#include <dynamix/feature.hpp>
-#include <dynamix/feature_parser.hpp>
-#include <dynamix/message.hpp>
+#include "global.hpp"
+#include "mixin_type_info.hpp"
+#include "object_type_info.hpp"
+#include "feature.hpp"
+#include "feature_parser.hpp"
+#include "message.hpp"
 
 #include <unordered_map>
 #include <memory>
