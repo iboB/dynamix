@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -108,7 +108,17 @@ TEST_CASE("bids")
     CHECK(sout.str() == "ba");
 }
 
-class a
+// test for issue #20
+class parent
+{
+public:
+    void priority_trace(std::ostream& out)
+    {
+        out << "-1";
+    }
+};
+
+class a : public parent
 {
 public:
 #if !DYNAMIX_USE_TYPEID
@@ -118,11 +128,6 @@ public:
     void trace(std::ostream& out)
     {
         out << "a";
-    }
-
-    void priority_trace(std::ostream& out)
-    {
-        out << "-1";
     }
 
     void bids_uni(std::ostream& out)
@@ -263,7 +268,7 @@ DYNAMIX_DEFINE_MIXIN(b,
     trace_msg & priority(2, priority_trace_msg)
     & priority(1, bid(1, bids_uni_msg)) & priority(-1, bids_bad_uni_msg) & bids_multi_override_msg & bid(1, bids_multi_msg));
 DYNAMIX_DEFINE_MIXIN(a,
-    trace_msg & priority(-1, priority_trace_msg)
+    trace_msg & priority(-1, from_parent<parent>(priority_trace_msg))
     & bid(2, priority(1, bids_uni_msg)) & bids_bad_uni_msg & bids_multi_override_msg & bids_multi_msg);
 DYNAMIX_DEFINE_MIXIN(c,
     trace_msg & priority(1, priority_trace_msg)

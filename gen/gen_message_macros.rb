@@ -124,11 +124,11 @@ File.open('short_message_macros_template', 'r').each_line do |line|
   shorten.each do |k, v|
     short[k] = v if short[k]
   end
-  
+
   line['%{arity}'] = '_%{arity}'
-  
+
   out = "#define #{short} #{line}"
-  
+
   MAX_ARITY.times do |i|
     output << out % { :arity => i }
   end

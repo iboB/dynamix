@@ -38,8 +38,10 @@ struct msg_caller
 {
     using caller_func = Ret (*)(void*, Args...);
 
-    // makes the actual method call
-    template <typename Mixin, Ret (Mixin::*Method)(Args...)>
+    // makes the actual method call    
+    // the MethodOwner type describes the owner of the method in case it's not
+    // the mixin but one of its parents
+    template <typename Mixin, typename MethodOwner, Ret (MethodOwner::*Method)(Args...)>
     static Ret caller(void* mixin, Args... args)
     {
         auto m = reinterpret_cast<Mixin*>(mixin);
@@ -51,7 +53,7 @@ struct msg_caller
     // as a template argument
     // because of this the macro which instantiates the template also constructs this
     // function's name based on the message constness
-    template <typename Mixin, Ret (Mixin::*Method)(Args...) const>
+    template <typename Mixin, typename MethodOwner, Ret (MethodOwner::*Method)(Args...) const>
     static Ret callerconst(void* mixin, Args... args)
     {
         auto m = reinterpret_cast<const Mixin*>(mixin);

@@ -110,7 +110,14 @@ public:
     int multi(int& out) { return out += 1; }
 };
 
-class has_unio4_multio1_multio2
+// test for issue #20
+class parent
+{
+public:
+    int multi(int& out, int a) { return out += a + 1; }
+};
+
+class has_unio4_multio1_multio2 : public parent
 {
 public:
 #if !DYNAMIX_USE_TYPEID
@@ -119,7 +126,6 @@ public:
 
     int uni(int a1, int a2, int a3) { return a1 + a2 + a3; }
     int multi(int& out) { return out += 1; }
-    int multi(int& out, int a) { return out += a + 1; }
 };
 
 class has_unio1_c_unio2
@@ -134,12 +140,11 @@ public:
     int uni(int a1) { return a1 + 80; }
 };
 
-// this order should be important if the messages aren't sorted by mixin name
 DYNAMIX_DEFINE_MIXIN(has_unio1_multio1, unioverload_1_msg & multioverload_1_msg);
 DYNAMIX_DEFINE_MIXIN(has_unio2_multio2, unioverload_2_msg & multioverload_2_msg);
-DYNAMIX_DEFINE_MIXIN(has_unio3_multio1, unioverload_3_msg & multioverload_1_msg);
-DYNAMIX_DEFINE_MIXIN(has_unio4_multio1_multio2, unioverload_4_msg & multioverload_1_msg & multioverload_2_msg);
+DYNAMIX_DEFINE_MIXIN(has_unio4_multio1_multio2, unioverload_4_msg & multioverload_1_msg & from_parent<parent>(multioverload_2_msg));
 DYNAMIX_DEFINE_MIXIN(has_unio1_c_unio2, unioverload_1_msg & unioverload_1c_msg & unioverload_2_msg);
+DYNAMIX_DEFINE_MIXIN(has_unio3_multio1, unioverload_3_msg & multioverload_1_msg);
 
 DYNAMIX_DEFINE_MESSAGE(multioverload_1);
 DYNAMIX_DEFINE_MESSAGE(multioverload_2);

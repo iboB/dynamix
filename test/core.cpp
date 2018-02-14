@@ -36,16 +36,7 @@ public:
 #endif
 };
 
-// issue 20 test
-struct parent
-{
-    int inherited()
-    {
-        return 22;
-    }
-};
-
-class counter : public parent
+class counter
 {
 public:
 #if !DYNAMIX_USE_TYPEID
@@ -67,17 +58,20 @@ public:
         ++n;
     }
 
-    int inherited()
-    {
-        return parent::inherited();
-    }
-
-
 private:
     int _count;
 };
 
-class type_checker
+// issue #20 test
+struct parent
+{
+    int inherited()
+    {
+        return 22;
+    }
+};
+
+class type_checker : public parent
 {
 public:
 #if !DYNAMIX_USE_TYPEID
@@ -132,6 +126,9 @@ TEST_CASE("basic_message")
 
     // works as ptr too
     CHECK(get_self(&o) == o.get<type_checker>());
+
+    // issue #20
+    CHECK(inherited(o) == 22);
 }
 
 TEST_CASE("complex_apply_mutation")
@@ -261,8 +258,8 @@ TEST_CASE("type_template")
 }
 
 DYNAMIX_DEFINE_MIXIN(no_messages, none);
-DYNAMIX_DEFINE_MIXIN(counter, dummy_msg & multi_msg & inherited_msg);
-DYNAMIX_DEFINE_MIXIN(type_checker, get_self_msg & multi_msg);
+DYNAMIX_DEFINE_MIXIN(counter, dummy_msg & multi_msg);
+DYNAMIX_DEFINE_MIXIN(type_checker, get_self_msg & multi_msg & from_parent<parent>(inherited_msg));
 
 DYNAMIX_DEFINE_MESSAGE(dummy);
 DYNAMIX_DEFINE_MESSAGE(get_self);

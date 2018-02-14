@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -132,7 +132,20 @@ template <typename Combinator>
 typename std::enable_if<!has_set_num_results<Combinator>::value>::type
 set_num_results_for(Combinator&, size_t) {}
 
+// other message wrappers
+
+struct message_wrapper {};
+
+template <typename Message, typename Parent>
+struct msg_from_parent : public message_wrapper {};
+
 } // namespace internal
+
+template <typename Parent, typename Message>
+internal::msg_from_parent<Message, Parent> from_parent(Message*)
+{
+    return internal::msg_from_parent<Message, Parent>();
+}
 
 // Used in the mixin's feature list to set perks to messages
 template <typename Message>
@@ -151,16 +164,35 @@ internal::message_perks<Message> bid(int b, Message*)
     return mp;
 }
 
+// Perks of message wrappers
+template <typename Message, typename Parent>
+internal::message_perks<internal::msg_from_parent<Message, Parent>>
+    priority(int p, internal::msg_from_parent<Message, Parent>)
+{
+    internal::message_perks<internal::msg_from_parent<Message, Parent>> mp;
+    mp.priority = p;
+    return mp;
+}
+
+template <typename Message, typename Parent>
+internal::message_perks<internal::msg_from_parent<Message, Parent>>
+    bid(int b, internal::msg_from_parent<Message, Parent>)
+{
+    internal::message_perks<internal::msg_from_parent<Message, Parent>> mp;
+    mp.bid = b;
+    return mp;
+}
+
 // So perks can be passed as arguments to one another
-template <typename Message>
-internal::message_perks<Message> priority(int p, internal::message_perks<Message> perks)
+template <typename Feature>
+internal::message_perks<Feature> priority(int p, internal::message_perks<Feature> perks)
 {
     perks.priority = p;
     return perks;
 }
 
-template <typename Message>
-internal::message_perks<Message> bid(int b, internal::message_perks<Message> perks)
+template <typename Feature>
+internal::message_perks<Feature> bid(int b, internal::message_perks<Feature> perks)
 {
     perks.bid = b;
     return perks;
