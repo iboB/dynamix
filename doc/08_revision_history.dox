@@ -1,5 +1,18 @@
 /*! \page revisions Revision History
 
+DynaMix 1.3.4
+=============
+
+Released: 2018 Feb 26
+
+- Exceptions are no longer derived from `std::exception`
+- Added a way to refere to a message for a parent as a workaround to issue #20
+- Fixed visibility for clang builds on macOS
+- Added an optional header with message macros with short names
+- Removed `noncopyable` class
+- CI tests of DynaMix as a static library
+
+
 DynaMix 1.3.3
 =============
 
