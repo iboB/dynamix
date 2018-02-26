@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -15,11 +15,15 @@ namespace dynamix
 
 /// A mixin collection is a class that allows the user to
 /// represent a number of mixins
-class DYNAMIX_API mixin_collection : public internal::noncopyable
+class DYNAMIX_API mixin_collection
 {
 public:
     mixin_collection();
     mixin_collection(const internal::mixin_type_info_vector& mixins);
+
+    // non-copyable
+    mixin_collection(const mixin_collection&) = delete;
+    mixin_collection& operator=(const mixin_collection&) = delete;
 
     /// Checks if a mixin type is present in the collection
     template <typename Mixin>

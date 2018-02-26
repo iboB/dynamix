@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -42,7 +42,7 @@ namespace internal
 
 struct message_t;
 
-class DYNAMIX_API domain : public noncopyable
+class DYNAMIX_API domain
 {
 public:
     // contains static local variable which has thread-safe initialization
@@ -127,6 +127,10 @@ _dynamix_internal:
 
     domain();
     ~domain();
+    
+    // non-copyable
+    domain(const domain&) = delete;
+    domain& operator=(const domain&) = delete;
 
     // sparse list of all mixin infos
     // some elements might be nullptr

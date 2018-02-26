@@ -28,11 +28,15 @@ namespace internal
 
 class object_type_info;
 
-class DYNAMIX_API object_mutator : public internal::noncopyable
+class DYNAMIX_API object_mutator
 {
 public:
     object_mutator();
     object_mutator(const mixin_collection* source_mixins);
+
+    // non-copyable
+    object_mutator(const object_mutator&) = delete;
+    object_mutator& operator=(const object_mutator&) = delete;
 
     template <typename Mixin>
     object_mutator& add()

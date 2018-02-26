@@ -84,12 +84,5 @@ namespace internal
 
     extern DYNAMIX_API available_mixins_bitset build_available_mixins_from(const mixin_type_info_vector& mixins);
 
-    struct DYNAMIX_API noncopyable
-    {
-        noncopyable() {}
-        noncopyable(const noncopyable&) = delete;
-        noncopyable& operator=(const noncopyable) = delete;
-    };
-
 } // namespace internal
 } // namespace dynamix

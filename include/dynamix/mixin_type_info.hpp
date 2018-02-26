@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -35,7 +35,7 @@ typedef void(*mixin_destructor_proc)(void* memory);
 * which can be viewed by the library's users
 * for all mixin allocation
 */
-class DYNAMIX_API basic_mixin_type_info : public internal::noncopyable
+class DYNAMIX_API basic_mixin_type_info
 {
 public:
     /// The mixin's id
@@ -82,6 +82,10 @@ protected:
         // since this is always static, other members will be initialized with 0
     {}
     ~basic_mixin_type_info() {}
+
+    // non-copyable
+    basic_mixin_type_info(const basic_mixin_type_info&) = delete;
+    basic_mixin_type_info& operator=(const basic_mixin_type_info&) = delete;
 };
 
 namespace internal
@@ -111,7 +115,7 @@ public:
 
 // this metafunction binds the type info of a mixin to its type
 template <typename Mixin>
-struct mixin_type_info_instance : public noncopyable
+struct mixin_type_info_instance
 {
     // have this static function instead of a simple member to guarantee
     // that mixin_type_info's constructor is called the first time
@@ -129,6 +133,10 @@ struct mixin_type_info_instance : public noncopyable
     mixin_type_info_instance();
 
     ~mixin_type_info_instance();
+
+    // non-copyable
+    mixin_type_info_instance(const mixin_type_info_instance&) = delete;
+    mixin_type_info_instance& operator=(const mixin_type_info_instance&) = delete;
 
     // to prevent warnings and optimizations that will say that we're not using
     // mixin_type_info_instance by simply referencing it

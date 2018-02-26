@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -26,7 +26,7 @@ extern DYNAMIX_API no_features_t* none;
 
 static const feature_id INVALID_FEATURE_ID = ~feature_id(0);
 
-class DYNAMIX_API feature : public internal::noncopyable
+class DYNAMIX_API feature
 {
 public:
     feature_id id;
@@ -45,6 +45,10 @@ protected:
         , is_private(is_private)
     {
     }
+
+    // non-copyable
+    feature(const feature&) = delete;
+    feature& operator=(const feature&) = delete;
 };
 
 
