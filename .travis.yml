@@ -16,7 +16,7 @@ notifications:
     on_start: never
 git:
   depth: 5
-  
+
 cache:
   directories:
     - .mtime_cache
@@ -110,7 +110,6 @@ before_script:
 script:
   # sanitizer options
   - export ASAN_OPTIONS=allow_addr2line=true:check_initialization_order=true:strict_init_order=true:strict_string_checks=true:detect_odr_violation=2:detect_stack_use_after_return=true:verbosity=0
-  - export LSAN_OPTIONS=suppressions=../tools/lsan.supp
   # prepare generated code for mutation performance test
   - cd perf/mutation_perf
   - ruby generate.rb
