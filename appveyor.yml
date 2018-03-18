@@ -13,13 +13,13 @@ branches:
   only:
     - master
     - dev
-    
+
 cache:
   - .mtime_cache
-  - vcbuild_x86
-  - vcbuild_x64
-  - vcbuild_cc
-  - vcbuild_static
+  # - vcbuild_x86
+  # - vcbuild_x64
+  # - vcbuild_cc
+  # - vcbuild_static
 
 matrix:
   fast_finish: false
