@@ -1,5 +1,13 @@
 /*! \page revisions Revision History
 
+DynaMix 1.3.5
+=============
+
+Released: 2018 Mar 26
+
+- Fixed a leak with gcc and clang when reloading plugins
+
+
 DynaMix 1.3.4
 =============
 
