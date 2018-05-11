@@ -134,7 +134,7 @@ File.open('short_message_macros_template', 'r').each_line do |line|
   end
 end
 
-output << '#define DYNAMIX_DEFINE_MESSAGE DEF_MSG'
+output << '#define DEF_MSG DYNAMIX_DEFINE_MESSAGE'
 
 File.open(SHORT_OUT_FILE, 'w') do |f|
   f.write(HEADER)
