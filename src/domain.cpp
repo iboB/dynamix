@@ -124,13 +124,13 @@ const object_type_info* domain::get_object_type_info(const mixin_type_info_vecto
     std::lock_guard<std::mutex> lock(_object_type_infos_mutex);
 #endif
 
-    object_type_info_map::iterator i = _object_type_infos.find(query);
+    object_type_info_map::iterator it = _object_type_infos.find(query);
 
-    if(i != _object_type_infos.end())
+    if(it != _object_type_infos.end())
     {
         // get existing
-        DYNAMIX_ASSERT(mixins == i->second->_compact_mixins);
-        return i->second;
+        DYNAMIX_ASSERT(mixins == it->second->_compact_mixins);
+        return it->second;
     }
     else
     {
