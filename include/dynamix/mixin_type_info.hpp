@@ -16,6 +16,7 @@
 
 #include "global.hpp"
 #include "message.hpp"
+#include "metrics.hpp"
 #include <type_traits>
 #include <utility>
 
@@ -71,7 +72,7 @@ public:
 
 #if DYNAMIX_ADDITIONAL_METRICS
     /// Number of "living" mixins of this type.
-    mutable size_t num_mixins;
+    mutable metric num_mixins;
 #endif
 
 protected:

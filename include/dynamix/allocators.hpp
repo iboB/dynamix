@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -24,7 +24,7 @@ namespace internal
 {
     // rounds s up to the nearest multiple of n
     inline constexpr size_t next_multiple(size_t s, size_t n)
-    {            
+    {
         return ((s + n - 1) / n) // divide rounding up
             * n;  // and scale
     }
@@ -105,7 +105,13 @@ public:
     bool has_allocated() const { return _has_allocated; }
 
 protected:
-    bool _has_allocated;
+#   if DYNAMIX_THREAD_SAFE_MUTATIONS
+    std::atomic<bool>
+#   else
+    bool
+#   endif
+        _has_allocated;
+
 #endif
 };
 

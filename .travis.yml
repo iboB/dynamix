@@ -77,6 +77,13 @@ matrix:
           packages: ["clang-5.0", "valgrind", "g++-6"]
           sources: *apt_sources
 
+    # Clang 5.0 - sanitize thread
+    - env: COMPILER=clang++-5.0 ADDITIONAL_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=thread"
+      addons: &clang50
+        apt:
+          packages: ["clang-5.0", "valgrind", "g++-6"]
+          sources: *apt_sources
+
     # Xcode 9.2 Clang
     - env: COMPILER=clang++ ADDITIONAL_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
       osx_image: xcode9.2
