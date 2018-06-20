@@ -20,7 +20,7 @@ foreach(source ${tests})
             # don't add plugins if DynaMix is a static library
             continue()
         endif()
-        
+
         set(lib "test_${test}")
 
         add_library(${lib} SHARED ${source})
@@ -31,7 +31,7 @@ foreach(source ${tests})
             # loader test can only work when DynaMix is a shared library
             continue()
         endif()
-        
+
         set(executable "test_${test}")
 
         add_executable(${executable} ${source})
@@ -40,6 +40,10 @@ foreach(source ${tests})
         add_test(NAME ${test} COMMAND $<TARGET_FILE:${executable}>)
     endif()
 endforeach()
+
+if (UNIX)
+    target_link_libraries(test_thread pthread)
+endif()
 
 if(DYNAMIX_SHARED_LIB)
     # custom deps
