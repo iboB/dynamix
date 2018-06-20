@@ -72,7 +72,7 @@ public:
 
 #if DYNAMIX_ADDITIONAL_METRICS
     /// Number of "living" mixins of this type.
-    mutable metric num_mixins;
+    mutable metric num_mixins = {0};
 #endif
 
 protected:

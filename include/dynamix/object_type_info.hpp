@@ -104,7 +104,7 @@ _dynamix_internal:
 
 #if DYNAMIX_ADDITIONAL_METRICS
     // number of living objects with this type info
-    mutable metric num_objects;
+    mutable metric num_objects = {0};
 #endif
 
     // this should be called after the mixins have been initialized
