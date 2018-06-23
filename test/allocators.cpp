@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -215,10 +215,6 @@ DYNAMIX_MESSAGE_0(int, get_x);
 
 class custom_1 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "normal_1"; }
-#endif
-
     int get_i() const
     {
         return i;
@@ -229,10 +225,6 @@ public:
 
 class custom_own_var {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "normal_own_var"; }
-#endif
-
     int get_x()
     {
         return x;
@@ -577,33 +569,14 @@ TEST_CASE("object allocator")
     CHECK(alloc_b.objects.empty());
 }
 
-class normal_a {
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "normal_a"; }
-#endif
-};
-class normal_b {
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "normal_b"; }
-#endif
-};
+class normal_a {};
+class normal_b {};
 class custom_2_a {
 public:
     custom_2_a() = default;
     custom_2_a(custom_2_a&&) = delete;
-
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "normal_2_a"; }
-#endif
 };
-class custom_2_b {
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "normal_2_b"; }
-#endif
-};
+class custom_2_b {};
 
 DYNAMIX_DEFINE_MIXIN(normal_a, dynamix::none);
 DYNAMIX_DEFINE_MIXIN(normal_b, dynamix::none);

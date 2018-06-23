@@ -10,7 +10,7 @@
 
 #include "doctest/doctest.h"
 
-#if defined (WIN32)
+#if defined (_WIN32)
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -158,9 +158,6 @@ TEST_CASE("shared")
 class exe_mixin
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "exe_mixin"; }
-#endif
     int dl_a_multicast()
     {
         return 1;

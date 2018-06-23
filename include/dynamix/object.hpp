@@ -117,7 +117,7 @@ public:
     bool has(mixin_id id) const noexcept;
 
     /// Checks if the object has a specific mixin by mixin name (name of the class or
-    /// dynamix_mixin_name if `DYNAMIX_USE_TYPEID` is false).
+    /// manual name provided by the `mixin_name` feature).
     bool has(const char* mixin_name) const noexcept;
 
     /// Gets a specific mixin by id from the object. Returns nullptr if the mixin
@@ -134,16 +134,16 @@ public:
     /// isn't available. It is the user's responsibility to cast the returned
     /// value to the appropriate type.
     ///
-    /// The mixin name is the name of the actual mixin class or the result of
-    /// dynamix_mixin_name if `DYNAMIX_USE_TYPEID` is false.
+    /// The mixin name is the name of the actual mixin class or a
+    /// manual name provided by the `mixin_name` feature.
     void* get(const char* mixin_name) noexcept;
 
     /// Gets a specific mixin by mixin name from the object. Returns nullptr if the mixin
     /// isn't available. It is the user's responsibility to cast the returned
     /// value to the appropriate type.
     ///
-    /// The mixin name is the name of the actual mixin class or the result of
-    /// dynamix_mixin_name if `DYNAMIX_USE_TYPEID` is false.
+    /// The mixin name is the name of the actual mixin class or a
+    /// manual name provided by the `mixin_name` feature.
     const void* get(const char* mixin_name) const noexcept;
     /////////////////////////////////////////////////////////////////
 
@@ -173,7 +173,7 @@ public:
         return internal_implements_by_mixin(f.id, typename Feature::feature_tag());
     }
 
-    /// Checks if the object implements a feature with a default implementation 
+    /// Checks if the object implements a feature with a default implementation
     /// (`false` means that it either does not implement it at all, or it's implemented by a mixin)
     template <typename Feature>
     bool implements_with_default(const Feature*) const noexcept
@@ -182,7 +182,7 @@ public:
         DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
         // intentionally disregarding the actual feature,
         // because of potential multiple implementations
-        return 
+        return
             internal_implements(f.id, typename Feature::feature_tag())
             && !internal_implements_by_mixin(f.id, typename Feature::feature_tag());
     }

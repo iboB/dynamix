@@ -19,23 +19,6 @@
 #include <vector>
 #include <cstring> // for memset
 
-// getting a type's name
-#if DYNAMIX_USE_TYPEID // using typeid: tested for msvc, gcc and clang
-#   if defined(__GNUC__) // __GNUC__ is defined with clang
-        // use cxxabi to unmangle the gcc typeid name
-#       include <cxxabi.h>
-        namespace dynamix { namespace internal { extern DYNAMIX_API int cxa_demangle_status; } }
-#       define DYNAMIX_MIXIN_TYPE_NAME(type) abi::__cxa_demangle(typeid(type).name(), nullptr, nullptr, &::dynamix::internal::cxa_demangle_status)
-#   elif defined(_MSC_VER)
-        // msvc typeid names are "class x" instead of "x", remove the "class " by adding 6
-#       define DYNAMIX_MIXIN_TYPE_NAME(type) (typeid(type).name() + 6)
-#   else
-#       error "getting typenames with typeid hasn't been tested on compilers other than gcc, clang, and msvc"
-#   endif
-#else // safer but more inconvenient way
-#   define DYNAMIX_MIXIN_TYPE_NAME(type) type::dynamix_mixin_name()
-#endif
-
 // logically internal data within classes that cannot be private or protected
 // due to implementation issues is marked with _dynamix_internal
 // class X

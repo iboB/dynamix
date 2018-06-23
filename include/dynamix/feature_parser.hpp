@@ -15,6 +15,7 @@
 
 #include "global.hpp"
 #include "message.hpp"
+#include "features.hpp"
 #include "object_type_info.hpp"
 #include "allocators.hpp" // clang needs this to assign mixin_allocator to allocator :(
 
@@ -61,9 +62,17 @@ public:
         return *this;
     }
 
+    feature_registrator& operator & (mixin_name_feature n)
+    {
+        mixin_name = n.name;
+        return *this;
+    }
+
     void operator & (const no_features_t*)
     {
     }
+
+    const char* mixin_name = nullptr;
 };
 
 
@@ -115,6 +124,11 @@ public:
 
     void operator & (const no_features_t*)
     {
+    }
+
+    feature_parser& operator & (mixin_name_feature)
+    {
+        return *this;
     }
 
 private:

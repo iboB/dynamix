@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -54,10 +54,6 @@ TEST_CASE("message_move_semantics")
 class receive_rvalue
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "receive_rvalue"; }
-#endif
-
     void i_like(movable&& m)
     {
         movable here_now = std::move(m);

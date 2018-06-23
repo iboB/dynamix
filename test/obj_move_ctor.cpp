@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -16,10 +16,6 @@ using namespace dynamix;
 class a
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "a"; }
-#endif
-
     a() : val(10) {}
     int val;
 
@@ -31,10 +27,6 @@ public:
 class b
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "b"; }
-#endif
-
     b() : val(1) {}
     int val;
 

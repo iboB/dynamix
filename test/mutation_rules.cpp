@@ -6,6 +6,7 @@
 // https://opensource.org/licenses/MIT
 //
 #include <dynamix/dynamix.hpp>
+#include <iostream>
 
 #include "doctest/doctest.h"
 

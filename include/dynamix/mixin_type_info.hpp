@@ -45,8 +45,8 @@ public:
     /// Shows whether this is as initialized mixin type
     bool is_valid() const { return id != INVALID_MIXIN_ID; }
 
-    /// The mixin name: The class name or, in case `DYNAMIX_USE_TYPEID` is false,
-    /// the name returned from `dynamix_mixin_name`.
+    /// The mixin name: The class name or, in case `mixin_name` feature is provided,
+    /// the manual name set from there
     const char* name;
 
     /// Size of the mixin type

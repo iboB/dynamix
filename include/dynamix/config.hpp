@@ -25,12 +25,13 @@
 #   include DYNAMIX_CUSTOM_CONFIG_FILE
 #endif
 
-// DynaMix heavily relies on type names
-// setting the DYNAMIX_USE_TYPEID to true will cause it to obtain said names with type_info via typeid.
-// setting it to false will require the following extra steps:
-//     * mixins must add static const char* dynamix_mixin_name() { return <mixin class name>; }
-#if !defined(DYNAMIX_USE_TYPEID)
-#   define DYNAMIX_USE_TYPEID 1
+// backwards compatibility
+// in previous versions when typeid was used to get the mixin name
+// the user could optionally set a manual name for a mixin by providing a
+// method `static const char* dynamix_mixin_name` per mixin
+// this is deprecated but kept for backwards compatibility
+#if defined(DYNAMIX_USE_TYPEID) && !DYNAMIX_USE_TYPEID
+#   define DYNAMIX_USE_STATIC_MEMBER_NAME
 #endif
 
 // enable various debug checks and assertions

@@ -167,10 +167,6 @@ TEST_CASE("mutate")
 class m1
 {
 public:
-    #if !DYNAMIX_USE_TYPEID
-        static const char* dynamix_mixin_name() { return "m1"; }
-    #endif
-
     void setter1(int n)
     {
         _n = n;
@@ -193,10 +189,6 @@ private:
 class m2
 {
 public:
-    #if !DYNAMIX_USE_TYPEID
-        static const char* dynamix_mixin_name() { return "m2"; }
-    #endif
-
     void setter2(int n)
     {
         _n = n;
@@ -219,10 +211,6 @@ private:
 class m3
 {
 public:
-    #if !DYNAMIX_USE_TYPEID
-        static const char* dynamix_mixin_name() { return "m3"; }
-    #endif
-
     void setter3(int n)
     {
         _n = n;
@@ -242,20 +230,8 @@ private:
     int _n = 0;
 };
 
-class e1
-{
-public:
-    #if !DYNAMIX_USE_TYPEID
-        static const char* dynamix_mixin_name() { return "e1"; }
-    #endif
-};
-class e2
-{
-public:
-    #if !DYNAMIX_USE_TYPEID
-        static const char* dynamix_mixin_name() { return "e2"; }
-    #endif
-};
+class e1 {};
+class e2 {};
 
 DYNAMIX_DEFINE_MIXIN(m1, setter1_msg & getter1_msg & getter_msg);
 DYNAMIX_DEFINE_MIXIN(m2, setter2_msg & getter2_msg & getter_msg);

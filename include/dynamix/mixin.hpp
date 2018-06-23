@@ -121,7 +121,7 @@ mixin_type_info_instance<Mixin>::~mixin_type_info_instance()
     /* create a features parsing function */ \
     /* features can be parsed multiple times by different parsers */ \
     template <typename FeaturesParser> \
-    void _dynamix_parse_mixin_features(const mixin_type*, FeaturesParser& parser) { parser & mixin_features; }
+    void _dynamix_parse_mixin_features(const mixin_type*, FeaturesParser& parser) { parser & ::dynamix::mixin_name(#mixin_type) & mixin_features; }
 
 class object;
 

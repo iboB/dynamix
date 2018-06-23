@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -13,36 +13,16 @@ using namespace dynamix;
 
 TEST_SUITE("by string");
 
-class mixin_a {
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "mixin_a"; }
-#endif
-};
+class mixin_a {};
 DYNAMIX_DEFINE_MIXIN(mixin_a, none);
 
-class other_mixin {
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "other_mixin"; }
-#endif
-};
+struct other_mixin {};
 DYNAMIX_DEFINE_MIXIN(other_mixin, none);
 
-class third {
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "third"; }
-#endif
-};
-DYNAMIX_DEFINE_MIXIN(third, none);
+class third {};
+DYNAMIX_DEFINE_MIXIN(third, mixin_name("3rd") & none);
 
-class unused {
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "unused"; }
-#endif
-};
+class unused {};
 DYNAMIX_DEFINE_MIXIN(unused, none);
 
 TEST_CASE("mixin_ids")
@@ -52,7 +32,7 @@ TEST_CASE("mixin_ids")
 
     mixin_id aid = di.get_mixin_id_by_name("mixin_a");
     mixin_id omid = di.get_mixin_id_by_name("other_mixin");
-    mixin_id tid = di.get_mixin_id_by_name("third");
+    mixin_id tid = di.get_mixin_id_by_name("3rd");
     mixin_id uid = di.get_mixin_id_by_name("unused");
 
     mixin_id paths[] = {aid, omid, tid, uid};
@@ -106,7 +86,7 @@ TEST_CASE("mixin_names")
 
     CHECK(tmpl.add("mixin_a"));
     CHECK(tmpl.add("other_mixin"));
-    CHECK(tmpl.add("third"));
+    CHECK(tmpl.add("3rd"));
 
     CHECK(!tmpl.add("asdf"));
     CHECK(!tmpl.add("mixin_axxx"));
@@ -122,14 +102,14 @@ TEST_CASE("mixin_names")
     CHECK(!o.has<unused>());
     CHECK(o.has("mixin_a"));
     CHECK(o.has("other_mixin"));
-    CHECK(o.has("third"));
+    CHECK(o.has("3rd"));
     CHECK(!o.has("unused"));
 
     single_object_mutator mutator(o);
 
     CHECK(mutator.remove("unused"));
     CHECK(mutator.remove("other_mixin"));
-    CHECK(mutator.remove("third"));
+    CHECK(mutator.remove("3rd"));
 
     CHECK(!mutator.remove("other_mixinxxx"));
     CHECK(!mutator.remove("OTHER_MIXIN"));
@@ -142,6 +122,6 @@ TEST_CASE("mixin_names")
     CHECK(!o.has<unused>());
     CHECK(o.has("mixin_a"));
     CHECK(!o.has("other_mixin"));
-    CHECK(!o.has("third"));
+    CHECK(!o.has("3rd"));
     CHECK(!o.has("unused"));
 }

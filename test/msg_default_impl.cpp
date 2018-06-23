@@ -132,9 +132,6 @@ TEST_CASE("multi")
 class mix_a
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "mix_a"; }
-#endif
     int basic()
     {
         return 100;
@@ -149,10 +146,6 @@ public:
 class mix_b
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "mix_b"; }
-#endif
-
     int basic_1(int x)
     {
         return n + x;
@@ -174,10 +167,6 @@ public:
 class mix_c
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "mix_c"; }
-#endif
-
     int basic_def()
     {
         CHECK(!DYNAMIX_HAS_NEXT_BIDDER(basic_def_no_impl_msg));

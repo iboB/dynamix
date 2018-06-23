@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -184,9 +184,6 @@ TEST_CASE("combinators")
 class a
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "a"; }
-#endif
     bool check1() const { return true; }
     bool check2() const { return false; }
     bool check3() const { return false; }
@@ -199,9 +196,6 @@ DYNAMIX_DEFINE_MIXIN(a, all_msg);
 class b
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "b"; }
-#endif
     bool check1() const { return true; }
     bool check2() const { return true; }
     bool check3() const { return false; }
@@ -214,9 +208,6 @@ DYNAMIX_DEFINE_MIXIN(b, all_msg);
 class c
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "c"; }
-#endif
     bool check1() const { return true; }
     bool check2() const { return false; }
     bool check3() const { return false; }

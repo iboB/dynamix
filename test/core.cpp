@@ -29,18 +29,11 @@ DYNAMIX_MESSAGE_0(int, inherited);
 
 class no_messages
 {
-public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "no_messages"; }
-#endif
 };
 
 class counter
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "counter"; }
-#endif
     counter()
         : _count(0)
     {}
@@ -73,9 +66,6 @@ struct parent
 class type_checker : public parent
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "type_checker"; }
-#endif
     const void* get_self() const
     {
         return this;

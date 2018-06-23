@@ -13,10 +13,6 @@ namespace dynamix
 {
 namespace internal
 {
-#if DYNAMIX_USE_TYPEID && defined(__GNUC__)
-    int cxa_demangle_status; // for getting unmangled types
-#endif
-
     available_mixins_bitset build_available_mixins_from(const mixin_type_info_vector& mixins)
     {
         available_mixins_bitset result;

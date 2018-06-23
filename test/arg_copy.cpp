@@ -190,7 +190,6 @@ TEST_CASE("multi")
     CHECK(track_ref::copies == 0);
     CHECK(track_ref::moves == 0);
 
-
     reset_tracks();
 }
 

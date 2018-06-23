@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -25,10 +25,6 @@ extern "C" DYNAMIX_SYMBOL_EXPORT void release_object(object* o)
 class mixin_b
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "mixin_b"; }
-#endif
-
     int dl_a_multicast()
     {
         return 1001;

@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -7,7 +7,6 @@
 //
 #pragma once
 
-#define DYNAMIX_USE_TYPEID 0
 #define DYNAMIX_MAX_MIXINS 256
 #define DYNAMIX_MAX_MESSAGES 512
 #define DYNAMIX_USE_EXCEPTIONS 0

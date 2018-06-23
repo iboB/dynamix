@@ -64,7 +64,6 @@ public:
     {
         DYNAMIX_ASSERT(info.id == INVALID_MIXIN_ID);
 
-        info.name = DYNAMIX_MIXIN_TYPE_NAME(Mixin);
         info.size = sizeof(Mixin);
         info.alignment = std::alignment_of<Mixin>::value;
         info.constructor = &call_mixin_constructor<Mixin>;
@@ -74,11 +73,18 @@ public:
         info.move_constructor = get_mixin_move_constructor<Mixin>();
         info.allocator = _allocator;
 
-        internal_register_mixin_type(info);
-
         // see comments in feature_instance on why this manual registration is needed
         feature_registrator reg;
         _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), reg);
+
+        info.name = reg.mixin_name;
+        DYNAMIX_ASSERT(info.name);
+
+#if defined(DYNAMIX_USE_STATIC_MEMBER_NAME)
+        info.name = Mixin::dynamix_mixin_name();
+#endif
+
+        internal_register_mixin_type(info);
 
         feature_parser<Mixin> parser;
         _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), parser);
@@ -127,7 +133,7 @@ _dynamix_internal:
 
     domain();
     ~domain();
-    
+
     // non-copyable
     domain(const domain&) = delete;
     domain& operator=(const domain&) = delete;

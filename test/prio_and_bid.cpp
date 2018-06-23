@@ -122,10 +122,6 @@ public:
 class a : public parent
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "a"; }
-#endif
-
     void trace(std::ostream& out)
     {
         out << "a";
@@ -159,10 +155,6 @@ public:
 class b
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "b"; }
-#endif
-
     void trace(std::ostream& out)
     {
         out << "b";
@@ -200,10 +192,6 @@ public:
 class c
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "c"; }
-#endif
-
     void trace(std::ostream& out)
     {
         out << "c";
@@ -234,10 +222,6 @@ public:
 class d
 {
 public:
-#if !DYNAMIX_USE_TYPEID
-    static const char* dynamix_mixin_name() { return "d"; }
-#endif
-
     void trace(std::ostream& out)
     {
         out << "d";
