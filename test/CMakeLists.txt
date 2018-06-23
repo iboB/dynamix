@@ -10,6 +10,12 @@ cmake_minimum_required(VERSION 3.2.2)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+add_library(doctest
+    doctest/doctest.h
+    doctest/doctest.cc
+)
+set_target_properties(doctest PROPERTIES FOLDER tests/doctest)
+
 file(GLOB_RECURSE tests *.cpp)
 
 foreach(source ${tests})
@@ -35,7 +41,7 @@ foreach(source ${tests})
         set(executable "test_${test}")
 
         add_executable(${executable} ${source})
-        target_link_libraries(${executable} dynamix)
+        target_link_libraries(${executable} dynamix doctest)
         set_target_properties(${executable} PROPERTIES FOLDER tests)
         add_test(NAME ${test} COMMAND $<TARGET_FILE:${executable}>)
     endif()

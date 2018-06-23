@@ -11,7 +11,6 @@
 
 #include "test_mixins.hpp"
 
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest/doctest.h"
 
 TEST_SUITE("obj optional metrics");

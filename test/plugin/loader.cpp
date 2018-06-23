@@ -8,7 +8,6 @@
 #include <dynamix/dynamix.hpp>
 #include "dynlib_A.hpp"
 
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest/doctest.h"
 
 #if defined (WIN32)
