@@ -38,7 +38,7 @@ struct msg_caller
 {
     using caller_func = Ret (*)(void*, Args...);
 
-    // makes the actual method call    
+    // makes the actual method call
     // the MethodOwner type describes the owner of the method in case it's not
     // the mixin but one of its parents
     template <typename Mixin, typename MethodOwner, Ret (MethodOwner::*Method)(Args...)>
@@ -111,7 +111,7 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
     {}
 
     template <typename Combinator>
-    static void make_combinator_call(Object& obj, Combinator& combinator, Args&&... args)
+    static void make_combinator_call(Object& obj, Combinator& combinator, Args&... args)
     {
         const ::dynamix::feature& self = _dynamix_get_mixin_feature_fast(static_cast<Derived*>(nullptr));
         DYNAMIX_ASSERT(static_cast<const message_t&>(self).mechanism
@@ -140,7 +140,7 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 
             auto func = reinterpret_cast<typename msg_caller<Ret, Args...>::caller_func>(msg_data->caller);
 
-            if (!combinator.add_result(func(mixin_data, std::forward<Args>(args)...)))
+            if (!combinator.add_result(func(mixin_data, args...)))
             {
                 return;
             }
@@ -156,7 +156,7 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
     //     constexpr bool add_result(R&& r) const { return true; }
     // };
     // with c++17 we would be able to add if constexpr(is_same(void, Ret)) to make it work
-    static void make_call(Object& obj, Args&&... args)
+    static void make_call(Object& obj, Args&... args)
     {
         const ::dynamix::feature& self = _dynamix_get_mixin_feature_fast(static_cast<Derived*>(nullptr));
         DYNAMIX_ASSERT(static_cast<const message_t&>(self).mechanism
@@ -184,7 +184,7 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 
             auto func = reinterpret_cast<typename msg_caller<Ret, Args...>::caller_func>(msg_data->caller);
 
-            func(mixin_data, std::forward<Args>(args)...);
+            func(mixin_data, args...);
         }
     }
 };

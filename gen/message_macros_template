@@ -50,25 +50,28 @@
     void method_name(constness ::dynamix::object& _d_obj %{coma_args_signature}, Combinator& _d_combinator) \
     { \
         /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator %{coma_fwd_args}); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator %{coma_args}); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj %{coma_args_signature}) \
     { \
         Combinator<return_type> _d_combinator; \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator %{coma_fwd_args}); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator %{coma_args}); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj %{coma_args_signature}) \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj %{coma_fwd_args}); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj %{coma_args}); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj %{coma_args_signature}) \
     {\
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj %{coma_fwd_args}); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj %{coma_args}); \
     }\
 
 #define DYNAMIX_MESSAGE_%{arity}(return_type, message %{args_coma}) \

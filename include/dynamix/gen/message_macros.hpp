@@ -67,17 +67,20 @@
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj ) \
     { \
         Combinator<return_type> _d_combinator; \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
         _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator ); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj ) \
     { \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
         _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj ); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj ) \
     {\
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
         _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj ); \
     }\
 
@@ -225,25 +228,28 @@
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, Combinator& _d_combinator) \
     { \
         /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0)); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , a0); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0) \
     { \
         Combinator<return_type> _d_combinator; \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , a0); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0) \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , a0); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj , arg0_type a0) \
     {\
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , a0); \
     }\
 
 #define DYNAMIX_MESSAGE_1(return_type, message , arg0_type, a0) \
@@ -390,25 +396,28 @@
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, Combinator& _d_combinator) \
     { \
         /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , a0, a1); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1) \
     { \
         Combinator<return_type> _d_combinator; \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , a0, a1); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1) \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , a0, a1); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1) \
     {\
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , a0, a1); \
     }\
 
 #define DYNAMIX_MESSAGE_2(return_type, message , arg0_type, a0, arg1_type, a1) \
@@ -555,25 +564,28 @@
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, Combinator& _d_combinator) \
     { \
         /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , a0, a1, a2); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2) \
     { \
         Combinator<return_type> _d_combinator; \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , a0, a1, a2); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2) \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , a0, a1, a2); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2) \
     {\
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , a0, a1, a2); \
     }\
 
 #define DYNAMIX_MESSAGE_3(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2) \
@@ -720,25 +732,28 @@
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, Combinator& _d_combinator) \
     { \
         /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , a0, a1, a2, a3); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
     { \
         Combinator<return_type> _d_combinator; \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , a0, a1, a2, a3); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , a0, a1, a2, a3); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
     {\
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , a0, a1, a2, a3); \
     }\
 
 #define DYNAMIX_MESSAGE_4(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3) \
@@ -885,25 +900,28 @@
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, Combinator& _d_combinator) \
     { \
         /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , a0, a1, a2, a3, a4); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
     { \
         Combinator<return_type> _d_combinator; \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , a0, a1, a2, a3, a4); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , a0, a1, a2, a3, a4); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
     {\
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , a0, a1, a2, a3, a4); \
     }\
 
 #define DYNAMIX_MESSAGE_5(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
@@ -1050,25 +1068,28 @@
     void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, Combinator& _d_combinator) \
     { \
         /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , a0, a1, a2, a3, a4, a5); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
     typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
     { \
         Combinator<return_type> _d_combinator; \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator , a0, a1, a2, a3, a4, a5); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj , a0, a1, a2, a3, a4, a5); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
     {\
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , a0, a1, a2, a3, a4, a5); \
     }\
 
 #define DYNAMIX_MESSAGE_6(return_type, message , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
