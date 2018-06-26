@@ -39,6 +39,9 @@ option(DYNAMIX_BUILD_TUTORIALS "DynaMix: build tutorials" ON)
 # Off by default since generated.h/cpp needs to be... well... generated for this to work
 option(DYNAMIX_BUILD_PERF "DynaMix: build performance tests (requires manual code generation step)" OFF)
 
+# Off by default since files need to be generated for this to work
+option(DYNAMIX_BUILD_COMPILER_PERF "DynaMix: build compilation performance tests (requires manual code generation step)" OFF)
+
 # config
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}) # so executables are next to the dll
@@ -171,4 +174,8 @@ endif()
 
 if(DYNAMIX_BUILD_PERF)
     add_subdirectory(perf)
+endif()
+
+if(DYNAMIX_BUILD_COMPILER_PERF)
+    add_subdirectory(compiler/perf)
 endif()
