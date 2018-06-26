@@ -1,21 +1,22 @@
 OUT_H = 'messages.hpp'
 OUT_CPP = 'messages.cpp'
+OUT_CALL_CPP = 'messages_call.cpp'
 
 MAX_ARITY = File.open('../../gen/arity').read.strip.to_i + 1
 
-TYPES = %w(
-  int
-  float
-  double
-  char
-  size_t
-  const\ char*
-  int*
-  const\ std::string&
-  std::string)
+TYPES = [
+  ['int', 14],
+  ['double', 22.11],
+  ['char', 42],
+  ['size_t', 456],
+  ['const char*', "some string"],
+  ['int*', 0],
+  ['const std::string&', "test2"],
+  ['std::string', "test asd"]]
 
-RET_TYPES = ['void'] + TYPES
 
+
+RET_TYPES = [['void', '']] + TYPES
 
 rnd = Random.new(100)
 
@@ -33,21 +34,25 @@ DATA
 
 header = ''
 cpp = ''
+call_cpp = ''
 
 1024.times do |i|
   arity = rnd.rand(MAX_ARITY)
   const = rnd.rand(2) == 0 ? 'CONST_' : ''
   multi = rnd.rand(2) == 0 ? 'MULTICAST_' : ''
-  ret = RET_TYPES.sample(random: rnd)
+  ret = RET_TYPES.sample(random: rnd)[0]
 
   header += "DYNAMIX_#{const}#{multi}MESSAGE_#{arity}(#{ret}, message_#{i}"
+  call_cpp += "    message_#{i}(o";
 
   arity.times do |a|
     type = TYPES.sample(random: rnd)
-    header += ", #{type}, arg_#{a}"
+    header += ", #{type[0]}, arg_#{a}"
+    call_cpp += ", #{type[1].inspect}"
   end
 
   header += ");\n"
+  call_cpp += ");\n";
 
   cpp += "DYNAMIX_DEFINE_MESSAGE(message_#{i});\n"
 end
@@ -67,4 +72,11 @@ File.open(OUT_CPP, 'w') do |f|
   f.puts(cpp)
 end
 
-
+File.open(OUT_CALL_CPP, 'w') do |f|
+  f.write(HEAD)
+  f.puts "#include \"#{OUT_H}\""
+  f.puts
+  f.puts "void make_calls(dynamix::object& o) {\n"
+  f.puts(call_cpp)
+  f.puts "}\n"
+end

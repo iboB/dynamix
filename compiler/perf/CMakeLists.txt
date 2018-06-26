@@ -11,6 +11,7 @@ cmake_minimum_required(VERSION 3.2.2)
 add_executable(cperf_msg
     messages.hpp
     messages.cpp
+    messages_call.cpp
     messages_main.cpp)
 
 target_link_libraries(cperf_msg dynamix)
