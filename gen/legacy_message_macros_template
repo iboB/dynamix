@@ -21,7 +21,7 @@
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<constness Mixin, constness MethodOwner, return_type, &Mixin::method_name>; \
+            static caller_func the_caller = caller<constness Mixin, constness MethodOwner, return_type, &MethodOwner::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \

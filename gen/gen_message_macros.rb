@@ -9,7 +9,8 @@
 # script generating message declaration macros
 
 MAX_ARITY = File.open('arity').read.strip.to_i + 1
-OUT_FILE = '../include/dynamix/gen/message_macros.hpp'
+OUT_FILE = '../include/dynamix/gen/template_message_macros.hpp'
+LEGACY_OUT_FILE = '../include/dynamix/gen/legacy_message_macros.hpp'
 NO_ARITY_OUT_FILE = '../include/dynamix/gen/no_arity_message_macros.hpp'
 SHORT_OUT_FILE = '../include/dynamix/gen/short_message_macros.hpp'
 
@@ -68,6 +69,16 @@ File.open(OUT_FILE, 'w') do |f|
   MAX_ARITY.times do |i|
     params = params_for_arity(i)
     f.write(DECL % params)
+  end
+end
+
+LEGACY_DECL = File.open('legacy_message_macros_template', 'r').read
+
+File.open(LEGACY_OUT_FILE, 'w') do |f|
+  f.write(HEADER)
+  MAX_ARITY.times do |i|
+    params = params_for_arity(i)
+    f.write(LEGACY_DECL % params)
   end
 end
 

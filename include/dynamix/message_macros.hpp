@@ -222,6 +222,12 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 /// \internal
 #define _DYNAMIX_VA_ARGS_PROXY(MACRO, args) MACRO args
 
+// a macro used in the legacy message macros to get the mixin data directly, skipping function calls
+// GREATLY improves message call time
+/// \internal
+#define _DYNAMIX_GET_MIXIN_DATA(obj, id) \
+    reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[obj._type_info->_mixin_indices[id]].mixin()))
+
 #if defined(DYNAMIX_DOXYGEN)
 // use these macros for the docs only
 
@@ -340,7 +346,22 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 #else
 
 // include the generated macros
-#include "gen/message_macros.hpp"
+// choose definition header
+// making this choice DOES NOT require you to rebuild the library
+// these headers are purely user facing
+#if defined(DYNAMIX_USE_LEGACY_MESSAGE_MACROS)
+// this file contains the old-style macros which have a lot of the calling code
+// in the macros itself. They make it a bit harder to step into messages when
+// debugging but in some cases with gcc and clang compile much faster
+#   include "gen/legacy_message_macros.hpp"
+#else
+// these are the new-style message macros only a single step into is needed when
+// debugging in order to go to debuggable c++ code
+// however they may be much slower to compile on gcc and clang
+// this is generally the recommended header, but users are encouraged to test
+// their compilation times with gcc and clang with the other header as well
+#   include "gen/template_message_macros.hpp"
+#endif
 
 // define message macro
 #define DYNAMIX_DEFINE_MESSAGE(message_name) \

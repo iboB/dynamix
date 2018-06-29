@@ -5,6 +5,7 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
+#define DYNAMIX_USE_LEGACY_MESSAGE_MACROS
 #include <dynamix/dynamix.hpp>
 
 #include <iostream>
