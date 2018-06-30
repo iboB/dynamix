@@ -53,17 +53,19 @@ class b
 
 };
 
+#if DYNAMIX_USE_TYPEID
+#   define NAME(x)
+#else
+#   define NAME(x) mixin_name(x) &
+#endif
+
 
 DYNAMIX_DEFINE_MIXIN(a,
-#if !DYNAMIX_USE_TYPEID
-    mixin_name("mixins1::a") &
-#endif
-        none);
+    NAME("mixins1::a")
+    none);
 DYNAMIX_DEFINE_MIXIN(b,
-#if !DYNAMIX_USE_TYPEID
-    mixin_name("mixins1::b") &
-#endif
-        none);
+    NAME("mixins1::b")
+    none);
 }
 
 namespace mixins2
@@ -81,13 +83,9 @@ class b
 
 
 DYNAMIX_DEFINE_MIXIN(a,
-#if !DYNAMIX_USE_TYPEID
-    mixin_name("mixins2::a") &
-#endif
-        none);
+    NAME("mixins2::a")
+    none);
 DYNAMIX_DEFINE_MIXIN(b,
-#if !DYNAMIX_USE_TYPEID
-    mixin_name("mixins2::b") &
-#endif
-        none);
+    NAME("mixins2::b")
+    none);
 }
