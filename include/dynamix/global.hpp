@@ -19,6 +19,7 @@
 #include <vector>
 #include <cstring> // for memset
 
+
 // logically internal data within classes that cannot be private or protected
 // due to implementation issues is marked with _dynamix_internal
 // class X
@@ -66,6 +67,13 @@ namespace internal
     typedef std::bitset<DYNAMIX_MAX_MIXINS> available_mixins_bitset;
 
     extern DYNAMIX_API available_mixins_bitset build_available_mixins_from(const mixin_type_info_vector& mixins);
+
+#if DYNAMIX_USE_TYPEID
+    extern DYNAMIX_API const char* get_mixin_name_from_typeid(const char* typeid_name);
+#   if defined(__GNUC__)
+    extern DYNAMIX_API void free_mixin_name_from_typeid(const char* typeid_name);
+#   endif
+#endif
 
 } // namespace internal
 } // namespace dynamix

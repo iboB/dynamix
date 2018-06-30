@@ -45,6 +45,13 @@ mixin_type_info_instance<Mixin>::~mixin_type_info_instance()
 
 } // namespace internal
 
+#if DYNAMIX_USE_MIXIN_NAME_FROM_MACRO
+#   define _DYNAMIX_MIXIN_NAME_FEATURE ::dynamix::mixin_name
+#else
+#   define _DYNAMIX_MIXIN_NAME_FEATURE ::dynamix::internal::noop_feature
+#endif
+
+
 
 /**
  * \brief Declares a dynamic library class as a mixin.
@@ -121,7 +128,7 @@ mixin_type_info_instance<Mixin>::~mixin_type_info_instance()
     /* create a features parsing function */ \
     /* features can be parsed multiple times by different parsers */ \
     template <typename FeaturesParser> \
-    void _dynamix_parse_mixin_features(const mixin_type*, FeaturesParser& parser) { parser & ::dynamix::mixin_name(#mixin_type) & mixin_features; }
+    void _dynamix_parse_mixin_features(const mixin_type*, FeaturesParser& parser) { parser & _DYNAMIX_MIXIN_NAME_FEATURE(#mixin_type) & mixin_features; }
 
 class object;
 

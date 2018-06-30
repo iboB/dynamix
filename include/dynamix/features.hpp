@@ -17,8 +17,25 @@
 namespace dynamix
 {
 
+/// The type of the `none` feature.
+struct DYNAMIX_API no_features_t {};
+
+/// Use this as a mixin feature to indicate that the mixin
+/// implements no features.
+extern DYNAMIX_API no_features_t* none;
+
 namespace internal
 {
+
+// noop feature used to discard features in the feature list
+struct DYNAMIX_API noop_feature_t {};
+
+// noop overloads
+inline noop_feature_t* noop_feature(const char*)
+{
+    return nullptr;
+}
+
 struct mixin_name_feature
 {
     const char* name;

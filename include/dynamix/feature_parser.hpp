@@ -68,6 +68,11 @@ public:
         return *this;
     }
 
+    feature_registrator& operator & (const noop_feature_t*)
+    {
+        return *this;
+    }
+
     void operator & (const no_features_t*)
     {
     }
@@ -127,6 +132,11 @@ public:
     }
 
     feature_parser& operator & (mixin_name_feature)
+    {
+        return *this;
+    }
+
+    feature_parser& operator & (const noop_feature_t*)
     {
         return *this;
     }

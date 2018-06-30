@@ -107,6 +107,12 @@ public:
     // list of all the message infos for the messages this mixin supports
     std::vector<message_for_mixin> message_infos;
 
+#if DYNAMIX_USE_TYPEID && defined(__GNUC__)
+    // boolean which shows whether the name in the mixin type info was obtained
+    // by cxa demangle and should be freed
+    bool owns_name = false;
+#endif
+
     mixin_type_info()
         : basic_mixin_type_info(INVALID_MIXIN_ID)
         // since this is always static, other members will be initialized with 0

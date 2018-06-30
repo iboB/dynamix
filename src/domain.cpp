@@ -281,6 +281,13 @@ void domain::unregister_mixin_type(const mixin_type_info& info)
     DYNAMIX_ASSERT_MSG(registered, "unregistering a mixin which isn't registered");
     DYNAMIX_ASSERT_MSG(registered == &info, "unregistering a mixin with known id but unknown data");
 
+#if DYNAMIX_USE_TYPEID && defined(__GNUC__)
+    // if the name wasn't overriden by a feature, it has been obtained through
+    // cxa_demangle and we must free it
+    if(info.owns_name)
+        free_mixin_name_from_typeid(info.name);
+#endif
+
     _mixin_type_infos[info.id] = nullptr;
 
     // since this mixin is no longer valid

@@ -17,6 +17,9 @@ notifications:
     on_start: never
 git:
   depth: 5
+branches:
+  except:
+    - next
 
 cache:
   directories:

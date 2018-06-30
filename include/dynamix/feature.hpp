@@ -17,13 +17,6 @@
 namespace dynamix
 {
 
-/// The type of the `none` feature.
-struct DYNAMIX_API no_features_t {};
-
-/// Use this as a mixin feature to indicate that the mixin
-/// implements no features.
-extern DYNAMIX_API no_features_t* none;
-
 static const feature_id INVALID_FEATURE_ID = ~feature_id(0);
 
 class DYNAMIX_API feature
