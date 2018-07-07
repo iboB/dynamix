@@ -120,10 +120,8 @@ void object::clear() noexcept
         _type_info->dealloc_mixin_data(_mixin_data, this);
         _mixin_data = &null_mixin_data;
 
-#if DYNAMIX_ADDITIONAL_METRICS
         DYNAMIX_ASSERT(_type_info->num_objects > 0);
         --_type_info->num_objects;
-#endif
     }
 
     _type_info = &object_type_info::null();
@@ -158,7 +156,6 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
         old_type->dealloc_mixin_data(old_mixin_data, this);
     }
 
-#if DYNAMIX_ADDITIONAL_METRICS
     if (old_type != &object_type_info::null())
     {
         DYNAMIX_ASSERT(old_type->num_objects > 0);
@@ -168,7 +165,6 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
     {
         ++new_type->num_objects;
     }
-#endif
 
     _type_info = new_type;
     _mixin_data = new_mixin_data;
@@ -481,7 +477,6 @@ void object::copy_from(const object& o)
         old_type->dealloc_mixin_data(old_mixin_data, this);
     }
 
-#if DYNAMIX_ADDITIONAL_METRICS
     if (old_type != &object_type_info::null())
     {
         DYNAMIX_ASSERT(old_type->num_objects > 0);
@@ -491,7 +486,6 @@ void object::copy_from(const object& o)
     {
         ++o._type_info->num_objects;
     }
-#endif
 
     _type_info = o._type_info;
     _mixin_data = new_mixin_data;

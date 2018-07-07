@@ -13,17 +13,15 @@
  * Defines types for additional metrics
  */
 
-#if DYNAMIX_ADDITIONAL_METRICS
-#   if DYNAMIX_THREAD_SAFE_MUTATIONS
-#       include <atomic>
+#if DYNAMIX_THREAD_SAFE_MUTATIONS
+#include <atomic>
 namespace dynamix
 {
 using metric = std::atomic<size_t>;
 }
-#   else
+#else
 namespace dynamix
 {
 using metric = size_t;
 }
-#   endif
 #endif

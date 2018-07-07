@@ -109,7 +109,6 @@
 // maintaining them is cheap, but does not cost zero
 // the additional metrics are
 // mixin_type_info::num_mixins - number of living mixins of this type
-// object_type_info::num_objects - number of living objects of this type
 #if !defined(DYNAMIX_ADDITIONAL_METRICS)
 #   define DYNAMIX_ADDITIONAL_METRICS 1
 #endif
