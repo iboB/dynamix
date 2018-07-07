@@ -145,6 +145,9 @@ public:
     // get mixin id by name string
     mixin_id get_mixin_id_by_name(const char* mixin_name) const;
 
+    // erases all type infos with zero objects
+    void garbage_collect_type_infos();
+
 _dynamix_internal:
 
     domain();

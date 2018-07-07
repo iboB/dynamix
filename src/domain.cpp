@@ -351,6 +351,22 @@ mixin_id domain::get_mixin_id_by_name(const char* mixin_name) const
     return INVALID_MIXIN_ID;
 }
 
+void domain::garbage_collect_type_infos()
+{
+    for (auto i = _object_type_infos.begin(); i != _object_type_infos.end(); )
+    {
+        if (i->second->num_objects == 0)
+        {
+            delete i->second;
+            i = _object_type_infos.erase(i);
+        }
+        else
+        {
+            ++i;
+        }
+    }
+}
+
 } // namespace internal
 
 mutation_rule_id add_new_mutation_rule(mutation_rule* rule)
