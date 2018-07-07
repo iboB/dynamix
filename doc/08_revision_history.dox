@@ -1,5 +1,21 @@
 /*! \page revisions Revision History
 
+DynaMix 1.3.6
+=============
+
+Released: 2018 Jul 07
+
+- New mixin feature `mixin_name` allows custom mixin names
+- Fixed short message macros
+- The metric `object_type_info::num_objects` is always on
+- Domain has a method which frees resources for unused object type infos
+- Allowed using the legacy message macros since clang and gcc may suffer increased compilation time with the new ones
+- Fixed a variable shadowing warning in domain.hpp
+- Added multi-threaded and mixin-in-namespace tests
+- Added a compiler performance benchmark
+- Improved build time of tests
+
+
 DynaMix 1.3.5
 =============
 
