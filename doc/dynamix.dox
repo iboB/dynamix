@@ -25,7 +25,7 @@ or the [roles in Perl](http://doc.perl6.org/language/objects#Roles).
 
 This is given while also having full abstraction between the interface and the
 definition of types &ndash; a problem often given as the motivation for the
-[PIMPL idiom](@http://www.drdobbs.com/cpp/making-pimpl-easy/205918714).
+[PIMPL idiom](http://www.drdobbs.com/cpp/making-pimpl-easy/205918714).
 
 In short, *DynaMix is an alternative way to accomplish polymorphism*. It is
 a means to create a project's *architecture*, rather than implement its purpose.
@@ -254,6 +254,21 @@ Still, a non-polymorphic ECS and DynaMix can be (and have been) used together in
 a signle piece of software where DynaMix is used in the business logic
 subsystem, while the performance critical low-level parts of the software make
 use of a non-polymorphic ECS.
+
+Comparison with COM {#com}
+-------------------
+
+There are indeed similarities between DynaMix and Microsoft [Component Object Model](https://en.wikipedia.org/wiki/Component_Object_Model).
+DynaMix object are composed out of mixins much like COM's objects are composed
+from components. Indeed many patterns in DynaMix might be familiar to
+programmers familiar with COM. The notable differences are:
+
+- DynaMix has [multicasts](glossary.html#multicast)
+- With DynaMix there are no interfaces per se. The messages are standalone
+functions and a mixin implements an arbitrary combination of them.
+- Removing a mixin from an object in restores the object's previous state
+- DynaMix objects feel more like idiomatic C++ objects: They can be moved and
+copied and they have destructors instead of relying on a `Release` method.
 
 Comparison with traits {#traits}
 ----------------------
