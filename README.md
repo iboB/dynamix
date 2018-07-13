@@ -69,6 +69,10 @@ cache-locality for critical parts of the code
 modifying, or even rebuilding, the executable.
 * Thread safe message calls &ndash; as thread safe as the underlying methods.
 
+You can also check out [the talk about DynaMix from C++ Russia 2018](https://www.youtube.com/watch?v=-s0zYXGCfJk) or the [article about it in ACCU's Overload Journal from April, 2018](https://accu.org/index.php/journals/2487).
+
+[![C++ Russia video on YouTube](doc/img/youtube-c++russia-talk-video.jpg)](https://www.youtube.com/watch?v=-s0zYXGCfJk)
+
 ## Created with DynaMix
 
 The following projects are known to use DynaMix as a key piece of their software architecture:
