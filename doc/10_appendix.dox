@@ -113,7 +113,7 @@ Further reading {#more_ecs}
 - In his e-book Game Programming Patterns, Robert Nystrom has a wonderful
 [chapter, called Components](http://gameprogrammingpatterns.com/component.html),
 in which he describes the benefits of using an ECS and gives a simple example.
-- Adam Martin has a great [series of articles](@http://t-machine.org/index.php/2007/09/03/entity-systems-are-the-future-of-mmog-development-part-1/)
+- Adam Martin has a great [series of articles](http://t-machine.org/index.php/2007/09/03/entity-systems-are-the-future-of-mmog-development-part-1/)
 on the subject. Especially on how such systems are related to game and MMOG
 development.
 - An existing simple classic entity-component-system is
