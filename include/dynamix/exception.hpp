@@ -83,3 +83,9 @@ class DYNAMIX_API bad_mixin_move : public exception {};
 #else
 #   define DYNAMIX_MSG_THROW_UNLESS(test, exception) DYNAMIX_ASSERT_MSG(test, _DYNAMIX_PP_STRINGIZE(exception))
 #endif
+
+#if defined(DYNAMIX_NO_BAD_MULTICASTS)
+#   define DYNAMIX_MULTICAST_MSG_THROW_UNLESS(test, exception) (void)0
+#else
+#   define DYNAMIX_MULTICAST_MSG_THROW_UNLESS DYNAMIX_MSG_THROW_UNLESS
+#endif

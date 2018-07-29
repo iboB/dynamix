@@ -123,8 +123,7 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
         auto begin = call_entry.begin;
         auto end = call_entry.end;
 
-        DYNAMIX_MSG_THROW_UNLESS(begin, ::dynamix::bad_message_call);
-        DYNAMIX_ASSERT(end);
+        DYNAMIX_MULTICAST_MSG_THROW_UNLESS(begin, ::dynamix::bad_message_call);
 
         set_num_results_for(combinator, size_t(end - begin));
         for (auto iter = begin; iter != end; ++iter)
@@ -168,8 +167,7 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
         auto begin = call_entry.begin;
         auto end = call_entry.end;
 
-        DYNAMIX_MSG_THROW_UNLESS(begin, ::dynamix::bad_message_call);
-        DYNAMIX_ASSERT(end);
+        DYNAMIX_MULTICAST_MSG_THROW_UNLESS(begin, ::dynamix::bad_message_call);
 
         for (auto iter = begin; iter != end; ++iter)
         {
