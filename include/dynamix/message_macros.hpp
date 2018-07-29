@@ -345,6 +345,9 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 
 #else
 
+// optionally don't include any message macros and let the user decide which
+// set they're going to use for each message
+#if !defined(DYNAMIX_NO_MESSAGE_MACROS)
 // include the generated macros
 // choose definition header
 // making this choice DOES NOT require you to rebuild the library
@@ -361,6 +364,7 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 // this is generally the recommended header, but users are encouraged to test
 // their compilation times with gcc and clang with the other header as well
 #   include "gen/template_message_macros.hpp"
+#endif
 #endif
 
 // define message macro
