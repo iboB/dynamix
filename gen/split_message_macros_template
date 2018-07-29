@@ -52,7 +52,7 @@
     template <template <typename> class Combinator> \
     [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj %{coma_args_signature}) \
     { \
-        constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
+        constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function C: no combinator */ \

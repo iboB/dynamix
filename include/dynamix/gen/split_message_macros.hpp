@@ -62,7 +62,7 @@
     template <template <typename> class Combinator> \
     [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj ) \
     { \
-        constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
+        constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function C: no combinator */ \
@@ -157,7 +157,7 @@
     template <template <typename> class Combinator> \
     [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0) \
     { \
-        constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
+        constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function C: no combinator */ \
@@ -252,7 +252,7 @@
     template <template <typename> class Combinator> \
     [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1) \
     { \
-        constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
+        constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function C: no combinator */ \
@@ -347,7 +347,7 @@
     template <template <typename> class Combinator> \
     [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2) \
     { \
-        constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
+        constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function C: no combinator */ \
@@ -442,7 +442,7 @@
     template <template <typename> class Combinator> \
     [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
     { \
-        constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
+        constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function C: no combinator */ \
@@ -537,7 +537,7 @@
     template <template <typename> class Combinator> \
     [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
     { \
-        constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
+        constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function C: no combinator */ \
@@ -632,7 +632,7 @@
     template <template <typename> class Combinator> \
     [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
     { \
-        constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
+        constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function C: no combinator */ \
