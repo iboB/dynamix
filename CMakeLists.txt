@@ -90,6 +90,8 @@ src_group("public~gen" dynamix_sources
     ${inc_path}/gen/legacy_message_macros.hpp
     ${inc_path}/gen/no_arity_message_macros.hpp
     ${inc_path}/gen/short_message_macros.hpp
+    ${inc_path}/gen/split_message_macros.hpp
+    ${inc_path}/gen/undef_message_macros.hpp
 )
 
 src_group("private" dynamix_sources

@@ -32,10 +32,16 @@ foreach(source ${tests})
         add_library(${lib} SHARED ${source})
         target_link_libraries(${lib} dynamix)
         set_target_properties(${lib} PROPERTIES FOLDER tests)
+    elseif(test STREQUAL "split_msg_macros_def")
+        continue()
     else()
         if(NOT DYNAMIX_SHARED_LIB AND test STREQUAL "loader")
             # loader test can only work when DynaMix is a shared library
             continue()
+        endif()
+
+        if(test STREQUAL "split_msg_macros")
+            set(source ${source} split_msg_macros_def.cpp split_msg_macros_messages.inl)
         endif()
 
         set(executable "test_${test}")
