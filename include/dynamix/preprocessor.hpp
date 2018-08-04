@@ -12,9 +12,9 @@
  * Some useful preprocessor macros used internally
  */
 
-#define _DYNAMIX_PP_EMPTY()
+#define I_DYNAMIX_PP_EMPTY()
 
-#define _DYNAMIX_PP_CAT(a, b) _DYNAMIX_PP_INTERNAL_CAT(a, b)
-#define _DYNAMIX_PP_INTERNAL_CAT(a, b) a##b
+#define I_DYNAMIX_PP_CAT(a, b) I_DYNAMIX_PP_INTERNAL_CAT(a, b)
+#define I_DYNAMIX_PP_INTERNAL_CAT(a, b) a##b
 
-#define _DYNAMIX_PP_STRINGIZE(x) #x
+#define I_DYNAMIX_PP_STRINGIZE(x) #x

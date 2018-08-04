@@ -1,20 +1,20 @@
 
-#define _DYNAMIX_MESSAGE%{arity}_DECL(export, message_name, method_name, return_type, constness, message_mechanism %{args_coma}) \
+#define I_DYNAMIX_MESSAGE%{arity}_DECL(export, message_name, method_name, return_type, constness, message_mechanism %{args_coma}) \
     /* mechanism shows whether it's a multicast or unicast */ \
     \
     /* step 1: define the message struct */ \
-    struct export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism) \
-        <_DYNAMIX_MESSAGE_STRUCT_NAME(message_name), constness ::dynamix::object, return_type %{coma_arg_types}> \
+    struct export I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::I_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism) \
+        <I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name), constness ::dynamix::object, return_type %{coma_arg_types}> \
     { \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
-            : _DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(_DYNAMIX_PP_STRINGIZE(message_name)) \
+        I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
+            : I_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(I_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
         /* MethodOwner is the actual owner of the message (either the mixin or one of its parents) */ \
         template <typename Mixin, typename MethodOwner> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = _DYNAMIX_CALLER_NAME(constness)<Mixin, MethodOwner, &MethodOwner::method_name>; \
+            static caller_func the_caller = I_DYNAMIX_CALLER_NAME(constness)<Mixin, MethodOwner, &MethodOwner::method_name>; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -23,34 +23,34 @@
     /* it would have been nice if we could set this global variable to the unique global instance of the feature*/ \
     /* but unfortunately we cannot trust dynamic libraries to keep it straight for us */ \
     /* hence we rely on a getter like the mixin one */ \
-    extern export _DYNAMIX_MESSAGE_STRUCT_NAME(message_name) * _DYNAMIX_MESSAGE_TAG(message_name); \
+    extern export I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name) * I_DYNAMIX_MESSAGE_TAG(message_name); \
     /* step 3: declare the feature getter and manual registrator for the message */ \
-    extern export ::dynamix::feature& _dynamix_get_mixin_feature_safe(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
-    extern export const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
-    extern export void _dynamix_register_mixin_feature(const _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export ::dynamix::feature& _dynamix_get_mixin_feature_safe(const I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export const ::dynamix::feature& _dynamix_get_mixin_feature_fast(const I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
+    extern export void _dynamix_register_mixin_feature(const I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*); \
 
-#define _DYNAMIX_MESSAGE%{arity}_UNI(export, message_name, method_name, return_type, constness %{args_coma}) \
-    _DYNAMIX_MESSAGE%{arity}_DECL(export, message_name, method_name, return_type, constness, unicast %{args_coma}) \
+#define I_DYNAMIX_MESSAGE%{arity}_UNI(export, message_name, method_name, return_type, constness %{args_coma}) \
+    I_DYNAMIX_MESSAGE%{arity}_DECL(export, message_name, method_name, return_type, constness, unicast %{args_coma}) \
     /* step 4: define the message function -> the one that will be called for the objects */ \
     inline return_type method_name(constness ::dynamix::object& _d_obj %{coma_args_signature}) \
     {\
-        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj %{coma_fwd_args}); \
+        return I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj %{coma_fwd_args}); \
     }\
     /* also define a pointer function */ \
     inline return_type method_name(constness ::dynamix::object* _d_obj %{coma_args_signature}) \
     {\
-        return _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj %{coma_fwd_args}); \
+        return I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj %{coma_fwd_args}); \
     }\
 
-#define _DYNAMIX_MESSAGE%{arity}_MULTI(export, message_name, method_name, return_type, constness %{args_coma}) \
-    _DYNAMIX_MESSAGE%{arity}_DECL(export, message_name, method_name, return_type, constness, multicast %{args_coma}) \
+#define I_DYNAMIX_MESSAGE%{arity}_MULTI(export, message_name, method_name, return_type, constness %{args_coma}) \
+    I_DYNAMIX_MESSAGE%{arity}_DECL(export, message_name, method_name, return_type, constness, multicast %{args_coma}) \
     /* step 4: define the message functions -> the one that will be called for the objects */ \
     /* function A: concrete combinator */ \
     template <typename Combinator> \
     void method_name(constness ::dynamix::object& _d_obj %{coma_args_signature}, Combinator& _d_combinator) \
     { \
         /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator %{coma_args}); \
+        I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator %{coma_args}); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
@@ -58,19 +58,19 @@
     { \
         Combinator<return_type> _d_combinator; \
         /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator %{coma_args}); \
+        I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_combinator_call(_d_obj, _d_combinator %{coma_args}); \
         return _d_combinator.result(); \
     } \
     /* function C: no combinator */ \
     inline void method_name(constness ::dynamix::object& _d_obj %{coma_args_signature}) \
     { \
         /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj %{coma_args}); \
+        I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(_d_obj %{coma_args}); \
     } \
     /* also define a pointer function with no combinator */ \
     inline void method_name(constness ::dynamix::object* _d_obj %{coma_args_signature}) \
     {\
         /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
-        _DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj %{coma_args}); \
+        I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj %{coma_args}); \
     }\
 

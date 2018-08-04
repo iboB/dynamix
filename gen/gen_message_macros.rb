@@ -126,9 +126,9 @@ File.open('no_arity_message_macros_template', 'r').each_line do |line|
   macro = macro_arity % empty_arity
   get_macro = "_GET_#{macro}_MACRO"
 
-  arity_macros = (MAX_ARITY-1).downto(0).to_a.map { |i| macro_arity % { :arity => "_#{i}" } }.join(', _DYNAMIX_MESSAGE_ARG_ERROR, ')
+  arity_macros = (MAX_ARITY-1).downto(0).to_a.map { |i| macro_arity % { :arity => "_#{i}" } }.join(', I_DYNAMIX_MESSAGE_ARG_ERROR, ')
 
-  output << "#define #{macro}(...) \\\n   _DYNAMIX_VA_ARGS_PROXY(#{get_macro}, (__VA_ARGS__, #{arity_macros}))(__VA_ARGS__)"
+  output << "#define #{macro}(...) \\\n   I_DYNAMIX_VA_ARGS_PROXY(#{get_macro}, (__VA_ARGS__, #{arity_macros}))(__VA_ARGS__)"
   output << "#define #{get_macro}#{macro_args % args} MACRO"
 end
 
