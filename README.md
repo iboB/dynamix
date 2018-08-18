@@ -1,5 +1,4 @@
-<p align="center"><img src="https://s22.postimg.cc/u1sqhb7jl/README.jpg"></p>
-===========
+# [![DynaMix](https://s22.postimg.cc/u1sqhb7jl/README.jpg)](https://ibob.github.io/dynamix/)
 
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/) [![Standard](https://img.shields.io/badge/C%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Gitter](https://badges.gitter.im/iboB/dynamix.svg)](https://gitter.im/iboB/dynamix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
@@ -117,6 +116,12 @@ See accompanying file LICENSE or copy [here](https://opensource.org/licenses/MIT
 
 Copyright &copy; 2013-2018 [Borislav Stanimirov](http://github.com/iboB), [Zahary Karadjov](http://github.com/zah)
 
+### Logo
+The [DynaMix logo](https://github.com/iboB/dynamix/tree/master/doc/logos) is licensed under a Creative Commons Attribution 4.0 International License. Copyright &copy; 2018 [area55git](https://github.com/area55git)
+
+[![License: CC BY 4.0](https://licensebuttons.net/l/by/4.0/80x15.png)](https://creativecommons.org/licenses/by/4.0/).
+
+
 ## Boost.Mixin
 
 DynaMix was initially developed as [Boost.Mixin](https://github.com/iboB/boost.mixin) but is now a separate library, that doesn't depend on the Boost libraries Collection.
@@ -125,4 +130,4 @@ DynaMix, unlike Boost.Mixin, has no C++98 support. It's C++11 only.
 
 DynaMix is distributed under the MIT license, whereas Boost.Mixin is distributed under the Boost Software License.
 
-<p align="center"><img src="https://s22.postimg.cc/gkvrylx9t/README_2.jpg"></p>
+![Footer](https://s22.postimg.cc/gkvrylx9t/README_2.jpg)
