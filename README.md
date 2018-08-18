@@ -1,4 +1,4 @@
-DynaMix
+<p align="center"><img src="https://s22.postimg.cc/u1sqhb7jl/README.jpg"></p>
 ===========
 
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/) [![Standard](https://img.shields.io/badge/C%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Gitter](https://badges.gitter.im/iboB/dynamix.svg)](https://gitter.im/iboB/dynamix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
@@ -125,3 +125,4 @@ DynaMix, unlike Boost.Mixin, has no C++98 support. It's C++11 only.
 
 DynaMix is distributed under the MIT license, whereas Boost.Mixin is distributed under the Boost Software License.
 
+<p align="center"><img src="https://s22.postimg.cc/gkvrylx9t/README_2.jpg"></p>
