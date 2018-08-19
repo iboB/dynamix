@@ -70,11 +70,10 @@ struct DYNAMIX_API message_for_mixin
     message_t* message; // message object
     mixin_id _mixin_id; // id of the handling mixin type information
 
-    // the caller member is a pointer to a template function instantiated by the message macros
-    // this function takes the appropriate parameters as arguments and is instantiated to call
-    // the mixin method, even from void*
-    // code based on
-    // http://www.codeproject.com/Articles/11015/The-Impossibly-Fast-C-Delegates
+    // the caller member is a pointer to a lambda created by the message macros
+	// (see get_caller_for)
+    // this function takes the appropriate parameters as arguments and calls
+    // the mixin method from void*
     func_ptr caller;
 
     // message perks
@@ -139,7 +138,7 @@ struct message_wrapper {};
 } // namespace internal
 
 
-  // Used in the mixin's feature list to set perks to messages
+// Used in the mixin's feature list to set perks to messages
 template <typename Message>
 internal::message_perks<Message> priority(int p, Message*)
 {
