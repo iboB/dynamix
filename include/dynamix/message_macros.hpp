@@ -178,10 +178,6 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 /// \internal
 #define I_DYNAMIX_MESSAGE_CALLER_STRUCT(mechanism) I_DYNAMIX_PP_CAT(msg_, mechanism)
 
-// construct the appropriate caller name, based on the message constness
-/// \internal
-#define I_DYNAMIX_CALLER_NAME(...) I_DYNAMIX_PP_CAT(caller, __VA_ARGS__)
-
 // default impl helper macros
 
 // name of default implementation struct
