@@ -136,18 +136,10 @@ set_num_results_for(Combinator&, size_t) {}
 
 struct message_wrapper {};
 
-template <typename Message, typename Parent>
-struct msg_from_parent : public message_wrapper {};
-
 } // namespace internal
 
-template <typename Parent, typename Message>
-internal::msg_from_parent<Message, Parent> from_parent(Message*)
-{
-    return internal::msg_from_parent<Message, Parent>();
-}
 
-// Used in the mixin's feature list to set perks to messages
+  // Used in the mixin's feature list to set perks to messages
 template <typename Message>
 internal::message_perks<Message> priority(int p, Message*)
 {
@@ -165,23 +157,6 @@ internal::message_perks<Message> bid(int b, Message*)
 }
 
 // Perks of message wrappers
-template <typename Message, typename Parent>
-internal::message_perks<internal::msg_from_parent<Message, Parent>>
-    priority(int p, internal::msg_from_parent<Message, Parent>)
-{
-    internal::message_perks<internal::msg_from_parent<Message, Parent>> mp;
-    mp.priority = p;
-    return mp;
-}
-
-template <typename Message, typename Parent>
-internal::message_perks<internal::msg_from_parent<Message, Parent>>
-    bid(int b, internal::msg_from_parent<Message, Parent>)
-{
-    internal::message_perks<internal::msg_from_parent<Message, Parent>> mp;
-    mp.bid = b;
-    return mp;
-}
 
 // So perks can be passed as arguments to one another
 template <typename Feature>

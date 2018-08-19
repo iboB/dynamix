@@ -248,7 +248,7 @@ TEST_CASE("type_template")
 
 DYNAMIX_DEFINE_MIXIN(no_messages, none);
 DYNAMIX_DEFINE_MIXIN(counter, dummy_msg & multi_msg);
-DYNAMIX_DEFINE_MIXIN(type_checker, get_self_msg & multi_msg & from_parent<parent>(inherited_msg));
+DYNAMIX_DEFINE_MIXIN(type_checker, get_self_msg & multi_msg & inherited_msg);
 
 DYNAMIX_DEFINE_MESSAGE(dummy);
 DYNAMIX_DEFINE_MESSAGE(get_self);

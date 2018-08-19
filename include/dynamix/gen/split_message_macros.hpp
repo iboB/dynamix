@@ -19,12 +19,15 @@
         I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
             : I_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(I_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
-        /* MethodOwner is the actual owner of the message (either the mixin or one of its parents) */ \
-        template <typename Mixin, typename MethodOwner> \
+        template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = I_DYNAMIX_CALLER_NAME(constness)<Mixin, MethodOwner, &MethodOwner::method_name>; \
+            static caller_func the_caller = [](void* _d_mixin ) -> return_type \
+            { \
+                constness Mixin* _d_m = reinterpret_cast<Mixin*>(_d_mixin); \
+                return _d_m->method_name(); \
+            }; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -114,12 +117,15 @@
         I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
             : I_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(I_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
-        /* MethodOwner is the actual owner of the message (either the mixin or one of its parents) */ \
-        template <typename Mixin, typename MethodOwner> \
+        template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = I_DYNAMIX_CALLER_NAME(constness)<Mixin, MethodOwner, &MethodOwner::method_name>; \
+            static caller_func the_caller = [](void* _d_mixin , arg0_type a0) -> return_type \
+            { \
+                constness Mixin* _d_m = reinterpret_cast<Mixin*>(_d_mixin); \
+                return _d_m->method_name(std::forward<arg0_type>(a0)); \
+            }; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -209,12 +215,15 @@
         I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
             : I_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(I_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
-        /* MethodOwner is the actual owner of the message (either the mixin or one of its parents) */ \
-        template <typename Mixin, typename MethodOwner> \
+        template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = I_DYNAMIX_CALLER_NAME(constness)<Mixin, MethodOwner, &MethodOwner::method_name>; \
+            static caller_func the_caller = [](void* _d_mixin , arg0_type a0, arg1_type a1) -> return_type \
+            { \
+                constness Mixin* _d_m = reinterpret_cast<Mixin*>(_d_mixin); \
+                return _d_m->method_name(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1)); \
+            }; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -304,12 +313,15 @@
         I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
             : I_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(I_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
-        /* MethodOwner is the actual owner of the message (either the mixin or one of its parents) */ \
-        template <typename Mixin, typename MethodOwner> \
+        template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = I_DYNAMIX_CALLER_NAME(constness)<Mixin, MethodOwner, &MethodOwner::method_name>; \
+            static caller_func the_caller = [](void* _d_mixin , arg0_type a0, arg1_type a1, arg2_type a2) -> return_type \
+            { \
+                constness Mixin* _d_m = reinterpret_cast<Mixin*>(_d_mixin); \
+                return _d_m->method_name(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2)); \
+            }; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -399,12 +411,15 @@
         I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
             : I_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(I_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
-        /* MethodOwner is the actual owner of the message (either the mixin or one of its parents) */ \
-        template <typename Mixin, typename MethodOwner> \
+        template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = I_DYNAMIX_CALLER_NAME(constness)<Mixin, MethodOwner, &MethodOwner::method_name>; \
+            static caller_func the_caller = [](void* _d_mixin , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) -> return_type \
+            { \
+                constness Mixin* _d_m = reinterpret_cast<Mixin*>(_d_mixin); \
+                return _d_m->method_name(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3)); \
+            }; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -494,12 +509,15 @@
         I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
             : I_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(I_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
-        /* MethodOwner is the actual owner of the message (either the mixin or one of its parents) */ \
-        template <typename Mixin, typename MethodOwner> \
+        template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = I_DYNAMIX_CALLER_NAME(constness)<Mixin, MethodOwner, &MethodOwner::method_name>; \
+            static caller_func the_caller = [](void* _d_mixin , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) -> return_type \
+            { \
+                constness Mixin* _d_m = reinterpret_cast<Mixin*>(_d_mixin); \
+                return _d_m->method_name(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4)); \
+            }; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
@@ -589,12 +607,15 @@
         I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
             : I_DYNAMIX_MESSAGE_CALLER_STRUCT(message_mechanism)(I_DYNAMIX_PP_STRINGIZE(message_name)) \
         {} \
-        /* MethodOwner is the actual owner of the message (either the mixin or one of its parents) */ \
-        template <typename Mixin, typename MethodOwner> \
+        template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = I_DYNAMIX_CALLER_NAME(constness)<Mixin, MethodOwner, &MethodOwner::method_name>; \
+            static caller_func the_caller = [](void* _d_mixin , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) -> return_type \
+            { \
+                constness Mixin* _d_m = reinterpret_cast<Mixin*>(_d_mixin); \
+                return _d_m->method_name(std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
+            }; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \

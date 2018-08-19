@@ -5,23 +5,19 @@
     /* step 1: define the message struct */ \
     struct export I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name) : public ::dynamix::internal::message_t \
     { \
-        /* define the actual caller func */ \
-        template <typename Mixin, typename MethodOwner, typename Ret, Ret (MethodOwner::*Method)(%{arg_types}) constness> \
-        static Ret caller(void* _d_ptr %{coma_args_signature}) \
-        { \
-            Mixin* _d_m = reinterpret_cast<Mixin*>(_d_ptr); \
-            return (_d_m->*Method)(%{fwd_args}); \
-        } \
         typedef return_type (*caller_func)(void* %{coma_arg_types}); \
         I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)() \
             : ::dynamix::internal::message_t(I_DYNAMIX_PP_STRINGIZE(message_name), message_mechanism, false) \
         {} \
-        /* MethodOwner is the actual owner of the message (either the mixin or one of its parents) */ \
-        template <typename Mixin, typename MethodOwner> \
+        template <typename Mixin> \
         ::dynamix::internal::func_ptr get_caller_for() const \
         { \
             /* prevent the linker from optimizing away the caller function */ \
-            static caller_func the_caller = caller<constness Mixin, constness MethodOwner, return_type, &MethodOwner::method_name>; \
+            static caller_func the_caller = [](void* _d_mixin %{coma_args_signature}) -> return_type \
+            { \
+                constness Mixin* _d_m = reinterpret_cast<Mixin*>(_d_mixin); \
+                return _d_m->method_name(%{fwd_args}); \
+            }; \
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \

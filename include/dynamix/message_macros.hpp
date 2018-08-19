@@ -37,28 +37,6 @@ template <typename Ret, typename... Args>
 struct msg_caller
 {
     using caller_func = Ret (*)(void*, Args...);
-
-    // makes the actual method call
-    // the MethodOwner type describes the owner of the method in case it's not
-    // the mixin but one of its parents
-    template <typename Mixin, typename MethodOwner, Ret (MethodOwner::*Method)(Args...)>
-    static Ret caller(void* mixin, Args... args)
-    {
-        auto m = reinterpret_cast<Mixin*>(mixin);
-        return (m->*Method)(std::forward<Args>(args)...);
-    }
-
-    // we need this silly-named alternative because there is no standard way to
-    // distiguish between constness-based overloads when providing a member function
-    // as a template argument
-    // because of this the macro which instantiates the template also constructs this
-    // function's name based on the message constness
-    template <typename Mixin, typename MethodOwner, Ret (MethodOwner::*Method)(Args...) const>
-    static Ret callerconst(void* mixin, Args... args)
-    {
-        auto m = reinterpret_cast<const Mixin*>(mixin);
-        return (m->*Method)(std::forward<Args>(args)...);
-    }
 };
 
 // instead of adding the multi and unicast calls in the same struct, we split it in two

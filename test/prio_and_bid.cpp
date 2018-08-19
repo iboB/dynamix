@@ -253,7 +253,7 @@ DYNAMIX_DEFINE_MIXIN(b,
     trace_msg & priority(2, priority_trace_msg)
     & priority(1, bid(1, bids_uni_msg)) & priority(-1, bids_bad_uni_msg) & bids_multi_override_msg & bid(1, bids_multi_msg));
 DYNAMIX_DEFINE_MIXIN(a,
-    trace_msg & priority(-1, from_parent<parent>(priority_trace_msg))
+    trace_msg & priority(-1, priority_trace_msg)
     & bid(2, priority(1, bids_uni_msg)) & bids_bad_uni_msg & bids_multi_override_msg & bids_multi_msg);
 DYNAMIX_DEFINE_MIXIN(c,
     trace_msg & priority(1, priority_trace_msg)
