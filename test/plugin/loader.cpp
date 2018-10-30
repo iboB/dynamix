@@ -19,7 +19,11 @@ typedef HMODULE DynamicLib;
 
 inline DynamicLib LoadDynamicLib(const char* lib)
 {
-    std::string l = lib;
+    std::string l;
+#if defined(__GNUC__)
+    l = "lib";
+#endif
+    l += lib;
     l += ".dll";
     return LoadLibrary(l.c_str());
 }
@@ -127,7 +131,7 @@ TEST_CASE("plugin")
 
     // apparently dlclose with gnuc doesn't consider unloading the plugin so file
     // this test works with MSVC and clang
-#if !defined(__GNUC__) || defined(__clang__)
+#if defined(_WIN32) || !defined(__GNUC__) || defined(__clang__)
     p = LoadPlugin("test_plugin_Amod", o);
 
     CHECK(dl_a_multicast<sum>(o) == 126);

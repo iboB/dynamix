@@ -26,7 +26,7 @@ target_link_libraries(executable
     dynlib
 )
 
-if(NOT MSVC)
+if(NOT WIN32)
     target_link_libraries(executable dl)
 endif()
 
