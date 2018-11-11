@@ -1,5 +1,16 @@
 /*! \page revisions Revision History
 
+DynaMix 1.3.7
+=============
+
+Released: 2018 Nov 11
+
+- Properly fixed problems with messages to methods from parent classes, removing the need for `from_parent`
+- User config macro `DYNAMIX_NO_BAD_MULTICASTS` allowing safe mutlicasts (no throwing if there's no implementation)
+- Optional split-message macros to allow message implementations to be hidden for faster compilation.
+- Renamed internal macros to start with `I_` instead of underscore and capital letter
+
+
 DynaMix 1.3.6
 =============
 

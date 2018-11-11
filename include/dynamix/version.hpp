@@ -14,7 +14,7 @@
 
 #define DYNAMIX_VERSION_MAJOR 1
 #define DYNAMIX_VERSION_MINOR 3
-#define DYNAMIX_VERSION_SUB_MINOR 6
+#define DYNAMIX_VERSION_SUB_MINOR 7
 
 /// The library's version.
 ///
