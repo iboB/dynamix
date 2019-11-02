@@ -10,6 +10,7 @@
 #include "doctest/doctest.h"
 
 #include <string>
+#include <iostream> // needed on macs for doctest
 
 TEST_SUITE("mixin moving");
 
