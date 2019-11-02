@@ -34,6 +34,8 @@ public:
     }
 };
 
+class xxx : public b {};
+
 DYNAMIX_DEFINE_MIXIN(b, testv_msg);
 
 struct script_mixin
@@ -47,8 +49,31 @@ void script_testv(void* m, vector<int> data)
     cout << "script(" << sm->n << "): " << data.size() << endl;
 }
 
+namespace is_mixin_ns
+{
+
+template <typename T>
+static int _dynamix_get_mixin_type_info(const T*); // better mach than global func for implicit casts
+
+template <typename T>
+struct is_mixin
+{
+    static constexpr bool value = !std::is_same<int, decltype(_dynamix_get_mixin_type_info(std::declval<T*>()))>::value;
+};
+
+}
+
+using is_mixin_ns::is_mixin;
+
+//template <typename T>
+//using is_mixin = std::is_same<T, decltype(extract_arg((::dynamix::internal::mixin_type_info&(*)(const T*))_dynamix_get_mixin_type_info))>;
+
 int main()
 {
+    cout << is_mixin<a>::value << endl;
+    cout << is_mixin<b>::value << endl;
+    cout << is_mixin<xxx>::value << endl;
+
     auto& dom = dynamix::internal::domain::safe_instance();
     dynamix::internal::mixin_type_info info0;
 
