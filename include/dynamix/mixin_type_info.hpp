@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -29,6 +29,7 @@ static const mixin_id INVALID_MIXIN_ID = ~mixin_id(0);
 
 typedef void(*mixin_constructor_proc)(void* memory);
 typedef void(*mixin_copy_proc)(void* memory, const void* source);
+typedef void(*mixin_move_proc)(void* memory, void* source);
 typedef void(*mixin_destructor_proc)(void* memory);
 
 /**
@@ -70,6 +71,14 @@ public:
     /// Might be left null for mixins which aren't copy-constructible
     mixin_copy_proc copy_constructor;
 
+    /// Procedure which calls the copy assignment of a mixin
+    /// Might be left null for mixins which aren't copy-assignable
+    mixin_copy_proc copy_assignment;
+
+    /// Procedure which calls the move-constrcutor of a mixin
+    /// Might be left null for mixin which aren't move-constructible
+    mixin_move_proc move_constructor;
+
 #if DYNAMIX_ADDITIONAL_METRICS
     /// Number of "living" mixins of this type.
     mutable metric num_mixins = {0};
@@ -92,18 +101,10 @@ protected:
 namespace internal
 {
 
-typedef void (*mixin_move_proc)(void* memory, void* source);
-
 // this struct contains information for a given mixin
 class DYNAMIX_API mixin_type_info : public basic_mixin_type_info
 {
 public:
-    // might be left null for mixins which aren't copy-assignable
-    mixin_copy_proc copy_assignment;
-
-    // might be left null for mixin which aren't move-constructible
-    mixin_move_proc move_constructor;
-
     // list of all the message infos for the messages this mixin supports
     std::vector<message_for_mixin> message_infos;
 
