@@ -18,16 +18,6 @@ namespace dynamix
 
 static_assert(domain_allocator::mixin_data_size == sizeof(internal::mixin_data_in_object), "Error in domain_allocator::mixin_data_size definition");
 
-// ceil(a/b)*b with integers
-// scales a so an exact number of b will fit in it
-static size_t ceil_scale(size_t a, size_t b)
-{
-    size_t result = (a + b - 1) / b; // division rounding up
-    result *= b; // scale
-
-    return result;
-}
-
 void mixin_allocator::construct_mixin(const basic_mixin_type_info& info, void* ptr)
 {
     info.constructor(ptr);
