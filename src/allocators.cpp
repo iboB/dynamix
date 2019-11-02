@@ -51,13 +51,13 @@ void object_allocator::on_set_to_object(object&)
 void object_allocator::release(object&) noexcept
 {}
 
-object_allocator* object_allocator::on_copy_construct(object& target, const object& source)
+object_allocator* object_allocator::on_copy_construct(object&, const object& source)
 {
     DYNAMIX_ASSERT(source.allocator() == this);
     return nullptr;
 }
 
-object_allocator* object_allocator::on_move(object& target, object& source) noexcept
+object_allocator* object_allocator::on_move(object&, object& source) noexcept
 {
     DYNAMIX_ASSERT(source.allocator() == this);
     return this;
