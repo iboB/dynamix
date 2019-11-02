@@ -1,5 +1,16 @@
 /*! \page revisions Revision History
 
+DynaMix 1.3.8
+=============
+
+Released: 2019 Nov 2
+
+- Added mixin move assignment to mixin type info
+- Added `object::move_matching_from` which move-assigns matching mixins from one object to another
+- Exposed copy assignment and move constructor in public mixin type info
+- Fixed some unused variable warnings
+
+
 DynaMix 1.3.7
 =============
 
