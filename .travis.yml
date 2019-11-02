@@ -24,12 +24,12 @@ branches:
 cache:
   directories:
     - .mtime_cache
-    #~ - debug_build
-    #~ - release_build
-    #~ - cc_debug
-    #~ - cc_release
-    #~ - static_debug
-    #~ - static_release
+    - debug_build
+    - release_build
+    - cc_debug
+    - cc_release
+    - static_debug
+    - static_release
 
 matrix:
   include:
@@ -41,34 +41,18 @@ matrix:
           packages: ["g++-5",     "valgrind"]
           sources: *apt_sources
 
-    # GCC 6
-    - env: COMPILER=g++-6
-      compiler: gcc
-      addons: &gcc6
-        apt:
-          packages: ["g++-6",     "valgrind"]
-          sources: *apt_sources
-
-    # GCC 7
-    - env: COMPILER=g++-7
-      compiler: gcc
-      addons: &gcc7
-        apt:
-          packages: ["g++-7",     "valgrind"]
-          sources: *apt_sources
-
     # Clang 4.0
     - env: COMPILER=clang++-4.0 ADDITIONAL_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
       addons: &clang40
         apt:
-          packages: ["clang-4.0", "valgrind", "g++-6"]
+          packages: ["clang-4.0", "valgrind"]
           sources: *apt_sources
 
     # Clang 4.0 - sanitize thread
     - env: COMPILER=clang++-4.0 ADDITIONAL_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=thread"
       addons: &clang50
         apt:
-          packages: ["clang-4.0", "valgrind", "g++-6"]
+          packages: ["clang-4.0", "valgrind"]
           sources: *apt_sources
 
     # Xcode 9.2 Clang
