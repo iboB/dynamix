@@ -31,15 +31,6 @@ cache:
     - static_debug
     - static_release
 
-addons:
-  apt:
-    sources: &apt_sources
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-trusty
-      - llvm-toolchain-trusty-4.0
-      - llvm-toolchain-trusty-5.0
-
-
 matrix:
   include:
     # GCC 5
