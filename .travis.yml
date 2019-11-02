@@ -24,12 +24,12 @@ branches:
 cache:
   directories:
     - .mtime_cache
-    - debug_build
-    - release_build
-    - cc_debug
-    - cc_release
-    - static_debug
-    - static_release
+    #~ - debug_build
+    #~ - release_build
+    #~ - cc_debug
+    #~ - cc_release
+    #~ - static_debug
+    #~ - static_release
 
 matrix:
   include:
