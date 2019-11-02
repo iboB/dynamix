@@ -205,7 +205,9 @@ TEST_CASE("mixin moves")
         CHECK(tc.data == "yuiop");
     }
 
+#if DYNAMIX_USE_EXCEPTIONS
     CHECK_THROWS_AS(target.move_matching_from(nope), bad_move_assignment);
+#endif
 
     CHECK(get_obj_default(src) == &src);
     CHECK(get_obj_custom(src) == &src);
