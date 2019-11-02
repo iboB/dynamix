@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -71,6 +71,7 @@ public:
         info.copy_constructor = get_mixin_copy_constructor<Mixin>();
         info.copy_assignment = get_mixin_copy_assignment<Mixin>();
         info.move_constructor = get_mixin_move_constructor<Mixin>();
+        info.move_assignment = get_mixin_move_assignment<Mixin>();
         info.allocator = _allocator;
 
 #if DYNAMIX_USE_TYPEID

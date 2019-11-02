@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -539,6 +539,21 @@ bool object::copyable() const noexcept
     }
 
     return true;
+}
+
+void object::move_matching_from(object& o)
+{
+    auto& dom = domain::instance();
+
+    for (auto* info : o._type_info->_compact_mixins)
+    {
+        auto id = info->id;
+        if (_type_info->has(id))
+        {
+            DYNAMIX_THROW_UNLESS(dom.mixin_info(id).move_assignment, bad_move_assignment);
+            dom.mixin_info(id).move_assignment(_mixin_data[_type_info->mixin_index(id)].mixin(), o._mixin_data[o._type_info->mixin_index(id)].mixin());
+        }
+    }
 }
 
 #if DYNAMIX_OBJECT_REPLACE_MIXIN

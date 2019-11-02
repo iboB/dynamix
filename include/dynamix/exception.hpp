@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -51,6 +51,10 @@ class DYNAMIX_API bad_copy_construction : public exception {};
 /// Thrown when a copy assignment is performed from an object which has a
 /// non-copy-assignable mixin
 class DYNAMIX_API bad_copy_assignment : public exception {};
+
+/// Thrown when move_matching_from is performed for mixins which have no
+/// move assignment operators defined
+class DYNAMIX_API bad_move_assignment : public exception {};
 
 /// Thrown by DYNAMIX_CALL_NEXT_BIDDER if no next bidder is available
 class DYNAMIX_API bad_next_bidder_call : public exception {};

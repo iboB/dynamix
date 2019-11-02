@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -85,6 +85,7 @@ int main()
     info0.copy_constructor = dynamix::internal::get_mixin_copy_constructor<script_mixin>();
     info0.copy_assignment = dynamix::internal::get_mixin_copy_assignment<script_mixin>();
     info0.move_constructor = dynamix::internal::get_mixin_move_constructor<script_mixin>();
+    info0.move_assignment = dynamix::internal::get_mixin_move_assignment<script_mixin>();
     info0.allocator = dom._allocator;
 
     dom.internal_register_mixin_type(info0);

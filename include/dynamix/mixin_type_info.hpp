@@ -79,6 +79,11 @@ public:
     /// Might be left null for mixin which aren't move-constructible
     mixin_move_proc move_constructor;
 
+    /// Procedure which calls the move assignment of a mixin
+    /// Might be left null for mixin which aren't move-constructible
+    mixin_move_proc move_assignment;
+
+
 #if DYNAMIX_ADDITIONAL_METRICS
     /// Number of "living" mixins of this type.
     mutable metric num_mixins = {0};
@@ -222,6 +227,26 @@ typename std::enable_if<std::is_move_constructible<Mixin>::value,
 template <typename Mixin>
 typename std::enable_if<!std::is_move_constructible<Mixin>::value,
     mixin_move_proc>::type get_mixin_move_constructor()
+{
+    return nullptr;
+}
+
+template <typename Mixin>
+void call_mixin_move_assignment(void* target, void* source)
+{
+    *reinterpret_cast<Mixin*>(target) = std::move(*reinterpret_cast<Mixin*>(source));
+}
+
+template <typename Mixin>
+typename std::enable_if<std::is_move_assignable<Mixin>::value,
+    mixin_move_proc>::type get_mixin_move_assignment()
+{
+    return call_mixin_move_assignment<Mixin>;
+}
+
+template <typename Mixin>
+typename std::enable_if<!std::is_move_constructible<Mixin>::value,
+    mixin_move_proc>::type get_mixin_move_assignment()
 {
     return nullptr;
 }

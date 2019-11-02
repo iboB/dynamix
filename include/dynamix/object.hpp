@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -83,6 +83,12 @@ public:
     /// (note that there might be cases where copy_from or copy_matching_from won't throw
     /// even though this function returns false).
     bool copyable() const noexcept;
+
+    /// Move-assignment of mixins that exist in both objects.
+    /// Will call move-assignment operators of the mixins.
+    /// Will not change the type of the target or the source, but will leave mathing mixins in the source
+    /// in a moved-out-from state.
+    void move_matching_from(object& o);
 
     /////////////////////////////////////////////////////////////////
     // mixin info
