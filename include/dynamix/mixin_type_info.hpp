@@ -245,7 +245,7 @@ typename std::enable_if<std::is_move_assignable<Mixin>::value,
 }
 
 template <typename Mixin>
-typename std::enable_if<!std::is_move_constructible<Mixin>::value,
+typename std::enable_if<!std::is_move_assignable<Mixin>::value,
     mixin_move_proc>::type get_mixin_move_assignment()
 {
     return nullptr;

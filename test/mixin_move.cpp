@@ -32,7 +32,7 @@ public:
     custom_mv& operator=(const custom_mv&) = delete;
     ~custom_mv() = default;
 
-    custom_mv(custom_mv&& other) = default;
+    custom_mv(custom_mv&& other) = delete;
 
     custom_mv& operator=(custom_mv&& other)
     {
