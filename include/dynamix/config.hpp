@@ -151,3 +151,14 @@
 #if !defined(DYNAMIX_API)
 #   define DYNAMIX_API // static lib, so nothing
 #endif
+
+// logically internal data within classes that cannot be private or protected
+// due to implementation issues is marked with _dynamix_internal
+// class X
+// {
+// public:
+//    <public stuff>
+// _dynamix_internal:
+//    <actually public but logically private stuff>
+// };
+#define _dynamix_internal public

@@ -72,13 +72,14 @@ src_group(public dynamix_sources
     ${inc_path}/exception.hpp
     ${inc_path}/feature.hpp
     ${inc_path}/feature_parser.hpp
-    ${inc_path}/global.hpp
     ${inc_path}/message.hpp
     ${inc_path}/message_macros.hpp
     ${inc_path}/mixin.hpp
+    ${inc_path}/mixin_id.hpp
     ${inc_path}/mixin_collection.hpp
     ${inc_path}/mixin_type_info.hpp
     ${inc_path}/mutation_rule.hpp
+    ${inc_path}/mutation_rule_id.hpp
     ${inc_path}/next_bidder.hpp
     ${inc_path}/object.hpp
     ${inc_path}/object_mutator.hpp
@@ -104,9 +105,9 @@ src_group("private" dynamix_sources
     ${src_path}/allocators.cpp
     ${src_path}/common_mutation_rules.cpp
     ${src_path}/domain.cpp
-    ${src_path}/global.cpp
     ${src_path}/internal.hpp
     ${src_path}/mixin_collection.cpp
+    ${src_path}/mixin_type_info.cpp
     ${src_path}/object.cpp
     ${src_path}/object_mutator.cpp
     ${src_path}/object_type_info.cpp
@@ -114,6 +115,7 @@ src_group("private" dynamix_sources
     ${src_path}/object_type_template.cpp
     ${src_path}/same_type_mutator.cpp
     ${src_path}/single_object_mutator.cpp
+    ${src_path}/zero_memory.hpp
 )
 
 if(DYNAMIX_SHARED_LIB)

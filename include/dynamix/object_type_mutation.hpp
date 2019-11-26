@@ -7,7 +7,7 @@
 //
 #pragma once
 
-#include "global.hpp"
+#include "config.hpp"
 #include "mixin_type_info.hpp"
 #include "mixin_collection.hpp"
 

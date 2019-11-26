@@ -12,8 +12,9 @@
  * Functions and classes related to mutation rules.
  */
 
-#include "global.hpp"
+#include "config.hpp"
 #include "mixin_collection.hpp"
+#include "mutation_rule_id.hpp"
 
 #include <memory>
 

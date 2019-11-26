@@ -14,11 +14,14 @@
  * features and message data, type name, size, alignment, etc.
  */
 
-#include "global.hpp"
+#include "config.hpp"
+#include "mixin_id.hpp"
 #include "message.hpp"
 #include "metrics.hpp"
+
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace dynamix
 {
@@ -105,6 +108,14 @@ protected:
 
 namespace internal
 {
+
+// getters of type info based on typeid
+#if DYNAMIX_USE_TYPEID
+    extern DYNAMIX_API const char* get_mixin_name_from_typeid(const char* typeid_name);
+#   if defined(__GNUC__)
+    extern DYNAMIX_API void free_mixin_name_from_typeid(const char* typeid_name);
+#   endif
+#endif
 
 // this struct contains information for a given mixin
 class DYNAMIX_API mixin_type_info : public basic_mixin_type_info

@@ -22,7 +22,7 @@
 #endif
 
 #include "config.hpp"
-#include "global.hpp"
+#include "config.hpp"
 #include "domain.hpp"
 #include "feature.hpp"
 #include "features.hpp"

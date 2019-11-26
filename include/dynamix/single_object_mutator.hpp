@@ -7,7 +7,7 @@
 //
 #pragma once
 
-#include "global.hpp"
+#include "config.hpp"
 #include "object_mutator.hpp"
 
 namespace dynamix

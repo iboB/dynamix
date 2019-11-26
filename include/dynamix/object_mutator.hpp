@@ -14,7 +14,7 @@
  * that deal with object mutation.
  */
 
-#include "global.hpp"
+#include "config.hpp"
 #include "object_type_mutation.hpp"
 #include "assert.hpp"
 

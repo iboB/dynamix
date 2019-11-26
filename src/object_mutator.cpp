@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -12,6 +12,7 @@
 #include <dynamix/exception.hpp>
 #include <dynamix/domain.hpp>
 #include <dynamix/object.hpp>
+#include <algorithm>
 
 namespace dynamix
 {
@@ -70,9 +71,11 @@ void object_mutator::create()
 
     for (const mixin_type_info* mixin_info : old_mixins)
     {
-        // intentionally using linear search instead of binary
-        // cache locality makes it faster for small arrays
-        if(!has_elem(_mutation._removing._compact_mixins, mixin_info))
+        // intentionally using linear search instead of _mutation._removing.has(id)
+        // cache locality makes it faster for small arrays and _mutation._removing
+        // is typically empty or very small
+        auto& removing = _mutation._removing._compact_mixins;
+        if(std::find(removing.begin(), removing.end(), mixin_info) == removing.end())
         {
             // elements are part of the new type only if they're not removed
             new_type_mixins.push_back(mixin_info);

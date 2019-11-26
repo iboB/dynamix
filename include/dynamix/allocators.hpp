@@ -12,7 +12,7 @@
  * Allocator classes.
  */
 
-#include "global.hpp"
+#include "config.hpp"
 #include "object_type_info.hpp"
 
 #include <utility>

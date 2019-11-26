@@ -7,6 +7,7 @@
 //
 #include <dynamix/dynamix.hpp>
 
+#include <cstring>
 #include <set>
 
 #include "doctest/doctest.h"

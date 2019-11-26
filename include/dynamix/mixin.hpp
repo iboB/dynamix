@@ -14,7 +14,7 @@
  * definition, and usage.
  */
 
-#include "global.hpp"
+#include "config.hpp"
 #include "domain.hpp"
 #include "mixin_type_info.hpp"
 #include "feature.hpp"

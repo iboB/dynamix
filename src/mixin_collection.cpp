@@ -9,6 +9,7 @@
 #include <dynamix/domain.hpp>
 #include <dynamix/mixin_collection.hpp>
 #include <dynamix/exception.hpp>
+#include <algorithm>
 
 using namespace std;
 
@@ -19,6 +20,21 @@ using namespace internal;
 
 mixin_collection::mixin_collection()
 {
+}
+
+namespace
+{
+available_mixins_bitset build_available_mixins_from(const mixin_type_info_vector& mixins)
+{
+    available_mixins_bitset result;
+
+    for (const mixin_type_info* mixin_info : mixins)
+    {
+        result[mixin_info->id] = true;
+    }
+
+    return result;
+}
 }
 
 mixin_collection::mixin_collection(const mixin_type_info_vector& mixins)
@@ -44,7 +60,7 @@ void mixin_collection::add(mixin_id id)
     if(_mixins[id])
     {
         // we already have this
-        DYNAMIX_ASSERT(has_elem(_compact_mixins, &info));
+        DYNAMIX_ASSERT(std::find(_compact_mixins.begin(), _compact_mixins.end(), &info) != _compact_mixins.end());
         return;
     }
 

@@ -12,11 +12,12 @@
  * Types related to mixin features.
  */
 
-#include "global.hpp"
+#include "config.hpp"
 
 namespace dynamix
 {
 
+typedef size_t feature_id;
 static const feature_id INVALID_FEATURE_ID = ~feature_id(0);
 
 class DYNAMIX_API feature

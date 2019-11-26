@@ -13,7 +13,7 @@
  * mixins, implemented features, etc.
  */
 
-#include "global.hpp"
+#include "config.hpp"
 #include "mixin_collection.hpp"
 #include "message.hpp"
 #include "assert.hpp"

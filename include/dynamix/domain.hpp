@@ -7,7 +7,8 @@
 //
 #pragma once
 
-#include "global.hpp"
+#include "config.hpp"
+#include "mutation_rule_id.hpp"
 #include "mixin_type_info.hpp"
 #include "object_type_info.hpp"
 #include "feature.hpp"
@@ -92,7 +93,7 @@ public:
         if (reg.mixin_name)
         {
 #if DYNAMIX_USE_TYPEID && defined(__GNUC__)
-            if (info.name) free_mixin_name_from_typeid(info.name);
+            if (info.name && info.owns_name) free_mixin_name_from_typeid(info.name);
             info.owns_name = false;
 #endif
             // override if available

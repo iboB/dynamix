@@ -12,7 +12,7 @@
  * Common multicast combinator classes.
  */
 
-#include "global.hpp"
+#include "config.hpp"
 #include "mixin_collection.hpp"
 
 namespace dynamix

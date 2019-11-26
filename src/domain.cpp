@@ -1,14 +1,16 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
 #include "internal.hpp"
+#include "zero_memory.hpp"
 #include <dynamix/domain.hpp>
 #include <dynamix/mutation_rule.hpp>
 #include <dynamix/allocators.hpp>
+#include <algorithm>
 
 namespace dynamix
 {
@@ -110,7 +112,7 @@ const object_type_info* domain::get_object_type_info(const mixin_type_info_vecto
     // the mixin type infos need to be sorted
     // so as to guarantee that two object type infos of the same mixins
     // will have the exact same content
-    DYNAMIX_ASSERT(is_sorted(mixins));
+    DYNAMIX_ASSERT(std::is_sorted(mixins.begin(), mixins.end()));
 
     available_mixins_bitset query;
 

@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -7,11 +7,20 @@
 //
 #pragma once
 
-#include "global.hpp"
+#include "config.hpp"
 #include "mixin_type_info.hpp"
+
+#include <vector>
+#include <bitset>
 
 namespace dynamix
 {
+
+namespace internal
+{
+using mixin_type_info_vector = std::vector<const internal::mixin_type_info*>;
+using available_mixins_bitset = std::bitset<DYNAMIX_MAX_MIXINS> ;
+}
 
 /// A mixin collection is a class that allows the user to
 /// represent a number of mixins

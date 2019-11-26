@@ -12,7 +12,7 @@
  * Common mutation rules classes.
  */
 
-#include "global.hpp"
+#include "config.hpp"
 #include "mutation_rule.hpp"
 #include "mixin_collection.hpp"
 

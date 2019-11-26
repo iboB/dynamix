@@ -6,7 +6,7 @@
 // https://opensource.org/licenses/MIT
 //
 #include <dynamix/dynamix.hpp>
-
+#include <algorithm>
 #include "doctest/doctest.h"
 
 using namespace dynamix;

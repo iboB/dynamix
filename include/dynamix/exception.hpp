@@ -12,7 +12,7 @@
  * The library's exceptions.
  */
 
-#include "global.hpp"
+#include "config.hpp"
 #include "assert.hpp"
 #include "preprocessor.hpp"
 

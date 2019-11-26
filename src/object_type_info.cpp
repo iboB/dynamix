@@ -1,17 +1,19 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
 #include "internal.hpp"
+#include "zero_memory.hpp"
 #include <dynamix/mixin_type_info.hpp>
 #include <dynamix/object_type_info.hpp>
 #include <dynamix/domain.hpp>
 #include <dynamix/allocators.hpp>
 #include <dynamix/exception.hpp>
 #include <dynamix/object.hpp>
+#include <algorithm>
 
 namespace dynamix
 {
