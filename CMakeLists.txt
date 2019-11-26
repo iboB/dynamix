@@ -23,7 +23,7 @@ project(dynamix)
 
 set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
-    ${CMAKE_CURRENT_SOURCE_DIR}/build/macros
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake
 )
 
 include(src_group)
