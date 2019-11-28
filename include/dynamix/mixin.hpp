@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -77,7 +77,7 @@ mixin_type_info_instance<Mixin>::~mixin_type_info_instance()
  */
 #define DYNAMIX_DECLARE_EXPORTED_MIXIN(export, mixin_type) \
     class mixin_type; \
-    extern export ::dynamix::internal::mixin_type_info& _dynamix_get_mixin_type_info(const mixin_type* m)
+    extern export ::dynamix::mixin_type_info& _dynamix_get_mixin_type_info(const mixin_type* m)
 
 /**
  * \brief Declares a class as a mixin.
@@ -124,7 +124,7 @@ mixin_type_info_instance<Mixin>::~mixin_type_info_instance()
     /* create a function that will reference mixin_type_info_instance static registrator to guarantee its instantiation */ \
     inline void _dynamix_register_mixin(mixin_type*) { ::dynamix::internal::mixin_type_info_instance<mixin_type>::registrator.unused = true; } \
     /* create a mixin_type_info getter for this type */ \
-    ::dynamix::internal::mixin_type_info& _dynamix_get_mixin_type_info(const mixin_type*) { return ::dynamix::internal::mixin_type_info_instance<mixin_type>::info(); } \
+    ::dynamix::mixin_type_info& _dynamix_get_mixin_type_info(const mixin_type*) { return ::dynamix::internal::mixin_type_info_instance<mixin_type>::info(); } \
     /* create a features parsing function */ \
     /* features can be parsed multiple times by different parsers */ \
     template <typename FeaturesParser> \

@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -71,7 +71,7 @@ used by the mixin instance.
 That's why this function is not as simple as the one for the mixin data
 array. It has to conform to the mixin (and also `object` pointer) alignment.
 */
-    virtual std::pair<char*, size_t> alloc_mixin(const dynamix::basic_mixin_type_info& info, const dynamix::object*) override
+    virtual std::pair<char*, size_t> alloc_mixin(const dynamix::mixin_type_info& info, const dynamix::object*) override
     {
 /*`
 The users are strongly advised to use the static method
@@ -101,7 +101,7 @@ You are encouraged to use the static method
 /*`
 The mixin instance deallocation method can be trivial
 */
-    virtual void dealloc_mixin(char* ptr, size_t, const dynamix::basic_mixin_type_info&, const dynamix::object*) override
+    virtual void dealloc_mixin(char* ptr, size_t, const dynamix::mixin_type_info&, const dynamix::object*) override
     {
         deallocate(ptr);
     }
@@ -169,7 +169,7 @@ public:
         _page_byte_index = 0;
     }
 
-    virtual std::pair<char*, size_t> alloc_mixin(const dynamix::basic_mixin_type_info& info, const dynamix::object*) override
+    virtual std::pair<char*, size_t> alloc_mixin(const dynamix::mixin_type_info& info, const dynamix::object*) override
     {
         if(_page_byte_index == NUM_IN_PAGE)
         {
@@ -188,7 +188,7 @@ public:
         return std::make_pair(buffer, offset);
     }
 
-    virtual void dealloc_mixin(char* buf, size_t, const dynamix::basic_mixin_type_info& info, const dynamix::object*) override
+    virtual void dealloc_mixin(char* buf, size_t, const dynamix::mixin_type_info& info, const dynamix::object*) override
     {
 #if !defined(NDEBUG)
         // in debug mode check if the mixin is within any of our pages

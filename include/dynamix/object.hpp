@@ -97,7 +97,7 @@ public:
     template <typename Mixin>
     bool has() const noexcept
     {
-        const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
+        const mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
         return internal_has_mixin(info.id);
     }
 
@@ -106,7 +106,7 @@ public:
     template <typename Mixin>
     Mixin* get() noexcept
     {
-        const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
+        const mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
         return reinterpret_cast<Mixin*>(internal_get_mixin(info.id));
     }
 
@@ -115,7 +115,7 @@ public:
     template <typename Mixin>
     const Mixin* get() const noexcept
     {
-        const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
+        const mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
         return reinterpret_cast<const Mixin*>(internal_get_mixin(info.id));
     }
 

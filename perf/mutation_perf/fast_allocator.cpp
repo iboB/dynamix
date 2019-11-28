@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -37,7 +37,7 @@ char* fast_allocator::allocate(size_t bytes)
     return ret;
 }
 
-std::pair<char*, size_t> fast_allocator::alloc_mixin(const basic_mixin_type_info& info, const object*)
+std::pair<char*, size_t> fast_allocator::alloc_mixin(const mixin_type_info& info, const object*)
 {
     size_t mem_size = mem_size_for_mixin(info.size, info.alignment);
 
@@ -46,7 +46,7 @@ std::pair<char*, size_t> fast_allocator::alloc_mixin(const basic_mixin_type_info
     return std::make_pair(buffer, offset);
 }
 
-void fast_allocator::dealloc_mixin(char*, size_t, const basic_mixin_type_info&, const object*)
+void fast_allocator::dealloc_mixin(char*, size_t, const mixin_type_info&, const object*)
 {
     --_living_objects;
 }

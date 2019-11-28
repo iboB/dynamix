@@ -18,7 +18,7 @@ namespace dynamix
 
 namespace internal
 {
-using mixin_type_info_vector = std::vector<const internal::mixin_type_info*>;
+using mixin_type_info_vector = std::vector<const mixin_type_info*>;
 using available_mixins_bitset = std::bitset<DYNAMIX_MAX_MIXINS> ;
 }
 
@@ -38,7 +38,7 @@ public:
     template <typename Mixin>
     bool has() const
     {
-        const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
+        const mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
         return has(info.id);
     }
     bool has(mixin_id id) const { return _mixins[id]; }
@@ -47,7 +47,7 @@ public:
     template <typename Mixin>
     void add()
     {
-        const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
+        const mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
         check_valid_mixin(info);
         add(info.id);
     }
@@ -57,7 +57,7 @@ public:
     template <typename Mixin>
     void remove()
     {
-        const internal::mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
+        const mixin_type_info& info = _dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr));
         remove(info.id);
     }
     void remove(mixin_id id);
@@ -75,7 +75,7 @@ public:
     internal::mixin_type_info_vector _compact_mixins;
 
     void rebuild_from_compact_mixins();
-    void check_valid_mixin(const internal::mixin_type_info& mixin_info);
+    void check_valid_mixin(const mixin_type_info& mixin_info);
 
     /// Removes all elements from the collection
     void clear();

@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -13,8 +13,8 @@ public:
     fast_allocator();
     ~fast_allocator();
 
-    virtual std::pair<char*, size_t> alloc_mixin(const dynamix::basic_mixin_type_info& info, const dynamix::object* obj) override;
-    virtual void dealloc_mixin(char* ptr, size_t mixin_offset, const dynamix::basic_mixin_type_info& info, const dynamix::object* obj) override;
+    virtual std::pair<char*, size_t> alloc_mixin(const dynamix::mixin_type_info& info, const dynamix::object* obj) override;
+    virtual void dealloc_mixin(char* ptr, size_t mixin_offset, const dynamix::mixin_type_info& info, const dynamix::object* obj) override;
     virtual char* alloc_mixin_data(size_t count, const dynamix::object* obj) override;
     virtual void dealloc_mixin_data(char* ptr, size_t count, const dynamix::object* obj) override;
 

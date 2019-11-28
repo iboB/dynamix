@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -66,34 +66,34 @@ public:
     ///
     /// \par Example:
     /// \code
-    /// std::pair<char*, size_t> your_allocator::alloc_mixin(const basic_mixin_type_info& info, const object*)
+    /// std::pair<char*, size_t> your_allocator::alloc_mixin(const mixin_type_info& info, const object*)
     /// {
     ///     size_t mem_size = mem_size_for_mixin(info.size, info.alignment);
     ///     auto buffer = new char[mem_size];
     ///     return make_pair(buffer, mixin_offset(buffer, info.alignment));
     /// }
     /// \endcode
-    virtual std::pair<char*, size_t> alloc_mixin(const basic_mixin_type_info& info, const object* obj) = 0;
+    virtual std::pair<char*, size_t> alloc_mixin(const mixin_type_info& info, const object* obj) = 0;
 
     /// Pure virtual.
     /// Should free the memory that has
     /// been obtained via a call to `alloc_mixin`.
     /// The library will call the method with the same mixin type info which was used to allocate it previously
     /// and also with the offset which was returned by the allocation.
-    virtual void dealloc_mixin(char* ptr, size_t mixin_offset, const basic_mixin_type_info& info, const object* obj) = 0;
+    virtual void dealloc_mixin(char* ptr, size_t mixin_offset, const mixin_type_info& info, const object* obj) = 0;
 
     /// Virtual function, which constructs a mixin within a memory buffer.
     /// The default implementation calls the default constructor.
-    virtual void construct_mixin(const basic_mixin_type_info& info, void* ptr);
+    virtual void construct_mixin(const mixin_type_info& info, void* ptr);
 
     /// Virtual function, which copy-constructs a mixin within a memory buffer, from a given source.
     /// Should return false if the copy-construction failed.
     /// The default implementation calls the default copy constructor and returns false if none exists.
-    virtual bool copy_construct_mixin(const basic_mixin_type_info& info, void* ptr, const void* source);
+    virtual bool copy_construct_mixin(const mixin_type_info& info, void* ptr, const void* source);
 
     /// Virtual function, which destroys a mixin from a given buffer.
     /// The default implementation calls the destructor.
-    virtual void destroy_mixin(const basic_mixin_type_info& info, void* ptr) noexcept;
+    virtual void destroy_mixin(const mixin_type_info& info, void* ptr) noexcept;
 
 #if DYNAMIX_DEBUG
     // checks to see if an allocator is changed after it has already started allocating
@@ -264,9 +264,9 @@ public:
     /// \internal
     virtual void dealloc_mixin_data(char* ptr, size_t count, const object* obj) override;
     /// \internal
-    virtual std::pair<char*, size_t> alloc_mixin(const basic_mixin_type_info& info, const object* obj) override;
+    virtual std::pair<char*, size_t> alloc_mixin(const mixin_type_info& info, const object* obj) override;
     /// \internal
-    virtual void dealloc_mixin(char* ptr, size_t mixin_offset, const basic_mixin_type_info& info, const object* obj) override;
+    virtual void dealloc_mixin(char* ptr, size_t mixin_offset, const mixin_type_info& info, const object* obj) override;
 };
 
 

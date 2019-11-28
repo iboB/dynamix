@@ -36,74 +36,77 @@ typedef void(*mixin_move_proc)(void* memory, void* source);
 typedef void(*mixin_destructor_proc)(void* memory);
 
 /**
-* Public mixin type info. Contains a slice of the type info data
-* which can be viewed by the library's users
-* for all mixin allocation
+* Mixin type info. Contains a the mixin type information, features and traits.
 */
-class DYNAMIX_API basic_mixin_type_info
+class DYNAMIX_API mixin_type_info
 {
 public:
+    mixin_type_info() = default;
+
     /// The mixin's id
-    mixin_id id;
+    mixin_id id = INVALID_MIXIN_ID;
 
     /// Shows whether this is as initialized mixin type
     bool is_valid() const { return id != INVALID_MIXIN_ID; }
 
     /// The mixin name: The class name or, in case `mixin_name` feature is provided,
     /// the manual name set from there
-    const char* name;
+    const char* name = nullptr;
 
     /// Size of the mixin type
-    size_t size;
+    size_t size = 0;
 
     /// Alignment of the mixin type
-    size_t alignment;
+    size_t alignment = 0;
 
     /// Allocator associated with this mixin type.
     /// If no special one was provided this will be equal to the allocator of the domain.
-    mixin_allocator* allocator;
+    mixin_allocator* allocator = nullptr;
 
     /// Procedure which calls the default constructor of a mixin.
     /// Might be left null if the mixin is not default-constructible.
-    mixin_constructor_proc constructor;
+    mixin_constructor_proc constructor = 0;
 
     /// Procedure which calls the destructor of a mixin. Never null.
-    mixin_destructor_proc destructor;
+    mixin_destructor_proc destructor = 0;
 
     /// Procedutre which calls the copy-constructor of a mixin.
     /// Might be left null for mixins which aren't copy-constructible
-    mixin_copy_proc copy_constructor;
+    mixin_copy_proc copy_constructor = 0;
 
     /// Procedure which calls the copy assignment of a mixin
     /// Might be left null for mixins which aren't copy-assignable
-    mixin_copy_proc copy_assignment;
+    mixin_copy_proc copy_assignment = 0;
 
     /// Procedure which calls the move-constrcutor of a mixin
     /// Might be left null for mixin which aren't move-constructible
-    mixin_move_proc move_constructor;
+    mixin_move_proc move_constructor = 0;
 
     /// Procedure which calls the move assignment of a mixin
     /// Might be left null for mixin which aren't move-constructible
-    mixin_move_proc move_assignment;
+    mixin_move_proc move_assignment = 0;
 
+    /// All the message infos for the messages this mixin supports
+    std::vector<internal::message_for_mixin> message_infos;
+
+#if DYNAMIX_USE_TYPEID && defined(__GNUC__)
+    // boolean which shows whether the name in the mixin type info was obtained
+    // by cxa demangle and should be freed
+    bool owns_name = false;
+#endif
 
 #if DYNAMIX_ADDITIONAL_METRICS
     /// Number of "living" mixins of this type.
     mutable metric num_mixins = {0};
 #endif
 
-protected:
-    // users shouldn't be able to construct or destroy this
-
-    basic_mixin_type_info(mixin_id i)
-        : id(i)
-        // since this is always static, other members will be initialized with 0
-    {}
-    ~basic_mixin_type_info() {}
-
     // non-copyable
-    basic_mixin_type_info(const basic_mixin_type_info&) = delete;
-    basic_mixin_type_info& operator=(const basic_mixin_type_info&) = delete;
+    mixin_type_info(const mixin_type_info&) = delete;
+    mixin_type_info& operator=(const mixin_type_info&) = delete;
+
+    // non-movable
+    mixin_type_info(mixin_type_info&&) = delete;
+    mixin_type_info& operator=(mixin_type_info&&) = delete;
 };
 
 namespace internal
@@ -116,26 +119,6 @@ namespace internal
     extern DYNAMIX_API void free_mixin_name_from_typeid(const char* typeid_name);
 #   endif
 #endif
-
-// this struct contains information for a given mixin
-class DYNAMIX_API mixin_type_info : public basic_mixin_type_info
-{
-public:
-    // list of all the message infos for the messages this mixin supports
-    std::vector<message_for_mixin> message_infos;
-
-#if DYNAMIX_USE_TYPEID && defined(__GNUC__)
-    // boolean which shows whether the name in the mixin type info was obtained
-    // by cxa demangle and should be freed
-    bool owns_name = false;
-#endif
-
-    mixin_type_info()
-        : basic_mixin_type_info(INVALID_MIXIN_ID)
-        // since this is always static, other members will be initialized with 0
-    {
-    }
-};
 
 // this metafunction binds the type info of a mixin to its type
 template <typename Mixin>

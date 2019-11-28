@@ -18,19 +18,19 @@ namespace dynamix
 
 static_assert(domain_allocator::mixin_data_size == sizeof(internal::mixin_data_in_object), "Error in domain_allocator::mixin_data_size definition");
 
-void mixin_allocator::construct_mixin(const basic_mixin_type_info& info, void* ptr)
+void mixin_allocator::construct_mixin(const mixin_type_info& info, void* ptr)
 {
     info.constructor(ptr);
 }
 
-bool mixin_allocator::copy_construct_mixin(const basic_mixin_type_info& info, void* ptr, const void* source)
+bool mixin_allocator::copy_construct_mixin(const mixin_type_info& info, void* ptr, const void* source)
 {
     if (!info.copy_constructor) return false;
     info.copy_constructor(ptr, source);
     return true;
 }
 
-void mixin_allocator::destroy_mixin(const basic_mixin_type_info& info, void* ptr) noexcept
+void mixin_allocator::destroy_mixin(const mixin_type_info& info, void* ptr) noexcept
 {
     info.destructor(ptr);
 }
@@ -72,7 +72,7 @@ void default_allocator::dealloc_mixin_data(char* ptr, size_t, const object*)
     delete[] ptr;
 }
 
-std::pair<char*, size_t> default_allocator::alloc_mixin(const basic_mixin_type_info& info, const object*)
+std::pair<char*, size_t> default_allocator::alloc_mixin(const mixin_type_info& info, const object*)
 {
 #if DYNAMIX_DEBUG
     _has_allocated = true;
@@ -88,7 +88,7 @@ std::pair<char*, size_t> default_allocator::alloc_mixin(const basic_mixin_type_i
     return std::make_pair(buffer, offset);
 }
 
-void default_allocator::dealloc_mixin(char* ptr, size_t, const basic_mixin_type_info&, const object*)
+void default_allocator::dealloc_mixin(char* ptr, size_t, const mixin_type_info&, const object*)
 {
 #if DYNAMIX_DEBUG
     DYNAMIX_ASSERT(_has_allocated); // what? deallocate without ever allocating?

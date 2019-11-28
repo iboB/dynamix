@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -25,7 +25,7 @@ template <typename Mixin, typename Message, typename ...Args>
 auto call_next_bidder(Mixin* mixin, Message* message, Args&&... args)
 -> decltype(std::declval<typename Message::caller_func>()(nullptr, std::forward<Args>(args)...))
 {
-    internal::mixin_type_info& mixin_info = _dynamix_get_mixin_type_info(mixin);
+    mixin_type_info& mixin_info = _dynamix_get_mixin_type_info(mixin);
     auto& msg = static_cast<const internal::message_t&>(_dynamix_get_mixin_feature_fast(message));
 
     const object* obj = object_of(mixin);
@@ -105,7 +105,7 @@ auto call_next_bidder(Mixin* mixin, Message* message, Args&&... args)
 template <typename Mixin, typename Message>
 bool has_next_bidder(Mixin* mixin, Message* message)
 {
-    internal::mixin_type_info& mixin_info = _dynamix_get_mixin_type_info(mixin);
+    mixin_type_info& mixin_info = _dynamix_get_mixin_type_info(mixin);
     auto& msg = static_cast<const internal::message_t&>(_dynamix_get_mixin_feature_fast(message));
     const object* obj = object_of(mixin);
     const internal::object_type_info::call_table_entry& entry = obj->_type_info->_call_table[msg.id];

@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -61,14 +61,14 @@ struct custom_allocator : public domain_allocator, public alloc_counter<T>
         delete[] ptr;
     }
 
-    virtual std::pair<char*, size_t> alloc_mixin(const basic_mixin_type_info& info, const object* obj) override
+    virtual std::pair<char*, size_t> alloc_mixin(const mixin_type_info& info, const object* obj) override
     {
         CHECK(obj == the_object);
         ++alloc_counter<T>::mixin_allocations;
         return _dda.alloc_mixin(info, obj);
     }
 
-    virtual void dealloc_mixin(char* ptr, size_t offset, const basic_mixin_type_info& info, const object* obj) override
+    virtual void dealloc_mixin(char* ptr, size_t offset, const mixin_type_info& info, const object* obj) override
     {
         CHECK(offset == mixin_offset(ptr, info.alignment));
         CHECK((!the_object || obj == the_object));
@@ -103,19 +103,19 @@ public:
         CHECK(false);
     }
 
-    virtual std::pair<char*, size_t> alloc_mixin(const basic_mixin_type_info& info, const object* obj) override
+    virtual std::pair<char*, size_t> alloc_mixin(const mixin_type_info& info, const object* obj) override
     {
         CHECK(&info == &m_info);
         return super::alloc_mixin(info, obj);
     }
 
-    virtual void dealloc_mixin(char* ptr, size_t offset, const basic_mixin_type_info& info, const object* obj) override
+    virtual void dealloc_mixin(char* ptr, size_t offset, const mixin_type_info& info, const object* obj) override
     {
         CHECK(&info == &m_info);
         super::dealloc_mixin(ptr, offset, info, obj);
     }
 
-    const basic_mixin_type_info& m_info;
+    const mixin_type_info& m_info;
 };
 
 class custom_alloc_2 : public custom_allocator<custom_alloc_2> {};
@@ -380,14 +380,14 @@ public:
         _dda.dealloc_mixin_data(ptr, count, obj);
     }
 
-    virtual std::pair<char*, size_t> alloc_mixin(const basic_mixin_type_info& info, const object* obj) override
+    virtual std::pair<char*, size_t> alloc_mixin(const mixin_type_info& info, const object* obj) override
     {
         CHECK(obj == the_object);
         ++mixin_allocations;
         return _dda.alloc_mixin(info, obj);
     }
 
-    virtual void dealloc_mixin(char* ptr, size_t offset, const basic_mixin_type_info& info, const object* obj) override
+    virtual void dealloc_mixin(char* ptr, size_t offset, const mixin_type_info& info, const object* obj) override
     {
         CHECK(offset == mixin_offset(ptr, info.alignment));
         CHECK((obj == the_object));

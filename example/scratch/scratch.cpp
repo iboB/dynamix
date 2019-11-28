@@ -66,7 +66,7 @@ struct is_mixin
 using is_mixin_ns::is_mixin;
 
 //template <typename T>
-//using is_mixin = std::is_same<T, decltype(extract_arg((::dynamix::internal::mixin_type_info&(*)(const T*))_dynamix_get_mixin_type_info))>;
+//using is_mixin = std::is_same<T, decltype(extract_arg((::dynamix::mixin_type_info&(*)(const T*))_dynamix_get_mixin_type_info))>;
 
 int main()
 {
@@ -75,7 +75,7 @@ int main()
     cout << is_mixin<xxx>::value << endl;
 
     auto& dom = dynamix::internal::domain::safe_instance();
-    dynamix::internal::mixin_type_info info0;
+    dynamix::mixin_type_info info0;
 
     info0.name = "bagavag";
     info0.size = sizeof(script_mixin);
