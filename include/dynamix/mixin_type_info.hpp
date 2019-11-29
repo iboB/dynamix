@@ -18,8 +18,8 @@
 #include "mixin_id.hpp"
 #include "message.hpp"
 #include "metrics.hpp"
+#include "mixin_funcs.hpp"
 
-#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -30,11 +30,6 @@ class mixin_allocator;
 
 // TODO: inline when on C++17
 static constexpr mixin_id INVALID_MIXIN_ID = ~mixin_id(0);
-
-typedef void(*mixin_constructor_proc)(void* memory);
-typedef void(*mixin_copy_proc)(void* memory, const void* source);
-typedef void(*mixin_move_proc)(void* memory, void* source);
-typedef void(*mixin_destructor_proc)(void* memory);
 
 /**
 * Mixin type info. Contains a the mixin type information, features and traits.
