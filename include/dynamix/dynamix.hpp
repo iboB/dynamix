@@ -3,7 +3,7 @@
 //
 // dynamix.hpp - main include file for the DynaMix library
 //
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -22,13 +22,13 @@
 #endif
 
 #include "config.hpp"
-#include "config.hpp"
 #include "domain.hpp"
 #include "feature.hpp"
 #include "features.hpp"
 #include "mixin_type_info.hpp"
 #include "declare_mixin.hpp"
 #include "mixin.hpp"
+#include "object_of.hpp"
 #include "message.hpp"
 #include "message_macros.hpp"
 #include "object.hpp"
@@ -38,6 +38,10 @@
 #include "object_type_info.hpp"
 #include "exception.hpp"
 #include "allocators.hpp"
+
+#if !defined(DYNAMIX_NO_DM_THIS)
+#   include "dm_this.hpp"
+#endif
 
 // possibly leave those to be included separately ?
 #include "next_bidder.hpp"

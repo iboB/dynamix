@@ -69,6 +69,7 @@ src_group(public dynamix_sources
     ${inc_path}/config.hpp
     ${inc_path}/domain.hpp
     ${inc_path}/declare_mixin.hpp
+    ${inc_path}/dm_this.hpp
     ${inc_path}/dynamix.hpp
     ${inc_path}/exception.hpp
     ${inc_path}/feature.hpp
@@ -84,6 +85,7 @@ src_group(public dynamix_sources
     ${inc_path}/next_bidder.hpp
     ${inc_path}/object.hpp
     ${inc_path}/object_mutator.hpp
+    ${inc_path}/object_of.hpp
     ${inc_path}/object_type_info.hpp
     ${inc_path}/object_type_mutation.hpp
     ${inc_path}/object_type_template.hpp
