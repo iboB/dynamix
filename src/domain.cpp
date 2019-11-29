@@ -369,6 +369,11 @@ void domain::garbage_collect_type_infos()
     }
 }
 
+mixin_allocator* domain::_mixin_allocator() const
+{
+    return _allocator;
+}
+
 } // namespace internal
 
 mutation_rule_id add_new_mutation_rule(mutation_rule* rule)

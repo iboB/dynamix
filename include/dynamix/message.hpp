@@ -57,6 +57,7 @@ protected:
     {}
 };
 
+// templated so the type can be passed along with the perks
 template <typename Message>
 struct message_perks
 {

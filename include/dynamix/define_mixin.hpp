@@ -15,7 +15,7 @@
 #include "config.hpp"
 #include "domain.hpp"
 #include "mixin_type_info.hpp"
-#include "feature.hpp"
+#include "features.hpp"
 
 namespace dynamix
 {

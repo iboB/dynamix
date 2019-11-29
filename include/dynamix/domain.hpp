@@ -73,7 +73,7 @@ public:
         info.copy_assignment = get_mixin_copy_assignment<Mixin>();
         info.move_constructor = get_mixin_move_constructor<Mixin>();
         info.move_assignment = get_mixin_move_assignment<Mixin>();
-        info.allocator = _allocator;
+        info.allocator = _mixin_allocator();
 
 #if DYNAMIX_USE_TYPEID
         info.name = get_mixin_name_from_typeid(typeid(Mixin).name());
@@ -192,6 +192,10 @@ _dynamix_internal:
 
 
     // allocators
+
+    // we need this silly function in order to perform the cast from domain to mixin allocator
+    // when allocators are included
+    mixin_allocator* _mixin_allocator() const;
     domain_allocator* _allocator;
 
 private:

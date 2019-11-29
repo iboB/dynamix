@@ -12,8 +12,6 @@
 * Non-message feature of mixins.
 */
 
-#include "feature.hpp"
-
 namespace dynamix
 {
 

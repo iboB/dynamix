@@ -17,7 +17,6 @@
 #include "message.hpp"
 #include "features.hpp"
 #include "object_type_info.hpp"
-#include "allocators.hpp" // clang needs this to assign mixin_allocator to allocator :(
 
 namespace dynamix
 {

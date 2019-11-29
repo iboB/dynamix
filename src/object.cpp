@@ -13,6 +13,7 @@
 #include <dynamix/domain.hpp>
 #include <dynamix/object_type_template.hpp>
 #include <dynamix/exception.hpp>
+#include <dynamix/allocators.hpp>
 
 #include <tuple>
 
