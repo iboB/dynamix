@@ -68,6 +68,7 @@ src_group(public dynamix_sources
     ${inc_path}/common_mutation_rules.hpp
     ${inc_path}/config.hpp
     ${inc_path}/domain.hpp
+    ${inc_path}/declare_mixin.hpp
     ${inc_path}/dynamix.hpp
     ${inc_path}/exception.hpp
     ${inc_path}/feature.hpp
