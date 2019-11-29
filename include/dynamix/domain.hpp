@@ -15,6 +15,8 @@
 #include "feature_parser.hpp"
 #include "message.hpp"
 
+#include "internal/mixin_traits.hpp"
+
 #include <unordered_map>
 #include <memory>
 #include <type_traits> // alignment of

@@ -95,6 +95,10 @@ src_group(public dynamix_sources
     ${inc_path}/version.hpp
 )
 
+src_group("public~internal" dynamix_sources
+    ${inc_path}/internal/mixin_traits.hpp
+)
+
 src_group("public~gen" dynamix_sources
     ${inc_path}/gen/template_message_macros.hpp
     ${inc_path}/gen/legacy_message_macros.hpp
@@ -110,7 +114,7 @@ src_group("private" dynamix_sources
     ${src_path}/domain.cpp
     ${src_path}/internal.hpp
     ${src_path}/mixin_collection.cpp
-    ${src_path}/mixin_type_info.cpp
+    ${src_path}/mixin_traits.cpp
     ${src_path}/object.cpp
     ${src_path}/object_mutator.cpp
     ${src_path}/object_type_info.cpp
