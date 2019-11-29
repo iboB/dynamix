@@ -16,7 +16,6 @@
 #include "domain.hpp"
 #include "mixin_type_info.hpp"
 #include "feature.hpp"
-#include "preprocessor.hpp"
 
 namespace dynamix
 {
@@ -24,22 +23,50 @@ namespace dynamix
 namespace internal
 {
 
+// this metafunction binds the type info of a mixin to its type
 template <typename Mixin>
-mixin_type_info_instance<Mixin>::mixin_type_info_instance()
+struct mixin_type_info_instance
 {
-    // register the mixin in the domain
-    domain::safe_instance().
-        // we use the function to get the type info, to guarantee that an instantiation of the template
-        // from another module won't override if
-        template register_mixin_type<Mixin>(_dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr)));
-}
+    // have this static function instead of a simple member to guarantee
+    // that mixin_type_info's constructor is called the first time
+    static mixin_type_info& info()
+    {
+        static mixin_type_info d;
+        return d;
+    }
 
+    // this static member registers the mixin in the domain
+    // we need to reference it somewhere so as to call its constructor
+    static mixin_type_info_instance registrator;
+
+    // the constructor is defined in mixin.h because it references the domain object
+    mixin_type_info_instance()
+    {
+        // register the mixin in the domain
+        domain::safe_instance().
+            // we use the function to get the type info, to guarantee that an instantiation of the template
+            // from another module won't override if
+            template register_mixin_type<Mixin>(_dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr)));
+    }
+
+
+    ~mixin_type_info_instance()
+    {
+        // unregister the mixin from the domain
+        domain::safe_instance().unregister_mixin_type(info());
+    }
+
+
+    // non-copyable
+    mixin_type_info_instance(const mixin_type_info_instance&) = delete;
+    mixin_type_info_instance& operator=(const mixin_type_info_instance&) = delete;
+
+    // to prevent warnings and optimizations that will say that we're not using
+    // mixin_type_info_instance by simply referencing it
+    int unused;
+};
 template <typename Mixin>
-mixin_type_info_instance<Mixin>::~mixin_type_info_instance()
-{
-    // unregister the mixin from the domain
-    domain::safe_instance().unregister_mixin_type(info());
-}
+mixin_type_info_instance<Mixin> mixin_type_info_instance<Mixin>::registrator;
 
 } // namespace internal
 

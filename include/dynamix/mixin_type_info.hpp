@@ -120,38 +120,6 @@ namespace internal
 #   endif
 #endif
 
-// this metafunction binds the type info of a mixin to its type
-template <typename Mixin>
-struct mixin_type_info_instance
-{
-    // have this static function instead of a simple member to guarantee
-    // that mixin_type_info's constructor is called the first time
-    static mixin_type_info& info()
-    {
-        static mixin_type_info d;
-        return d;
-    }
-
-    // this static member registers the mixin in the domain
-    // we need to reference it somewhere so as to call its constructor
-    static mixin_type_info_instance registrator;
-
-    // the constructor is defined in mixin.h because it references the domain object
-    mixin_type_info_instance();
-
-    ~mixin_type_info_instance();
-
-    // non-copyable
-    mixin_type_info_instance(const mixin_type_info_instance&) = delete;
-    mixin_type_info_instance& operator=(const mixin_type_info_instance&) = delete;
-
-    // to prevent warnings and optimizations that will say that we're not using
-    // mixin_type_info_instance by simply referencing it
-    int unused;
-};
-template <typename Mixin>
-mixin_type_info_instance<Mixin> mixin_type_info_instance<Mixin>::registrator;
-
 // this procedure is used for the mixin construction
 template <typename Mixin>
 void call_mixin_constructor(void* memory)
