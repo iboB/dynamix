@@ -46,7 +46,7 @@ mixin_type_info_instance<Mixin>::~mixin_type_info_instance()
 #if DYNAMIX_USE_MIXIN_NAME_FROM_MACRO
 #   define I_DYNAMIX_MIXIN_NAME_FEATURE ::dynamix::mixin_name
 #else
-#   define I_DYNAMIX_MIXIN_NAME_FEATURE ::dynamix::internal::noop_feature
+#   define I_DYNAMIX_MIXIN_NAME_FEATURE ::dynamix::noop_feature
 #endif
 
 

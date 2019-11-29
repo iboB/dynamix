@@ -15,7 +15,7 @@
 namespace dynamix
 {
 
-no_features_t* none;
+noop_feature_t* none;
 
 namespace internal
 {

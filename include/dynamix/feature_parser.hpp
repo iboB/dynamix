@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -61,10 +61,6 @@ public:
         return *this;
     }
 
-    void operator & (const no_features_t*)
-    {
-    }
-
     const char* mixin_name = nullptr;
 };
 
@@ -99,10 +95,6 @@ public:
         mixin_info.allocator = &allocator;
 
         return *this;
-    }
-
-    void operator & (const no_features_t*)
-    {
     }
 
     feature_parser& operator & (mixin_name_feature)
