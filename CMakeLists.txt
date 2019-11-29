@@ -69,6 +69,7 @@ src_group(public dynamix_sources
     ${inc_path}/config.hpp
     ${inc_path}/domain.hpp
     ${inc_path}/declare_mixin.hpp
+    ${inc_path}/define_mixin.hpp
     ${inc_path}/dm_this.hpp
     ${inc_path}/dynamix.hpp
     ${inc_path}/exception.hpp
@@ -76,7 +77,6 @@ src_group(public dynamix_sources
     ${inc_path}/feature_parser.hpp
     ${inc_path}/message.hpp
     ${inc_path}/message_macros.hpp
-    ${inc_path}/mixin.hpp
     ${inc_path}/mixin_id.hpp
     ${inc_path}/mixin_collection.hpp
     ${inc_path}/mixin_type_info.hpp

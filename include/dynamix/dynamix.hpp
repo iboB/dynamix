@@ -27,7 +27,7 @@
 #include "features.hpp"
 #include "mixin_type_info.hpp"
 #include "declare_mixin.hpp"
-#include "mixin.hpp"
+#include "define_mixin.hpp"
 #include "object_of.hpp"
 #include "message.hpp"
 #include "message_macros.hpp"

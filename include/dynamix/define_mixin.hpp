@@ -7,11 +7,9 @@
 //
 #pragma once
 
-
 /**
  * \file
- * Functions and macros associated with mixin declaration,
- * definition, and usage.
+ * Functions and macros associated with mixin definition
  */
 
 #include "config.hpp"
