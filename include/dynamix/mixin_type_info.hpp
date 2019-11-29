@@ -28,7 +28,8 @@ namespace dynamix
 
 class mixin_allocator;
 
-static const mixin_id INVALID_MIXIN_ID = ~mixin_id(0);
+// TODO: inline when on C++17
+static constexpr mixin_id INVALID_MIXIN_ID = ~mixin_id(0);
 
 typedef void(*mixin_constructor_proc)(void* memory);
 typedef void(*mixin_copy_proc)(void* memory, const void* source);

@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -18,7 +18,9 @@ namespace dynamix
 {
 
 typedef size_t feature_id;
-static const feature_id INVALID_FEATURE_ID = ~feature_id(0);
+
+// TODO: inline when on C++17
+static constexpr feature_id INVALID_FEATURE_ID = ~feature_id(0);
 
 class DYNAMIX_API feature
 {

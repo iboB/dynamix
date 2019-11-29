@@ -6,10 +6,11 @@
 // https://opensource.org/licenses/MIT
 //
 #include "internal.hpp"
+#include "dynamix/domain.hpp"
 #include "zero_memory.hpp"
-#include <dynamix/domain.hpp>
-#include <dynamix/mutation_rule.hpp>
-#include <dynamix/allocators.hpp>
+#include "dynamix/object_type_info.hpp"
+#include "dynamix/mutation_rule.hpp"
+#include "dynamix/allocators.hpp"
 #include <algorithm>
 
 namespace dynamix
@@ -235,7 +236,7 @@ void domain::internal_unregister_feature(message_t& msg)
     // will be dropped
 }
 
-void domain::internal_register_mixin_type(mixin_type_info& info)
+void domain::register_existing_mixin_type(mixin_type_info& info)
 {
     // as is the case with messages, multiple modules may turn out
     // trying to register the same mixin over again

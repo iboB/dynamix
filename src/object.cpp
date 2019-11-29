@@ -277,9 +277,9 @@ bool object::implements_message_by_mixin(feature_id id) const
         return false;
     }
 
-    const auto msg_data = domain::instance()._messages[id];
+    const auto& msg_data = domain::instance().message_data(id);
 
-    return entry.top_bid_message != msg_data->default_impl_data;
+    return entry.top_bid_message != msg_data.default_impl_data;
 }
 
 size_t object::message_num_implementers(feature_id id) const
@@ -291,7 +291,7 @@ size_t object::message_num_implementers(feature_id id) const
         return 0;
     }
 
-    if (domain::instance()._messages[id]->mechanism == message_t::unicast)
+    if (domain::instance().message_data(id).mechanism == message_t::unicast)
     {
         return 1;
     }
@@ -309,7 +309,7 @@ void object::get_message_names(std::vector<const char*>& out_message_names) cons
     {
         if(implements_message(i))
         {
-            out_message_names.push_back(dom._messages[i]->name);
+            out_message_names.push_back(dom.message_data(i).name);
         }
     }
 }

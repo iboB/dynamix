@@ -10,7 +10,6 @@
 #include "config.hpp"
 #include "mutation_rule_id.hpp"
 #include "mixin_type_info.hpp"
-#include "object_type_info.hpp"
 #include "feature.hpp"
 #include "feature_parser.hpp"
 #include "message.hpp"
@@ -44,6 +43,7 @@ namespace internal
 {
 
 struct message_t;
+class object_type_info;
 
 class DYNAMIX_API domain
 {
@@ -104,11 +104,13 @@ public:
 
         DYNAMIX_ASSERT_MSG(info.name, "Mixin name must be provided through a feature");
 
-        internal_register_mixin_type(info);
+        register_existing_mixin_type(info);
 
         feature_parser<Mixin> parser;
         _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), parser);
     }
+
+    void register_existing_mixin_type(mixin_type_info& info);
 
     void unregister_mixin_type(const mixin_type_info& info);
 
@@ -142,6 +144,13 @@ public:
         return *_mixin_type_infos[id];
     }
 
+    const message_t& message_data(feature_id id) const
+    {
+        DYNAMIX_ASSERT(id <= _num_registered_messages);
+        DYNAMIX_ASSERT(_messages[id]);
+        return *_messages[id];
+    }
+
     // sets the current domain allocator
     void set_allocator(domain_allocator* allocator);
     domain_allocator* allocator() const { return _allocator; }
@@ -152,10 +161,12 @@ public:
     // erases all type infos with zero objects
     void garbage_collect_type_infos();
 
-_dynamix_internal:
-
+private:
     domain();
     ~domain();
+
+    friend class object_type_info;
+    friend class object_mutator;
 
     // non-copyable
     domain(const domain&) = delete;
@@ -167,8 +178,6 @@ _dynamix_internal:
     // and then unregistered when it was unloaded
     mixin_type_info* _mixin_type_infos[DYNAMIX_MAX_MIXINS];
     size_t _num_registered_mixins; // max registered mixin
-
-    void internal_register_mixin_type(mixin_type_info& info);
 
     // sparse list of all message infos
     // some elements might be nullptr

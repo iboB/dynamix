@@ -86,9 +86,9 @@ int main()
     info0.copy_assignment = dynamix::internal::get_mixin_copy_assignment<script_mixin>();
     info0.move_constructor = dynamix::internal::get_mixin_move_constructor<script_mixin>();
     info0.move_assignment = dynamix::internal::get_mixin_move_assignment<script_mixin>();
-    info0.allocator = dom._allocator;
+    info0.allocator = dom.allocator();
 
-    dom.internal_register_mixin_type(info0);
+    dom.register_existing_mixin_type(info0);
 
     info0.message_infos.emplace_back();
     auto& msg = info0.message_infos.back();
