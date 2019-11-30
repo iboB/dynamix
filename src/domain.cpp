@@ -45,13 +45,7 @@ domain::domain()
     zero_memory(_messages, sizeof(_messages));
 }
 
-domain::~domain()
-{
-    for(auto& i : _object_type_infos)
-    {
-        delete i.second;
-    }
-}
+domain::~domain() = default;
 
 mutation_rule_id domain::add_mutation_rule(mutation_rule* rule)
 {
@@ -133,7 +127,7 @@ const object_type_info* domain::get_object_type_info(const mixin_type_info_vecto
     {
         // get existing
         DYNAMIX_ASSERT(mixins == it->second->_compact_mixins);
-        return it->second;
+        return it->second.get();
     }
     else
     {
@@ -305,7 +299,6 @@ void domain::unregister_mixin_type(const mixin_type_info& info)
     {
         if (i->first[info.id])
         {
-            delete i->second;
             i = _object_type_infos.erase(i);
         }
         else
@@ -360,7 +353,6 @@ void domain::garbage_collect_type_infos()
     {
         if (i->second->num_objects == 0)
         {
-            delete i->second;
             i = _object_type_infos.erase(i);
         }
         else

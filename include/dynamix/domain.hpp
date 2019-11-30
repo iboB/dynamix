@@ -77,29 +77,27 @@ public:
         info.move_assignment = get_mixin_move_assignment<Mixin>();
         info.allocator = _mixin_allocator();
 
-#if DYNAMIX_USE_TYPEID
-        info.name = get_mixin_name_from_typeid(typeid(Mixin).name());
-#   if defined(__GNUC__)
-        info.owns_name = true;
-#   endif
-#elif DYNAMIX_USE_STATIC_MEMBER_NAME
-        // defining DYNAMIX_USE_STATIC_MEMBER_NAME means that you must provide
-        // mixin names with a static const char* member function
-        info.name = Mixin::dynamix_mixin_name();
-#endif
-
         // see comments in feature_instance on why this manual registration is needed
         feature_registrator reg;
         _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), reg);
 
         if (reg.mixin_name)
         {
-#if DYNAMIX_USE_TYPEID && defined(__GNUC__)
-            if (info.name && info.owns_name) free_mixin_name_from_typeid(info.name);
-            info.owns_name = false;
-#endif
-            // override if available
+            // there's a mixin name which has been set by the features
             info.name = reg.mixin_name;
+        }
+        else
+        {
+#if DYNAMIX_USE_TYPEID
+            info.name = get_mixin_name_from_typeid(typeid(Mixin).name());
+#   if defined(__GNUC__)
+            info.owns_name = true;
+#   endif
+#elif DYNAMIX_USE_STATIC_MEMBER_NAME
+            // defining DYNAMIX_USE_STATIC_MEMBER_NAME means that you must provide
+            // mixin names with a static const char* member function
+            info.name = Mixin::dynamix_mixin_name();
+#endif
         }
 
         DYNAMIX_ASSERT_MSG(info.name, "Mixin name must be provided through a feature");
@@ -186,7 +184,7 @@ private:
     message_t* _messages[DYNAMIX_MAX_MESSAGES];
     size_t _num_registered_messages;
 
-    typedef std::unordered_map<available_mixins_bitset, object_type_info*> object_type_info_map;
+    typedef std::unordered_map<available_mixins_bitset, std::unique_ptr<object_type_info>> object_type_info_map;
 
     object_type_info_map _object_type_infos;
 

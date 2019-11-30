@@ -167,10 +167,6 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 }
 }
 
-// some macros here have an underscore in front so it doesn't appear as a suggestion in
-// ides that support these
-// that shows that they're for internal use only
-
 /// \internal
 #define I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name) I_DYNAMIX_PP_CAT(dynamix_msg_, message_name)
 /// \internal
