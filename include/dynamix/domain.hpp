@@ -14,7 +14,7 @@
 #include "feature_parser.hpp"
 #include "message.hpp"
 
-#include "internal/mixin_traits.hpp"
+#include "mixin_traits.hpp"
 
 #include <unordered_map>
 #include <memory>
@@ -67,6 +67,13 @@ public:
     {
         DYNAMIX_ASSERT(info.id == INVALID_MIXIN_ID);
 
+        // see comments in feature_instance on why this manual registration is needed
+        feature_registrator reg;
+        _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), reg);
+
+        feature_parser<Mixin> parser;
+        _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), parser);
+
         info.size = sizeof(Mixin);
         info.alignment = std::alignment_of<Mixin>::value;
         info.constructor = &call_mixin_constructor<Mixin>;
@@ -75,11 +82,11 @@ public:
         info.copy_assignment = get_mixin_copy_assignment<Mixin>();
         info.move_constructor = get_mixin_move_constructor<Mixin>();
         info.move_assignment = get_mixin_move_assignment<Mixin>();
-        info.allocator = _mixin_allocator();
 
-        // see comments in feature_instance on why this manual registration is needed
-        feature_registrator reg;
-        _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), reg);
+        if (!info.allocator)
+        {
+            info.allocator = _mixin_allocator();
+        }
 
         if (reg.mixin_name)
         {
@@ -103,9 +110,6 @@ public:
         DYNAMIX_ASSERT_MSG(info.name, "Mixin name must be provided through a feature");
 
         register_existing_mixin_type(info);
-
-        feature_parser<Mixin> parser;
-        _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), parser);
     }
 
     void register_existing_mixin_type(mixin_type_info& info);

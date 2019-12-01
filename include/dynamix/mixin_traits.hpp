@@ -7,8 +7,8 @@
 //
 #pragma once
 
-#include "../config.hpp"
-#include "../mixin_funcs.hpp"
+#include "config.hpp"
+#include "mixin_funcs.hpp"
 
 #include <type_traits>
 #include <utility>

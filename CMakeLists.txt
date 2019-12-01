@@ -80,6 +80,7 @@ src_group(public dynamix_sources
     ${inc_path}/mixin_collection.hpp
 	${inc_path}/mixin_funcs.hpp
     ${inc_path}/mixin_id.hpp
+	${inc_path}/mixin_traits.hpp
     ${inc_path}/mixin_type_info.hpp
     ${inc_path}/mutation_rule.hpp
     ${inc_path}/mutation_rule_id.hpp
@@ -94,10 +95,6 @@ src_group(public dynamix_sources
     ${inc_path}/same_type_mutator.hpp
     ${inc_path}/single_object_mutator.hpp
     ${inc_path}/version.hpp
-)
-
-src_group("public~internal" dynamix_sources
-    ${inc_path}/internal/mixin_traits.hpp
 )
 
 src_group("public~gen" dynamix_sources
