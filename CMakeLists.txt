@@ -78,7 +78,6 @@ src_group(public dynamix_sources
     ${inc_path}/message.hpp
     ${inc_path}/message_macros.hpp
     ${inc_path}/mixin_collection.hpp
-	${inc_path}/mixin_funcs.hpp
     ${inc_path}/mixin_id.hpp
 	${inc_path}/mixin_traits.hpp
     ${inc_path}/mixin_type_info.hpp

@@ -18,7 +18,6 @@
 #include "mixin_id.hpp"
 #include "message.hpp"
 #include "metrics.hpp"
-#include "mixin_funcs.hpp"
 
 #include <utility>
 #include <vector>
@@ -38,6 +37,11 @@ class DYNAMIX_API mixin_type_info
 {
 public:
     mixin_type_info() = default;
+
+    typedef void(*mixin_constructor_proc)(void* memory);
+    typedef void(*mixin_copy_proc)(void* memory, const void* source);
+    typedef void(*mixin_move_proc)(void* memory, void* source);
+    typedef void(*mixin_destructor_proc)(void* memory);
 
     /// The mixin's id
     mixin_id id = INVALID_MIXIN_ID;

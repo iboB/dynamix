@@ -269,6 +269,13 @@ void domain::register_existing_mixin_type(mixin_type_info& info)
         info.id = free;
     }
 
+    // also set allocator
+    if (!info.allocator)
+    {
+        info.allocator = _allocator;
+    }
+
+
     _mixin_type_infos[info.id] = &info;
 }
 
@@ -361,11 +368,6 @@ void domain::garbage_collect_type_infos()
             ++i;
         }
     }
-}
-
-mixin_allocator* domain::_mixin_allocator() const
-{
-    return _allocator;
 }
 
 } // namespace internal

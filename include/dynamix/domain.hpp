@@ -67,45 +67,15 @@ public:
     {
         DYNAMIX_ASSERT(info.id == INVALID_MIXIN_ID);
 
-        // see comments in feature_instance on why this manual registration is needed
-        feature_registrator reg;
-        _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), reg);
+        feature_parser_phase_1 p1(info);
+        _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), p1);
 
-        feature_parser<Mixin> parser;
-        _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), parser);
+        info.message_infos.reserve(p1.num_messages());
 
-        info.size = sizeof(Mixin);
-        info.alignment = std::alignment_of<Mixin>::value;
-        info.constructor = &call_mixin_constructor<Mixin>;
-        info.destructor = &call_mixin_destructor<Mixin>;
-        info.copy_constructor = get_mixin_copy_constructor<Mixin>();
-        info.copy_assignment = get_mixin_copy_assignment<Mixin>();
-        info.move_constructor = get_mixin_move_constructor<Mixin>();
-        info.move_assignment = get_mixin_move_assignment<Mixin>();
+        feature_parser_phase_2<Mixin> p2(info);
+        _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), p2);
 
-        if (!info.allocator)
-        {
-            info.allocator = _mixin_allocator();
-        }
-
-        if (reg.mixin_name)
-        {
-            // there's a mixin name which has been set by the features
-            info.name = reg.mixin_name;
-        }
-        else
-        {
-#if DYNAMIX_USE_TYPEID
-            info.name = get_mixin_name_from_typeid(typeid(Mixin).name());
-#   if defined(__GNUC__)
-            info.owns_name = true;
-#   endif
-#elif DYNAMIX_USE_STATIC_MEMBER_NAME
-            // defining DYNAMIX_USE_STATIC_MEMBER_NAME means that you must provide
-            // mixin names with a static const char* member function
-            info.name = Mixin::dynamix_mixin_name();
-#endif
-        }
+        set_missing_traits_to_info<Mixin>(info);
 
         DYNAMIX_ASSERT_MSG(info.name, "Mixin name must be provided through a feature");
 
@@ -205,10 +175,6 @@ private:
 
 
     // allocators
-
-    // we need this silly function in order to perform the cast from domain to mixin allocator
-    // when allocators are included
-    mixin_allocator* _mixin_allocator() const;
     domain_allocator* _allocator;
 
 private:

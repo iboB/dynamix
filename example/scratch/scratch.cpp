@@ -78,16 +78,7 @@ int main()
     dynamix::mixin_type_info info0;
 
     info0.name = "bagavag";
-    info0.size = sizeof(script_mixin);
-    info0.alignment = std::alignment_of<script_mixin>::value;
-    info0.constructor = &dynamix::internal::call_mixin_constructor<script_mixin>;
-    info0.destructor = &dynamix::internal::call_mixin_destructor<script_mixin>;
-    info0.copy_constructor = dynamix::internal::get_mixin_copy_constructor<script_mixin>();
-    info0.copy_assignment = dynamix::internal::get_mixin_copy_assignment<script_mixin>();
-    info0.move_constructor = dynamix::internal::get_mixin_move_constructor<script_mixin>();
-    info0.move_assignment = dynamix::internal::get_mixin_move_assignment<script_mixin>();
-    info0.allocator = dom.allocator();
-
+    dynamix::internal::set_missing_traits_to_info<script_mixin>(info0);
     dom.register_existing_mixin_type(info0);
 
     info0.message_infos.emplace_back();
