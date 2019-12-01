@@ -69,7 +69,6 @@ struct message_perks
 struct DYNAMIX_API message_for_mixin
 {
     message_t* message; // message object
-    mixin_id _mixin_id; // id of the handling mixin type information
 
     // the caller member is a pointer to a lambda created by the message macros
 	// (see get_caller_for)

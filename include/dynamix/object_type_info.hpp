@@ -56,8 +56,7 @@ _dynamix_internal:
     using mixin_collection::_compact_mixins;
 
     // indices in the object::_mixin_data
-    // size+1 for the id of the fake mixin used for default message implementations
-    size_t _mixin_indices[DYNAMIX_MAX_MIXINS + 1];
+    size_t _mixin_indices[DYNAMIX_MAX_MIXINS];
 
     // special indices in an object's _mixin_data member
     enum reserved_mixin_indices
@@ -73,6 +72,25 @@ _dynamix_internal:
         MIXIN_INDEX_OFFSET
     };
 
+    // message data for the call table which consists of tighly packed elements
+    // for faster acciess
+    struct call_table_message
+    {
+        size_t mixin_index; // index of mixin within the _compact_mixins vector
+        func_ptr caller;
+        const message_for_mixin* data;
+
+        explicit operator bool() const { return !!caller; }
+        void reset()
+        {
+            mixin_index = INVALID_MIXIN_ID;
+            caller = nullptr;
+            data = nullptr;
+        }
+    };
+
+    call_table_message make_call_table_message(mixin_id id, const message_for_mixin& data) const;
+
     struct call_table_entry
     {
         // used when building the buffer to hold the top-bid message for the top priority
@@ -80,7 +98,7 @@ _dynamix_internal:
         // message without the indrection from dereferencing begin
         // also for multicasts which fall back to a default msg implementation this is used to
         // hold the pointer to the default implementation
-        const message_for_mixin* top_bid_message;
+        call_table_message top_bid_message;
 
         // a dynamically allocated array of all message datas
         // for unicasts it will hold pointers to all top-prirority messages for each bid
@@ -92,14 +110,12 @@ _dynamix_internal:
         // when multiple bids are involved the buffer will continue after end until a nullptr address is pointed
         // also for multicasts it will be even slower depending on how many messages with the same bid exist
         // we pay this price to achieve the maximum performance for the straight-forward simple message call case
-        const message_for_mixin** begin;
-        const message_for_mixin** end;
+        call_table_message* begin;
+        call_table_message* end;
     };
 
     // a single buffer for all dynamically allocated message pointers to minimize allocations
-    using c_message_for_mixin = const message_for_mixin;
-    using pc_message_for_mixin = c_message_for_mixin*;
-    std::unique_ptr<pc_message_for_mixin[]> _message_data_buffer;
+    std::unique_ptr<call_table_message[]> _message_data_buffer;
     call_table_entry _call_table[DYNAMIX_MAX_MESSAGES];
 
     // number of living objects with this type info

@@ -137,7 +137,6 @@ private:
         mixin_info.message_infos.resize(mixin_info.message_infos.size() + 1);
         message_for_mixin& mfm = mixin_info.message_infos.back();
         mfm.message = &msg;
-        mfm._mixin_id = mixin_info.id;
         mfm.caller = msg.template get_caller_for<Mixin>();
         mfm.bid = bid;
         mfm.priority = priority;

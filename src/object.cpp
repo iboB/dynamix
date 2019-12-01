@@ -279,7 +279,7 @@ bool object::implements_message_by_mixin(feature_id id) const
 
     const auto& msg_data = domain::instance().message_data(id);
 
-    return entry.top_bid_message != msg_data.default_impl_data;
+    return entry.top_bid_message.data != msg_data.default_impl_data;
 }
 
 size_t object::message_num_implementers(feature_id id) const

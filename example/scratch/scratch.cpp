@@ -93,7 +93,6 @@ int main()
     info0.message_infos.emplace_back();
     auto& msg = info0.message_infos.back();
     msg.bid = msg.priority = 0;
-    msg._mixin_id = info0.id;
     msg.caller = reinterpret_cast<dynamix::internal::func_ptr>(script_testv);
     msg.message = static_cast<dynamix::internal::message_t*>(&_dynamix_get_mixin_feature_safe(testv_msg));
 

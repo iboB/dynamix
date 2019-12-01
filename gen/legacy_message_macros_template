@@ -40,12 +40,12 @@
         const ::dynamix::feature& _d_self = _dynamix_get_mixin_feature_fast(static_cast<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)*>(nullptr)); \
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::unicast); \
         const ::dynamix::internal::object_type_info::call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin* _d_msg_data = _d_call_entry.top_bid_message; \
-        DYNAMIX_MSG_THROW_UNLESS(_d_msg_data, ::dynamix::bad_message_call); \
-        /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-        char* _d_mixin_data = I_DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
+        const ::dynamix::internal::object_type_info::call_table_message& _d_msg = _d_call_entry.top_bid_message; \
+        DYNAMIX_MSG_THROW_UNLESS(!!_d_msg, ::dynamix::bad_message_call); \
+        /* unfortunately we can't assert(_d_msg.data->message == &_d_self); since the data might come from a different module */ \
+        char* _d_mixin_data = reinterpret_cast<char*>(const_cast<void*>(_d_obj._mixin_data[_d_msg.mixin_index].mixin())); \
         I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
+                reinterpret_cast<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg.caller); \
         /* forward unicast arguments since some of them might be rvalue references */ \
         return _d_func(_d_mixin_data %{coma_fwd_args}); \
     }\
@@ -66,18 +66,18 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
+        const ::dynamix::internal::object_type_info::call_table_message* _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::object_type_info::call_table_message* _d_end = _d_call_entry.end; \
         DYNAMIX_MULTICAST_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
         ::dynamix::internal::set_num_results_for(_d_combinator, size_t(_d_end - _d_begin)); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::object_type_info::call_table_message* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = I_DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
+            const ::dynamix::internal::object_type_info::call_table_message& _d_msg = *_d_iter; \
+            DYNAMIX_ASSERT(!!_d_msg); \
+            /* unfortunately we can't assert(_d_msg.data->message == &_d_self); since the data might come from a different module */ \
+            char* _d_mixin_data = reinterpret_cast<char*>(const_cast<void*>(_d_obj._mixin_data[_d_msg.mixin_index].mixin())); \
             I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
+                reinterpret_cast<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg.caller); \
             /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
             if(!_d_combinator.add_result(_d_func(_d_mixin_data %{coma_args}))) \
             { \
@@ -101,17 +101,17 @@
         DYNAMIX_ASSERT(static_cast<const ::dynamix::internal::message_t&>(_d_self).mechanism == ::dynamix::internal::message_t::multicast); \
         typedef ::dynamix::internal::object_type_info::call_table_entry call_table_entry; \
         const call_table_entry& _d_call_entry = _d_obj._type_info->_call_table[_d_self.id]; \
-        const ::dynamix::internal::message_for_mixin** _d_begin = _d_call_entry.begin; \
-        const ::dynamix::internal::message_for_mixin** _d_end = _d_call_entry.end; \
+        const ::dynamix::internal::object_type_info::call_table_message* _d_begin = _d_call_entry.begin; \
+        const ::dynamix::internal::object_type_info::call_table_message* _d_end = _d_call_entry.end; \
         DYNAMIX_MULTICAST_MSG_THROW_UNLESS(_d_begin, ::dynamix::bad_message_call); \
-        for(const ::dynamix::internal::message_for_mixin** _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
+        for(const ::dynamix::internal::object_type_info::call_table_message* _d_iter = _d_begin; _d_iter!=_d_end; ++_d_iter) \
         { \
-            const ::dynamix::internal::message_for_mixin* _d_msg_data = *_d_iter; \
-            DYNAMIX_ASSERT(_d_msg_data); \
-            /* unfortunately we can't assert(_d_msg_data->message == &_d_self); since the data might come from a different module */ \
-            char* _d_mixin_data = I_DYNAMIX_GET_MIXIN_DATA(_d_obj, _d_msg_data->_mixin_id); \
+            const ::dynamix::internal::object_type_info::call_table_message&  _d_msg = *_d_iter; \
+            DYNAMIX_ASSERT(!!_d_msg); \
+            /* unfortunately we can't assert(_d_msg.data->message == &_d_self); since the data might come from a different module */ \
+            char* _d_mixin_data = reinterpret_cast<char*>(const_cast<void*>(_d_obj._mixin_data[_d_msg.mixin_index].mixin())); \
             I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func _d_func = \
-                reinterpret_cast<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg_data->caller); \
+                reinterpret_cast<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func>(_d_msg.caller); \
             /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
             _d_func(_d_mixin_data %{coma_args}); \
         } \

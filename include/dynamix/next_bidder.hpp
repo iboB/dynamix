@@ -25,11 +25,11 @@ template <typename Mixin, typename Message, typename ...Args>
 auto call_next_bidder(Mixin* mixin, Message* message, Args&&... args)
 -> decltype(std::declval<typename Message::caller_func>()(nullptr, std::forward<Args>(args)...))
 {
-    mixin_type_info& mixin_info = _dynamix_get_mixin_type_info(mixin);
+    const mixin_type_info& mixin_info = _dynamix_get_mixin_type_info(mixin);
     auto& msg = static_cast<const internal::message_t&>(_dynamix_get_mixin_feature_fast(message));
-
     const object* obj = object_of(mixin);
     const internal::object_type_info::call_table_entry& entry = obj->_type_info->_call_table[msg.id];
+    const size_t mixin_index = obj->_type_info->_mixin_indices[mixin_info.id];
 
     DYNAMIX_MSG_THROW_UNLESS(entry.top_bid_message, bad_message_call);
 
@@ -40,16 +40,13 @@ auto call_next_bidder(Mixin* mixin, Message* message, Args&&... args)
         DYNAMIX_THROW_UNLESS(ptr, bad_next_bidder_call); // no next bidder calls
 
         // since this is called from a mixin this loop must end eventually
-        while ((*ptr++)->_mixin_id != mixin_info.id) DYNAMIX_ASSERT(ptr < entry.end);
+        while (ptr++->mixin_index != mixin_index) DYNAMIX_ASSERT(ptr < entry.end);
         DYNAMIX_THROW_UNLESS(ptr < entry.end, bad_next_bidder_call);
 
         // for unicasts the next message for mixin (pointed by ptr) must be the one
         // we want to execute (with the next bid)
-        const internal::message_for_mixin* msg_data = *ptr;
-        auto data =
-            reinterpret_cast<char*>(const_cast<void*>(obj->_mixin_data[obj->_type_info->_mixin_indices[msg_data->_mixin_id]].mixin()));
-
-        auto func = reinterpret_cast<typename Message::caller_func>(msg_data->caller);
+        auto data = reinterpret_cast<char*>(const_cast<void*>(obj->_mixin_data[ptr->mixin_index].mixin()));
+        auto func = reinterpret_cast<typename Message::caller_func>(ptr->caller);
         return func(data, std::forward<Args>(args)...);
     }
     else
@@ -58,7 +55,7 @@ auto call_next_bidder(Mixin* mixin, Message* message, Args&&... args)
         auto ptr = entry.begin;
         // since this is called from a mixin this loop must end eventually
         // no way to assert anything sensible here
-        while ((*ptr++)->_mixin_id != mixin_info.id);
+        while (ptr++->mixin_index != mixin_index);
 
         // buffer ends here, so there are no next bidders
         DYNAMIX_THROW_UNLESS(*ptr, bad_next_bidder_call);
@@ -66,28 +63,26 @@ auto call_next_bidder(Mixin* mixin, Message* message, Args&&... args)
         // for multicasts this might be the message we're looking for or simply the next
         // in the chain of priorities
         // so check the previous one's bid and if it's the same search for the next one that's different
-        const internal::message_for_mixin* prev_msg_data = *(ptr - 1);
+        const internal::object_type_info::call_table_message* prev_msg = ptr - 1;
 
         // loop to the end of the bid chain
-        while ((*ptr)->bid == prev_msg_data->bid) ++ptr;
+        while (ptr->data->bid == prev_msg->data->bid) ++ptr;
 
         DYNAMIX_ASSERT(ptr >= entry.end); // we must be past the end here
 
-        // after the end of the bid chaing we could STILL have reached the end of the buffer
+        // after the end of the bid chain we could STILL have reached the end of the buffer
         DYNAMIX_THROW_UNLESS(*ptr, bad_next_bidder_call);
 
-        auto bid = (*ptr)->bid;
+        auto bid = ptr->data->bid;
 
         // execute the bid chain
         for (;;)
         {
-            const internal::message_for_mixin* msg_data = *ptr;
-            auto data =
-                reinterpret_cast<char*>(const_cast<void*>(obj->_mixin_data[obj->_type_info->_mixin_indices[msg_data->_mixin_id]].mixin()));
-            auto func = reinterpret_cast<typename Message::caller_func>(msg_data->caller);
+            auto data = reinterpret_cast<char*>(const_cast<void*>(obj->_mixin_data[ptr->mixin_index].mixin()));
+            auto func = reinterpret_cast<typename Message::caller_func>(ptr->caller);
             ++ptr;
             // check next message data
-            if (!(*ptr) || (*ptr)->bid != bid)
+            if (!(*ptr) || ptr->data->bid != bid)
             {
                 // end of bid chain
                 // return last call
@@ -105,10 +100,11 @@ auto call_next_bidder(Mixin* mixin, Message* message, Args&&... args)
 template <typename Mixin, typename Message>
 bool has_next_bidder(Mixin* mixin, Message* message)
 {
-    mixin_type_info& mixin_info = _dynamix_get_mixin_type_info(mixin);
+    const mixin_type_info& mixin_info = _dynamix_get_mixin_type_info(mixin);
     auto& msg = static_cast<const internal::message_t&>(_dynamix_get_mixin_feature_fast(message));
     const object* obj = object_of(mixin);
     const internal::object_type_info::call_table_entry& entry = obj->_type_info->_call_table[msg.id];
+    const size_t mixin_index = obj->_type_info->_mixin_indices[mixin_info.id];
 
     if (!entry.top_bid_message) return false;
 
@@ -116,17 +112,17 @@ bool has_next_bidder(Mixin* mixin, Message* message)
     {
         auto ptr = entry.begin;
         if (!ptr) return false;
-        while ((*ptr++)->_mixin_id != mixin_info.id) DYNAMIX_ASSERT(ptr < entry.end);
+        while (ptr++->mixin_index != mixin_index) DYNAMIX_ASSERT(ptr < entry.end);
         return ptr < entry.end;
     }
     else
     {
         auto ptr = entry.begin;
-        while ((*ptr++)->_mixin_id != mixin_info.id);
-        if (!ptr) return false;
-        const internal::message_for_mixin* prev_msg_data = *(ptr - 1);
-        while ((*ptr)->bid == prev_msg_data->bid) ++ptr;
-        return !!ptr;
+        while (ptr++->mixin_index != mixin_index);
+        if (!*ptr) return false;
+        const internal::object_type_info::call_table_message* prev_msg = ptr - 1;
+        while (ptr->data->bid == prev_msg->data->bid) ++ptr;
+        return !!*ptr;
     }
 }
 

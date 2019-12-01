@@ -62,16 +62,15 @@ struct msg_unicast : public message_t, public msg_caller<Ret, Args...>
         const object_type_info::call_table_entry& call_entry =
             obj._type_info->_call_table[self.id];
 
-        const message_for_mixin* msg_data = call_entry.top_bid_message;
-        DYNAMIX_MSG_THROW_UNLESS(msg_data, ::dynamix::bad_message_call);
+        const object_type_info::call_table_message& msg = call_entry.top_bid_message;
+        DYNAMIX_MSG_THROW_UNLESS(!!msg, ::dynamix::bad_message_call);
 
-        // unfortunately we can't assert(msg_data->message == &self); since the data might come from a different module
+        // unfortunately we can't assert(msg_data.data->message == &self); since the data might come from a different module
 
-        char* mixin_data =
-            // skipping several function calls, which greatly improves build time
-            reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[obj._type_info->_mixin_indices[msg_data->_mixin_id]].mixin()));
+        // skipping several function calls, which greatly improves build time
+        char* mixin_data = reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[msg.mixin_index].mixin()));
 
-        auto func = reinterpret_cast<typename msg_caller<Ret, Args...>::caller_func>(msg_data->caller);
+        auto func = reinterpret_cast<typename msg_caller<Ret, Args...>::caller_func>(msg.caller);
 
         return func(mixin_data, std::forward<Args>(args)...);
     }
@@ -106,16 +105,15 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
         set_num_results_for(combinator, size_t(end - begin));
         for (auto iter = begin; iter != end; ++iter)
         {
-            auto msg_data = *iter;
-            DYNAMIX_ASSERT(msg_data);
+            auto& msg = *iter;
+            DYNAMIX_ASSERT(!!msg);
 
             // unfortunately we can't assert(msg_data->message == &self); since the data might come from a different module
 
-            char* mixin_data =
-                // skipping several function calls, which greatly improves build time
-                reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[obj._type_info->_mixin_indices[msg_data->_mixin_id]].mixin()));
+            // skipping several function calls, which greatly improves build time
+            char* mixin_data = reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[msg.mixin_index].mixin()));
 
-            auto func = reinterpret_cast<typename msg_caller<Ret, Args...>::caller_func>(msg_data->caller);
+            auto func = reinterpret_cast<typename msg_caller<Ret, Args...>::caller_func>(msg.caller);
 
             if (!combinator.add_result(func(mixin_data, args...)))
             {
@@ -149,16 +147,15 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 
         for (auto iter = begin; iter != end; ++iter)
         {
-            auto msg_data = *iter;
-            DYNAMIX_ASSERT(msg_data);
+            auto& msg = *iter;
+            DYNAMIX_ASSERT(!!msg);
 
             // unfortunately we can't assert(msg_data->message == &self); since the data might come from a different module
 
-            char* mixin_data =
-                // skipping several function calls, which greatly improves build time
-                reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[obj._type_info->_mixin_indices[msg_data->_mixin_id]].mixin()));
+            // skipping several function calls, which greatly improves build time
+            char* mixin_data = reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[msg.mixin_index].mixin()));
 
-            auto func = reinterpret_cast<typename msg_caller<Ret, Args...>::caller_func>(msg_data->caller);
+            auto func = reinterpret_cast<typename msg_caller<Ret, Args...>::caller_func>(msg.caller);
 
             func(mixin_data, args...);
         }
@@ -189,12 +186,6 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 // a workaround to a visaul c issue which doesn't expand __VA_ARGS__ but inead gives them as a single argument
 /// \internal
 #define I_DYNAMIX_VA_ARGS_PROXY(MACRO, args) MACRO args
-
-// a macro used in the legacy message macros to get the mixin data directly, skipping function calls
-// GREATLY improves message call time
-/// \internal
-#define I_DYNAMIX_GET_MIXIN_DATA(obj, id) \
-    reinterpret_cast<char*>(const_cast<void*>(obj._mixin_data[obj._type_info->_mixin_indices[id]].mixin()))
 
 #if defined(DYNAMIX_DOXYGEN)
 // use these macros for the docs only
