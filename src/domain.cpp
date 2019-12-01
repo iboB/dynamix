@@ -145,8 +145,9 @@ const object_type_info* domain::get_object_type_info(const mixin_type_info_vecto
 
         new_type->fill_call_table();
 
-        _object_type_infos.insert(make_pair(query, new_type.get()));
-        return new_type.release();
+        auto ret = new_type.get();
+        _object_type_infos.emplace(make_pair(query, std::move(new_type)));
+        return ret;
     }
 }
 
