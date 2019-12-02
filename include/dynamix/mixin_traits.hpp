@@ -14,6 +14,10 @@
 #include <type_traits>
 #include <utility>
 
+#if DYNAMIX_USE_TYPEID
+#include <typeinfo>
+#endif
+
 namespace dynamix
 {
 
