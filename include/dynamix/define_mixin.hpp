@@ -16,7 +16,7 @@
 #include "domain.hpp"
 #include "mixin_type_info.hpp"
 #include "features.hpp"
-#include "feature_parser.hpp"
+#include "internal/feature_parser.hpp"
 #include "internal/mixin_traits.hpp"
 
 namespace dynamix

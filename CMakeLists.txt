@@ -74,7 +74,6 @@ src_group(public dynamix_sources
     ${inc_path}/dynamix.hpp
     ${inc_path}/exception.hpp
     ${inc_path}/feature.hpp
-    ${inc_path}/feature_parser.hpp
     ${inc_path}/message.hpp
     ${inc_path}/message_macros.hpp
     ${inc_path}/mixin_collection.hpp
@@ -96,6 +95,7 @@ src_group(public dynamix_sources
 )
 
 src_group("public~internal" dynamix_sources
+    ${inc_path}/internal/feature_parser.hpp
     ${inc_path}/internal/mixin_traits.hpp
 )
 
@@ -112,6 +112,7 @@ src_group("private" dynamix_sources
     ${src_path}/allocators.cpp
     ${src_path}/common_mutation_rules.cpp
     ${src_path}/domain.cpp
+    ${src_path}/export.cpp
     ${src_path}/internal.hpp
     ${src_path}/mixin_collection.cpp
     ${src_path}/mixin_traits.cpp

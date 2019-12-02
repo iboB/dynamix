@@ -14,6 +14,8 @@
 
 #include "config.hpp"
 
+#include <cstddef>
+
 namespace dynamix
 {
 

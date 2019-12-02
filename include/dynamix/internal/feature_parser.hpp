@@ -13,10 +13,10 @@
  */
 
 
-#include "config.hpp"
-#include "message.hpp"
-#include "features.hpp"
-#include "object_type_info.hpp"
+#include "../config.hpp"
+#include "../message.hpp"
+#include "../features.hpp"
+#include "../object_type_info.hpp"
 
 namespace dynamix
 {
