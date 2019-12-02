@@ -16,6 +16,8 @@
 #include "domain.hpp"
 #include "mixin_type_info.hpp"
 #include "features.hpp"
+#include "feature_parser.hpp"
+#include "internal/mixin_traits.hpp"
 
 namespace dynamix
 {
@@ -39,14 +41,22 @@ struct mixin_type_info_instance
     // we need to reference it somewhere so as to call its constructor
     static mixin_type_info_instance registrator;
 
-    // the constructor is defined in mixin.h because it references the domain object
     mixin_type_info_instance()
     {
+        auto& the_info = info();
+
+        feature_parser_phase_1 p1(the_info);
+        _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), p1);
+
+        the_info.message_infos.reserve(p1.num_messages());
+
+        feature_parser_phase_2<Mixin> p2(the_info);
+        _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), p2);
+
+        set_missing_traits_to_info<Mixin>(the_info);
+
         // register the mixin in the domain
-        domain::safe_instance().
-            // we use the function to get the type info, to guarantee that an instantiation of the template
-            // from another module won't override if
-            template register_mixin_type<Mixin>(_dynamix_get_mixin_type_info(static_cast<Mixin*>(nullptr)));
+        domain::safe_instance().register_mixin_type(the_info);
     }
 
 

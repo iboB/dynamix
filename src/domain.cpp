@@ -11,6 +11,8 @@
 #include "dynamix/object_type_info.hpp"
 #include "dynamix/mutation_rule.hpp"
 #include "dynamix/allocators.hpp"
+#include "dynamix/internal/mixin_traits.hpp"
+#include "dynamix/features.hpp"
 #include <algorithm>
 
 namespace dynamix
@@ -151,8 +153,16 @@ const object_type_info* domain::get_object_type_info(const mixin_type_info_vecto
     }
 }
 
-void domain::internal_register_feature(message_t& m)
+void domain::register_feature(message_t& m)
 {
+    // since messages get registered by registering mixins
+    // registration can happen multiple times
+    // it the message is registered, we have nothing more to do
+    if(m.id != INVALID_FEATURE_ID)
+    {
+        return;
+    }
+
     // we need to see if we don't already have a message by that name
     // if we do we'll set this instantiation's id to the already existing one
     // and disregard this instantiation
@@ -212,7 +222,7 @@ void domain::internal_register_feature(message_t& m)
     _messages[m.id] = &m;
 }
 
-void domain::internal_unregister_feature(message_t& msg)
+void domain::unregister_feature(message_t& msg)
 {
     DYNAMIX_ASSERT_MSG(msg.id < _num_registered_messages, "unregistering a message which isn't registered");
     auto* registered = _messages[msg.id];
@@ -231,15 +241,19 @@ void domain::internal_unregister_feature(message_t& msg)
     // will be dropped
 }
 
-void domain::register_existing_mixin_type(mixin_type_info& info)
+void domain::register_mixin_type(mixin_type_info& info)
 {
-    // as is the case with messages, multiple modules may turn out
-    // trying to register the same mixin over again
-    // due to module specific template instantiation
-    // check if we already have this mixin registered
+    // mixin is already registered?
+    DYNAMIX_ASSERT(info.id == INVALID_MIXIN_ID);
+
+    // if this assert fails, there is no mixin name
+    // you must either enable DYNAMIX_USE_TYPEID or DYNAMIX_USE_STATIC_MEMBER_NAME
+    // or provide the name through a feature
+    DYNAMIX_ASSERT_MSG(info.name, "Mixin name must be provided");
 
     mixin_id free = INVALID_MIXIN_ID;
 
+    // TODO: optimize this check
     for (size_t i = 0; i < _num_registered_mixins; ++i)
     {
         mixin_type_info* registered = _mixin_type_infos[i];
@@ -274,7 +288,6 @@ void domain::register_existing_mixin_type(mixin_type_info& info)
     {
         info.allocator = _allocator;
     }
-
 
     _mixin_type_infos[info.id] = &info;
 }

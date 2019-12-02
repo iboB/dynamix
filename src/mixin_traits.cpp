@@ -6,7 +6,7 @@
 // https://opensource.org/licenses/MIT
 //
 #include "internal.hpp"
-#include "dynamix/mixin_traits.hpp"
+#include "dynamix/internal/mixin_traits.hpp"
 
 #if DYNAMIX_USE_TYPEID && defined(__GNUC__)
 #   include <cstdlib>

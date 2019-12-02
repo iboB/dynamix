@@ -79,7 +79,7 @@ int main()
 
     info0.name = "bagavag";
     dynamix::internal::set_missing_traits_to_info<script_mixin>(info0);
-    dom.register_existing_mixin_type(info0);
+    dom.register_mixin_type(info0);
 
     info0.message_infos.emplace_back();
     auto& msg = info0.message_infos.back();

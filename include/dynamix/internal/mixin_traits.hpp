@@ -7,9 +7,8 @@
 //
 #pragma once
 
-#include "config.hpp"
-
-#include "mixin_type_info.hpp"
+#include "../config.hpp"
+#include "../mixin_type_info.hpp"
 
 #include <type_traits>
 #include <utility>
@@ -32,7 +31,6 @@ namespace internal
 #   endif
 #endif
 
-// this procedure is used for the mixin construction
 template <typename Mixin>
 void call_mixin_constructor(void* memory)
 {
@@ -125,7 +123,7 @@ typename std::enable_if<!std::is_move_assignable<Mixin>::value,
     return nullptr;
 }
 
-// set any traits which are not already set with a meaningful default
+// set a meaningful default value to any traits which are not already set
 template <typename Mixin>
 void set_missing_traits_to_info(mixin_type_info& info)
 {

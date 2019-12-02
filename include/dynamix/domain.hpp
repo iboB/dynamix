@@ -11,10 +11,9 @@
 #include "mutation_rule_id.hpp"
 #include "mixin_type_info.hpp"
 #include "feature.hpp"
-#include "feature_parser.hpp"
 #include "message.hpp"
-
-#include "mixin_traits.hpp"
+#include "mixin_collection.hpp"
+#include "assert.hpp"
 
 #include <unordered_map>
 #include <memory>
@@ -62,47 +61,12 @@ public:
 
     size_t num_registered_mixins() const { return _num_registered_mixins; }
 
-    template <typename Mixin>
-    void register_mixin_type(mixin_type_info& info)
-    {
-        DYNAMIX_ASSERT(info.id == INVALID_MIXIN_ID);
-
-        feature_parser_phase_1 p1(info);
-        _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), p1);
-
-        info.message_infos.reserve(p1.num_messages());
-
-        feature_parser_phase_2<Mixin> p2(info);
-        _dynamix_parse_mixin_features(static_cast<Mixin*>(nullptr), p2);
-
-        set_missing_traits_to_info<Mixin>(info);
-
-        DYNAMIX_ASSERT_MSG(info.name, "Mixin name must be provided through a feature");
-
-        register_existing_mixin_type(info);
-    }
-
-    void register_existing_mixin_type(mixin_type_info& info);
-
+    void register_mixin_type(mixin_type_info& info);
     void unregister_mixin_type(const mixin_type_info& info);
 
-    template <typename Feature>
-    void register_feature(Feature& feature)
-    {
-        // see comments in feature_instance on why features may be registered multiple times
-        if(feature.id != INVALID_FEATURE_ID)
-        {
-            return;
-        }
-
-        internal_register_feature(feature);
-    }
-
-    template <typename Feature>
-    void unregister_feature(Feature& feature)
-    {
-        internal_unregister_feature(feature);
-    }
+    // feature registration functions for the supported kinds of features
+    void register_feature(message_t& m);
+    void unregister_feature(message_t& m);
 
     // creates a new type info if needed
     const object_type_info* get_object_type_info(const mixin_type_info_vector& mixins);
@@ -159,9 +123,9 @@ private:
     size_t _num_registered_messages;
 
     typedef std::unordered_map<available_mixins_bitset, std::unique_ptr<object_type_info>> object_type_info_map;
-
     object_type_info_map _object_type_infos;
 
+    // mutation rules for this domain
     std::vector<std::shared_ptr<mutation_rule>> _mutation_rules;
 
 #if DYNAMIX_THREAD_SAFE_MUTATIONS
@@ -169,15 +133,9 @@ private:
     std::mutex _mutation_rules_mutex;
 #endif
 
-    // feature registration functions for the supported kinds of features
-    void internal_register_feature(message_t& m);
-    void internal_unregister_feature(message_t& m);
-
-
     // allocators
     domain_allocator* _allocator;
 
-private:
     static const domain& _instance; // used for the fast version of the instance getter
 };
 
