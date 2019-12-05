@@ -58,5 +58,5 @@ private:
     char* _mixin = nullptr;
 };
 
-}
-}
+} // namespace internal
+} // namespace dynamix

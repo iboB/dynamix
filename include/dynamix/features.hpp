@@ -12,6 +12,8 @@
 * Non-message feature of mixins.
 */
 
+#include "config.hpp"
+
 namespace dynamix
 {
 
@@ -39,4 +41,4 @@ inline internal::mixin_name_feature mixin_name(const char* name)
     return {name};
 }
 
-}
+} // namespace dynamix

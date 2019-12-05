@@ -12,7 +12,7 @@
 #include "mixin_type_info.hpp"
 #include "feature.hpp"
 #include "message.hpp"
-#include "mixin_collection.hpp"
+#include "mixin_collection.hpp" // for mixin_type_info_vector
 #include "internal/assert.hpp"
 
 #include <unordered_map>

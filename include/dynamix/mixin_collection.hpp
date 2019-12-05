@@ -84,5 +84,4 @@ public:
     bool empty() const { return _compact_mixins.empty(); }
 };
 
-
 } // namespace dynamix

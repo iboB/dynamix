@@ -13,7 +13,6 @@
  */
 
 #include "config.hpp"
-#include "mixin_collection.hpp"
 #include "mutation_rule_id.hpp"
 
 #include <memory>
@@ -32,6 +31,8 @@ public:
     /// Called when applying the mutation rule.
     virtual void apply_to(object_type_mutation& mutation) = 0;
 };
+
+// the following functions are defined in domain.cpp
 
 /// DEPRECATED:
 /// Adds a mutation rule to the domain.

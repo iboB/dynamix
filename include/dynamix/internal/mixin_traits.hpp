@@ -19,7 +19,6 @@
 
 namespace dynamix
 {
-
 namespace internal
 {
 
@@ -152,4 +151,4 @@ void set_missing_traits_to_info(mixin_type_info& info)
 }
 
 } // namespace internal
-}
+} // namespace dynamix
