@@ -14,6 +14,7 @@
 #include <dynamix/object_type_template.hpp>
 #include <dynamix/exception.hpp>
 #include <dynamix/allocators.hpp>
+#include "dynamix/internal/mixin_data_in_object.hpp"
 
 #include <tuple>
 

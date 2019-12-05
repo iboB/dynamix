@@ -97,6 +97,7 @@ src_group(public dynamix_sources
 src_group("public~internal" dynamix_sources
     ${inc_path}/internal/feature_parser.hpp
     ${inc_path}/internal/mixin_traits.hpp
+    ${inc_path}/internal/mixin_data_in_object.hpp
 )
 
 src_group("public~gen" dynamix_sources

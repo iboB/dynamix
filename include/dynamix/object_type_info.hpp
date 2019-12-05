@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -123,52 +123,6 @@ _dynamix_internal:
 
     // this should be called after the mixins have been initialized
     void fill_call_table();
-};
-
-// represents the mixin data in an object
-class mixin_data_in_object
-{
-public:
-    mixin_data_in_object()
-        : _buffer(nullptr)
-        , _mixin(nullptr)
-    {
-    }
-
-    void set_buffer(char* buffer, size_t mixin_offset)
-    {
-        DYNAMIX_ASSERT(buffer);
-        DYNAMIX_ASSERT(mixin_offset >= sizeof(object*));
-        _buffer = buffer;
-        _mixin = buffer + mixin_offset;
-    }
-
-    void set_object(object* o)
-    {
-        DYNAMIX_ASSERT(o);
-        DYNAMIX_ASSERT(_buffer);
-        object** data_as_objec_ptr = reinterpret_cast<object**>(_mixin - sizeof(object*));
-        *data_as_objec_ptr = o;
-    }
-
-    void clear()
-    {
-        _buffer = nullptr;
-        _mixin = nullptr;
-    }
-
-    char* buffer() { return _buffer; }
-    void* mixin() { return _mixin; }
-    const char* buffer() const { return _buffer; }
-    const void* mixin() const { return _mixin; }
-
-    size_t mixin_offset() const
-    {
-        return _mixin - _buffer;
-    }
-private:
-    char* _buffer;
-    char* _mixin;
 };
 
 } // namespace internal

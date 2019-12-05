@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -8,6 +8,7 @@
 #include "internal.hpp"
 
 #include <dynamix/allocators.hpp>
+#include <dynamix/object_type_info.hpp>
 
 #if DYNAMIX_DEBUG
 #include <dynamix/object.hpp>
@@ -59,7 +60,7 @@ namespace internal
 char* default_allocator::alloc_mixin_data(size_t count, const object*)
 {
 #if DYNAMIX_DEBUG
-    _has_allocated = true;
+    _has_allocated.store(true, std::memory_order_relaxed);
 #endif
     return new char[sizeof(internal::mixin_data_in_object) * count];
 }
@@ -67,7 +68,7 @@ char* default_allocator::alloc_mixin_data(size_t count, const object*)
 void default_allocator::dealloc_mixin_data(char* ptr, size_t, const object*)
 {
 #if DYNAMIX_DEBUG
-    DYNAMIX_ASSERT(_has_allocated); // what? deallocate without ever allocating?
+    DYNAMIX_ASSERT(has_allocated()); // what? deallocate without ever allocating?
 #endif
     delete[] ptr;
 }
@@ -75,7 +76,7 @@ void default_allocator::dealloc_mixin_data(char* ptr, size_t, const object*)
 std::pair<char*, size_t> default_allocator::alloc_mixin(const mixin_type_info& info, const object*)
 {
 #if DYNAMIX_DEBUG
-    _has_allocated = true;
+    _has_allocated.store(true, std::memory_order_relaxed);
 #endif
 
     size_t mem_size = mem_size_for_mixin(info.size, info.alignment);
@@ -91,7 +92,7 @@ std::pair<char*, size_t> default_allocator::alloc_mixin(const mixin_type_info& i
 void default_allocator::dealloc_mixin(char* ptr, size_t, const mixin_type_info&, const object*)
 {
 #if DYNAMIX_DEBUG
-    DYNAMIX_ASSERT(_has_allocated); // what? deallocate without ever allocating?
+    DYNAMIX_ASSERT(has_allocated()); // what? deallocate without ever allocating?
 #endif
     delete[] ptr;
 }

@@ -13,21 +13,25 @@
  */
 
 #include "config.hpp"
-#include "object_type_info.hpp"
+
+#include "internal/mixin_data_in_object.hpp"
 
 #include <utility>
+#include <atomic>
 
 namespace dynamix
 {
+class mixin_type_info;
+class object;
 
 namespace internal
 {
-    // rounds s up to the nearest multiple of n
-    inline constexpr size_t next_multiple(size_t s, size_t n)
-    {
-        return ((s + n - 1) / n) // divide rounding up
-            * n;  // and scale
-    }
+// rounds s up to the nearest multiple of n
+inline constexpr size_t next_multiple(size_t s, size_t n)
+{
+    return ((s + n - 1) / n) // divide rounding up
+        * n;  // and scale
+}
 }
 
 /**
@@ -100,18 +104,10 @@ public:
     // it could be a serious bug to allocate from one and deallocate from another
 
     // users are encouraged to make use of this when debugging
-    mixin_allocator() : _has_allocated(false) {}
-
-    bool has_allocated() const { return _has_allocated; }
+    bool has_allocated() const { return _has_allocated.load(std::memory_order_relaxed); }
 
 protected:
-#   if DYNAMIX_THREAD_SAFE_MUTATIONS
-    std::atomic<bool>
-#   else
-    bool
-#   endif
-        _has_allocated;
-
+    std::atomic_bool _has_allocated = {};
 #endif
 };
 
