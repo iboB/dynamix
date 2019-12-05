@@ -13,7 +13,7 @@
 #include "feature.hpp"
 #include "message.hpp"
 #include "mixin_collection.hpp"
-#include "assert.hpp"
+#include "internal/assert.hpp"
 
 #include <unordered_map>
 #include <memory>
@@ -73,17 +73,17 @@ public:
 
     const mixin_type_info& mixin_info(mixin_id id) const
     {
-        DYNAMIX_ASSERT(id != INVALID_MIXIN_ID);
-        DYNAMIX_ASSERT(id <= _num_registered_mixins);
-        DYNAMIX_ASSERT(_mixin_type_infos[id]);
+        I_DYNAMIX_ASSERT(id != INVALID_MIXIN_ID);
+        I_DYNAMIX_ASSERT(id <= _num_registered_mixins);
+        I_DYNAMIX_ASSERT(_mixin_type_infos[id]);
 
         return *_mixin_type_infos[id];
     }
 
     const message_t& message_data(feature_id id) const
     {
-        DYNAMIX_ASSERT(id <= _num_registered_messages);
-        DYNAMIX_ASSERT(_messages[id]);
+        I_DYNAMIX_ASSERT(id <= _num_registered_messages);
+        I_DYNAMIX_ASSERT(_messages[id]);
         return *_messages[id];
     }
 

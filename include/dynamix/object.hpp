@@ -161,7 +161,7 @@ public:
     bool implements(const Feature*) const noexcept
     {
         const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
-        DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
+        I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
         // intentionally disregarding the actual feature,
         // because of potential multiple implementations
         return internal_implements(f.id, typename Feature::feature_tag());
@@ -173,7 +173,7 @@ public:
     bool implements_by_mixin(const Feature*) const noexcept
     {
         const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
-        DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
+        I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
         // intentionally disregarding the actual feature,
         // because of potential multiple implementations
         return internal_implements_by_mixin(f.id, typename Feature::feature_tag());
@@ -185,7 +185,7 @@ public:
     bool implements_with_default(const Feature*) const noexcept
     {
         const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
-        DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
+        I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
         // intentionally disregarding the actual feature,
         // because of potential multiple implementations
         return
@@ -198,7 +198,7 @@ public:
     size_t num_implementers(const Feature*) const noexcept
     {
         const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
-        DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
+        I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
         // intentionally disregarding the actual feature,
         // because of potential multiple implementations
         // the actual feature will be gotten from the feature registry in the domain

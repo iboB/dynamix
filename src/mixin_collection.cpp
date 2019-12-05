@@ -47,7 +47,7 @@ void mixin_collection::check_valid_mixin(const mixin_type_info& mixin_info)
 {
     // this shouldn't be possible without a bug in the library
     // hence no throw
-    DYNAMIX_ASSERT(mixin_info.is_valid());
+    I_DYNAMIX_ASSERT(mixin_info.is_valid());
 }
 
 void mixin_collection::add(mixin_id id)
@@ -60,7 +60,7 @@ void mixin_collection::add(mixin_id id)
     if(_mixins[id])
     {
         // we already have this
-        DYNAMIX_ASSERT(std::find(_compact_mixins.begin(), _compact_mixins.end(), &info) != _compact_mixins.end());
+        I_DYNAMIX_ASSERT(std::find(_compact_mixins.begin(), _compact_mixins.end(), &info) != _compact_mixins.end());
         return;
     }
 
@@ -75,11 +75,11 @@ void mixin_collection::remove(mixin_id id)
     // argument of type mixin_type_info
     const mixin_type_info& info = domain::instance().mixin_info(id);
 
-    DYNAMIX_ASSERT(_mixins[id]); // should have it to remove it
+    I_DYNAMIX_ASSERT(_mixins[id]); // should have it to remove it
     _mixins[id] = false;
 
     mixin_type_info_vector::iterator i = find(_compact_mixins.begin(), _compact_mixins.end(), &info);
-    DYNAMIX_ASSERT(i != _compact_mixins.end());
+    I_DYNAMIX_ASSERT(i != _compact_mixins.end());
     _compact_mixins.erase(i);
 }
 

@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2017 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -8,7 +8,7 @@
 #include "internal.hpp"
 #include <dynamix/common_mutation_rules.hpp>
 #include <dynamix/object_type_mutation.hpp>
-#include <dynamix/assert.hpp>
+#include "dynamix/internal/assert.hpp"
 
 namespace dynamix
 {
@@ -25,7 +25,7 @@ void mutually_exclusive_mixins::apply_to(object_type_mutation& mutation)
     {
         if(mutation.is_adding(mixin_info->id))
         {
-            DYNAMIX_ASSERT_MSG(adding == INVALID_MIXIN_ID, "mutation breaking a mutually exclusive mixin rule");
+            I_DYNAMIX_ASSERT_MSG(adding == INVALID_MIXIN_ID, "mutation breaking a mutually exclusive mixin rule");
             adding = mixin_info->id;
 #if !DYNAMIX_DEBUG
             // in debug mode continue the loop, to check for other rule breaking
@@ -82,7 +82,7 @@ void bundled_mixins::apply_to(object_type_mutation& mutation)
         }
     }
 
-    DYNAMIX_ASSERT_MSG(adding == INVALID_MIXIN_ID || removing == INVALID_MIXIN_ID, "mutation breaking a bundle mixin rule");
+    I_DYNAMIX_ASSERT_MSG(adding == INVALID_MIXIN_ID || removing == INVALID_MIXIN_ID, "mutation breaking a bundle mixin rule");
 
     if (adding != INVALID_MIXIN_ID)
     {

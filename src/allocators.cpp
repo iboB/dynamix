@@ -44,13 +44,13 @@ void object_allocator::release(object&) noexcept
 
 object_allocator* object_allocator::on_copy_construct(object&, const object& source)
 {
-    DYNAMIX_ASSERT(source.allocator() == this);
+    I_DYNAMIX_ASSERT(source.allocator() == this);
     return nullptr;
 }
 
 object_allocator* object_allocator::on_move(object&, object& source) noexcept
 {
-    DYNAMIX_ASSERT(source.allocator() == this);
+    I_DYNAMIX_ASSERT(source.allocator() == this);
     return this;
 }
 
@@ -68,7 +68,7 @@ char* default_allocator::alloc_mixin_data(size_t count, const object*)
 void default_allocator::dealloc_mixin_data(char* ptr, size_t, const object*)
 {
 #if DYNAMIX_DEBUG
-    DYNAMIX_ASSERT(has_allocated()); // what? deallocate without ever allocating?
+    I_DYNAMIX_ASSERT(has_allocated()); // what? deallocate without ever allocating?
 #endif
     delete[] ptr;
 }
@@ -84,7 +84,7 @@ std::pair<char*, size_t> default_allocator::alloc_mixin(const mixin_type_info& i
     auto buffer = new char[mem_size];
     auto offset = mixin_offset(buffer, info.alignment);
 
-    DYNAMIX_ASSERT(offset + info.size <= mem_size); // we should have room for the mixin
+    I_DYNAMIX_ASSERT(offset + info.size <= mem_size); // we should have room for the mixin
 
     return std::make_pair(buffer, offset);
 }
@@ -92,7 +92,7 @@ std::pair<char*, size_t> default_allocator::alloc_mixin(const mixin_type_info& i
 void default_allocator::dealloc_mixin(char* ptr, size_t, const mixin_type_info&, const object*)
 {
 #if DYNAMIX_DEBUG
-    DYNAMIX_ASSERT(has_allocated()); // what? deallocate without ever allocating?
+    I_DYNAMIX_ASSERT(has_allocated()); // what? deallocate without ever allocating?
 #endif
     delete[] ptr;
 }

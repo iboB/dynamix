@@ -16,7 +16,7 @@
 #include "config.hpp"
 #include "mixin_collection.hpp"
 #include "message.hpp"
-#include "assert.hpp"
+#include "internal/assert.hpp"
 
 #include <memory>
 

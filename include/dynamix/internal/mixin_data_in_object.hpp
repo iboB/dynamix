@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../config.hpp"
-#include "../assert.hpp"
+#include "assert.hpp"
 
 #include <cstddef>
 
@@ -24,16 +24,16 @@ class mixin_data_in_object
 public:
     void set_buffer(char* buffer, size_t mixin_offset)
     {
-        DYNAMIX_ASSERT(buffer);
-        DYNAMIX_ASSERT(mixin_offset >= sizeof(object*));
+        I_DYNAMIX_ASSERT(buffer);
+        I_DYNAMIX_ASSERT(mixin_offset >= sizeof(object*));
         _buffer = buffer;
         _mixin = buffer + mixin_offset;
     }
 
     void set_object(object* o)
     {
-        DYNAMIX_ASSERT(o);
-        DYNAMIX_ASSERT(_buffer);
+        I_DYNAMIX_ASSERT(o);
+        I_DYNAMIX_ASSERT(_buffer);
         object** data_as_objec_ptr = reinterpret_cast<object**>(_mixin - sizeof(object*));
         *data_as_objec_ptr = o;
     }

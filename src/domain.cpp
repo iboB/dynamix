@@ -109,7 +109,7 @@ const object_type_info* domain::get_object_type_info(const mixin_type_info_vecto
     // the mixin type infos need to be sorted
     // so as to guarantee that two object type infos of the same mixins
     // will have the exact same content
-    DYNAMIX_ASSERT(std::is_sorted(mixins.begin(), mixins.end()));
+    I_DYNAMIX_ASSERT(std::is_sorted(mixins.begin(), mixins.end()));
 
     available_mixins_bitset query;
 
@@ -128,7 +128,7 @@ const object_type_info* domain::get_object_type_info(const mixin_type_info_vecto
     if(it != _object_type_infos.end())
     {
         // get existing
-        DYNAMIX_ASSERT(mixins == it->second->_compact_mixins);
+        I_DYNAMIX_ASSERT(mixins == it->second->_compact_mixins);
         return it->second.get();
     }
     else
@@ -140,7 +140,7 @@ const object_type_info* domain::get_object_type_info(const mixin_type_info_vecto
 
         for(size_t i=0; i<mixins.size(); ++i)
         {
-            DYNAMIX_ASSERT(mixins[i]);
+            I_DYNAMIX_ASSERT(mixins[i]);
             new_type->_mixins[mixins[i]->id] = true;
             new_type->_mixin_indices[mixins[i]->id] = i + object_type_info::MIXIN_INDEX_OFFSET;
         }
@@ -189,7 +189,7 @@ void domain::register_feature(message_t& m)
 
         message_t& registered_message = *_messages[i];
 
-        DYNAMIX_ASSERT(registered_message.id != INVALID_FEATURE_ID); // how could this happen?
+        I_DYNAMIX_ASSERT(registered_message.id != INVALID_FEATURE_ID); // how could this happen?
 
         if(strcmp(m.name, registered_message.name) == 0)
         {
@@ -197,7 +197,7 @@ void domain::register_feature(message_t& m)
             // for now this is an error
 
             // at least check if the mechanism is the same
-            DYNAMIX_ASSERT_MSG(false, "Attempting to register a message that has already been registered");
+            I_DYNAMIX_ASSERT_MSG(false, "Attempting to register a message that has already been registered");
 
             // try to resque the situation in some way
             m.id = registered_message.id;
@@ -208,7 +208,7 @@ void domain::register_feature(message_t& m)
 
     if (free == INVALID_FEATURE_ID)
     {
-        DYNAMIX_ASSERT_MSG(_num_registered_messages < DYNAMIX_MAX_MESSAGES,
+        I_DYNAMIX_ASSERT_MSG(_num_registered_messages < DYNAMIX_MAX_MESSAGES,
             "you have to increase the maximum number of messages");
 
         m.id = _num_registered_messages;
@@ -224,10 +224,10 @@ void domain::register_feature(message_t& m)
 
 void domain::unregister_feature(message_t& msg)
 {
-    DYNAMIX_ASSERT_MSG(msg.id < _num_registered_messages, "unregistering a message which isn't registered");
+    I_DYNAMIX_ASSERT_MSG(msg.id < _num_registered_messages, "unregistering a message which isn't registered");
     auto* registered = _messages[msg.id];
-    DYNAMIX_ASSERT_MSG(registered, "unregistering a message which isn't registered");
-    DYNAMIX_ASSERT_MSG(registered == &msg, "unregistering a message with know id but unknown data");
+    I_DYNAMIX_ASSERT_MSG(registered, "unregistering a message which isn't registered");
+    I_DYNAMIX_ASSERT_MSG(registered == &msg, "unregistering a message with know id but unknown data");
 
     _messages[msg.id] = nullptr;
 
@@ -244,12 +244,12 @@ void domain::unregister_feature(message_t& msg)
 void domain::register_mixin_type(mixin_type_info& info)
 {
     // mixin is already registered?
-    DYNAMIX_ASSERT(info.id == INVALID_MIXIN_ID);
+    I_DYNAMIX_ASSERT(info.id == INVALID_MIXIN_ID);
 
     // if this assert fails, there is no mixin name
     // you must either enable DYNAMIX_USE_TYPEID or DYNAMIX_USE_STATIC_MEMBER_NAME
     // or provide the name through a feature
-    DYNAMIX_ASSERT_MSG(info.name, "Mixin name must be provided");
+    I_DYNAMIX_ASSERT_MSG(info.name, "Mixin name must be provided");
 
     mixin_id free = INVALID_MIXIN_ID;
 
@@ -260,8 +260,8 @@ void domain::register_mixin_type(mixin_type_info& info)
 
         if (registered)
         {
-            DYNAMIX_ASSERT(registered->is_valid());
-            DYNAMIX_ASSERT_MSG(strcmp(info.name, registered->name) != 0, "registering the same mixin twice");
+            I_DYNAMIX_ASSERT(registered->is_valid());
+            I_DYNAMIX_ASSERT_MSG(strcmp(info.name, registered->name) != 0, "registering the same mixin twice");
         }
         else
         {
@@ -272,7 +272,7 @@ void domain::register_mixin_type(mixin_type_info& info)
     if (free == INVALID_MIXIN_ID)
     {
         // no free slot has been found dugin the iteration, so add a new one
-        DYNAMIX_ASSERT_MSG(_num_registered_mixins < DYNAMIX_MAX_MIXINS,
+        I_DYNAMIX_ASSERT_MSG(_num_registered_mixins < DYNAMIX_MAX_MIXINS,
             "you have to increase the maximum number of mixins");
 
         info.id = _num_registered_mixins;
@@ -294,10 +294,10 @@ void domain::register_mixin_type(mixin_type_info& info)
 
 void domain::unregister_mixin_type(const mixin_type_info& info)
 {
-    DYNAMIX_ASSERT_MSG(info.id < _num_registered_mixins, "unregistering a mixin which isn't registered");
+    I_DYNAMIX_ASSERT_MSG(info.id < _num_registered_mixins, "unregistering a mixin which isn't registered");
     mixin_type_info* const registered = _mixin_type_infos[info.id];
-    DYNAMIX_ASSERT_MSG(registered, "unregistering a mixin which isn't registered");
-    DYNAMIX_ASSERT_MSG(registered == &info, "unregistering a mixin with known id but unknown data");
+    I_DYNAMIX_ASSERT_MSG(registered, "unregistering a mixin which isn't registered");
+    I_DYNAMIX_ASSERT_MSG(registered == &info, "unregistering a mixin with known id but unknown data");
 
 #if DYNAMIX_USE_TYPEID && defined(__GNUC__)
     // if the name wasn't overriden by a feature, it has been obtained through
@@ -331,7 +331,7 @@ void domain::unregister_mixin_type(const mixin_type_info& info)
 
 void domain::set_allocator(domain_allocator* allocator)
 {
-    DYNAMIX_ASSERT(!_allocator || !_allocator->has_allocated());
+    I_DYNAMIX_ASSERT(!_allocator || !_allocator->has_allocated());
 
     for(size_t i=0; i<_num_registered_mixins; ++i)
     {

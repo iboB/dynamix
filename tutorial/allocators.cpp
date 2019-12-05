@@ -206,7 +206,7 @@ public:
         }
 
         // deallocating memory, which hasn't been allocated from that allocator
-        DYNAMIX_ASSERT(found);
+        I_DYNAMIX_ASSERT(found);
 #else
         buf; // to skip warning for unused parameter
 #endif
@@ -219,7 +219,7 @@ public:
     // function to be called once each frame that resets the allocator
     void reset()
     {
-        DYNAMIX_ASSERT(_num_allocations == 0); // premature reset
+        I_DYNAMIX_ASSERT(_num_allocations == 0); // premature reset
         for(size_t i=1; i<_pages.size(); ++i)
         {
             delete[] _pages[i];

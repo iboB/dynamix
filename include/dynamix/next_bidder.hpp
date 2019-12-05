@@ -40,7 +40,7 @@ auto call_next_bidder(Mixin* mixin, Message* message, Args&&... args)
         DYNAMIX_THROW_UNLESS(ptr, bad_next_bidder_call); // no next bidder calls
 
         // since this is called from a mixin this loop must end eventually
-        while (ptr++->mixin_index != mixin_index) DYNAMIX_ASSERT(ptr < entry.end);
+        while (ptr++->mixin_index != mixin_index) I_DYNAMIX_ASSERT(ptr < entry.end);
         DYNAMIX_THROW_UNLESS(ptr < entry.end, bad_next_bidder_call);
 
         // for unicasts the next message for mixin (pointed by ptr) must be the one
@@ -68,7 +68,7 @@ auto call_next_bidder(Mixin* mixin, Message* message, Args&&... args)
         // loop to the end of the bid chain
         while (ptr->data->bid == prev_msg->data->bid) ++ptr;
 
-        DYNAMIX_ASSERT(ptr >= entry.end); // we must be past the end here
+        I_DYNAMIX_ASSERT(ptr >= entry.end); // we must be past the end here
 
         // after the end of the bid chain we could STILL have reached the end of the buffer
         DYNAMIX_THROW_UNLESS(*ptr, bad_next_bidder_call);
@@ -112,7 +112,7 @@ bool has_next_bidder(Mixin* mixin, Message* message)
     {
         auto ptr = entry.begin;
         if (!ptr) return false;
-        while (ptr++->mixin_index != mixin_index) DYNAMIX_ASSERT(ptr < entry.end);
+        while (ptr++->mixin_index != mixin_index) I_DYNAMIX_ASSERT(ptr < entry.end);
         return ptr < entry.end;
     }
     else

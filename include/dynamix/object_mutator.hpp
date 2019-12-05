@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -16,7 +16,7 @@
 
 #include "config.hpp"
 #include "object_type_mutation.hpp"
-#include "assert.hpp"
+#include "internal/assert.hpp"
 
 namespace dynamix
 {
@@ -41,7 +41,7 @@ public:
     template <typename Mixin>
     object_mutator& add()
     {
-        DYNAMIX_ASSERT(!_is_created); // once a mutator is created, you cannot change its mutation
+        I_DYNAMIX_ASSERT(!_is_created); // once a mutator is created, you cannot change its mutation
         _mutation.start_adding<Mixin>();
         return *this;
     }
@@ -49,7 +49,7 @@ public:
     template <typename Mixin>
     object_mutator& remove()
     {
-        DYNAMIX_ASSERT(!_is_created); // once a mutator is created, you cannot change its mutation
+        I_DYNAMIX_ASSERT(!_is_created); // once a mutator is created, you cannot change its mutation
         _mutation.start_removing<Mixin>();
         return *this;
     }

@@ -122,7 +122,7 @@ void object::clear() noexcept
         _type_info->dealloc_mixin_data(_mixin_data, this);
         _mixin_data = &null_mixin_data;
 
-        DYNAMIX_ASSERT(_type_info->num_objects > 0);
+        I_DYNAMIX_ASSERT(_type_info->num_objects > 0);
         --_type_info->num_objects;
     }
 
@@ -160,7 +160,7 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
 
     if (old_type != &object_type_info::null())
     {
-        DYNAMIX_ASSERT(old_type->num_objects > 0);
+        I_DYNAMIX_ASSERT(old_type->num_objects > 0);
         --old_type->num_objects;
     }
     if (new_type != &object_type_info::null())
@@ -194,9 +194,9 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
 
 bool object::make_mixin(mixin_id id, const void* source)
 {
-    DYNAMIX_ASSERT(_type_info->has(id));
+    I_DYNAMIX_ASSERT(_type_info->has(id));
     mixin_data_in_object& data = _mixin_data[_type_info->mixin_index(id)];
-    DYNAMIX_ASSERT(!data.buffer());
+    I_DYNAMIX_ASSERT(!data.buffer());
 
     auto& dom = domain::instance();
 
@@ -207,8 +207,8 @@ bool object::make_mixin(mixin_id id, const void* source)
     size_t mixin_offset;
     std::tie(buffer, mixin_offset) = alloc->alloc_mixin(mixin_info, this);
 
-    DYNAMIX_ASSERT(buffer);
-    DYNAMIX_ASSERT(mixin_offset >= sizeof(object*)); // we should have room for an object pointer
+    I_DYNAMIX_ASSERT(buffer);
+    I_DYNAMIX_ASSERT(mixin_offset >= sizeof(object*)); // we should have room for an object pointer
 
     data.set_buffer(buffer, mixin_offset);
     data.set_object(this);
@@ -242,7 +242,7 @@ bool object::make_mixin(mixin_id id, const void* source)
 
 void object::delete_mixin(mixin_id id)
 {
-    DYNAMIX_ASSERT(_type_info->has(id));
+    I_DYNAMIX_ASSERT(_type_info->has(id));
     mixin_data_in_object& data = _mixin_data[_type_info->mixin_index(id)];
 
     const mixin_type_info& mixin_info = domain::instance().mixin_info(id);
@@ -256,7 +256,7 @@ void object::delete_mixin(mixin_id id)
         data.mixin_offset(), mixin_info, this);
 
 #if DYNAMIX_ADDITIONAL_METRICS
-    DYNAMIX_ASSERT(mixin_info.num_mixins > 0);
+    I_DYNAMIX_ASSERT(mixin_info.num_mixins > 0);
     --mixin_info.num_mixins;
 #endif
 
@@ -481,7 +481,7 @@ void object::copy_from(const object& o)
 
     if (old_type != &object_type_info::null())
     {
-        DYNAMIX_ASSERT(old_type->num_objects > 0);
+        I_DYNAMIX_ASSERT(old_type->num_objects > 0);
         --old_type->num_objects;
     }
     if (o._type_info != &object_type_info::null())
@@ -585,9 +585,9 @@ std::pair<char*, size_t> object::move_mixin(mixin_id id, char* buffer, size_t mi
 
 std::pair<char*, size_t> object::hard_replace_mixin(mixin_id id, char* buffer, size_t mixin_offset) noexcept
 {
-    DYNAMIX_ASSERT(id < DYNAMIX_MAX_MIXINS);
+    I_DYNAMIX_ASSERT(id < DYNAMIX_MAX_MIXINS);
     auto& data = _mixin_data[_type_info->mixin_index(id)];
-    DYNAMIX_ASSERT(data.mixin());
+    I_DYNAMIX_ASSERT(data.mixin());
 
     auto ret = std::make_pair(data.buffer(), data.mixin_offset());
     data.set_buffer(buffer, mixin_offset);
@@ -607,7 +607,7 @@ void object::reallocate_mixins()
 
         auto& data = _mixin_data[_type_info->mixin_index(id)];
         auto old_data = data;
-        DYNAMIX_ASSERT(data.buffer());
+        I_DYNAMIX_ASSERT(data.buffer());
 
         mixin_allocator* alloc = _allocator ? _allocator : mixin_info->allocator;
 

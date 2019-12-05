@@ -1,5 +1,5 @@
 # DynaMix
-# Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+# Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 #
 # Distributed under the MIT Software License
 # See accompanying file LICENSE.txt or copy at
@@ -63,7 +63,6 @@ set(src_path ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 src_group(public dynamix_sources
     ${inc_path}/allocators.hpp
-    ${inc_path}/assert.hpp
     ${inc_path}/combinators.hpp
     ${inc_path}/common_mutation_rules.hpp
     ${inc_path}/config.hpp
@@ -95,9 +94,10 @@ src_group(public dynamix_sources
 )
 
 src_group("public~internal" dynamix_sources
+    ${inc_path}/internal/assert.hpp
     ${inc_path}/internal/feature_parser.hpp
-    ${inc_path}/internal/mixin_traits.hpp
     ${inc_path}/internal/mixin_data_in_object.hpp
+    ${inc_path}/internal/mixin_traits.hpp
 )
 
 src_group("public~gen" dynamix_sources

@@ -177,7 +177,7 @@ void object_type_info::fill_call_table()
                         ++message_data_buffer_ptr;
                     }
 
-                    DYNAMIX_ASSERT(message_data_buffer_ptr - _message_data_buffer.get() <= message_data_buffer_size);
+                    I_DYNAMIX_ASSERT(message_data_buffer_ptr - _message_data_buffer.get() <= message_data_buffer_size);
                     table_entry.begin = begin;
                     table_entry.end = begin;
                 }
@@ -301,7 +301,7 @@ void object_type_info::fill_call_table()
         }
 
         // use this opportunity to assert that the buffer is at least two elements big
-        DYNAMIX_ASSERT(table_entry.end - table_entry.begin > 1);
+        I_DYNAMIX_ASSERT(table_entry.end - table_entry.begin > 1);
 
         for (auto ptr = table_entry.begin; ptr != table_entry.end - 1; ++ptr)
         {

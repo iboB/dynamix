@@ -56,7 +56,7 @@ struct msg_unicast : public message_t, public msg_caller<Ret, Args...>
     static Ret make_call(Object& obj, Args&&... args)
     {
         const ::dynamix::feature& self = _dynamix_get_mixin_feature_fast(static_cast<Derived*>(nullptr));
-        DYNAMIX_ASSERT(static_cast<const message_t&>(self).mechanism
+        I_DYNAMIX_ASSERT(static_cast<const message_t&>(self).mechanism
             == message_t::unicast);
 
         const object_type_info::call_table_entry& call_entry =
@@ -91,7 +91,7 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
     static void make_combinator_call(Object& obj, Combinator& combinator, Args&... args)
     {
         const ::dynamix::feature& self = _dynamix_get_mixin_feature_fast(static_cast<Derived*>(nullptr));
-        DYNAMIX_ASSERT(static_cast<const message_t&>(self).mechanism
+        I_DYNAMIX_ASSERT(static_cast<const message_t&>(self).mechanism
             == message_t::multicast);
 
         const object_type_info::call_table_entry& call_entry =
@@ -106,7 +106,7 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
         for (auto iter = begin; iter != end; ++iter)
         {
             auto& msg = *iter;
-            DYNAMIX_ASSERT(!!msg);
+            I_DYNAMIX_ASSERT(!!msg);
 
             // unfortunately we can't assert(msg_data->message == &self); since the data might come from a different module
 
@@ -134,7 +134,7 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
     static void make_call(Object& obj, Args&... args)
     {
         const ::dynamix::feature& self = _dynamix_get_mixin_feature_fast(static_cast<Derived*>(nullptr));
-        DYNAMIX_ASSERT(static_cast<const message_t&>(self).mechanism
+        I_DYNAMIX_ASSERT(static_cast<const message_t&>(self).mechanism
             == message_t::multicast);
 
         const object_type_info::call_table_entry& call_entry =
@@ -148,7 +148,7 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
         for (auto iter = begin; iter != end; ++iter)
         {
             auto& msg = *iter;
-            DYNAMIX_ASSERT(!!msg);
+            I_DYNAMIX_ASSERT(!!msg);
 
             // unfortunately we can't assert(msg_data->message == &self); since the data might come from a different module
 

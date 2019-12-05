@@ -143,7 +143,7 @@ inline size_t mixin_allocator::mixin_offset(const char* buffer, size_t mixin_ali
     // this means that memory not-aligned to the pointer size was allocated
     // This platform is strange and creepy and is not supported by the default allocator
     // you should write your own, that allocates properly aligned memory
-    DYNAMIX_ASSERT_MSG(uintptr_t(buffer) % sizeof(object*) == 0,
+    I_DYNAMIX_ASSERT_MSG(uintptr_t(buffer) % sizeof(object*) == 0,
         "allocators should always return memory aligned to sizeof(void*)");
 
     uintptr_t mixin_pos = internal::next_multiple(uintptr_t(buffer + sizeof(object*)), mixin_alignment);

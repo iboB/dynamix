@@ -43,15 +43,15 @@ plugin_proc plugin_release_object;
 void load_plugin()
 {
     plugin = LoadDynamicLib("plugin");
-    DYNAMIX_ASSERT(plugin);
+    I_DYNAMIX_ASSERT(plugin);
 
     auto fp = GetProc(plugin, "modify_object");
-    DYNAMIX_ASSERT(fp);
+    I_DYNAMIX_ASSERT(fp);
 
     plugin_modify_object = reinterpret_cast<plugin_proc>(fp);
 
     fp = GetProc(plugin, "release_object");
-    DYNAMIX_ASSERT(fp);
+    I_DYNAMIX_ASSERT(fp);
 
     plugin_release_object = reinterpret_cast<plugin_proc>(fp);
 }

@@ -41,7 +41,7 @@ void object_mutator::cancel()
 
 void object_mutator::create()
 {
-    DYNAMIX_ASSERT(_mutation._source);
+    I_DYNAMIX_ASSERT(_mutation._source);
 
     if(_is_created)
     {
@@ -111,7 +111,7 @@ void object_mutator::apply_to(object& obj) const
     // typically a type template for which the explicit .create() hasn't been called
     DYNAMIX_THROW_UNLESS(_is_created, bad_mutation);
 
-    DYNAMIX_ASSERT(_mutation._source);
+    I_DYNAMIX_ASSERT(_mutation._source);
 
     // we need to mutate only objects of the same type
     DYNAMIX_THROW_UNLESS(obj._type_info->as_mixin_collection() == _mutation._source, bad_mutation_source);
@@ -124,7 +124,7 @@ void object_mutator::apply_to(object& obj) const
 
     // shouldn't be trying to set the same type info
     // unless they're both null, which is covereted by the previous if
-    DYNAMIX_ASSERT(obj._type_info != _target_type_info);
+    I_DYNAMIX_ASSERT(obj._type_info != _target_type_info);
 
     if(_target_type_info == &object_type_info::null())
     {

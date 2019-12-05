@@ -89,7 +89,7 @@ public:
     feature_parser_phase_2& operator & (const Feature*)
     {
         Feature& f = static_cast<Feature&>(_dynamix_get_mixin_feature_safe(static_cast<Feature*>(nullptr)));
-        DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID); // must be registered
+        I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID); // must be registered
         parse_feature(f, typename Feature::feature_tag());
 
         return *this;
@@ -118,7 +118,7 @@ private:
     void parse_message_with_perks(int bid, int priority)
     {
         Message& msg = static_cast<Message&>(_dynamix_get_mixin_feature_safe(static_cast<Message*>(nullptr)));
-        DYNAMIX_ASSERT(msg.id != INVALID_FEATURE_ID);
+        I_DYNAMIX_ASSERT(msg.id != INVALID_FEATURE_ID);
 
         parse_message(msg, bid, priority);
     }
@@ -130,8 +130,8 @@ private:
         // check for duplicate entries
         for (const message_for_mixin& msg_info : info.message_infos)
         {
-            DYNAMIX_ASSERT(msg_info.message); // null message ???
-            DYNAMIX_ASSERT(msg_info.message != &msg); // duplicate message. You have "x_msg & ... & x_msg"
+            I_DYNAMIX_ASSERT(msg_info.message); // null message ???
+            I_DYNAMIX_ASSERT(msg_info.message != &msg); // duplicate message. You have "x_msg & ... & x_msg"
         }
 #endif
         info.message_infos.emplace_back();

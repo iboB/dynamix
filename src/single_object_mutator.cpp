@@ -23,7 +23,7 @@ single_object_mutator::single_object_mutator(object* o)
     : _object(*o)
     , _is_manually_applied(false)
 {
-    DYNAMIX_ASSERT(o);
+    I_DYNAMIX_ASSERT(o);
 }
 
 single_object_mutator::single_object_mutator(object& o)
