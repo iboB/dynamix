@@ -81,32 +81,6 @@ struct DYNAMIX_API message_for_mixin
     int priority;
 };
 
-
-// metafunction used to register messages
-// in case no mixin implements them (if it does, it will also register the message)
-template <typename Message>
-struct message_registrator
-{
-    message_registrator()
-    {
-        _dynamix_register_mixin_feature(static_cast<Message*>(nullptr));
-    }
-
-    // defined in message_macros because it depends on domain.hpp
-    // unregisteres the message
-    ~message_registrator();
-
-    // "payload" instance of the type
-    static message_registrator registrator;
-
-    // as with mixin_type_info_instance, this is
-    // to prevent warnings and optimizations that will say that we're not using
-    // instantiator by simply referencing it
-    int unused;
-};
-template <typename Message>
-message_registrator<Message> message_registrator<Message>::registrator;
-
 // check if a class has a method set_num_results
 template <typename Combinator>
 struct has_set_num_results

@@ -23,14 +23,36 @@ namespace dynamix
 {
 namespace internal
 {
-template <typename Message>
-message_registrator<Message>::~message_registrator()
-{
-    internal::domain::safe_instance().
-        unregister_feature(static_cast<message_t&>(_dynamix_get_mixin_feature_safe(static_cast<Message*>(nullptr))));
-}
-
 // classes instantiated by the message macros
+
+// type used to register messages in case no mixin implements them
+// (all mixins which implement a message will also register it)
+template <typename Message>
+struct message_registrator
+{
+    message_registrator()
+    {
+        _dynamix_register_mixin_feature(static_cast<Message*>(nullptr));
+    }
+
+    // defined in message_macros because it depends on domain.hpp
+    // unregisteres the message
+    ~message_registrator()
+    {
+        internal::domain::safe_instance().
+            unregister_feature(static_cast<message_t&>(_dynamix_get_mixin_feature_safe(static_cast<Message*>(nullptr))));
+    }
+
+    // "payload" instance of the type
+    static message_registrator registrator;
+
+    // as with mixin_type_info_instance, this is
+    // to prevent warnings and optimizations that will say that we're not using
+    // instantiator by simply referencing it
+    int unused;
+};
+template <typename Message>
+message_registrator<Message> message_registrator<Message>::registrator;
 
 // defines calling function
 template <typename Ret, typename... Args>
