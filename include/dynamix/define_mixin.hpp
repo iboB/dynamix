@@ -21,7 +21,6 @@
 
 namespace dynamix
 {
-
 namespace internal
 {
 

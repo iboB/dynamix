@@ -67,14 +67,20 @@ src_group(public dynamix_sources
     ${inc_path}/common_mutation_rules.hpp
     ${inc_path}/config.hpp
     ${inc_path}/domain.hpp
+    ${inc_path}/declare_message_opt.hpp
+    ${inc_path}/declare_message.hpp
+    ${inc_path}/declare_message_legacy.hpp
+    ${inc_path}/declare_message_no_arity.hpp
+    ${inc_path}/declare_message_split.hpp
     ${inc_path}/declare_mixin.hpp
+    ${inc_path}/define_message.hpp
+    ${inc_path}/define_message_split.hpp
     ${inc_path}/define_mixin.hpp
     ${inc_path}/dm_this.hpp
     ${inc_path}/dynamix.hpp
     ${inc_path}/exception.hpp
     ${inc_path}/feature.hpp
     ${inc_path}/message.hpp
-    ${inc_path}/message_macros.hpp
     ${inc_path}/metrics.hpp
     ${inc_path}/mixin_collection.hpp
     ${inc_path}/mixin_id.hpp
@@ -88,7 +94,6 @@ src_group(public dynamix_sources
     ${inc_path}/object_type_info.hpp
     ${inc_path}/object_type_mutation.hpp
     ${inc_path}/object_type_template.hpp
-    ${inc_path}/preprocessor.hpp
     ${inc_path}/same_type_mutator.hpp
     ${inc_path}/single_object_mutator.hpp
     ${inc_path}/version.hpp
@@ -97,8 +102,11 @@ src_group(public dynamix_sources
 src_group("public~internal" dynamix_sources
     ${inc_path}/internal/assert.hpp
     ${inc_path}/internal/feature_parser.hpp
+    ${inc_path}/internal/message_callers.hpp
     ${inc_path}/internal/mixin_data_in_object.hpp
     ${inc_path}/internal/mixin_traits.hpp
+    ${inc_path}/internal/message_macros.hpp
+    ${inc_path}/internal/preprocessor.hpp
 )
 
 src_group("public~gen" dynamix_sources

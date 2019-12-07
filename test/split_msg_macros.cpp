@@ -6,7 +6,7 @@
 // https://opensource.org/licenses/MIT
 //
 #define DYNAMIX_NO_MESSAGE_MACROS
-#include <dynamix/dynamix.hpp>
+#include <dynamix/declare_mixin.hpp>
 
 #include "doctest/doctest.h"
 
@@ -22,6 +22,7 @@ DYNAMIX_DECLARE_MIXIN(type_checker);
 //DYNAMIX_DECLARE_MIXIN(foo);
 //DYNAMIX_DECLARE_MIXIN(bar);
 
+#include <dynamix/declare_message_split.hpp>
 #include "split_msg_macros_messages.inl"
 
 class no_messages
@@ -74,6 +75,9 @@ public:
     }
 
 };
+
+#include <dynamix/object.hpp>
+#include <dynamix/single_object_mutator.hpp>
 
 TEST_CASE("basic_message")
 {
@@ -174,6 +178,8 @@ TEST_CASE("multicast")
     multi(o, n);
     CHECK(n == 6);
 }
+
+#include <dynamix/define_mixin.hpp>
 
 DYNAMIX_DEFINE_MIXIN(no_messages, none);
 DYNAMIX_DEFINE_MIXIN(counter, dummy_msg & multi_msg);

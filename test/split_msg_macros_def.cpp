@@ -6,10 +6,7 @@
 // https://opensource.org/licenses/MIT
 //
 #define DYNAMIX_NO_MESSAGE_MACROS
-#include <dynamix/dynamix.hpp>
-
-#include <dynamix/gen/undef_message_macros.ipp>
-#define DYNAMIX_SPLIT_MESSAGE_DEFINE
+#include <dynamix/define_message_split.hpp>
 #include "split_msg_macros_messages.inl"
 
 DYNAMIX_DEFINE_MESSAGE(dummy);

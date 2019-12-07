@@ -14,7 +14,6 @@
 */
 
 #include "config.hpp"
-#include "message_macros.hpp"
 #include "exception.hpp"
 #include "object.hpp"
 

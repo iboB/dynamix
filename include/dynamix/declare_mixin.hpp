@@ -13,7 +13,7 @@
  */
 
 #include "config.hpp"
-#include "preprocessor.hpp"
+#include "internal/preprocessor.hpp"
 
 namespace dynamix
 {

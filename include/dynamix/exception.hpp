@@ -14,7 +14,7 @@
 
 #include "config.hpp"
 #include "internal/assert.hpp"
-#include "preprocessor.hpp"
+#include "internal/preprocessor.hpp"
 
 #if DYNAMIX_USE_EXCEPTIONS
 
