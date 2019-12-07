@@ -9,6 +9,7 @@
 
 #include "config.hpp"
 #include "mixin_type_info.hpp"
+#include "internal/assert.hpp"
 
 namespace dynamix
 {

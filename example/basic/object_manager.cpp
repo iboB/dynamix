@@ -5,13 +5,16 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include "basic.hpp"
 #include "object_manager.hpp"
 #include "system_messages.hpp"
 #include "has_id_mixin.hpp"
 #include "transform_mixin.hpp"
 #include "d3d_renderer_mixin.hpp"
 #include "gl_renderer_mixin.hpp"
+
+#include <dynamix/common_mutation_rules.hpp>
+#include <dynamix/object_type_template.hpp>
+#include <dynamix/same_type_mutator.hpp>
 
 using namespace dynamix;
 

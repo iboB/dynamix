@@ -5,11 +5,12 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include "basic.hpp"
 #include "object_manager.hpp"
 #include "system_messages.hpp"
 #include "transform_messages.hpp"
 #include "rendering_messages.hpp"
+
+#include <iostream>
 
 // here we have only messages
 // no mixin info whatsoever

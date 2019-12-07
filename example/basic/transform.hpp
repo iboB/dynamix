@@ -9,6 +9,8 @@
 
 #include "transform_mixin.hpp"
 
+#include <iosfwd>
+
 class has_transform
 {
 public:

@@ -7,4 +7,6 @@
 //
 #pragma once
 
+#include <dynamix/declare_mixin.hpp>
+
 DYNAMIX_DECLARE_MIXIN(has_transform);

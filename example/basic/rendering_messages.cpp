@@ -5,8 +5,8 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include "basic.hpp"
 #include "rendering_messages.hpp"
+#include <dynamix/define_message.hpp>
 
 DYNAMIX_DEFINE_MESSAGE(render_on_target);
 DYNAMIX_DEFINE_MESSAGE(render_on_backbuffer);

@@ -7,6 +7,8 @@
 //
 #pragma once
 
+#include <dynamix/declare_message.hpp>
+
 DYNAMIX_CONST_MESSAGE_0(int, get_id);
 DYNAMIX_MESSAGE_1(void, set_id, int, id);
 

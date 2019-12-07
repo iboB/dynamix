@@ -7,6 +7,8 @@
 //
 #pragma once
 
+#include <dynamix/declare_message.hpp>
+
 DYNAMIX_CONST_MESSAGE_1_OVERLOAD(render_on_target, void, render, int, target);
 DYNAMIX_CONST_MESSAGE_0_OVERLOAD(render_on_backbuffer, void, render);
 

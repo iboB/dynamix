@@ -5,16 +5,17 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include "basic.hpp"
 #include "has_id.hpp"
 #include "system_messages.hpp"
 
+#include <dynamix/define_mixin.hpp>
+#include <iostream>
+
 using namespace dynamix;
-using namespace std;
 
 void has_id::trace(std::ostream& o) const
 {
-    o << "object with id: " << _id << endl;
+    o << "object with id: " << _id << std::endl;
 }
 
 //                                                    set the priority of trace to a big number so it would be called first

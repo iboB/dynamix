@@ -5,10 +5,12 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include "basic.hpp"
 #include "transform.hpp"
 #include "system_messages.hpp"
 #include "transform_messages.hpp"
+
+#include <dynamix/define_mixin.hpp>
+#include <iostream>
 
 using namespace dynamix;
 using namespace std;

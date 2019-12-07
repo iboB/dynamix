@@ -9,6 +9,8 @@
 
 #include "d3d_renderer_mixin.hpp"
 
+#include <iosfwd>
+
 class d3d_renderer
 {
 public:

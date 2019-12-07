@@ -9,6 +9,8 @@
 
 #include "has_id_mixin.hpp"
 
+#include <iosfwd>
+
 class has_id
 {
 public:

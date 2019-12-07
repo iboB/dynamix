@@ -9,6 +9,8 @@
 
 #include "gl_renderer_mixin.hpp"
 
+#include <iosfwd>
+
 class gl_renderer
 {
 public:

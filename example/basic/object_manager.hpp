@@ -7,6 +7,13 @@
 //
 #pragma once
 
+#include <vector>
+
+namespace dynamix
+{
+class object;
+}
+
 class object_manager
 {
 public:
