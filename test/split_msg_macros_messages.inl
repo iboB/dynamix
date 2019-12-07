@@ -5,7 +5,7 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include <dynamix/gen/split_message_macros.hpp>
+#include <dynamix/gen/split_message_macros.ipp>
 
 DYNAMIX_MESSAGE_0(void, dummy);
 DYNAMIX_CONST_MESSAGE_0(const void*, get_self);

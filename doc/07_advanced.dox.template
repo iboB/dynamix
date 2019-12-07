@@ -275,7 +275,7 @@ In your DynaMix installation, in the `gen` directory you will see a file,
 named `arity`. It is a text file with a single number in it. Edit the file,
 setting the number to whichever value you need. Then run the script
 `gen_message_macros.rb` (you will need a Ruby interpreter to do so). It will
-generate the file `include/dynamix/gen/message_macros.hpp` with macros for
+generate the file `include/dynamix/gen/message_macros.ipp` with macros for
 messages with 0 to *arity* arguments.
 
 If you use an include directory for DynaMix diferent from the one in your

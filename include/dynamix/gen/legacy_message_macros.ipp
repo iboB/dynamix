@@ -876,4 +876,4 @@
         method_name(*_d_obj , std::forward<arg0_type>(a0), std::forward<arg1_type>(a1), std::forward<arg2_type>(a2), std::forward<arg3_type>(a3), std::forward<arg4_type>(a4), std::forward<arg5_type>(a5)); \
     }\
 
-#include "arity_message_macros.hpp"
+#include "arity_message_macros.ipp"

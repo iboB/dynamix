@@ -561,4 +561,4 @@
         I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::make_call(*_d_obj , a0, a1, a2, a3, a4, a5); \
     }\
 
-#include "arity_message_macros.hpp"
+#include "arity_message_macros.ipp"

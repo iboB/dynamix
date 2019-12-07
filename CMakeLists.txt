@@ -102,12 +102,12 @@ src_group("public~internal" dynamix_sources
 )
 
 src_group("public~gen" dynamix_sources
-    ${inc_path}/gen/template_message_macros.hpp
-    ${inc_path}/gen/legacy_message_macros.hpp
-    ${inc_path}/gen/no_arity_message_macros.hpp
-    ${inc_path}/gen/short_message_macros.hpp
-    ${inc_path}/gen/split_message_macros.hpp
-    ${inc_path}/gen/undef_message_macros.hpp
+    ${inc_path}/gen/template_message_macros.ipp
+    ${inc_path}/gen/legacy_message_macros.ipp
+    ${inc_path}/gen/no_arity_message_macros.ipp
+    ${inc_path}/gen/short_message_macros.ipp
+    ${inc_path}/gen/split_message_macros.ipp
+    ${inc_path}/gen/undef_message_macros.ipp
 )
 
 src_group("private" dynamix_sources

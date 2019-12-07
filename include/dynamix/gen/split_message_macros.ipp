@@ -694,4 +694,4 @@
     }\
 
 #endif
-#include "arity_message_macros.hpp"
+#include "arity_message_macros.ipp"

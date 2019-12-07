@@ -10,14 +10,14 @@
 
 INCLUDE = '../include/dynamix/gen/'
 MAX_ARITY = File.open('arity').read.strip.to_i + 1
-OUT_FILE = INCLUDE + 'template_message_macros.hpp'
-LEGACY_OUT_FILE = INCLUDE + 'legacy_message_macros.hpp'
-ARITY_FNAME = 'arity_message_macros.hpp'
+OUT_FILE = INCLUDE + 'template_message_macros.ipp'
+LEGACY_OUT_FILE = INCLUDE + 'legacy_message_macros.ipp'
+ARITY_FNAME = 'arity_message_macros.ipp'
 ARITY_OUT_FILE = INCLUDE + ARITY_FNAME
-SPLIT_OUT_FILE = INCLUDE + 'split_message_macros.hpp'
-NO_ARITY_OUT_FILE = INCLUDE + 'no_arity_message_macros.hpp'
-SHORT_OUT_FILE = INCLUDE + 'short_message_macros.hpp'
-UNDEF_OUT_FILE= INCLUDE + 'undef_message_macros.hpp'
+SPLIT_OUT_FILE = INCLUDE + 'split_message_macros.ipp'
+NO_ARITY_OUT_FILE = INCLUDE + 'no_arity_message_macros.ipp'
+SHORT_OUT_FILE = INCLUDE + 'short_message_macros.ipp'
+UNDEF_OUT_FILE= INCLUDE + 'undef_message_macros.ipp'
 
 HEADER = <<DATA
 // DynaMix

@@ -337,14 +337,14 @@ struct msg_multicast : public message_t, public msg_caller<Ret, Args...>
 // this file contains the old-style macros which have a lot of the calling code
 // in the macros itself. They make it a bit harder to step into messages when
 // debugging but in some cases with gcc and clang compile much faster
-#   include "gen/legacy_message_macros.hpp"
+#   include "gen/legacy_message_macros.ipp"
 #else
 // these are the new-style message macros only a single step into is needed when
 // debugging in order to go to debuggable c++ code
 // however they may be much slower to compile on gcc and clang
 // this is generally the recommended header, but users are encouraged to test
 // their compilation times with gcc and clang with the other header as well
-#   include "gen/template_message_macros.hpp"
+#   include "gen/template_message_macros.ipp"
 #endif
 #endif
 

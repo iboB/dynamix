@@ -8,7 +8,7 @@
 #define DYNAMIX_NO_MESSAGE_MACROS
 #include <dynamix/dynamix.hpp>
 
-#include <dynamix/gen/undef_message_macros.hpp>
+#include <dynamix/gen/undef_message_macros.ipp>
 #define DYNAMIX_SPLIT_MESSAGE_DEFINE
 #include "split_msg_macros_messages.inl"
 
