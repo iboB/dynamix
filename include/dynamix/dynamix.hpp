@@ -33,7 +33,7 @@
 #include "declare_message_opt.hpp"
 #include "define_message.hpp"
 #include "object.hpp"
-#include "single_object_mutator.hpp"
+#include "mutate.hpp"
 #include "same_type_mutator.hpp"
 #include "object_type_template.hpp"
 #include "object_type_info.hpp"

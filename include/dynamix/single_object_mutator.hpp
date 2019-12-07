@@ -39,6 +39,4 @@ private:
     using object_mutator::create;
 };
 
-typedef single_object_mutator mutate;
-
 } // namespace dynamix

@@ -85,6 +85,7 @@ src_group(public dynamix_sources
     ${inc_path}/mixin_collection.hpp
     ${inc_path}/mixin_id.hpp
     ${inc_path}/mixin_type_info.hpp
+    ${inc_path}/mutate.hpp
     ${inc_path}/mutation_rule.hpp
     ${inc_path}/mutation_rule_id.hpp
     ${inc_path}/next_bidder.hpp
