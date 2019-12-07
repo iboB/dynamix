@@ -5,7 +5,8 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include <dynamix/dynamix.hpp>
+#include <dynamix/core.hpp>
+#include <dynamix/combinators.hpp>
 
 #include "doctest/doctest.h"
 

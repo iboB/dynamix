@@ -66,6 +66,7 @@ src_group(public dynamix_sources
     ${inc_path}/combinators.hpp
     ${inc_path}/common_mutation_rules.hpp
     ${inc_path}/config.hpp
+    ${inc_path}/core.hpp
     ${inc_path}/domain.hpp
     ${inc_path}/declare_message_opt.hpp
     ${inc_path}/declare_message.hpp
@@ -111,6 +112,7 @@ src_group("public~internal" dynamix_sources
 )
 
 src_group("public~gen" dynamix_sources
+    ${inc_path}/gen/arity_message_macros.ipp
     ${inc_path}/gen/template_message_macros.ipp
     ${inc_path}/gen/legacy_message_macros.ipp
     ${inc_path}/gen/no_arity_message_macros.ipp

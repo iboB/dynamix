@@ -8,6 +8,7 @@
 #pragma once
 
 #include "object.hpp"
+#include "exception.hpp"
 #include "internal/mixin_data_in_object.hpp"
 #include "internal/message_macros.hpp"
 #include "gen/legacy_message_macros.ipp"

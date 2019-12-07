@@ -5,7 +5,10 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include <dynamix/dynamix.hpp>
+#include <dynamix/core.hpp>
+#include <dynamix/combinators.hpp>
+#include <dynamix/same_type_mutator.hpp>
+#include <dynamix/object_type_template.hpp>
 
 #if DYNAMIX_USE_EXCEPTIONS
 

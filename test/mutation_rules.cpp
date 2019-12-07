@@ -5,7 +5,9 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include <dynamix/dynamix.hpp>
+#include <dynamix/core.hpp>
+#include <dynamix/mutation_rule.hpp>
+#include <dynamix/common_mutation_rules.hpp>
 #include <iostream>
 
 #include "doctest/doctest.h"
