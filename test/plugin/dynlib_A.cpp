@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -7,6 +7,8 @@
 //
 #define DYNLIB_A_SRC
 #include "dynlib_A.hpp"
+#include <dynamix/define_message.hpp>
+#include <dynamix/define_mixin.hpp>
 
 DYNAMIX_DEFINE_MESSAGE(dl_a_mixin_specific);
 DYNAMIX_DEFINE_MESSAGE(dl_a_exported);

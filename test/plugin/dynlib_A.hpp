@@ -1,12 +1,13 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
 #pragma once
-#include <dynamix/dynamix.hpp>
+#include <dynamix/declare_message_opt.hpp>
+#include <dynamix/declare_mixin.hpp>
 
 #if defined(DYNLIB_A_SRC)
 #   define DYNLIB_A_API DYNAMIX_SYMBOL_EXPORT

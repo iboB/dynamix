@@ -5,8 +5,10 @@
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include <dynamix/dynamix.hpp>
 #include "dynlib_A.hpp"
+#include <dynamix/object.hpp>
+#include <dynamix/mutate.hpp>
+#include <dynamix/define_mixin.hpp>
 
 using namespace dynamix;
 

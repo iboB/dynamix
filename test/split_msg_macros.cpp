@@ -77,7 +77,7 @@ public:
 };
 
 #include <dynamix/object.hpp>
-#include <dynamix/single_object_mutator.hpp>
+#include <dynamix/mutate.hpp>
 
 TEST_CASE("basic_message")
 {

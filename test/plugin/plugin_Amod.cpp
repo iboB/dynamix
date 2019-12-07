@@ -1,12 +1,12 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
 // https://opensource.org/licenses/MIT
 //
-#include <dynamix/dynamix.hpp>
 #include "dynlib_A.hpp"
+#include <dynamix/dynamix.hpp>
 
 using namespace dynamix;
 
