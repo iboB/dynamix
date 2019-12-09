@@ -8,9 +8,28 @@
 
 cmake_minimum_required(VERSION 3.2.2)
 
+project(dynamix)
+
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-    # if DynaMix is built as root, activate folders
+    # if DynaMix is built as root, activate some sane defaults for build configuration
+
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+    if(MSVC)
+        set(DEMO_WARNING_FLAGS "") # the default is fine here
+    else()
+        set(DEMO_WARNING_FLAGS "-Wall -Wextra -Wno-unused-variable")
+    endif()
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DEMO_WARNING_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DEMO_WARNING_FLAGS}")
+
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+    find_package(Threads REQUIRED) # for thread test
 
     # is_demo is used below to enable the build of various subprojects
     # which typically wouldn't be built if DynaMix is a subdirectory of a project
@@ -18,8 +37,6 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 else()
     set(is_demo OFF)
 endif()
-
-project(dynamix)
 
 set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
@@ -47,10 +64,6 @@ option(DYNAMIX_BUILD_PERF "DynaMix: build performance tests (requires manual cod
 
 # Off by default since files need to be generated for this to work
 option(DYNAMIX_BUILD_COMPILER_PERF "DynaMix: build compilation performance tests (requires manual code generation step)" OFF)
-
-# config
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}) # so executables are next to the dll
 
 # sources
 
@@ -155,20 +168,6 @@ if(DYNAMIX_CUSTOM_CONFIG_FILE)
 endif()
 
 set_target_properties(dynamix PROPERTIES FOLDER dynamix)
-
-target_compile_features(dynamix PUBLIC
-    cxx_alias_templates
-    cxx_auto_type
-    cxx_decltype
-    cxx_delegating_constructors
-    cxx_final
-    cxx_lambdas
-    cxx_override
-    cxx_range_for
-    cxx_right_angle_brackets
-    cxx_rvalue_references
-    cxx_static_assert
-)
 
 target_include_directories(dynamix PUBLIC
     ${dynamix_include}
