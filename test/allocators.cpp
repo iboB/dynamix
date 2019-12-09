@@ -13,7 +13,7 @@
 
 #include "doctest/doctest.h"
 
-TEST_SUITE("allocators");
+TEST_SUITE_BEGIN("allocators");
 
 using namespace dynamix;
 
@@ -55,7 +55,7 @@ struct custom_allocator : public domain_allocator, public alloc_counter<T>
         return new char[count * mixin_data_size];
     }
 
-    virtual void dealloc_mixin_data(char* ptr, size_t count, const object* obj) override
+    virtual void dealloc_mixin_data(char* ptr, size_t, const object* obj) override
     {
         CHECK((!the_object || obj == the_object));
         ++alloc_counter<T>::data_deallocations;
@@ -429,7 +429,7 @@ public:
         CHECK(objects.size() == ref_count);
     }
 
-    virtual object_allocator* on_copy_construct(object& target, const object& source) override
+    virtual object_allocator* on_copy_construct(object&, const object& source) override
     {
         CHECK(objects.find(&source) != objects.end());
         CHECK(source.allocator() == this);

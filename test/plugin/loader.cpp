@@ -59,7 +59,7 @@ inline DynamicLib LoadDynamicLib(const char* lib)
 
 typedef void(*plugin_proc)(dynamix::object*);
 
-TEST_SUITE("plugins");
+TEST_SUITE_BEGIN("plugins");
 
 using namespace dynamix;
 using namespace dynamix::combinators;

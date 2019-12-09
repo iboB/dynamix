@@ -10,9 +10,11 @@ cmake_minimum_required(VERSION 3.2.2)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(doctest
+add_library(doctest STATIC
+    doctest/doctest_fwd.h
+    doctest/doctest_impl.h
     doctest/doctest.h
-    doctest/doctest.cc
+    doctest/doctest_main.cc # .cc so it doesn't get identified as a test by the glob below
 )
 set_target_properties(doctest PROPERTIES FOLDER tests/doctest)
 
@@ -53,9 +55,7 @@ foreach(source ${tests})
     endif()
 endforeach()
 
-if (UNIX)
-    target_link_libraries(test_thread pthread)
-endif()
+target_link_libraries(test_thread ${CMAKE_THREAD_LIBS_INIT})
 
 if(DYNAMIX_SHARED_LIB)
     # custom deps

@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -9,8 +9,7 @@
 
 #include "doctest/doctest.h"
 
-TEST_SUITE("obj copying");
-
+TEST_SUITE_BEGIN("obj copying");
 
 using namespace dynamix;
 
@@ -217,4 +216,3 @@ TEST_CASE("obj_copy_ctor")
     CHECK(c1.get<special_copy>()->a == 3);
 }
 #endif
-

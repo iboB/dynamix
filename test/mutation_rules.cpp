@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -16,7 +16,7 @@
 
 using namespace dynamix;
 
-TEST_SUITE("mutation rules");
+TEST_SUITE_BEGIN("mutation rules");
 
 // simple dependency rule
 class custom_rule : public mutation_rule
@@ -34,8 +34,6 @@ public:
         }
     }
 };
-
-TEST_SUITE("mutation rules");
 
 TEST_CASE("custom rule")
 {

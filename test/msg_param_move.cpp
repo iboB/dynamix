@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -9,7 +9,7 @@
 
 #include "doctest/doctest.h"
 
-TEST_SUITE("msg param move");
+TEST_SUITE_BEGIN("msg param move");
 
 using namespace dynamix;
 

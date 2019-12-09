@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -12,7 +12,7 @@
 
 using namespace dynamix;
 
-TEST_SUITE("by string");
+TEST_SUITE_BEGIN("by string");
 
 class mixin_a {};
 DYNAMIX_DEFINE_MIXIN(mixin_a, none);

@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -9,7 +9,7 @@
 
 #include "doctest/doctest.h"
 
-TEST_SUITE("arg copy");
+TEST_SUITE_BEGIN("arg copy");
 
 enum track_tag
 {
@@ -140,6 +140,7 @@ TEST_CASE("ret")
     CHECK(track_ref::moves == 0);
 
     auto m = uni_ret(o);
+    I_DYNAMIX_MAYBE_UNUSED(m);
 
     CHECK(track_copy::defaults == 0);
     CHECK(track_copy::copies == 0);
@@ -192,6 +193,8 @@ TEST_CASE("multi")
 
     reset_tracks();
 }
+
+TEST_SUITE_END();
 
 class a
 {

@@ -12,7 +12,7 @@
 #include <string>
 #include <iostream> // needed on macs for doctest
 
-TEST_SUITE("mixin moving");
+TEST_SUITE_BEGIN("mixin moving");
 
 using namespace dynamix;
 

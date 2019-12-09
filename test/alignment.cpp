@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -10,7 +10,7 @@
 
 #include "doctest/doctest.h"
 
-TEST_SUITE("align");
+TEST_SUITE_BEGIN("align");
 
 using namespace dynamix;
 
@@ -53,6 +53,8 @@ TEST_CASE("aligned_mixin")
 
     check_alignment(o);
 }
+
+TEST_SUITE_END();
 
 class align_default
 {
