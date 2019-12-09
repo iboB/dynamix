@@ -18,3 +18,5 @@
 #define I_DYNAMIX_PP_INTERNAL_CAT(a, b) a##b
 
 #define I_DYNAMIX_PP_STRINGIZE(x) #x
+
+#define I_DYNAMIX_MAYBE_UNUSED(x) (void)(x)

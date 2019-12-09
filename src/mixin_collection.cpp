@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -48,6 +48,7 @@ void mixin_collection::check_valid_mixin(const mixin_type_info& mixin_info)
     // this shouldn't be possible without a bug in the library
     // hence no throw
     I_DYNAMIX_ASSERT(mixin_info.is_valid());
+    I_DYNAMIX_MAYBE_UNUSED(mixin_info);
 }
 
 void mixin_collection::add(mixin_id id)

@@ -403,7 +403,7 @@ void enemy_ai::think()
 
 void enemy_ai::trace(ostream& out) const
 {
-    cout << "\twith enemy ai" << endl;
+    out << "\twith enemy ai" << endl;
 }
 
 void ally_ai::think()
@@ -414,7 +414,7 @@ void ally_ai::think()
 
 void ally_ai::trace(ostream& out) const
 {
-    cout << "\twith ally ai" << endl;
+    out << "\twith ally ai" << endl;
 }
 
 void stunned_ai::think()
@@ -425,7 +425,7 @@ void stunned_ai::think()
 
 void stunned_ai::trace(ostream& out) const
 {
-    cout << "\tthat is stunned" << endl;
+    out << "\tthat is stunned" << endl;
 }
 
 //[tutorial_messages_C

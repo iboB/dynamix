@@ -188,7 +188,7 @@ public:
         return std::make_pair(buffer, offset);
     }
 
-    virtual void dealloc_mixin(char* buf, size_t, const dynamix::mixin_type_info& info, const dynamix::object*) override
+    virtual void dealloc_mixin(char* buf, size_t, const dynamix::mixin_type_info&, const dynamix::object*) override
     {
 #if !defined(NDEBUG)
         // in debug mode check if the mixin is within any of our pages
@@ -208,7 +208,7 @@ public:
         // deallocating memory, which hasn't been allocated from that allocator
         I_DYNAMIX_ASSERT(found);
 #else
-        buf; // to skip warning for unused parameter
+        I_DYNAMIX_MAYBE_UNUSED(buf);
 #endif
         // no actual deallocation to be done
         // just decrement our living instances counter

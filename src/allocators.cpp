@@ -9,6 +9,7 @@
 
 #include <dynamix/allocators.hpp>
 #include <dynamix/object_type_info.hpp>
+#include <dynamix/internal/preprocessor.hpp>
 
 #if DYNAMIX_DEBUG
 #include <dynamix/object.hpp>
@@ -45,12 +46,14 @@ void object_allocator::release(object&) noexcept
 object_allocator* object_allocator::on_copy_construct(object&, const object& source)
 {
     I_DYNAMIX_ASSERT(source.allocator() == this);
+    I_DYNAMIX_MAYBE_UNUSED(source);
     return nullptr;
 }
 
 object_allocator* object_allocator::on_move(object&, object& source) noexcept
 {
     I_DYNAMIX_ASSERT(source.allocator() == this);
+    I_DYNAMIX_MAYBE_UNUSED(source);
     return this;
 }
 
