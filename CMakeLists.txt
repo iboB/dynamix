@@ -18,14 +18,25 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+    option(DYNAMIX_TSAN "DynaMix: build with thread sanitizer on" OFF)
+    option(DYNAMIX_ASAN "DynaMix: build with address sanitizer on" OFF)
+
+    set(DEMO_SAN_FLAGS "")
     if(MSVC)
         set(DEMO_WARNING_FLAGS "") # the default is fine here
     else()
         set(DEMO_WARNING_FLAGS "-Wall -Wextra -Wno-unused-variable")
+        if(DYNAMIX_TSAN)
+            set(DEMO_SAN_FLAGS "-fsanitize=thread -g")
+        elseif(DYNAMIX_ASAN)
+            set(DEMO_SAN_FLAGS "-fsanitize=address,undefined,leak -pthread -g")
+        endif()
     endif()
 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DEMO_WARNING_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DEMO_WARNING_FLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DEMO_WARNING_FLAGS} ${DEMO_SAN_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DEMO_WARNING_FLAGS} ${DEMO_SAN_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${DEMO_SAN_FLAGS}")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${DEMO_SAN_FLAGS}")
 
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
