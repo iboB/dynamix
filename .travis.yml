@@ -55,32 +55,10 @@ matrix:
           packages: ["clang-4.0", "valgrind"]
           sources: *apt_sources
 
-    # Xcode 9.2 Clang
+    # Xcode 11.2 Clang
     - env: COMPILER=clang++ ADDITIONAL_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
-      osx_image: xcode9.2
       os: osx
 
-    # OSX GCC 5
-    #- env: COMPILER=g++-5
-    #  compiler: gcc
-    #  osx_image: xcode7.3
-    #  os: osx
-
-install:
-  - |
-    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      brew update
-      # cmake
-      if brew list -1 | grep -q "^cmake\$"; then
-        brew outdated cmake || brew upgrade cmake
-      else
-        brew install cmake
-      fi
-      # gcc
-      if [[ "${COMPILER}" = "g++-5" ]]; then
-        brew install gcc5
-      fi
-    fi
 
 before_script:
   - ${COMPILER} --version
