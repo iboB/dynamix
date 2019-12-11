@@ -19,6 +19,7 @@ a way to render the object on the screen:
 
 class game_object
 {
+public:
     int _id;
     string name;
     // ... other common fields

@@ -56,14 +56,14 @@
     /* step 4: define the message functions -> the one that will be called for the objects */ \
     /* function A: concrete combinator */ \
     template <typename Combinator> \
-    void method_name(constness ::dynamix::object& _d_obj , Combinator& _d_combinator) \
+    void method_name(constness ::dynamix::object& , Combinator& ) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
-    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj ) \
+    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& ) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
@@ -154,14 +154,14 @@
     /* step 4: define the message functions -> the one that will be called for the objects */ \
     /* function A: concrete combinator */ \
     template <typename Combinator> \
-    void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, Combinator& _d_combinator) \
+    void method_name(constness ::dynamix::object& , arg0_type, Combinator& ) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
-    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0) \
+    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& , arg0_type) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
@@ -252,14 +252,14 @@
     /* step 4: define the message functions -> the one that will be called for the objects */ \
     /* function A: concrete combinator */ \
     template <typename Combinator> \
-    void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, Combinator& _d_combinator) \
+    void method_name(constness ::dynamix::object& , arg0_type, arg1_type, Combinator& ) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
-    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1) \
+    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& , arg0_type, arg1_type) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
@@ -350,14 +350,14 @@
     /* step 4: define the message functions -> the one that will be called for the objects */ \
     /* function A: concrete combinator */ \
     template <typename Combinator> \
-    void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, Combinator& _d_combinator) \
+    void method_name(constness ::dynamix::object& , arg0_type, arg1_type, arg2_type, Combinator& ) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
-    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2) \
+    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& , arg0_type, arg1_type, arg2_type) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
@@ -448,14 +448,14 @@
     /* step 4: define the message functions -> the one that will be called for the objects */ \
     /* function A: concrete combinator */ \
     template <typename Combinator> \
-    void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, Combinator& _d_combinator) \
+    void method_name(constness ::dynamix::object& , arg0_type, arg1_type, arg2_type, arg3_type, Combinator& ) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
-    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3) \
+    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& , arg0_type, arg1_type, arg2_type, arg3_type) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
@@ -546,14 +546,14 @@
     /* step 4: define the message functions -> the one that will be called for the objects */ \
     /* function A: concrete combinator */ \
     template <typename Combinator> \
-    void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, Combinator& _d_combinator) \
+    void method_name(constness ::dynamix::object& , arg0_type, arg1_type, arg2_type, arg3_type, arg4_type, Combinator& ) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
-    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4) \
+    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& , arg0_type, arg1_type, arg2_type, arg3_type, arg4_type) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
@@ -644,14 +644,14 @@
     /* step 4: define the message functions -> the one that will be called for the objects */ \
     /* function A: concrete combinator */ \
     template <typename Combinator> \
-    void method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, Combinator& _d_combinator) \
+    void method_name(constness ::dynamix::object& , arg0_type, arg1_type, arg2_type, arg3_type, arg4_type, arg5_type, Combinator& ) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
-    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj , arg0_type a0, arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5) \
+    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& , arg0_type, arg1_type, arg2_type, arg3_type, arg4_type, arg5_type) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \

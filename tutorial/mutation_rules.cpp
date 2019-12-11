@@ -21,6 +21,7 @@ So, again we have a mixin that we want to be present in every object.
 
 class furniture
 {
+public:
     int _id;
     string name;
     // ... other common fields

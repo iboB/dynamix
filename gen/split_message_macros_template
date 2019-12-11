@@ -46,14 +46,14 @@
     /* step 4: define the message functions -> the one that will be called for the objects */ \
     /* function A: concrete combinator */ \
     template <typename Combinator> \
-    void method_name(constness ::dynamix::object& _d_obj %{coma_args_signature}, Combinator& _d_combinator) \
+    void method_name(constness ::dynamix::object& %{coma_arg_types}, Combinator& ) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
     } \
     /* function B: template combinator -> can be called on a single line */ \
     template <template <typename> class Combinator> \
-    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& _d_obj %{coma_args_signature}) \
+    [[noreturn]] typename Combinator<return_type>::result_type method_name(constness ::dynamix::object& %{coma_arg_types}) \
     { \
         constexpr bool dependent_always_false = sizeof(Combinator<return_type>) == 0; \
         static_assert(dependent_always_false, "Sadly split message macros don't support combinator calls"); \
