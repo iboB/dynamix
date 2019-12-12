@@ -8,19 +8,19 @@
 #pragma once
 
 #include "config.hpp"
-#include "mixin_type_info.hpp"
 #include "internal/assert.hpp"
+#include "mixin_type_info.hpp"
 
 namespace dynamix
 {
 
 namespace internal
 {
-    class object_type_info;
-    class mixin_data_in_object;
-    struct message_t;
-    struct message_feature_tag;
-}
+class object_type_info;
+class mixin_data_in_object;
+struct message_t;
+struct message_feature_tag;
+} // namespace internal
 
 class object_type_template;
 class object_allocator;
@@ -54,7 +54,8 @@ public:
     /// Will call assignment operators for mixins that exist in both.
     /// Will copy-construct new mixins for this.
     /// Will destroy mixins that don't exist in source.
-    /// It will not, however, match asssignment operators for different mixin types which have such defined between them,
+    /// It will not, however, match asssignment operators for different mixin types
+    /// which have such defined between them.
     object& operator=(const object& o);
 #else
     object(const object& o) = delete;
@@ -70,13 +71,15 @@ public:
     /// Will call assignment operators for mixins that exist in both.
     /// Will copy-construct new mixins for this.
     /// Will destroy mixins that don't exist in source.
-    /// It will not, however, match asssignment operators for different mixin types which have such defined between them,
+    /// It will not, however, match asssignment operators for different mixin types
+    /// which have such defined between them.
     void copy_from(const object& o);
 
     /// Assignment of mixins that exist in both objects.
     /// Will not change the type of the target.
     /// Will call assignment operators for mixins that exist in both objects.
-    /// It will not, however, match asssignment operators for different mixin types which have such defined between them,
+    /// It will not, however, match asssignment operators for different mixin types
+    /// which have such defined between them.
     void copy_matching_from(const object& o);
 
     /// Checks whether all of the object's mixins have copy-constructors and assignment operators.
@@ -189,9 +192,8 @@ public:
         I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
         // intentionally disregarding the actual feature,
         // because of potential multiple implementations
-        return
-            internal_implements(f.id, typename Feature::feature_tag())
-            && !internal_implements_by_mixin(f.id, typename Feature::feature_tag());
+        return internal_implements(f.id, typename Feature::feature_tag()) &&
+               !internal_implements_by_mixin(f.id, typename Feature::feature_tag());
     }
 
     /// Returns the number of mixins in the object which implement a feature.
@@ -265,7 +267,7 @@ _dynamix_internal:
     // if manage_mixins is true the object will destroy all mixins removed and construct all new ones
     // we have the manage_mixins argument because its a lot faster to manage from the outside
     // if we know exactly what's added and removed
-    void change_type(const internal::object_type_info* new_type, bool manage_mixins/* = true*/);
+    void change_type(const internal::object_type_info* new_type, bool manage_mixins);
 
     // performs the move from one object source to this
     // can only be performed on empty objects

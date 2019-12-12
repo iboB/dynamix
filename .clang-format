@@ -2,4 +2,19 @@
 Language: Cpp
 BasedOnStyle: Microsoft
 PointerAlignment: Left
+IncludeCategories:
+  - Regex:    '^"config.hpp'
+    Priority: -1
+  - Regex:    '^"internal.hpp'
+    Priority: -1
+  - Regex:    '^"dynamix/internal'
+    Priority: 2
+  - Regex:    '^"internal/'
+    Priority: 2
+BreakConstructorInitializers: BeforeComma
+AlwaysBreakTemplateDeclarations: Yes
+AlignAfterOpenBracket: DontAlign
+AllowShortIfStatementsOnASingleLine: Always
+AllowShortFunctionsOnASingleLine: Inline
+AccessModifierOffset: -4
 ...

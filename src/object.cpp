@@ -6,14 +6,14 @@
 // https://opensource.org/licenses/MIT
 //
 #include "internal.hpp"
-#include <dynamix/object.hpp>
-#include <dynamix/object_type_info.hpp>
-#include <dynamix/mixin_type_info.hpp>
-#include <dynamix/message.hpp>
-#include <dynamix/domain.hpp>
-#include <dynamix/object_type_template.hpp>
-#include <dynamix/exception.hpp>
-#include <dynamix/allocators.hpp>
+#include "dynamix/object.hpp"
+#include "dynamix/allocators.hpp"
+#include "dynamix/domain.hpp"
+#include "dynamix/exception.hpp"
+#include "dynamix/message.hpp"
+#include "dynamix/mixin_type_info.hpp"
+#include "dynamix/object_type_info.hpp"
+#include "dynamix/object_type_template.hpp"
 #include "dynamix/internal/mixin_data_in_object.hpp"
 
 #include <tuple>
@@ -94,7 +94,6 @@ object object::copy() const
     return o;
 }
 
-
 void* object::internal_get_mixin(mixin_id id)
 {
     return _mixin_data[_type_info->mixin_index(id)].mixin();
@@ -117,7 +116,7 @@ void object::clear() noexcept
         delete_mixin(mixin_info->id);
     }
 
-    if(_mixin_data != &null_mixin_data)
+    if (_mixin_data != &null_mixin_data)
     {
         _type_info->dealloc_mixin_data(_mixin_data, this);
         _mixin_data = &null_mixin_data;
@@ -134,7 +133,7 @@ bool object::empty() const noexcept
     return _type_info == &object_type_info::null();
 }
 
-void object::change_type(const object_type_info* new_type, bool manage_mixins /*= true*/)
+void object::change_type(const object_type_info* new_type, bool manage_mixins)
 {
     const object_type_info* old_type = _type_info;
     mixin_data_in_object* old_mixin_data = _mixin_data;
@@ -143,17 +142,17 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
     for (const mixin_type_info* mixin_info : old_type->_compact_mixins)
     {
         mixin_id id = mixin_info->id;
-        if(new_type->has(id))
+        if (new_type->has(id))
         {
             new_mixin_data[new_type->mixin_index(id)] = old_mixin_data[old_type->mixin_index(id)];
         }
-        else if(manage_mixins)
+        else if (manage_mixins)
         {
             delete_mixin(id);
         }
     }
 
-    if(old_mixin_data != &null_mixin_data)
+    if (old_mixin_data != &null_mixin_data)
     {
         old_type->dealloc_mixin_data(old_mixin_data, this);
     }
@@ -171,12 +170,12 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins /*
     _type_info = new_type;
     _mixin_data = new_mixin_data;
 
-    if(manage_mixins)
+    if (manage_mixins)
     {
         for (const mixin_type_info* mixin_info : new_type->_compact_mixins)
         {
             size_t index = new_type->mixin_index(mixin_info->id);
-            if(!new_mixin_data[index].buffer())
+            if (!new_mixin_data[index].buffer())
             {
                 make_mixin(mixin_info->id, nullptr);
             }
@@ -252,8 +251,7 @@ void object::delete_mixin(mixin_id id)
     alloc->destroy_mixin(mixin_info, data.mixin());
 
     // dealocate mixin
-    alloc->dealloc_mixin(data.buffer(),
-        data.mixin_offset(), mixin_info, this);
+    alloc->dealloc_mixin(data.buffer(), data.mixin_offset(), mixin_info, this);
 
 #if DYNAMIX_ADDITIONAL_METRICS
     I_DYNAMIX_ASSERT(mixin_info.num_mixins > 0);
@@ -306,9 +304,9 @@ void object::get_message_names(std::vector<const char*>& out_message_names) cons
 {
     const domain& dom = domain::instance();
 
-    for(size_t i=0; i<DYNAMIX_MAX_MESSAGES; ++i)
+    for (size_t i = 0; i < DYNAMIX_MAX_MESSAGES; ++i)
     {
-        if(implements_message(i))
+        if (implements_message(i))
         {
             out_message_names.push_back(dom.message_data(i).name);
         }
@@ -325,8 +323,7 @@ void object::get_mixin_names(std::vector<const char*>& out_mixin_names) const
 
 bool object::has(mixin_id id) const noexcept
 {
-    if (id >= DYNAMIX_MAX_MIXINS)
-        return false;
+    if (id >= DYNAMIX_MAX_MIXINS) return false;
     return internal_has_mixin(id);
 }
 
@@ -338,15 +335,13 @@ bool object::has(const char* mixin_name) const noexcept
 
 void* object::get(mixin_id id) noexcept
 {
-    if (id >= DYNAMIX_MAX_MIXINS)
-        return nullptr;
+    if (id >= DYNAMIX_MAX_MIXINS) return nullptr;
     return internal_get_mixin(id);
 }
 
 const void* object::get(mixin_id id) const noexcept
 {
-    if (id >= DYNAMIX_MAX_MIXINS)
-        return nullptr;
+    if (id >= DYNAMIX_MAX_MIXINS) return nullptr;
     return internal_get_mixin(id);
 }
 
@@ -383,7 +378,8 @@ void object::usurp(object&& o) noexcept
     _type_info = o._type_info;
     _mixin_data = o._mixin_data;
 
-    for (size_t i = object_type_info::MIXIN_INDEX_OFFSET; i < _type_info->_compact_mixins.size() + object_type_info::MIXIN_INDEX_OFFSET; ++i)
+    for (size_t i = object_type_info::MIXIN_INDEX_OFFSET;
+         i < _type_info->_compact_mixins.size() + object_type_info::MIXIN_INDEX_OFFSET; ++i)
     {
         _mixin_data[i].set_object(this);
     }
@@ -447,7 +443,9 @@ void object::copy_from(const object& o)
 
     enum
     {
-        none, bad_assign, bad_copy_construct
+        none,
+        bad_assign,
+        bad_copy_construct
     } copy_fail = none;
 
     for (const mixin_type_info* mixin_info : old_type->_compact_mixins)
@@ -527,7 +525,8 @@ void object::copy_matching_from(const object& o)
         if (_type_info->has(id))
         {
             DYNAMIX_THROW_UNLESS(dom.mixin_info(id).copy_assignment, bad_copy_assignment);
-            dom.mixin_info(id).copy_assignment(_mixin_data[_type_info->mixin_index(id)].mixin(), o._mixin_data[o._type_info->mixin_index(id)].mixin());
+            dom.mixin_info(id).copy_assignment(
+                _mixin_data[_type_info->mixin_index(id)].mixin(), o._mixin_data[o._type_info->mixin_index(id)].mixin());
         }
     }
 }
@@ -553,7 +552,8 @@ void object::move_matching_from(object& o)
         if (_type_info->has(id))
         {
             DYNAMIX_THROW_UNLESS(dom.mixin_info(id).move_assignment, bad_move_assignment);
-            dom.mixin_info(id).move_assignment(_mixin_data[_type_info->mixin_index(id)].mixin(), o._mixin_data[o._type_info->mixin_index(id)].mixin());
+            dom.mixin_info(id).move_assignment(
+                _mixin_data[_type_info->mixin_index(id)].mixin(), o._mixin_data[o._type_info->mixin_index(id)].mixin());
         }
     }
 }
@@ -562,12 +562,10 @@ void object::move_matching_from(object& o)
 
 std::pair<char*, size_t> object::move_mixin(mixin_id id, char* buffer, size_t mixin_offset)
 {
-    if (id >= DYNAMIX_MAX_MIXINS)
-        return std::pair<char*, size_t>(nullptr, 0);
+    if (id >= DYNAMIX_MAX_MIXINS) return std::pair<char*, size_t>(nullptr, 0);
 
     auto& data = _mixin_data[_type_info->mixin_index(id)];
-    if (!data.mixin())
-        return std::pair<char*, size_t>(nullptr, 0);
+    if (!data.mixin()) return std::pair<char*, size_t>(nullptr, 0);
 
     auto& dom = domain::instance();
     const auto& mixin_info = dom.mixin_info(id);
@@ -624,4 +622,4 @@ void object::reallocate_mixins()
 
 #endif // DYNAMIX_OBJECT_REPLACE_MIXIN
 
-} // dynamix
+} // namespace dynamix
