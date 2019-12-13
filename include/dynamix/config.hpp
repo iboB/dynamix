@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -117,7 +117,7 @@
 // they can be dangerous as clients which keep pointers to mixins within objects can have them
 // invalidated without a way to be notified about this
 // however those functions can be quite useful for complex allocation strategies which try to
-// keep some mixins in a congiguous block of memory
+// keep some mixins in a contiguous block of memory
 #if !defined(DYNAMIX_OBJECT_REPLACE_MIXIN)
 #   define DYNAMIX_OBJECT_REPLACE_MIXIN 1
 #endif

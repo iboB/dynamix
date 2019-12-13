@@ -65,10 +65,4 @@ void object_type_mutation::clear()
     _removing.clear();
 }
 
-void object_type_mutation::check_valid()
-{
-    // no reason to have invalid mutations as of now
-    // so nothing to do
-}
-
 } // namespace dynamix

@@ -72,27 +72,6 @@ public:
         return _source->has(id);
     }
 
-    /// Checks if any of the mixins that are being added by the mutation
-    /// also implements a given feature.
-    template <typename Feature>
-    bool is_adding(const Feature* f) const
-    {
-        return _adding.implements(f);
-    }
-    /// Checks if any of the mixins that are being removed by the mutation
-    /// also implements a given feature.
-    template <typename Feature>
-    bool is_removing(const Feature* f) const
-    {
-        return _removing.implements(f);
-    }
-    /// Checks if the mutation's source implements a feature.
-    template <typename Feature>
-    bool source_implements(const Feature* f) const
-    {
-        return _source->implements(f);
-    }
-
     /// Removes a mixin from the ones being added by the mutation.
     template <typename Mixin>
     void stop_adding()
@@ -115,21 +94,6 @@ public:
         _removing.remove(id);
     }
 
-    /// Removes all mixins from the ones being added by the mutation, that
-    /// also implement a specific feature.
-    template <typename Feature>
-    void stop_adding(const Feature* f)
-    {
-        _adding.clear_all_implementing(f);
-    }
-    /// Removes all mixins from the ones being removed by the mutation, that
-    /// also implement a specific feature.
-    template <typename Feature>
-    void stop_removing(const Feature* f)
-    {
-        _removing.clear_all_implementing(f);
-    }
-
     /// Adds a mixin to the ones being added by the mutation.
     template <typename Mixin>
     void start_adding()
@@ -141,24 +105,16 @@ public:
     void start_removing()
     {
         _removing.add<Mixin>();
-        check_valid();
     }
 
     void start_adding(mixin_id id)
     {
         _adding.add(id);
-        check_valid();
     }
     void start_removing(mixin_id id)
     {
         _removing.add(id);
-        check_valid();
     }
-
-    /// Adds a feature to the mutation so that all mixins in the source, that
-    /// implement a specific feature will be removed.
-    template <typename Feature>
-    void start_removing(const Feature* f);
 
     /// Returns true if the mutation is empty - adds no mixins and removes no mixins.
     bool empty() const { return _adding.empty() && _removing.empty(); }
@@ -172,7 +128,6 @@ public:
 
 private:
     friend class internal::object_mutator;
-    void check_valid();
 
     mixin_collection _adding;
     mixin_collection _removing;
