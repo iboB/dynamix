@@ -15,7 +15,7 @@ namespace dynamix
 
 using namespace internal;
 
-void mutually_exclusive_mixins::apply_to(object_type_mutation& mutation)
+void mutually_exclusive_mixins::apply_to(object_type_mutation& mutation, const mixin_collection& source)
 {
     // find if the mutation is adding any of the mutually exclusive mixins
 
@@ -53,7 +53,7 @@ void mutually_exclusive_mixins::apply_to(object_type_mutation& mutation)
             continue;
         }
 
-        if(mutation.source_has(mixin_info->id))
+        if(source.has(mixin_info->id))
         {
             // remove all others from the object
             mutation.start_removing(mixin_info->id);
@@ -61,7 +61,7 @@ void mutually_exclusive_mixins::apply_to(object_type_mutation& mutation)
     }
 }
 
-void bundled_mixins::apply_to(object_type_mutation& mutation)
+void bundled_mixins::apply_to(object_type_mutation& mutation, const mixin_collection&)
 {
     // find if the mutation is adding any of the bundled mixins
 
@@ -102,7 +102,7 @@ void bundled_mixins::apply_to(object_type_mutation& mutation)
     }
 }
 
-void dependent_mixins::apply_to(object_type_mutation& mutation)
+void dependent_mixins::apply_to(object_type_mutation& mutation, const mixin_collection&)
 {
     if (mutation.is_adding(_master_id))
     {
@@ -124,22 +124,22 @@ void dependent_mixins::apply_to(object_type_mutation& mutation)
 
 namespace internal
 {
-void mandatory_mixin_impl::apply_to(object_type_mutation& mutation)
+void mandatory_mixin_impl::apply_to(object_type_mutation& mutation, const mixin_collection& source)
 {
     if(mutation.is_removing(_id))
     {
         mutation.stop_removing(_id);
     }
 
-    if(mutation.source_has(_id))
+    if(source.has(_id))
         return;
 
     mutation.start_adding(_id);
 }
 
-void deprecated_mixin_impl::apply_to(object_type_mutation& mutation)
+void deprecated_mixin_impl::apply_to(object_type_mutation& mutation, const mixin_collection& source)
 {
-    if(mutation.source_has(_id))
+    if(source.has(_id))
     {
         mutation.start_removing(_id);
     }
@@ -150,7 +150,7 @@ void deprecated_mixin_impl::apply_to(object_type_mutation& mutation)
     }
 }
 
-void substitute_mixin_impl::apply_to(object_type_mutation& mutation)
+void substitute_mixin_impl::apply_to(object_type_mutation& mutation, const mixin_collection&)
 {
     if(mutation.is_adding(_source_id))
     {

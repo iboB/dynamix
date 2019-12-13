@@ -57,7 +57,7 @@ public:
     mutation_rule_id add_mutation_rule(std::shared_ptr<mutation_rule> rule);
     mutation_rule_id add_mutation_rule(mutation_rule* rule);
     std::shared_ptr<mutation_rule> remove_mutation_rule(mutation_rule_id id);
-    void apply_mutation_rules(object_type_mutation& mutation);
+    void apply_mutation_rules(object_type_mutation& mutation, const mixin_collection& source_mixins);
 
     size_t num_registered_mixins() const { return _num_registered_mixins; }
 

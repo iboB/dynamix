@@ -22,7 +22,7 @@ TEST_SUITE_BEGIN("mutation rules");
 class custom_rule : public mutation_rule
 {
 public:
-    void apply_to(object_type_mutation& mutation)
+    void apply_to(object_type_mutation& mutation, const mixin_collection&)
     {
         if (mutation.is_adding<a>())
         {

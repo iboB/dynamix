@@ -89,7 +89,7 @@ std::shared_ptr<mutation_rule> domain::remove_mutation_rule(mutation_rule_id id)
     return ret;
 }
 
-void domain::apply_mutation_rules(object_type_mutation& mutation)
+void domain::apply_mutation_rules(object_type_mutation& mutation, const mixin_collection& source_mixins)
 {
 #if DYNAMIX_THREAD_SAFE_MUTATIONS
     std::lock_guard<std::mutex> lock(_mutation_rules_mutex);
@@ -99,7 +99,7 @@ void domain::apply_mutation_rules(object_type_mutation& mutation)
     {
         if (rule)
         {
-            rule->apply_to(mutation);
+            rule->apply_to(mutation, source_mixins);
         }
     }
 }

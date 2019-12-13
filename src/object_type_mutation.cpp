@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -14,16 +14,6 @@ namespace dynamix
 {
 
 using namespace internal;
-
-object_type_mutation::object_type_mutation()
-    : _source(nullptr)
-{
-}
-
-object_type_mutation::object_type_mutation(const mixin_collection* src)
-    : _source(src)
-{
-}
 
 void object_type_mutation::normalize()
 {
@@ -57,12 +47,6 @@ break2:
 
     _adding.rebuild_from_compact_mixins();
     _removing.rebuild_from_compact_mixins();
-}
-
-void object_type_mutation::clear()
-{
-    _adding.clear();
-    _removing.clear();
 }
 
 } // namespace dynamix

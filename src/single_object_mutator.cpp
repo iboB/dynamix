@@ -43,11 +43,11 @@ single_object_mutator::~single_object_mutator()
 
 void single_object_mutator::apply()
 {
-    _mutation.set_source(_object._type_info->as_mixin_collection());
+    _source_mixins = _object._type_info->as_mixin_collection();
     create();
     apply_to(_object);
     cancel(); // to go back to empty state
-    _mutation.set_source(nullptr); // really empty
+    _source_mixins = nullptr; // really empty
     _is_manually_applied = true;
 }
 

@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -24,22 +24,9 @@ namespace internal
 /// Internally the class has two `mixin_collection` objects -
 /// `removing` and `adding`. They represent the mixins that are supposed to be
 /// removed and added by the mutation.
-///
-/// Additionally another mixin collection might be present - the source.
-/// It is a pointer that may be null. If it's not, it represents the mixins
-/// of the object that currently being mutated by this mutation.
 class DYNAMIX_API object_type_mutation
 {
 public:
-    /// Constructs an empty mutation
-    object_type_mutation();
-
-    /// Constructs a mutation with a specific source.
-    object_type_mutation(const mixin_collection* src);
-
-    /// Sets the source of the mutation.
-    void set_source(const mixin_collection* src) { _source = src; }
-
     /// Checks if the mutation is adding a mixin.
     template <typename Mixin>
     bool is_adding() const
@@ -52,12 +39,6 @@ public:
     {
         return _removing.has<Mixin>();
     }
-    /// Checks if the mutation's source has a mixin.
-    template <typename Mixin>
-    bool source_has() const
-    {
-        return _source->has<Mixin>();
-    }
 
     bool is_adding(mixin_id id) const
     {
@@ -67,9 +48,14 @@ public:
     {
         return _removing.has(id);
     }
-    bool source_has(mixin_id id) const
+
+    bool is_adding(const mixin_type_info& info) const
     {
-        return _source->has(id);
+        return _adding.has(info);
+    }
+    bool is_removing(const mixin_type_info& info) const
+    {
+        return _removing.has(info);
     }
 
     /// Removes a mixin from the ones being added by the mutation.
@@ -94,6 +80,15 @@ public:
         _removing.remove(id);
     }
 
+    void stop_adding(const mixin_type_info& info)
+    {
+        _adding.remove(info);
+    }
+    void stop_removing(const mixin_type_info& info)
+    {
+        _removing.remove(info);
+    }
+
     /// Adds a mixin to the ones being added by the mutation.
     template <typename Mixin>
     void start_adding()
@@ -116,6 +111,15 @@ public:
         _removing.add(id);
     }
 
+    void start_adding(const mixin_type_info& info)
+    {
+        _adding.add(info);
+    }
+    void start_removing(const mixin_type_info& info)
+    {
+        _removing.add(info);
+    }
+
     /// Returns true if the mutation is empty - adds no mixins and removes no mixins.
     bool empty() const { return _adding.empty() && _removing.empty(); }
 
@@ -123,15 +127,18 @@ public:
     /// That is, if an element is in both, it will be removed from both.
     void normalize();
 
-    /// Clears a mutation. Restores it to its initial state.
-    void clear();
+    /// Clears a mutation. Makes it a noop - adds no mixins and removes no mixins.
+    void clear()
+    {
+        _adding.clear();
+        _removing.clear();
+    }
 
 private:
     friend class internal::object_mutator;
 
     mixin_collection _adding;
     mixin_collection _removing;
-    const mixin_collection* _source;
 };
 
 } // namespace dynamix

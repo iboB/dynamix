@@ -78,9 +78,10 @@ protected:
     void apply_to(object& obj) const;
 
     object_type_mutation _mutation;
-    const object_type_info* _target_type_info;
+    const mixin_collection* _source_mixins = nullptr; // mixins the object being mutated
+    const object_type_info* _target_type_info = nullptr; // new type info of the object
 
-    bool _is_created;
+    bool _is_created = false;
 };
 
 } // namespace internal

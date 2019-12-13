@@ -194,14 +194,14 @@ is being removed and the object has doors.
     class container_rule : public dynamix::mutation_rule
     {
     public:
-        virtual void apply_to(dynamix::object_type_mutation& mutation)
+        virtual void apply_to(dynamix::object_type_mutation& mutation, const dynamix::mixin_collection& source)
         {
             if(mutation.is_adding<has_doors>())
             {
                 mutation.start_adding<container>();
             }
 
-            if(mutation.is_removing<container>() && mutation.source_has<has_doors>())
+            if(mutation.is_removing<container>() && source.has<has_doors>())
             {
                 mutation.start_removing<has_doors>();
             }

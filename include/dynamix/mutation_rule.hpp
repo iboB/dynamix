@@ -21,6 +21,7 @@ namespace dynamix
 {
 
 class object_type_mutation;
+class mixin_collection;
 
 /// Base class for all mutation rules
 class DYNAMIX_API mutation_rule
@@ -29,7 +30,7 @@ public:
     virtual ~mutation_rule() {}
 
     /// Called when applying the mutation rule.
-    virtual void apply_to(object_type_mutation& mutation) = 0;
+    virtual void apply_to(object_type_mutation& mutation, const mixin_collection& source) = 0;
 };
 
 // the following functions are defined in domain.cpp

@@ -33,7 +33,7 @@ void same_type_mutator::apply_to(object& o)
 {
     if(!_is_created)
     {
-        _mutation.set_source(o._type_info->as_mixin_collection());
+        _source_mixins = o._type_info->as_mixin_collection();
         create();
     }
 
