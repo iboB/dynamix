@@ -125,21 +125,7 @@ void object_mutator::apply_to(object& obj) const
         return;
     }
 
-    for (const mixin_type_info* rem : _mutation._removing._compact_mixins)
-    {
-        // we allow removing of mixins that aren't even there
-        if(obj.internal_has_mixin(rem->id))
-            obj.delete_mixin(rem->id);
-    }
-
-    obj.change_type(_target_type_info, false);
-
-    for (const mixin_type_info* add : _mutation._adding._compact_mixins)
-    {
-        // we allow adding mixins that are already there
-        if(!obj.internal_get_mixin(add->id))
-            obj.make_mixin(add->id, nullptr);
-    }
+    obj.change_type(_target_type_info);
 }
 
 bool object_mutator::add(const char* mixin_type_name)

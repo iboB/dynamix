@@ -133,8 +133,14 @@ bool object::empty() const noexcept
     return _type_info == &object_type_info::null();
 }
 
-void object::change_type(const object_type_info* new_type, bool manage_mixins)
+void object::change_type(const object_type_info* new_type)
 {
+    change_type_from(new_type, nullptr);
+}
+
+object::change_type_from_result object::change_type_from(const object_type_info* new_type, const internal::mixin_data_in_object* source)
+{
+    auto res = change_type_from_result::success;
     const object_type_info* old_type = _type_info;
     mixin_data_in_object* old_mixin_data = _mixin_data;
     mixin_data_in_object* new_mixin_data = new_type->alloc_mixin_data(this);
@@ -144,9 +150,23 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins)
         mixin_id id = mixin_info->id;
         if (new_type->has(id))
         {
-            new_mixin_data[new_type->mixin_index(id)] = old_mixin_data[old_type->mixin_index(id)];
+            auto new_index = new_type->mixin_index(id);
+            auto& data = new_mixin_data[new_index];
+            data = old_mixin_data[old_type->mixin_index(id)];
+
+            if (source)
+            {
+                if (!mixin_info->copy_assignment)
+                {
+                    res = change_type_from_result::bad_assign;
+                }
+                else
+                {
+                    mixin_info->copy_assignment(data.mixin(), source[new_index].mixin());
+                }
+            }
         }
-        else if (manage_mixins)
+        else
         {
             delete_mixin(id);
         }
@@ -170,14 +190,16 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins)
     _type_info = new_type;
     _mixin_data = new_mixin_data;
 
-    if (manage_mixins)
+    for (const mixin_type_info* mixin_info : new_type->_compact_mixins)
     {
-        for (const mixin_type_info* mixin_info : new_type->_compact_mixins)
+        auto id = mixin_info->id;
+        size_t index = new_type->mixin_index(id);
+        if (!new_mixin_data[index].buffer())
         {
-            size_t index = new_type->mixin_index(mixin_info->id);
-            if (!new_mixin_data[index].buffer())
+            const void* source_mixin_data = source ? source[index].mixin() : nullptr;
+            if (!make_mixin(id, source_mixin_data))
             {
-                make_mixin(mixin_info->id, nullptr);
+                res = change_type_from_result::bad_copy_construct;
             }
         }
     }
@@ -189,6 +211,8 @@ void object::change_type(const object_type_info* new_type, bool manage_mixins)
         data.set_buffer(reinterpret_cast<char*>(&_default_impl_virtual_mixin_data), sizeof(object*));
         data.set_object(this);
     }
+
+    return res;
 }
 
 bool object::make_mixin(mixin_id id, const void* source)
@@ -432,86 +456,12 @@ void object::copy_from(const object& o)
         return;
     }
 
-    // what follows is basically copy-pasted from change_type
-    // think of a way to share the code
+    auto res = change_type_from(o._type_info, o._mixin_data);
 
-    const object_type_info* old_type = _type_info;
-    mixin_data_in_object* old_mixin_data = _mixin_data;
-    mixin_data_in_object* new_mixin_data = o._type_info->alloc_mixin_data(this);
-
-    auto& dom = domain::instance();
-
-    enum
+    if (res != change_type_from_result::success)
     {
-        none,
-        bad_assign,
-        bad_copy_construct
-    } copy_fail = none;
-
-    for (const mixin_type_info* mixin_info : old_type->_compact_mixins)
-    {
-        mixin_id id = mixin_info->id;
-        if (o._type_info->has(id))
-        {
-            auto new_index = o._type_info->mixin_index(id);
-            auto& data = new_mixin_data[new_index];
-            data = old_mixin_data[old_type->mixin_index(id)];
-
-            if (!dom.mixin_info(id).copy_assignment)
-            {
-                copy_fail = bad_assign;
-            }
-            else
-            {
-                dom.mixin_info(id).copy_assignment(data.mixin(), o._mixin_data[new_index].mixin());
-            }
-        }
-        else
-        {
-            delete_mixin(id);
-        }
-    }
-
-    if (old_mixin_data != &null_mixin_data)
-    {
-        old_type->dealloc_mixin_data(old_mixin_data, this);
-    }
-
-    if (old_type != &object_type_info::null())
-    {
-        I_DYNAMIX_ASSERT(old_type->num_objects > 0);
-        --old_type->num_objects;
-    }
-    if (o._type_info != &object_type_info::null())
-    {
-        ++o._type_info->num_objects;
-    }
-
-    _type_info = o._type_info;
-    _mixin_data = new_mixin_data;
-
-    for (const mixin_type_info* mixin_info : _type_info->_compact_mixins)
-    {
-        auto id = mixin_info->id;
-        size_t index = _type_info->mixin_index(id);
-        if (!new_mixin_data[index].buffer())
-        {
-            if (!make_mixin(id, o._mixin_data[index].mixin()))
-            {
-                copy_fail = bad_copy_construct;
-            }
-        }
-    }
-
-    // set the appropriate default message implementation virtual mixin
-    mixin_data_in_object& data = _mixin_data[object_type_info::DEFAULT_MSG_IMPL_INDEX];
-    data.set_buffer(reinterpret_cast<char*>(&_default_impl_virtual_mixin_data), sizeof(object*));
-    data.set_object(this);
-
-    if (copy_fail)
-    {
-        DYNAMIX_THROW_UNLESS(copy_fail == bad_assign, bad_copy_construction);
-        DYNAMIX_THROW_UNLESS(copy_fail == bad_copy_construct, bad_copy_assignment);
+        DYNAMIX_THROW_UNLESS(res == change_type_from_result::bad_assign, bad_copy_construction);
+        DYNAMIX_THROW_UNLESS(res == change_type_from_result::bad_copy_construct, bad_copy_assignment);
     }
 }
 

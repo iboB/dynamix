@@ -264,10 +264,24 @@ _dynamix_internal:
     bool internal_has_mixin(mixin_id id) const;
 
     // reorganizes the mixins for the new type
-    // if manage_mixins is true the object will destroy all mixins removed and construct all new ones
-    // we have the manage_mixins argument because its a lot faster to manage from the outside
-    // if we know exactly what's added and removed
-    void change_type(const internal::object_type_info* new_type, bool manage_mixins);
+    // destroys all mixins removed and construct all new ones
+    void change_type(const internal::object_type_info* new_type);
+
+    enum class change_type_from_result
+    {
+        success,
+        bad_assign,
+        bad_copy_construct
+    };
+
+    // changes the type and optionally copies mixins from the source
+    // if source is null will default_construct new mixins and destroy old ones
+    // if source is not null it
+    // copy-assigns from source the ones we already have
+    // copy-constructs from source ones we don't have
+    // destroys mixins which are not in new_type
+    // this function is only valid if the source mixins are null or from the same type info as new_type
+    change_type_from_result change_type_from(const internal::object_type_info* new_type, const internal::mixin_data_in_object* source);
 
     // performs the move from one object source to this
     // can only be performed on empty objects
