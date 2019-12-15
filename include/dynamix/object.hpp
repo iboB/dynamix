@@ -290,10 +290,10 @@ _dynamix_internal:
     // allocates memory and
     // constructs mixin with optional source to copy from
     // will return false if source is provided but no copy constructor exists
-    bool make_mixin(mixin_id id, const void* source);
+    bool make_mixin(const mixin_type_info& mixin_info, const void* source);
 
     // destroys mixin and deallocates memory
-    void delete_mixin(mixin_id id);
+    void delete_mixin(const mixin_type_info& mixin_info);
 
     const internal::object_type_info* _type_info;
 

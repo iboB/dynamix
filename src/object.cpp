@@ -113,7 +113,7 @@ void object::clear() noexcept
 {
     for (const mixin_type_info* mixin_info : _type_info->_compact_mixins)
     {
-        delete_mixin(mixin_info->id);
+        delete_mixin(*mixin_info);
     }
 
     if (_mixin_data != &null_mixin_data)
@@ -168,7 +168,7 @@ object::change_type_from_result object::change_type_from(const object_type_info*
         }
         else
         {
-            delete_mixin(id);
+            delete_mixin(*mixin_info);
         }
     }
 
@@ -192,12 +192,11 @@ object::change_type_from_result object::change_type_from(const object_type_info*
 
     for (const mixin_type_info* mixin_info : new_type->_compact_mixins)
     {
-        auto id = mixin_info->id;
-        size_t index = new_type->mixin_index(id);
+        size_t index = new_type->mixin_index(mixin_info->id);
         if (!new_mixin_data[index].buffer())
         {
             const void* source_mixin_data = source ? source[index].mixin() : nullptr;
-            if (!make_mixin(id, source_mixin_data))
+            if (!make_mixin(*mixin_info, source_mixin_data))
             {
                 res = change_type_from_result::bad_copy_construct;
             }
@@ -215,15 +214,11 @@ object::change_type_from_result object::change_type_from(const object_type_info*
     return res;
 }
 
-bool object::make_mixin(mixin_id id, const void* source)
+bool object::make_mixin(const mixin_type_info& mixin_info, const void* source)
 {
-    I_DYNAMIX_ASSERT(_type_info->has(id));
-    mixin_data_in_object& data = _mixin_data[_type_info->mixin_index(id)];
+    I_DYNAMIX_ASSERT(_type_info->has(mixin_info.id));
+    mixin_data_in_object& data = _mixin_data[_type_info->mixin_index(mixin_info.id)];
     I_DYNAMIX_ASSERT(!data.buffer());
-
-    auto& dom = domain::instance();
-
-    const mixin_type_info& mixin_info = dom.mixin_info(id);
 
     mixin_allocator* alloc = _allocator ? _allocator : mixin_info.allocator;
     char* buffer;
@@ -263,12 +258,10 @@ bool object::make_mixin(mixin_id id, const void* source)
     return true;
 }
 
-void object::delete_mixin(mixin_id id)
+void object::delete_mixin(const mixin_type_info& mixin_info)
 {
-    I_DYNAMIX_ASSERT(_type_info->has(id));
-    mixin_data_in_object& data = _mixin_data[_type_info->mixin_index(id)];
-
-    const mixin_type_info& mixin_info = domain::instance().mixin_info(id);
+    I_DYNAMIX_ASSERT(_type_info->has(mixin_info.id));
+    mixin_data_in_object& data = _mixin_data[_type_info->mixin_index(mixin_info.id)];
 
     mixin_allocator* alloc = _allocator ? _allocator : mixin_info.allocator;
 
@@ -467,15 +460,13 @@ void object::copy_from(const object& o)
 
 void object::copy_matching_from(const object& o)
 {
-    auto& dom = domain::instance();
-
     for (const mixin_type_info* info : o._type_info->_compact_mixins)
     {
         auto id = info->id;
         if (_type_info->has(id))
         {
-            DYNAMIX_THROW_UNLESS(dom.mixin_info(id).copy_assignment, bad_copy_assignment);
-            dom.mixin_info(id).copy_assignment(
+            DYNAMIX_THROW_UNLESS(info->copy_assignment, bad_copy_assignment);
+            info->copy_assignment(
                 _mixin_data[_type_info->mixin_index(id)].mixin(), o._mixin_data[o._type_info->mixin_index(id)].mixin());
         }
     }
@@ -494,15 +485,13 @@ bool object::copyable() const noexcept
 
 void object::move_matching_from(object& o)
 {
-    auto& dom = domain::instance();
-
     for (auto* info : o._type_info->_compact_mixins)
     {
         auto id = info->id;
         if (_type_info->has(id))
         {
-            DYNAMIX_THROW_UNLESS(dom.mixin_info(id).move_assignment, bad_move_assignment);
-            dom.mixin_info(id).move_assignment(
+            DYNAMIX_THROW_UNLESS(info->move_assignment, bad_move_assignment);
+            info->move_assignment(
                 _mixin_data[_type_info->mixin_index(id)].mixin(), o._mixin_data[o._type_info->mixin_index(id)].mixin());
         }
     }
