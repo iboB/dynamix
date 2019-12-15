@@ -56,11 +56,12 @@ void object_mutator::create()
         return;
     }
 
-    mixin_type_info_vector new_type_mixins;
+    mixin_collection new_type_mixins;
     const mixin_type_info_vector& old_mixins = _source_mixins->_compact_mixins;
-    new_type_mixins.reserve(_mutation._adding._compact_mixins.size() + old_mixins.size());
+    new_type_mixins._compact_mixins.reserve(_mutation._adding._compact_mixins.size() + old_mixins.size());
 
-    new_type_mixins = _mutation._adding._compact_mixins;
+    new_type_mixins._mixins = _mutation._adding._mixins;
+    new_type_mixins._compact_mixins = _mutation._adding._compact_mixins;
 
     for (const mixin_type_info* mixin_info : old_mixins)
     {
@@ -71,7 +72,7 @@ void object_mutator::create()
         if(std::find(removing.begin(), removing.end(), mixin_info) == removing.end())
         {
             // elements are part of the new type only if they're not removed
-            new_type_mixins.push_back(mixin_info);
+            new_type_mixins.add(*mixin_info);
         }
     }
 
@@ -81,13 +82,9 @@ void object_mutator::create()
         return;
     }
 
-    sort(new_type_mixins.begin(), new_type_mixins.end());
+    sort(new_type_mixins._compact_mixins.begin(), new_type_mixins._compact_mixins.end());
 
-    // erase duplicates
-    // there could be duplicates if we're adding something that's already there
-    new_type_mixins.erase(std::unique(new_type_mixins.begin(), new_type_mixins.end()), new_type_mixins.end());
-
-    _target_type_info = dom.get_object_type_info(new_type_mixins);
+    _target_type_info = dom.get_object_type_info(std::move(new_type_mixins));
 
     if(_target_type_info->as_mixin_collection() == _source_mixins)
     {

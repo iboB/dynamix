@@ -104,31 +104,24 @@ void domain::apply_mutation_rules(object_type_mutation& mutation, const mixin_co
     }
 }
 
-const object_type_info* domain::get_object_type_info(const mixin_type_info_vector& mixins)
+const object_type_info* domain::get_object_type_info(mixin_collection mixins)
 {
     // the mixin type infos need to be sorted
     // so as to guarantee that two object type infos of the same mixins
     // will have the exact same content
-    I_DYNAMIX_ASSERT(std::is_sorted(mixins.begin(), mixins.end()));
-
-    available_mixins_bitset query;
-
-    for(const mixin_type_info* info : mixins)
-    {
-        query[info->id] = true;
-    }
+    I_DYNAMIX_ASSERT(std::is_sorted(mixins._compact_mixins.begin(), mixins._compact_mixins.end()));
 
 #if DYNAMIX_THREAD_SAFE_MUTATIONS
     // TODO C++17: do this with a shared mutex instead
     std::lock_guard<std::mutex> lock(_object_type_infos_mutex);
 #endif
 
-    object_type_info_map::iterator it = _object_type_infos.find(query);
+    object_type_info_map::iterator it = _object_type_infos.find(mixins._mixins);
 
     if(it != _object_type_infos.end())
     {
         // get existing
-        I_DYNAMIX_ASSERT(mixins == it->second->_compact_mixins);
+        I_DYNAMIX_ASSERT(mixins._compact_mixins == it->second->_compact_mixins);
         return it->second.get();
     }
     else
@@ -136,19 +129,21 @@ const object_type_info* domain::get_object_type_info(const mixin_type_info_vecto
         // create object type info
         // use unique_ptr since fill_call_table might throw
         std::unique_ptr<object_type_info> new_type(new object_type_info);
-        new_type->_compact_mixins = mixins;
+        new_type->_mixins = mixins._mixins;
 
-        for(size_t i=0; i<mixins.size(); ++i)
+        for(size_t i=0; i<mixins._compact_mixins.size(); ++i)
         {
-            I_DYNAMIX_ASSERT(mixins[i]);
-            new_type->_mixins[mixins[i]->id] = true;
-            new_type->_mixin_indices[mixins[i]->id] = i + object_type_info::MIXIN_INDEX_OFFSET;
+            auto info = mixins._compact_mixins[i];
+            I_DYNAMIX_ASSERT(info);
+            new_type->_mixin_indices[info->id] = i + object_type_info::MIXIN_INDEX_OFFSET;
         }
+
+        new_type->_compact_mixins = std::move(mixins._compact_mixins);
 
         new_type->fill_call_table();
 
         auto ret = new_type.get();
-        _object_type_infos.emplace(make_pair(query, std::move(new_type)));
+        _object_type_infos.emplace(make_pair(std::move(mixins._mixins), std::move(new_type)));
         return ret;
     }
 }

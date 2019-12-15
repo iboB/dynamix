@@ -69,7 +69,7 @@ public:
     void unregister_feature(message_t& m);
 
     // creates a new type info if needed
-    const object_type_info* get_object_type_info(const mixin_type_info_vector& mixins);
+    const object_type_info* get_object_type_info(mixin_collection mixins);
 
     const mixin_type_info& mixin_info(mixin_id id) const
     {

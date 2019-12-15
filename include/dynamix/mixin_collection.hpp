@@ -36,6 +36,9 @@ public:
     mixin_collection(const mixin_collection&) = delete;
     mixin_collection& operator=(const mixin_collection&) = delete;
 
+    // moveable
+    mixin_collection(mixin_collection&&) noexcept = default;
+
     /// Checks if a mixin type is present in the collection
     template <typename Mixin>
     bool has() const noexcept
