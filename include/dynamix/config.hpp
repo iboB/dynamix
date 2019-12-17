@@ -105,14 +105,6 @@
 #   define DYNAMIX_THREAD_SAFE_MUTATIONS 1
 #endif
 
-// setting this to true will add additional metrics to the library's structures
-// maintaining them is cheap, but does not cost zero
-// the additional metrics are
-// mixin_type_info::num_mixins - number of living mixins of this type
-#if !defined(DYNAMIX_ADDITIONAL_METRICS)
-#   define DYNAMIX_ADDITIONAL_METRICS 1
-#endif
-
 // setting this to true will enable the compilation of object::replace_mixin and object::move_mixin
 // they can be dangerous as clients which keep pointers to mixins within objects can have them
 // invalidated without a way to be notified about this

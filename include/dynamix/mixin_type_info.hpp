@@ -95,10 +95,10 @@ public:
     bool owns_name = false;
 #endif
 
-#if DYNAMIX_ADDITIONAL_METRICS
     /// Number of "living" mixins of this type.
-    mutable metric num_mixins = {0};
-#endif
+    /// Note that this is a counter of mixins which are within objects and not
+    /// a counter of instances which you might otherwise have
+    mutable metric num_mixins = {size_t(0)};
 
     // non-copyable
     mixin_type_info(const mixin_type_info&) = delete;

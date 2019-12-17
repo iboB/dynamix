@@ -15,7 +15,6 @@
 #define DYNAMIX_USE_EXCEPTIONS 0
 #define DYNAMIX_OBJECT_IMPLICIT_COPY 1
 #define DYNAMIX_THREAD_SAFE_MUTATIONS 0
-#define DYNAMIX_ADDITIONAL_METRICS 0
 
 // the following don't affect the build of the library but we'll just
 // use the opportunity to run tests with them

@@ -7,8 +7,6 @@
 //
 #include <dynamix/core.hpp>
 
-#if DYNAMIX_ADDITIONAL_METRICS
-
 #include "test_mixins.hpp"
 
 #include "doctest/doctest.h"
@@ -80,11 +78,3 @@ TEST_CASE("metrics")
     CHECK(mtc.num_mixins == 1);
 
 }
-
-#else
-int main()
-{
-    // tests not applicalble for this case
-    return 0;
-}
-#endif

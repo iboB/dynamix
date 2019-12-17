@@ -51,6 +51,7 @@ public:
     mixin_data_in_object* alloc_mixin_data(const object* obj) const;
     void dealloc_mixin_data(mixin_data_in_object* data, const object* obj) const;
 
+    // the following need to be public in order for the message macros to work
 _dynamix_internal:
     using mixin_collection::_mixins;
     using mixin_collection::_compact_mixins;
@@ -119,7 +120,7 @@ _dynamix_internal:
     call_table_entry _call_table[DYNAMIX_MAX_MESSAGES];
 
     // number of living objects with this type info
-    mutable metric num_objects = {0};
+    mutable metric num_objects = {size_t(0)};
 
     // this should be called after the mixins have been initialized
     void fill_call_table();

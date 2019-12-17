@@ -231,9 +231,7 @@ bool object::make_mixin(const mixin_type_info& mixin_info, const void* source)
     data.set_buffer(buffer, mixin_offset);
     data.set_object(this);
 
-#if DYNAMIX_ADDITIONAL_METRICS
     ++mixin_info.num_mixins;
-#endif
 
     if (!source)
     {
@@ -270,10 +268,8 @@ void object::delete_mixin(const mixin_type_info& mixin_info)
     // dealocate mixin
     alloc->dealloc_mixin(data.buffer(), data.mixin_offset(), mixin_info, this);
 
-#if DYNAMIX_ADDITIONAL_METRICS
     I_DYNAMIX_ASSERT(mixin_info.num_mixins > 0);
     --mixin_info.num_mixins;
-#endif
 
     data.clear();
 }

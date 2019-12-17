@@ -72,8 +72,6 @@ mutation. HOWEVER:
     - Mutating the same object in multiple threads is never safe.
     - Mutating an object in one thread and calling messages for this object in
     another is never safe.
-- `DYNAMIX_ADDITIONAL_METRICS` &ndash; allows the access to some useful metrics
-about the library's usage such as number of mixins of a given type.
 - `DYNAMIX_OBJECT_REPLACE_MIXIN` &ndash; enables `object::move_mixin`,
 `object::hard_replace_mixin` and `object::reallocate_mixins`, which allow users
 to replace mixins within an object. These functions can be dangerous as pointers

@@ -7,6 +7,9 @@
 //
 #pragma once
 
+#include "config.hpp"
+
+#include <cstddef>
 
 /**
  * \file
@@ -17,7 +20,29 @@
 #include <atomic>
 namespace dynamix
 {
-using metric = std::atomic<size_t>;
+struct metric
+{
+    metric(size_t v) : value(v) {}
+
+    operator size_t() const
+    {
+        return value.load(std::memory_order_relaxed);
+    }
+
+    metric& operator++()
+    {
+        value.fetch_add(1, std::memory_order_relaxed);
+        return *this;
+    }
+
+    metric& operator--()
+    {
+        value.fetch_sub(1, std::memory_order_relaxed);
+        return *this;
+    }
+
+    mutable std::atomic<size_t> value;
+};
 }
 #else
 namespace dynamix
