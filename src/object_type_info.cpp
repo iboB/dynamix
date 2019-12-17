@@ -41,7 +41,7 @@ mixin_data_in_object* object_type_info::alloc_mixin_data(const object* obj) cons
 {
     const size_t num_to_allocate = _compact_mixins.size() + MIXIN_INDEX_OFFSET;
 
-    domain_allocator* alloc = obj->_allocator ? obj->_allocator : domain::instance().allocator();
+    domain_allocator* alloc = obj->allocator() ? obj->allocator() : domain::instance().allocator();
     char* memory = alloc->alloc_mixin_data(num_to_allocate, obj);
     mixin_data_in_object* ret = new (memory) mixin_data_in_object[num_to_allocate];
 
@@ -56,7 +56,7 @@ void object_type_info::dealloc_mixin_data(mixin_data_in_object* data, const obje
         data[i].~mixin_data_in_object();
     }
 
-    domain_allocator* alloc = obj->_allocator ? obj->_allocator : domain::instance().allocator();
+    domain_allocator* alloc = obj->allocator() ? obj->allocator() : domain::instance().allocator();
     alloc->dealloc_mixin_data(reinterpret_cast<char*>(data), num_mixins, obj);
 }
 

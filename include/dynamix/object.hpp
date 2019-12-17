@@ -210,7 +210,7 @@ public:
     /////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////
-    // memory and mixin management
+    // memory, mutation, and mixin management
 
     /// Destroys all mixins within an object and resets its type info
     // (sets null type info)
@@ -221,6 +221,10 @@ public:
 
     /// Returns the allcator associated with this object (may be `nullptr`)
     object_allocator* allocator() const { return _allocator; }
+
+    /// Reorganizes the mixins for the new type.
+    /// Destroys all mixins removed and construct all new ones
+    void change_type(const internal::object_type_info* new_type);
 
 #if DYNAMIX_OBJECT_REPLACE_MIXIN
     /// Moves a mixin to the designated buffer, by invocating its move constructor.
@@ -258,14 +262,19 @@ public:
 
     /////////////////////////////////////////////////////////////////
 
+    // the following need to be public in order for the message macros to work
 _dynamix_internal:
+    const internal::object_type_info* _type_info;
+
+    // each element of this array points to a buffer which cointains a pointer to
+    // this - the object and then the mixin
+    // thus each mixin can get its own object
+    internal::mixin_data_in_object* _mixin_data;
+
+private:
     void* internal_get_mixin(mixin_id id);
     const void* internal_get_mixin(mixin_id id) const;
     bool internal_has_mixin(mixin_id id) const;
-
-    // reorganizes the mixins for the new type
-    // destroys all mixins removed and construct all new ones
-    void change_type(const internal::object_type_info* new_type);
 
     enum class change_type_from_result
     {
@@ -273,7 +282,6 @@ _dynamix_internal:
         bad_assign,
         bad_copy_construct
     };
-
     // changes the type and optionally copies mixins from the source
     // if source is null will default_construct new mixins and destroy old ones
     // if source is not null it
@@ -294,13 +302,6 @@ _dynamix_internal:
 
     // destroys mixin and deallocates memory
     void delete_mixin(const mixin_type_info& mixin_info);
-
-    const internal::object_type_info* _type_info;
-
-    // each element of this array points to a buffer which cointains a pointer to
-    // this - the object and then the mixin
-    // thus each mixin can get its own object
-    internal::mixin_data_in_object* _mixin_data;
 
     bool internal_implements(feature_id id, const internal::message_feature_tag&) const
     {
