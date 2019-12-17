@@ -105,6 +105,7 @@ ARITY_DECL = File.open('arity_message_macros_template', 'r').read
 File.open(ARITY_OUT_FILE, 'w') do |f|
   f.write(HEADER)
   f.puts('#include <limits>')
+  f.puts('#include <type_traits>')
   MAX_ARITY.times do |i|
     params = params_for_arity(i)
     f.write(ARITY_DECL % params)

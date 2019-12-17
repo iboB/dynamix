@@ -48,6 +48,9 @@
     I_DYNAMIX_MESSAGE%{arity}_MULTI(export, message_name, method_name, return_type, const %{args_coma})
 
 #define DYNAMIX_DEFINE_MESSAGE_%{arity}_WITH_DEFAULT_IMPL(return_type, message_name %{args_coma}) \
+    /* check for correct type */ \
+    static_assert(std::is_same<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func, return_type(*)(void* %{coma_arg_types})>::value, \
+        "The default implementation must have the same signature as the message."); \
     /* standard message definition */ \
     struct DYNAMIX_DEFAULT_IMPL_STRUCT(message_name) \
     { \

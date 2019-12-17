@@ -9,6 +9,7 @@
 //
 
 #include <limits>
+#include <type_traits>
 
 #define DYNAMIX_MESSAGE_0(return_type, message ) \
     I_DYNAMIX_MESSAGE0_UNI(I_DYNAMIX_PP_EMPTY(), message, message, return_type, I_DYNAMIX_PP_EMPTY() )
@@ -59,6 +60,9 @@
     I_DYNAMIX_MESSAGE0_MULTI(export, message_name, method_name, return_type, const )
 
 #define DYNAMIX_DEFINE_MESSAGE_0_WITH_DEFAULT_IMPL(return_type, message_name ) \
+    /* check for correct type */ \
+    static_assert(std::is_same<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func, return_type(*)(void* )>::value, \
+        "The default implementation must have the same signature as the message."); \
     /* standard message definition */ \
     struct DYNAMIX_DEFAULT_IMPL_STRUCT(message_name) \
     { \
@@ -151,6 +155,9 @@
     I_DYNAMIX_MESSAGE1_MULTI(export, message_name, method_name, return_type, const , arg0_type, a0)
 
 #define DYNAMIX_DEFINE_MESSAGE_1_WITH_DEFAULT_IMPL(return_type, message_name , arg0_type, a0) \
+    /* check for correct type */ \
+    static_assert(std::is_same<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func, return_type(*)(void* , arg0_type)>::value, \
+        "The default implementation must have the same signature as the message."); \
     /* standard message definition */ \
     struct DYNAMIX_DEFAULT_IMPL_STRUCT(message_name) \
     { \
@@ -243,6 +250,9 @@
     I_DYNAMIX_MESSAGE2_MULTI(export, message_name, method_name, return_type, const , arg0_type, a0, arg1_type, a1)
 
 #define DYNAMIX_DEFINE_MESSAGE_2_WITH_DEFAULT_IMPL(return_type, message_name , arg0_type, a0, arg1_type, a1) \
+    /* check for correct type */ \
+    static_assert(std::is_same<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func, return_type(*)(void* , arg0_type, arg1_type)>::value, \
+        "The default implementation must have the same signature as the message."); \
     /* standard message definition */ \
     struct DYNAMIX_DEFAULT_IMPL_STRUCT(message_name) \
     { \
@@ -335,6 +345,9 @@
     I_DYNAMIX_MESSAGE3_MULTI(export, message_name, method_name, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2)
 
 #define DYNAMIX_DEFINE_MESSAGE_3_WITH_DEFAULT_IMPL(return_type, message_name , arg0_type, a0, arg1_type, a1, arg2_type, a2) \
+    /* check for correct type */ \
+    static_assert(std::is_same<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func, return_type(*)(void* , arg0_type, arg1_type, arg2_type)>::value, \
+        "The default implementation must have the same signature as the message."); \
     /* standard message definition */ \
     struct DYNAMIX_DEFAULT_IMPL_STRUCT(message_name) \
     { \
@@ -427,6 +440,9 @@
     I_DYNAMIX_MESSAGE4_MULTI(export, message_name, method_name, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3)
 
 #define DYNAMIX_DEFINE_MESSAGE_4_WITH_DEFAULT_IMPL(return_type, message_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3) \
+    /* check for correct type */ \
+    static_assert(std::is_same<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func, return_type(*)(void* , arg0_type, arg1_type, arg2_type, arg3_type)>::value, \
+        "The default implementation must have the same signature as the message."); \
     /* standard message definition */ \
     struct DYNAMIX_DEFAULT_IMPL_STRUCT(message_name) \
     { \
@@ -519,6 +535,9 @@
     I_DYNAMIX_MESSAGE5_MULTI(export, message_name, method_name, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4)
 
 #define DYNAMIX_DEFINE_MESSAGE_5_WITH_DEFAULT_IMPL(return_type, message_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4) \
+    /* check for correct type */ \
+    static_assert(std::is_same<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func, return_type(*)(void* , arg0_type, arg1_type, arg2_type, arg3_type, arg4_type)>::value, \
+        "The default implementation must have the same signature as the message."); \
     /* standard message definition */ \
     struct DYNAMIX_DEFAULT_IMPL_STRUCT(message_name) \
     { \
@@ -611,6 +630,9 @@
     I_DYNAMIX_MESSAGE6_MULTI(export, message_name, method_name, return_type, const , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5)
 
 #define DYNAMIX_DEFINE_MESSAGE_6_WITH_DEFAULT_IMPL(return_type, message_name , arg0_type, a0, arg1_type, a1, arg2_type, a2, arg3_type, a3, arg4_type, a4, arg5_type, a5) \
+    /* check for correct type */ \
+    static_assert(std::is_same<I_DYNAMIX_MESSAGE_STRUCT_NAME(message_name)::caller_func, return_type(*)(void* , arg0_type, arg1_type, arg2_type, arg3_type, arg4_type, arg5_type)>::value, \
+        "The default implementation must have the same signature as the message."); \
     /* standard message definition */ \
     struct DYNAMIX_DEFAULT_IMPL_STRUCT(message_name) \
     { \
