@@ -13,6 +13,7 @@
 #include "dynamix/allocators.hpp"
 #include "dynamix/internal/mixin_traits.hpp"
 #include "dynamix/features.hpp"
+
 #include <algorithm>
 
 namespace dynamix
@@ -131,11 +132,12 @@ const object_type_info* domain::get_object_type_info(mixin_collection mixins)
         std::unique_ptr<object_type_info> new_type(new object_type_info);
         new_type->_mixins = mixins._mixins;
 
-        for(size_t i=0; i<mixins._compact_mixins.size(); ++i)
+        uint32_t index = 0;
+        for(auto info : mixins._compact_mixins)
         {
-            auto info = mixins._compact_mixins[i];
             I_DYNAMIX_ASSERT(info);
-            new_type->_mixin_indices[info->id] = i + object_type_info::MIXIN_INDEX_OFFSET;
+            new_type->_mixin_indices[info->id] = index + object_type_info::MIXIN_INDEX_OFFSET;
+            ++index;
         }
 
         new_type->_compact_mixins = std::move(mixins._compact_mixins);

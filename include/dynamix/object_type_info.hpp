@@ -19,6 +19,7 @@
 #include "internal/assert.hpp"
 
 #include <memory>
+#include <cstdint>
 
 // object type info is an immutable class that represents the type information for a
 // group of objects
@@ -44,7 +45,7 @@ public:
 
     const mixin_collection* as_mixin_collection() const { return this; }
 
-    size_t mixin_index(mixin_id id) const { return _mixin_indices[id]; }
+    uint32_t mixin_index(mixin_id id) const { return _mixin_indices[id]; }
 
     static const object_type_info& null();
 
@@ -57,10 +58,10 @@ _dynamix_internal:
     using mixin_collection::_compact_mixins;
 
     // indices in the object::_mixin_data
-    size_t _mixin_indices[DYNAMIX_MAX_MIXINS];
+    uint32_t _mixin_indices[DYNAMIX_MAX_MIXINS];
 
     // special indices in an object's _mixin_data member
-    enum reserved_mixin_indices
+    enum reserved_mixin_indices : uint32_t
     {
         // index 0 is reserved for a null mixin data. It's used to return nullptr on queries for non member mixins
         //         (without having to check with an if or worse yet - a loop)
@@ -77,14 +78,14 @@ _dynamix_internal:
     // for faster acciess
     struct call_table_message
     {
-        size_t mixin_index; // index of mixin within the _compact_mixins vector
+        uint32_t mixin_index; // index of mixin within the _compact_mixins vector
         func_ptr caller;
         const message_for_mixin* data;
 
         explicit operator bool() const { return !!caller; }
         void reset()
         {
-            mixin_index = INVALID_MIXIN_ID;
+            mixin_index = ~0u;
             caller = nullptr;
             data = nullptr;
         }

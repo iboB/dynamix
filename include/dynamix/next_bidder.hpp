@@ -28,7 +28,7 @@ auto call_next_bidder(Mixin* mixin, Message* message, Args&&... args)
     auto& msg = static_cast<const internal::message_t&>(_dynamix_get_mixin_feature_fast(message));
     const object* obj = object_of(mixin);
     const internal::object_type_info::call_table_entry& entry = obj->_type_info->_call_table[msg.id];
-    const size_t mixin_index = obj->_type_info->_mixin_indices[mixin_info.id];
+    const uint32_t mixin_index = obj->_type_info->_mixin_indices[mixin_info.id];
 
     DYNAMIX_MSG_THROW_UNLESS(entry.top_bid_message, bad_message_call);
 
@@ -103,7 +103,7 @@ bool has_next_bidder(Mixin* mixin, Message* message)
     auto& msg = static_cast<const internal::message_t&>(_dynamix_get_mixin_feature_fast(message));
     const object* obj = object_of(mixin);
     const internal::object_type_info::call_table_entry& entry = obj->_type_info->_call_table[msg.id];
-    const size_t mixin_index = obj->_type_info->_mixin_indices[mixin_info.id];
+    const uint32_t mixin_index = obj->_type_info->_mixin_indices[mixin_info.id];
 
     if (!entry.top_bid_message) return false;
 
