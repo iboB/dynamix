@@ -179,7 +179,8 @@ int main(int argc, char* argv[])
         return r.error();
     }
 
-    auto report = r.run_benchmarks();
+    r.run_benchmarks();
+    auto report = r.generate_report();
 
     report.to_text(std::cout);
 

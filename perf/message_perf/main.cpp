@@ -44,7 +44,8 @@ int main(int argc, char* argv[])
     extern void fill_sample_data(size_t max_size);
     fill_sample_data(max_iters);
 
-    auto report = r.run_benchmarks();
+    r.run_benchmarks();
+    auto report = r.generate_report();
 
     report.to_text(std::cout);
 
@@ -84,6 +85,6 @@ int main(int argc, char* argv[])
         cerr << "Some performance regression tests failed!\n";
         return 1;
     }
-    
+
     return 0;
 }

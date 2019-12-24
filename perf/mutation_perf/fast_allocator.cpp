@@ -56,7 +56,7 @@ char* fast_allocator::alloc_mixin_data(size_t count, const object*)
     return allocate(mixin_data_size * count);
 }
 
-void fast_allocator::dealloc_mixin_data(char* ptr, size_t count, const object*)
+void fast_allocator::dealloc_mixin_data(char*, size_t, const object*)
 {
     --_living_objects;
 }
