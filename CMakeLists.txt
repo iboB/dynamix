@@ -5,45 +5,14 @@
 # See accompanying file LICENSE.txt or copy at
 # https://opensource.org/licenses/MIT
 #
-
 cmake_minimum_required(VERSION 3.2.2)
 
 project(dynamix)
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-    # if DynaMix is built as root, activate some sane defaults for build configuration
-
-    set(CMAKE_CXX_STANDARD 11)
-    set(CMAKE_CXX_EXTENSIONS OFF)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-    option(DYNAMIX_TSAN "DynaMix: build with thread sanitizer on" OFF)
-    option(DYNAMIX_ASAN "DynaMix: build with address sanitizer on" OFF)
-
-    set(DEMO_SAN_FLAGS "")
-    if(MSVC)
-        set(DEMO_WARNING_FLAGS "") # the default is fine here
-    else()
-        set(DEMO_WARNING_FLAGS "-Wall -Wextra -Wno-unused-variable")
-        if(DYNAMIX_TSAN)
-            set(DEMO_SAN_FLAGS "-fsanitize=thread -g")
-        elseif(DYNAMIX_ASAN)
-            set(DEMO_SAN_FLAGS "-fsanitize=address,undefined,leak -pthread -g")
-        endif()
-    endif()
-
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DEMO_WARNING_FLAGS} ${DEMO_SAN_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DEMO_WARNING_FLAGS} ${DEMO_SAN_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${DEMO_SAN_FLAGS}")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${DEMO_SAN_FLAGS}")
-
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-
-    find_package(Threads REQUIRED) # for thread test
-
-    # is_demo is used below to enable the build of various subprojects
-    # which typically wouldn't be built if DynaMix is a subdirectory of a project
+    # is_demo is used below to make life simpler for developers
+    # it enables some configurations and the defaults for building tests and examples
+    # which typically wouldn't be built if DynaMix is a subdirectory of another project
     set(is_demo ON)
 else()
     set(is_demo OFF)
@@ -55,6 +24,8 @@ set(CMAKE_MODULE_PATH
 )
 
 include(src_group)
+
+option(DYNAMIX_DEMO "DynaMix: build as standalone demo (developer mode)" ${is_demo})
 
 option(DYNAMIX_SHARED_LIB "DynaMix: build as a shared library" ON)
 
@@ -75,6 +46,12 @@ option(DYNAMIX_BUILD_PERF "DynaMix: build performance tests (requires manual cod
 
 # Off by default since files need to be generated for this to work
 option(DYNAMIX_BUILD_COMPILER_PERF "DynaMix: build compilation performance tests (requires manual code generation step)" OFF)
+
+# demo
+
+if(DYNAMIX_DEMO)
+    include(demo)
+endif()
 
 # sources
 
