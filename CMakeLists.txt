@@ -47,6 +47,9 @@ option(DYNAMIX_BUILD_PERF "DynaMix: build performance tests (requires manual cod
 # Off by default since files need to be generated for this to work
 option(DYNAMIX_BUILD_COMPILER_PERF "DynaMix: build compilation performance tests (requires manual code generation step)" OFF)
 
+# Optionally disable this so dynamix doesn't get installed along with other projects which are using it
+option(DYNAMIX_CONFIGURE_INSTALL "DynaMix: add install configuration" ON)
+
 # demo
 
 if(DYNAMIX_DEMO)
@@ -197,4 +200,9 @@ endif()
 
 if(DYNAMIX_BUILD_COMPILER_PERF)
     add_subdirectory(compiler/perf)
+endif()
+
+if(DYNAMIX_CONFIGURE_INSTALL)
+    install(TARGETS dynamix)
+    install(DIRECTORY include DESTINATION .)
 endif()
