@@ -14,9 +14,10 @@
 
 
 #include "../config.hpp"
-#include "../message.hpp"
+
 #include "../features.hpp"
 #include "../object_type_info.hpp"
+#include "../message_features.hpp"
 
 namespace dynamix
 {
@@ -44,7 +45,7 @@ public:
     }
 
     template <typename Message>
-    feature_parser_phase_1& operator & (message_perks<Message>)
+    feature_parser_phase_1& operator & (const message_perks<Message>&)
     {
         return operator&(static_cast<Message*>(nullptr));
     }
@@ -88,17 +89,24 @@ public:
     template <typename Feature>
     feature_parser_phase_2& operator & (const Feature*)
     {
-        Feature& f = static_cast<Feature&>(_dynamix_get_mixin_feature_safe(static_cast<Feature*>(nullptr)));
-        I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID); // must be registered
+        Feature& f = get_registered_feature<Feature>();
         parse_feature(f, typename Feature::feature_tag());
-
         return *this;
     }
 
     template <typename Message>
     feature_parser_phase_2& operator & (message_perks<Message> mp)
     {
-        parse_message_with_perks<Message>(mp.bid, mp.priority);
+        Message& msg = get_registered_feature<Message>();
+        parse_message(msg, mp.bid, mp.priority, msg.template get_caller_for<Mixin>());
+        return *this;
+    }
+
+    template <typename Message>
+    feature_parser_phase_2& operator & (message_perks_and_caller<Message> mp)
+    {
+        Message& msg = get_registered_feature<Message>();
+        parse_message(msg, mp.bid, mp.priority, mp.caller);
         return *this;
     }
 
@@ -108,23 +116,21 @@ public:
     feature_parser_phase_2& operator & (const noop_feature_t*) { return *this; }
 
 private:
+    template <typename Feature>
+    Feature& get_registered_feature()
+    {
+        Feature& f = static_cast<Feature&>(_dynamix_get_mixin_feature_safe(static_cast<Feature*>(nullptr)));
+        I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID); // must be registered
+        return f;
+    }
+
     template <typename Message>
     void parse_feature(Message& msg, const message_feature_tag&)
     {
-        parse_message(msg, 0, 0);
+        parse_message(msg, 0, 0, msg.template get_caller_for<Mixin>());
     }
 
-    template <typename Message>
-    void parse_message_with_perks(int bid, int priority)
-    {
-        Message& msg = static_cast<Message&>(_dynamix_get_mixin_feature_safe(static_cast<Message*>(nullptr)));
-        I_DYNAMIX_ASSERT(msg.id != INVALID_FEATURE_ID);
-
-        parse_message(msg, bid, priority);
-    }
-
-    template <typename Message>
-    void parse_message(Message& msg, int bid, int priority)
+    void parse_message(message_t& msg, int bid, int priority, func_ptr caller)
     {
 #if DYNAMIX_DEBUG
         // check for duplicate entries
@@ -137,7 +143,7 @@ private:
         info.message_infos.emplace_back();
         message_for_mixin& mfm = info.message_infos.back();
         mfm.message = &msg;
-        mfm.caller = msg.template get_caller_for<Mixin>();
+        mfm.caller = caller;
         mfm.bid = bid;
         mfm.priority = priority;
     }

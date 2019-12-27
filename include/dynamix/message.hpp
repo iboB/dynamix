@@ -57,14 +57,6 @@ protected:
     {}
 };
 
-// templated so the type can be passed along with the perks
-template <typename Message>
-struct message_perks
-{
-    int bid = 0;
-    int priority = 0;
-};
-
 // a structure that describes a message with specific data for a concrete mixin
 struct DYNAMIX_API message_for_mixin
 {
@@ -105,45 +97,5 @@ template <typename Combinator>
 typename std::enable_if<!has_set_num_results<Combinator>::value>::type
 set_num_results_for(Combinator&, size_t) {}
 
-// other message wrappers
-
-struct message_wrapper {};
-
 } // namespace internal
-
-
-// Used in the mixin's feature list to set perks to messages
-template <typename Message>
-internal::message_perks<Message> priority(int p, Message*)
-{
-    internal::message_perks<Message> mp;
-    mp.priority = p;
-    return mp;
-}
-
-template <typename Message>
-internal::message_perks<Message> bid(int b, Message*)
-{
-    internal::message_perks<Message> mp;
-    mp.bid = b;
-    return mp;
-}
-
-// Perks of message wrappers
-
-// So perks can be passed as arguments to one another
-template <typename Feature>
-internal::message_perks<Feature> priority(int p, internal::message_perks<Feature> perks)
-{
-    perks.priority = p;
-    return perks;
-}
-
-template <typename Feature>
-internal::message_perks<Feature> bid(int b, internal::message_perks<Feature> perks)
-{
-    perks.bid = b;
-    return perks;
-}
-
 } // namespace dynamix

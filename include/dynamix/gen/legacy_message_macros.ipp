@@ -155,6 +155,17 @@
             /* cast the caller to a void (*)() - safe according to the standard */ \
             return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
         } \
+        template <typename Mixin> \
+        static ::dynamix::internal::func_ptr wrap_caller(return_type (*caller)(constness Mixin*, arg0_type)) \
+        { \
+            static return_type (*wcaller)(constness Mixin*, arg0_type) = caller; \
+            static caller_func the_caller = [](void* _d_mixin, arg0_type a0) -> return_type \
+            { \
+                constness Mixin* _d_m = reinterpret_cast<Mixin*>(_d_mixin); \
+                return wcaller(_d_m, std::forward<arg0_type>(a0)); \
+            }; \
+            return reinterpret_cast< ::dynamix::internal::func_ptr>(the_caller); \
+        } \
     }; \
     /* step 2: define a message tag, that will be used to identify the message in feature lists */ \
     /* it would have been nice if we could set this global variable to the unique global instance of the feature*/ \

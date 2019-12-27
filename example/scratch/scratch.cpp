@@ -28,15 +28,16 @@ DYNAMIX_DEFINE_MIXIN(a, testv_msg);
 class b
 {
 public:
-    void testv(vector<int> data)
-    {
-        cout << "b: " << data.size() << endl;
-    }
 };
+
+void b_testv(void*, vector<int> data)
+{
+    cout << "b: " << data.size() << endl;
+}
 
 class xxx : public b {};
 
-DYNAMIX_DEFINE_MIXIN(b, testv_msg);
+DYNAMIX_DEFINE_MIXIN(b, bind(testv_msg, b_testv));
 
 struct script_mixin
 {
