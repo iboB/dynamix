@@ -1,3 +1,5 @@
 .vscode/
+.vs/
+CMakeSettings.json
 .mtime_cache/
 build/
