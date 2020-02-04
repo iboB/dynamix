@@ -18,6 +18,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 option(DYNAMIX_TSAN "DynaMix: build with thread sanitizer on" OFF)
 option(DYNAMIX_ASAN "DynaMix: build with address sanitizer on" OFF)
+option(DYNAMIX_CLANG_TIDY "Dynamix: use clang tidy" OFF)
 
 set(DEMO_SAN_FLAGS "")
 if(MSVC)
@@ -28,6 +29,10 @@ else()
         set(DEMO_SAN_FLAGS "-fsanitize=thread -g")
     elseif(DYNAMIX_ASAN)
         set(DEMO_SAN_FLAGS "-fsanitize=address,undefined,leak -pthread -g")
+    endif()
+
+    if(DYNAMIX_CLANG_TIDY)
+        set(CMAKE_CXX_CLANG_TIDY clang-tidy)
     endif()
 endif()
 

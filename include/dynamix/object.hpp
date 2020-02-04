@@ -330,10 +330,10 @@ private:
     // virtual mixin for default message implementation
     // used only so as to not have a null pointer cast to the appropriate type for default implementations
     // which could be treated as an error in some debuggers
-    struct default_impl_virtual_mixin { void* unused; };
+    struct default_impl_virtual_mixin { void* unused = nullptr; };
     struct default_impl_virtual_mixin_data_in_object
     {
-        object* obj;
+        object* obj = nullptr; // we don't need this initialization but static analyzers complain
         default_impl_virtual_mixin mixin;
     };
     default_impl_virtual_mixin_data_in_object _default_impl_virtual_mixin_data;
