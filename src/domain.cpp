@@ -291,9 +291,8 @@ void domain::register_mixin_type(mixin_type_info& info)
 void domain::unregister_mixin_type(const mixin_type_info& info)
 {
     I_DYNAMIX_ASSERT_MSG(info.id < _num_registered_mixins, "unregistering a mixin which isn't registered");
-    mixin_type_info* const registered = _mixin_type_infos[info.id];
-    I_DYNAMIX_ASSERT_MSG(registered, "unregistering a mixin which isn't registered");
-    I_DYNAMIX_ASSERT_MSG(registered == &info, "unregistering a mixin with known id but unknown data");
+    I_DYNAMIX_ASSERT_MSG(_mixin_type_infos[info.id], "unregistering a mixin which isn't registered");
+    I_DYNAMIX_ASSERT_MSG(_mixin_type_infos[info.id] == &info, "unregistering a mixin with known id but unknown data");
 
 #if DYNAMIX_USE_TYPEID && defined(__GNUC__)
     // if the name wasn't overriden by a feature, it has been obtained through
