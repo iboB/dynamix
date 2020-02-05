@@ -222,9 +222,8 @@ void domain::register_feature(message_t& m)
 void domain::unregister_feature(message_t& msg)
 {
     I_DYNAMIX_ASSERT_MSG(msg.id < _num_registered_messages, "unregistering a message which isn't registered");
-    auto* registered = _messages[msg.id];
-    I_DYNAMIX_ASSERT_MSG(registered, "unregistering a message which isn't registered");
-    I_DYNAMIX_ASSERT_MSG(registered == &msg, "unregistering a message with know id but unknown data");
+    I_DYNAMIX_ASSERT_MSG(_messages[msg.id], "unregistering a message which isn't registered");
+    I_DYNAMIX_ASSERT_MSG(_messages[msg.id] == &msg, "unregistering a message with know id but unknown data");
 
     _messages[msg.id] = nullptr;
 
