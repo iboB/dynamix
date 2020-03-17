@@ -21,11 +21,11 @@ namespace dynamix
 static constexpr type_class_id INVALID_TYPE_CLASS_ID = ~type_class_id(0);
 
 class define_type_class;
+class object_type_info;
 
 namespace internal
 {
 class domain;
-class object_type_info;
 }
 
 /// A type class is a desciption of an object type info which may or may not match an existing one
@@ -42,12 +42,12 @@ public:
     type_class(type_class&&) = delete;
     type_class& operator=(type_class&&) = delete;
 
-    typedef bool (*match_func)(const internal::object_type_info&);
+    typedef bool (*match_func)(const object_type_info&);
 
     type_class_id id() const { return _id; }
     bool is_registered() const { return _id != INVALID_TYPE_CLASS_ID; }
 
-    bool matches(const internal::object_type_info& ti) const { return _match_func(ti); }
+    bool matches(const object_type_info& ti) const { return _match_func(ti); }
 
 private:
     friend class internal::domain;

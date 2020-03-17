@@ -16,12 +16,12 @@ namespace dynamix
 
 namespace internal
 {
-class object_type_info;
 class mixin_data_in_object;
 struct message_t;
 struct message_feature_tag;
 } // namespace internal
 
+class object_type_info;
 class object_type_template;
 class object_allocator;
 class type_class;
@@ -193,7 +193,7 @@ public:
 
     /// Reorganizes the mixins for the new type.
     /// Destroys all mixins removed and construct all new ones
-    void change_type(const internal::object_type_info* new_type);
+    void change_type(const object_type_info* new_type);
 
 #if DYNAMIX_OBJECT_REPLACE_MIXIN
     /// Moves a mixin to the designated buffer, by invocating its move constructor.
@@ -221,11 +221,11 @@ public:
     /////////////////////////////////////////////////////////////////
 
     /// Get the object's type info
-    const internal::object_type_info& type_info() const { return *_type_info; }
+    const object_type_info& type_info() const { return *_type_info; }
 
     // the following need to be public in order for the message macros to work
 _dynamix_internal:
-    const internal::object_type_info* _type_info;
+    const object_type_info* _type_info;
 
     // each element of this array points to a buffer which cointains a pointer to
     // this - the object and then the mixin
@@ -250,7 +250,7 @@ private:
     // copy-constructs from source ones we don't have
     // destroys mixins which are not in new_type
     // this function is only valid if the source mixins are null or from the same type info as new_type
-    change_type_from_result change_type_from(const internal::object_type_info* new_type, const internal::mixin_data_in_object* source);
+    change_type_from_result change_type_from(const object_type_info* new_type, const internal::mixin_data_in_object* source);
 
     // performs the move from one object source to this
     // can only be performed on empty objects

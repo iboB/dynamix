@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2020 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -27,7 +27,7 @@ auto call_next_bidder(Mixin* mixin, Message* message, Args&&... args)
     const mixin_type_info& mixin_info = _dynamix_get_mixin_type_info(mixin);
     auto& msg = static_cast<const internal::message_t&>(_dynamix_get_mixin_feature_fast(message));
     const object* obj = object_of(mixin);
-    const internal::object_type_info::call_table_entry& entry = obj->_type_info->_call_table[msg.id];
+    const object_type_info::call_table_entry& entry = obj->_type_info->_call_table[msg.id];
     const uint32_t mixin_index = obj->_type_info->_mixin_indices[mixin_info.id];
 
     DYNAMIX_MSG_THROW_UNLESS(entry.top_bid_message, bad_message_call);
@@ -62,7 +62,7 @@ auto call_next_bidder(Mixin* mixin, Message* message, Args&&... args)
         // for multicasts this might be the message we're looking for or simply the next
         // in the chain of priorities
         // so check the previous one's bid and if it's the same search for the next one that's different
-        const internal::object_type_info::call_table_message* prev_msg = ptr - 1;
+        const object_type_info::call_table_message* prev_msg = ptr - 1;
 
         // loop to the end of the bid chain
         while (ptr->data->bid == prev_msg->data->bid) ++ptr;
@@ -102,7 +102,7 @@ bool has_next_bidder(Mixin* mixin, Message* message)
     const mixin_type_info& mixin_info = _dynamix_get_mixin_type_info(mixin);
     auto& msg = static_cast<const internal::message_t&>(_dynamix_get_mixin_feature_fast(message));
     const object* obj = object_of(mixin);
-    const internal::object_type_info::call_table_entry& entry = obj->_type_info->_call_table[msg.id];
+    const object_type_info::call_table_entry& entry = obj->_type_info->_call_table[msg.id];
     const uint32_t mixin_index = obj->_type_info->_mixin_indices[mixin_info.id];
 
     if (!entry.top_bid_message) return false;
@@ -119,7 +119,7 @@ bool has_next_bidder(Mixin* mixin, Message* message)
         auto ptr = entry.begin;
         while (ptr++->mixin_index != mixin_index);
         if (!*ptr) return false;
-        const internal::object_type_info::call_table_message* prev_msg = ptr - 1;
+        const object_type_info::call_table_message* prev_msg = ptr - 1;
         while (ptr->data->bid == prev_msg->data->bid) ++ptr;
         return !!*ptr;
     }

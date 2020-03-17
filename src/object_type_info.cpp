@@ -18,13 +18,11 @@
 
 namespace dynamix
 {
-namespace internal
-{
 
 object_type_info::object_type_info()
 {
-    zero_memory(_mixin_indices, sizeof(_mixin_indices));
-    zero_memory(_call_table, sizeof(_call_table));
+    internal::zero_memory(_mixin_indices, sizeof(_mixin_indices));
+    internal::zero_memory(_call_table, sizeof(_call_table));
 }
 
 object_type_info::~object_type_info()
@@ -38,18 +36,18 @@ const object_type_info& object_type_info::null()
     return null_type_info;
 };
 
-mixin_data_in_object* object_type_info::alloc_mixin_data(const object* obj) const
+internal::mixin_data_in_object* object_type_info::alloc_mixin_data(const object* obj) const
 {
     const size_t num_to_allocate = _compact_mixins.size() + MIXIN_INDEX_OFFSET;
 
-    domain_allocator* alloc = obj->allocator() ? obj->allocator() : domain::instance().allocator();
+    domain_allocator* alloc = obj->allocator() ? obj->allocator() : internal::domain::instance().allocator();
     char* memory = alloc->alloc_mixin_data(num_to_allocate, obj);
-    mixin_data_in_object* ret = new (memory) mixin_data_in_object[num_to_allocate];
+    internal::mixin_data_in_object* ret = new (memory) internal::mixin_data_in_object[num_to_allocate];
 
     return ret;
 }
 
-void object_type_info::dealloc_mixin_data(mixin_data_in_object* data, const object* obj) const
+void object_type_info::dealloc_mixin_data(internal::mixin_data_in_object* data, const object* obj) const
 {
     const size_t num_mixins = _compact_mixins.size() + MIXIN_INDEX_OFFSET;
     for (size_t i = 0; i < num_mixins; ++i)
@@ -57,7 +55,7 @@ void object_type_info::dealloc_mixin_data(mixin_data_in_object* data, const obje
         data[i].~mixin_data_in_object();
     }
 
-    domain_allocator* alloc = obj->allocator() ? obj->allocator() : domain::instance().allocator();
+    domain_allocator* alloc = obj->allocator() ? obj->allocator() : internal::domain::instance().allocator();
     alloc->dealloc_mixin_data(reinterpret_cast<char*>(data), num_mixins, obj);
 }
 
@@ -77,7 +75,7 @@ bool object_type_info::is_a(const type_class& tc) const
     }
 }
 
-object_type_info::call_table_message object_type_info::make_call_table_message(mixin_id id, const message_for_mixin& data) const
+object_type_info::call_table_message object_type_info::make_call_table_message(mixin_id id, const internal::message_for_mixin& data) const
 {
     call_table_message ret;
     ret.mixin_index = _mixin_indices[id];
@@ -98,11 +96,11 @@ void object_type_info::fill_call_table()
 
     for (const mixin_type_info* info : _compact_mixins)
     {
-        for (const message_for_mixin& msg : info->message_infos)
+        for (const internal::message_for_mixin& msg : info->message_infos)
         {
             call_table_entry& table_entry = _call_table[msg.message->id];
 
-            if (msg.message->mechanism == message_t::unicast)
+            if (msg.message->mechanism == internal::message_t::unicast)
             {
                 if (!table_entry.top_bid_message)
                 {
@@ -144,7 +142,7 @@ void object_type_info::fill_call_table()
                     }
                 }
             }
-            if(msg.message->mechanism == message_t::multicast)
+            if(msg.message->mechanism == internal::message_t::multicast)
             {
                 if (!table_entry.begin)
                 {
@@ -165,7 +163,7 @@ void object_type_info::fill_call_table()
         }
     }
 
-    const domain& dom = domain::instance();
+    const internal::domain& dom = internal::domain::instance();
 
     _message_data_buffer.reset(new call_table_message[message_data_buffer_size]);
     auto message_data_buffer_ptr = _message_data_buffer.get();
@@ -174,7 +172,7 @@ void object_type_info::fill_call_table()
     // update begin and end pointers of _call_table and add message datas to buffer
     for (const mixin_type_info* info : _compact_mixins)
     {
-        for (const message_for_mixin& msg : info->message_infos)
+        for (const internal::message_for_mixin& msg : info->message_infos)
         {
             call_table_entry& table_entry = _call_table[msg.message->id];
 
@@ -188,7 +186,7 @@ void object_type_info::fill_call_table()
                     auto begin = message_data_buffer_ptr;
                     message_data_buffer_ptr += reinterpret_cast<intptr_t>(table_entry.begin) / sizeof(*table_entry.begin);
 
-                    if (msg.message->mechanism == message_t::multicast)
+                    if (msg.message->mechanism == internal::message_t::multicast)
                     {
                         // for multicasts also add one for the nullptr terminators
                         ++message_data_buffer_ptr;
@@ -199,7 +197,7 @@ void object_type_info::fill_call_table()
                     table_entry.end = begin;
                 }
 
-                if (msg.message->mechanism == message_t::multicast || table_entry.top_bid_message.data->priority == msg.priority)
+                if (msg.message->mechanism == internal::message_t::multicast || table_entry.top_bid_message.data->priority == msg.priority)
                 {
                     // add all messages for multicasts
                     // add same-priority messages for unicasts
@@ -236,7 +234,7 @@ void object_type_info::fill_call_table()
             return b.data->bid < a.data->bid;
         });
 
-        if (dom._messages[i]->mechanism == message_t::multicast)
+        if (dom._messages[i]->mechanism == internal::message_t::multicast)
         {
             // for multicasts we have extra work to do
             // we need to sort messages with the same bid by priority
@@ -303,7 +301,7 @@ void object_type_info::fill_call_table()
             continue;
         }
 
-        const message_t* msg_data = dom._messages[i];
+        const internal::message_t* msg_data = dom._messages[i];
 
         if (!msg_data)
         {
@@ -311,7 +309,7 @@ void object_type_info::fill_call_table()
             continue;
         }
 
-        if (msg_data->mechanism != message_t::unicast)
+        if (msg_data->mechanism != internal::message_t::unicast)
         {
             // not a unicast
             continue;
@@ -341,7 +339,7 @@ void object_type_info::fill_call_table()
             continue;
         }
 
-        const message_t* msg_data = dom._messages[i];
+        const internal::message_t* msg_data = dom._messages[i];
 
         if (!msg_data)
         {
@@ -359,7 +357,7 @@ void object_type_info::fill_call_table()
         table_entry.top_bid_message.caller = msg_data->default_impl_data->caller;
         table_entry.top_bid_message.data = msg_data->default_impl_data;
 
-        if (msg_data->mechanism == message_t::multicast)
+        if (msg_data->mechanism == internal::message_t::multicast)
         {
             // for multicasts reuse the top-bid message to hold the pointer
             // to the default implemetation
@@ -379,7 +377,7 @@ bool object_type_info::implements_message_by_mixin(feature_id id) const
         return false;
     }
 
-    const auto& msg_data = domain::instance().message_data(id);
+    const auto& msg_data = internal::domain::instance().message_data(id);
 
     return entry.top_bid_message.data != msg_data.default_impl_data;
 }
@@ -393,7 +391,7 @@ size_t object_type_info::message_num_implementers(feature_id id) const
         return 0;
     }
 
-    if (domain::instance().message_data(id).mechanism == message_t::unicast)
+    if (internal::domain::instance().message_data(id).mechanism == internal::message_t::unicast)
     {
         return 1;
     }
@@ -405,7 +403,7 @@ size_t object_type_info::message_num_implementers(feature_id id) const
 
 void object_type_info::get_message_names(std::vector<const char*>& out_message_names) const
 {
-    const domain& dom = domain::instance();
+    const internal::domain& dom = internal::domain::instance();
 
     for (size_t i = 0; i < DYNAMIX_MAX_MESSAGES; ++i)
     {
@@ -424,5 +422,4 @@ void object_type_info::get_mixin_names(std::vector<const char*>& out_mixin_names
     }
 }
 
-} // namespace internal
 } // namespace dynamix

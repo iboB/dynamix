@@ -34,8 +34,8 @@ class object;
 
 namespace internal
 {
-
 class mixin_data_in_object;
+} // namespace internal
 
 class DYNAMIX_API object_type_info : private mixin_collection
 {
@@ -51,8 +51,8 @@ public:
 
     static const object_type_info& null();
 
-    mixin_data_in_object* alloc_mixin_data(const object* obj) const;
-    void dealloc_mixin_data(mixin_data_in_object* data, const object* obj) const;
+    internal::mixin_data_in_object* alloc_mixin_data(const object* obj) const;
+    void dealloc_mixin_data(internal::mixin_data_in_object* data, const object* obj) const;
 
     /// Checks if the type implements a feature.
     template <typename Feature>
@@ -138,8 +138,8 @@ _dynamix_internal:
     struct call_table_message
     {
         uint32_t mixin_index; // index of mixin within the _compact_mixins vector
-        func_ptr caller;
-        const message_for_mixin* data;
+        internal::func_ptr caller;
+        const internal::message_for_mixin* data;
 
         explicit operator bool() const { return !!caller; }
         void reset()
@@ -150,7 +150,7 @@ _dynamix_internal:
         }
     };
 
-    call_table_message make_call_table_message(mixin_id id, const message_for_mixin& data) const;
+    call_table_message make_call_table_message(mixin_id id, const internal::message_for_mixin& data) const;
 
     struct call_table_entry
     {
@@ -211,5 +211,4 @@ _dynamix_internal:
     std::vector<type_class_id> _matching_type_classes;
 };
 
-} // namespace internal
 } // namespace dynamix

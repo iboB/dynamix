@@ -38,12 +38,12 @@ class mutation_rule;
 class object_type_mutation;
 class domain_allocator;
 class type_class;
+class object_type_info;
 
 namespace internal
 {
 
 struct message_t;
-class object_type_info;
 
 class DYNAMIX_API domain
 {

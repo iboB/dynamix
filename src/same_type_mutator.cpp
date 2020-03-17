@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2020 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -17,13 +17,11 @@ using namespace std;
 namespace dynamix
 {
 
-using namespace internal;
-
 same_type_mutator::same_type_mutator()
 {
 }
 
-same_type_mutator::same_type_mutator(const internal::object_type_info* info)
+same_type_mutator::same_type_mutator(const object_type_info* info)
     : object_mutator(info->as_mixin_collection())
 {
 }

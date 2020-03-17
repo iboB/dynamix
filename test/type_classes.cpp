@@ -33,7 +33,7 @@ TEST_CASE("local")
     object gs; mutate(gs).add<ghost>().add<soldier>();
     object vt; mutate(vt).add<visible>().add<tank>();
 
-    type_class has_ghost = define_type_class([](const dynamix::internal::object_type_info& ti) {
+    type_class has_ghost = define_type_class([](const dynamix::object_type_info& ti) {
         return ti.has<ghost>();
     });
 

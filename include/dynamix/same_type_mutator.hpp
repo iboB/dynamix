@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2016 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2020 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -24,7 +24,7 @@ class DYNAMIX_API same_type_mutator : public internal::object_mutator
 {
 public:
     same_type_mutator();
-    same_type_mutator(const internal::object_type_info* info);
+    same_type_mutator(const object_type_info* info);
 
     // not using but hiding parent's function
     void apply_to(object& o);

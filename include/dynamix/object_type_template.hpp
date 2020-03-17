@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2020 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -12,10 +12,6 @@
 
 namespace dynamix
 {
-namespace internal
-{
-    class object_type_info;
-}
 
 /// An object type template. Internally it represents a prepared object type
 /// information.
