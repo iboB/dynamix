@@ -6,21 +6,27 @@
 // https://opensource.org/licenses/MIT
 //
 #include "internal.hpp"
-#include "dynamix/define_type_class.hpp"
+#include "dynamix/type_class.hpp"
 #include "dynamix/domain.hpp"
 
 namespace dynamix
 {
 
-type_class::type_class(define_type_class builder)
-    : _match_func(builder.func)
+type_class::type_class(type_class::match_func func, bool register_globally /*= false*/)
+    : _match_func(func)
 {
-    if (builder.do_register)
+    if (register_globally)
     {
         internal::domain::safe_instance().register_type_class(*this);
     }
 }
 
-type_class::~type_class() = default;
+type_class::~type_class()
+{
+    if (is_registered())
+    {
+        internal::domain::safe_instance().unregister_type_class(*this);
+    }
+}
 
 }

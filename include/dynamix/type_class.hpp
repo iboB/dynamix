@@ -20,7 +20,6 @@ namespace dynamix
 
 static constexpr type_class_id INVALID_TYPE_CLASS_ID = ~type_class_id(0);
 
-class define_type_class;
 class object_type_info;
 
 namespace internal
@@ -33,7 +32,8 @@ class domain;
 class DYNAMIX_API type_class
 {
 public:
-    type_class(define_type_class builder);
+    typedef bool (*match_func)(const object_type_info&);
+    type_class(match_func func, bool register_globally = false);
     ~type_class();
 
     // do not copy or move
@@ -41,8 +41,6 @@ public:
     type_class& operator=(const type_class&) = delete;
     type_class(type_class&&) = delete;
     type_class& operator=(type_class&&) = delete;
-
-    typedef bool (*match_func)(const object_type_info&);
 
     type_class_id id() const { return _id; }
     bool is_registered() const { return _id != INVALID_TYPE_CLASS_ID; }

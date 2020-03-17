@@ -81,7 +81,6 @@ src_group(public dynamix_sources
     ${inc_path}/define_message.hpp
     ${inc_path}/define_message_split.hpp
     ${inc_path}/define_mixin.hpp
-    ${inc_path}/define_type_class.hpp
     ${inc_path}/dm_this.hpp
     ${inc_path}/dynamix.hpp
     ${inc_path}/exception.hpp

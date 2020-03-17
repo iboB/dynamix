@@ -106,7 +106,7 @@ private:
     domain();
     ~domain();
 
-    friend class object_type_info;
+    friend class dynamix::object_type_info;
     friend class object_mutator;
 
     // non-copyable

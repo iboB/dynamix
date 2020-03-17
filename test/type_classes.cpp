@@ -6,7 +6,7 @@
 // https://opensource.org/licenses/MIT
 //
 #include <dynamix/core.hpp>
-#include <dynamix/define_type_class.hpp>
+#include <dynamix/type_class.hpp>
 
 #include "doctest/doctest.h"
 
@@ -33,49 +33,57 @@ TEST_CASE("local")
     object gs; mutate(gs).add<ghost>().add<soldier>();
     object vt; mutate(vt).add<visible>().add<tank>();
 
-    type_class has_ghost = define_type_class([](const dynamix::object_type_info& ti) {
+    type_class has_ghost([](const object_type_info& ti) {
         return ti.has<ghost>();
     });
 
-    //type_class move_and_shoot = define_type_class()
-    //    .implements(move_msg)
-    //    .implements(shoot_msg);
+    type_class move_and_shoot([](const object_type_info& ti) {
+        return ti.implements(move_msg) && ti.implements(shoot_msg);
+    });
 
-    //type_class shoot_and_visible_and_tank = define_type_class()
-    //    .implements(move_msg)
-    //    .has<tank>();
+    type_class shoot_and_visible_and_tank([](const object_type_info& ti) {
+        return ti.implements(shoot_msg) && ti.implements(draw_msg) && ti.has<tank>();
+    });
 
     CHECK(gc.is_a(has_ghost));
 
-    //CHECK_FALSE(vc.is_a(has_ghost));
-    //CHECK_FALSE(vc.is_a(move_and_shoot));
-    //CHECK_FALSE(vc.is_a(shoot_and_visible_and_tank));
+    CHECK_FALSE(vc.is_a(has_ghost));
+    CHECK_FALSE(vc.is_a(move_and_shoot));
+    CHECK_FALSE(vc.is_a(shoot_and_visible_and_tank));
 
-    //CHECK(gs.is_a(has_ghost));
-    //CHECK(gs.is_a(move_and_shoot));
+    CHECK(gs.is_a(has_ghost));
+    CHECK(gs.is_a(move_and_shoot));
 
-    //CHECK_FALSE(vt.is_a(has_ghost));
-    //CHECK(vt.is_a(move_and_shoot));
-    //CHECK(vt.is_a(shoot_and_visible_and_tank));
+    CHECK_FALSE(vt.is_a(has_ghost));
+    CHECK(vt.is_a(move_and_shoot));
+    CHECK(vt.is_a(shoot_and_visible_and_tank));
 }
 
-//const dynamix::type_class move_and_shoot_and_ghost = dynamix::register_type_class()
-//    .implements(move_msg)
-//    .implements(shoot_msg)
-//    .has<ghost>();
-//
-//const dynamix::type_class move_and_ghost_and_tank = dynamix::register_type_class()
-//    .implements(move_msg)
-//    .has<ghost>()
-//    .has<tank>();
+const dynamix::type_class move_and_shoot_and_ghost([](const dynamix::object_type_info& ti) {
+    return ti.implements(move_msg)
+        && ti.implements(shoot_msg)
+        && ti.has<ghost>();
+}, true);
 
-//TEST_CASE("global")
-//{
-//    using namespace dynamix;
-//    object gt; mutate(gt).add<ghost>().add<tank>();
-//
-//    CHECK(gt._type_info->_matching_type_classes.size() == 2);
-//}
+const dynamix::type_class move_and_ghost_and_tank([](const dynamix::object_type_info& ti) {
+    return ti.implements(move_msg)
+        && ti.has<ghost>()
+        && ti.has<tank>();
+}, true);
+
+TEST_CASE("global")
+{
+    using namespace dynamix;
+    object gt; mutate(gt).add<ghost>().add<tank>();
+    CHECK(gt._type_info->_matching_type_classes.size() == 2);
+    CHECK(gt.is_a(move_and_shoot_and_ghost));
+    CHECK(gt.is_a(move_and_ghost_and_tank));
+
+    object gs; mutate(gs).add<ghost>().add<soldier>();
+    CHECK(gs._type_info->_matching_type_classes.size() == 1);
+    CHECK(gs.is_a(move_and_shoot_and_ghost));
+    CHECK_FALSE(gs.is_a(move_and_ghost_and_tank));
+}
 
 DYNAMIX_DEFINE_MESSAGE(move);
 DYNAMIX_DEFINE_MESSAGE(draw);
