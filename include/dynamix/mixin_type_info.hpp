@@ -21,6 +21,7 @@
 
 #include <utility>
 #include <vector>
+#include <cstdint>
 
 namespace dynamix
 {
@@ -88,6 +89,9 @@ public:
 
     /// All the message infos for the messages this mixin supports
     std::vector<internal::message_for_mixin> message_infos;
+
+    /// User data associated with this type info
+    uintptr_t user_data = 0;
 
 #if DYNAMIX_USE_TYPEID && defined(__GNUC__)
     // boolean which shows whether the name in the mixin type info was obtained

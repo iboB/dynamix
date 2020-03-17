@@ -79,6 +79,29 @@ public:
 
 };
 
+TEST_CASE("mixin_type_info")
+{
+    {
+        auto& info = _dynamix_get_mixin_type_info((no_messages*)nullptr);
+        CHECK(info.is_valid());
+        CHECK(info.user_data == 0);
+        CHECK(info.message_infos.empty());
+    }
+
+    {
+        auto& info = _dynamix_get_mixin_type_info((counter*)nullptr);
+        CHECK(info.is_valid());
+        CHECK(info.user_data == 33);
+        CHECK(info.message_infos.size() == 2);
+    }
+
+    {
+        auto& info = _dynamix_get_mixin_type_info((type_checker*)nullptr);
+        CHECK(info.is_valid());
+        CHECK(info.user_data == 44);
+        CHECK(info.message_infos.size() == 3);
+    }
+}
 
 TEST_CASE("simple_inline_mutation")
 {
@@ -248,8 +271,8 @@ TEST_CASE("type_template")
 }
 
 DYNAMIX_DEFINE_MIXIN(no_messages, none);
-DYNAMIX_DEFINE_MIXIN(counter, dummy_msg & multi_msg);
-DYNAMIX_DEFINE_MIXIN(type_checker, get_self_msg & multi_msg & inherited_msg);
+DYNAMIX_DEFINE_MIXIN(counter, dummy_msg & multi_msg & user_data(33));
+DYNAMIX_DEFINE_MIXIN(type_checker, get_self_msg & user_data(44) & multi_msg & inherited_msg);
 
 DYNAMIX_DEFINE_MESSAGE(dummy);
 DYNAMIX_DEFINE_MESSAGE(get_self);

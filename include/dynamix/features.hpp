@@ -14,6 +14,8 @@
 
 #include "config.hpp"
 
+#include <cstdint>
+
 namespace dynamix
 {
 
@@ -33,12 +35,21 @@ struct mixin_name_feature
 {
     const char* name;
 };
+struct mixin_user_data_feature
+{
+    uintptr_t user_data;
+};
 }
 
 /// Allows the mixin name to be set manually (instead of obtained by the class name)
 inline internal::mixin_name_feature mixin_name(const char* name)
 {
     return {name};
+}
+
+inline internal::mixin_user_data_feature user_data(uintptr_t data)
+{
+    return {data};
 }
 
 } // namespace dynamix

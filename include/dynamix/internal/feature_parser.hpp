@@ -62,6 +62,12 @@ public:
         return *this;
     }
 
+    feature_parser_phase_1& operator & (mixin_user_data_feature d)
+    {
+        info.user_data = d.user_data;
+        return *this;
+    }
+
     feature_parser_phase_1& operator & (const noop_feature_t*) { return *this; }
 
     // counters
@@ -113,6 +119,8 @@ public:
     // unique_features which we con't care about at this phase
     feature_parser_phase_2& operator & (mixin_allocator&) { return *this; }
     feature_parser_phase_2& operator & (mixin_name_feature) { return *this; }
+    feature_parser_phase_2& operator & (mixin_user_data_feature) { return *this; }
+
     feature_parser_phase_2& operator & (const noop_feature_t*) { return *this; }
 
 private:
