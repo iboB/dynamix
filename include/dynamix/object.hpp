@@ -24,6 +24,7 @@ struct message_feature_tag;
 
 class object_type_template;
 class object_allocator;
+class type_class;
 
 /// The main object class.
 class DYNAMIX_API object
@@ -208,6 +209,9 @@ public:
         return internal_num_implementers(f.id, typename Feature::feature_tag());
     }
     /////////////////////////////////////////////////////////////////
+
+    /// Checks if the object belongs to a given type class
+    bool is_a(const type_class& tc) const;
 
     /////////////////////////////////////////////////////////////////
     // memory, mutation, and mixin management

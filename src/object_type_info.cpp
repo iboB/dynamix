@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2020 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -7,12 +7,13 @@
 //
 #include "internal.hpp"
 #include "zero_memory.hpp"
-#include <dynamix/mixin_type_info.hpp>
-#include <dynamix/object_type_info.hpp>
-#include <dynamix/domain.hpp>
-#include <dynamix/allocators.hpp>
-#include <dynamix/exception.hpp>
-#include <dynamix/object.hpp>
+#include "dynamix/mixin_type_info.hpp"
+#include "dynamix/object_type_info.hpp"
+#include "dynamix/domain.hpp"
+#include "dynamix/allocators.hpp"
+#include "dynamix/exception.hpp"
+#include "dynamix/object.hpp"
+#include "dynamix/type_class.hpp"
 #include <algorithm>
 
 namespace dynamix
@@ -58,6 +59,22 @@ void object_type_info::dealloc_mixin_data(mixin_data_in_object* data, const obje
 
     domain_allocator* alloc = obj->allocator() ? obj->allocator() : domain::instance().allocator();
     alloc->dealloc_mixin_data(reinterpret_cast<char*>(data), num_mixins, obj);
+}
+
+bool object_type_info::is_a(const type_class& tc) const
+{
+    if (tc.is_registered())
+    {
+        for (auto id : _matching_type_classes)
+        {
+            if (id == tc.id()) return true;
+        }
+        return false;
+    }
+    else
+    {
+        return tc.matches(*this);
+    }
 }
 
 object_type_info::call_table_message object_type_info::make_call_table_message(mixin_id id, const message_for_mixin& data) const

@@ -17,6 +17,7 @@
 #include "mixin_collection.hpp"
 #include "message.hpp"
 #include "internal/assert.hpp"
+#include "type_class_id.hpp"
 
 #include <memory>
 #include <cstdint>
@@ -27,6 +28,7 @@
 namespace dynamix
 {
 
+class type_class;
 class object_mutator;
 class object;
 
@@ -53,6 +55,9 @@ public:
     void dealloc_mixin_data(mixin_data_in_object* data, const object* obj) const;
 
     bool implements_message(feature_id id) const { return !!_call_table[id].top_bid_message; }
+
+    // if tc is a registered type_class is checks the _matching_type_classes member
+    bool is_a(const type_class& tc) const;
 
     // the following need to be public in order for the message macros to work
 _dynamix_internal:
@@ -127,6 +132,10 @@ _dynamix_internal:
 
     // this should be called after the mixins have been initialized
     void fill_call_table();
+
+    // contains all registered type class ids which were match this type info
+    // thus if a type class is registerd it will be faster to check whether it matches an info
+    std::vector<type_class_id> _matching_type_classes;
 };
 
 } // namespace internal

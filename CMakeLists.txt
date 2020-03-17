@@ -81,6 +81,7 @@ src_group(public dynamix_sources
     ${inc_path}/define_message.hpp
     ${inc_path}/define_message_split.hpp
     ${inc_path}/define_mixin.hpp
+    ${inc_path}/define_type_class.hpp
     ${inc_path}/dm_this.hpp
     ${inc_path}/dynamix.hpp
     ${inc_path}/exception.hpp
@@ -104,6 +105,8 @@ src_group(public dynamix_sources
     ${inc_path}/object_type_template.hpp
     ${inc_path}/same_type_mutator.hpp
     ${inc_path}/single_object_mutator.hpp
+    ${inc_path}/type_class.hpp
+    ${inc_path}/type_class_id.hpp
     ${inc_path}/version.hpp
 )
 
@@ -142,6 +145,7 @@ src_group("private" dynamix_sources
     ${src_path}/object_type_template.cpp
     ${src_path}/same_type_mutator.cpp
     ${src_path}/single_object_mutator.cpp
+    ${src_path}/type_class.cpp
     ${src_path}/zero_memory.hpp
 )
 

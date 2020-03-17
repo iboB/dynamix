@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2020 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -13,6 +13,7 @@
 #include "dynamix/allocators.hpp"
 #include "dynamix/internal/mixin_traits.hpp"
 #include "dynamix/features.hpp"
+#include "dynamix/type_class.hpp"
 
 #include <algorithm>
 
@@ -144,6 +145,15 @@ const object_type_info* domain::get_object_type_info(mixin_collection mixins)
 
         new_type->fill_call_table();
 
+        // add matching type classes
+        for (auto tc : _type_classes)
+        {
+            if (tc && tc->matches(*new_type))
+            {
+                new_type->_matching_type_classes.emplace_back(tc->id());
+            }
+        }
+
         auto ret = new_type.get();
         _object_type_infos.emplace(make_pair(std::move(mixins._mixins), std::move(new_type)));
         return ret;
@@ -219,7 +229,7 @@ void domain::register_feature(message_t& m)
     _messages[m.id] = &m;
 }
 
-void domain::unregister_feature(message_t& msg)
+void domain::unregister_feature(const message_t& msg)
 {
     I_DYNAMIX_ASSERT_MSG(msg.id < _num_registered_messages, "unregistering a message which isn't registered");
     I_DYNAMIX_ASSERT_MSG(_messages[msg.id], "unregistering a message which isn't registered");
@@ -315,6 +325,9 @@ void domain::unregister_mixin_type(const mixin_type_info& info)
     {
         if (i->first[info.id])
         {
+            // uh-oh there are still objects alive with this mixin?
+            // this is not supported
+            I_DYNAMIX_ASSERT(i->second->num_objects == 0);
             i = _object_type_infos.erase(i);
         }
         else
@@ -377,6 +390,60 @@ void domain::garbage_collect_type_infos()
         }
     }
 }
+
+void domain::register_type_class(type_class& t)
+{
+#if DYNAMIX_THREAD_SAFE_MUTATIONS
+    // lock since registering new types reads the _type_classes array
+    std::lock_guard<std::mutex> lock(_object_type_infos_mutex);
+#endif
+
+    type_class_id free = 0;
+    for (auto r : _type_classes)
+    {
+        if (!r) break;
+        ++free;
+    }
+
+    if (free == _type_classes.size())
+    {
+        _type_classes.emplace_back();
+    }
+
+    t._id = free;
+    _type_classes[free] = &t;
+
+#if DYNAMIX_DEBUG
+    // make a check
+    // we don't support registering a type class which matches existing type infos
+    for (const auto& ti : _object_type_infos)
+    {
+        auto& info = ti.second;
+        I_DYNAMIX_ASSERT_MSG(!t.matches(*info), "registering a type class which matches existing type infos");
+    }
+#endif
+}
+
+void domain::unregister_type_class(const type_class& t)
+{
+#if DYNAMIX_THREAD_SAFE_MUTATIONS
+    // lock since registering new types reads the _type_classes array
+    std::lock_guard<std::mutex> lock(_object_type_infos_mutex);
+#endif
+
+    I_DYNAMIX_ASSERT_MSG(t.id() < _type_classes.size(), "unregistering a type class which isn't registered");
+    I_DYNAMIX_ASSERT_MSG(_type_classes[t.id()], "unregistering a type class which isn't registered");
+    I_DYNAMIX_ASSERT_MSG(_type_classes[t.id()] == &t, "unregistering a type class with know id but unknown data");
+
+    // unregister
+    _type_classes[t.id()] = nullptr;
+
+    // now since the type class is unregistered we assume all type infos which reference it
+    // are also either unregistered or about to be unregistered very soon so we don't do any checks
+    // still it's possible, if one tries hard, to actually make this fault
+    // for now to nothing and hope for the best
+}
+
 
 } // namespace internal
 

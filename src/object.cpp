@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2020 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -107,6 +107,11 @@ const void* object::internal_get_mixin(mixin_id id) const
 bool object::internal_has_mixin(mixin_id id) const
 {
     return _type_info->has(id);
+}
+
+bool object::is_a(const type_class& tc) const
+{
+    return _type_info->is_a(tc);
 }
 
 void object::clear() noexcept

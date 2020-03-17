@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2020 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -37,6 +37,7 @@ namespace dynamix
 class mutation_rule;
 class object_type_mutation;
 class domain_allocator;
+class type_class;
 
 namespace internal
 {
@@ -66,7 +67,11 @@ public:
 
     // feature registration functions for the supported kinds of features
     void register_feature(message_t& m);
-    void unregister_feature(message_t& m);
+    void unregister_feature(const message_t& m);
+
+    // type class registration
+    void register_type_class(type_class& t);
+    void unregister_type_class(const type_class& t);
 
     // creates a new type info if needed
     const object_type_info* get_object_type_info(mixin_collection mixins);
@@ -121,6 +126,12 @@ private:
     // and then unregistered when it was unloaded
     message_t* _messages[DYNAMIX_MAX_MESSAGES];
     size_t _num_registered_messages;
+
+    // sparse list of all registered type classes
+    // some elements might be nullptr
+    // such elements have been registered from a loadable module (plugin)
+    // and then unregistered when it was unloaded
+    std::vector<type_class*> _type_classes;
 
     typedef std::unordered_map<available_mixins_bitset, std::unique_ptr<object_type_info>> object_type_info_map;
     object_type_info_map _object_type_infos;
