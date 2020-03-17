@@ -276,7 +276,7 @@ void object::delete_mixin(const mixin_type_info& mixin_info)
 
 bool object::implements_message(feature_id id) const
 {
-    return !!_type_info->_call_table[id].top_bid_message;
+    return _type_info->implements_message(id);
 }
 
 bool object::implements_message_by_mixin(feature_id id) const
