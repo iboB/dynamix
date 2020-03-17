@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2020 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -41,7 +41,7 @@ TEST_CASE("different_priority")
         .add<d>();
 
     CHECK(o.implements(priority_trace_msg));
-    CHECK(o.num_implementers(priority_trace_msg) == 4);
+    CHECK(o.type_info().num_implementers(priority_trace_msg) == 4);
 
     ostringstream sout;
     priority_trace(o, sout);
@@ -59,7 +59,7 @@ TEST_CASE("same_priority")
         .add<d>();
 
     CHECK(o.implements(trace_msg));
-    CHECK(o.num_implementers(trace_msg) == 4);
+    CHECK(o.type_info().num_implementers(trace_msg) == 4);
 
     ostringstream sout;
     trace(o, sout);

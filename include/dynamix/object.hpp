@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2020 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -159,9 +159,10 @@ public:
     /////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////
-    // feature info
+    // Other queries
 
     /// Checks if the object implements a feature.
+    /// For more detailed feature queries consult the object type info
     template <typename Feature>
     bool implements(const Feature*) const noexcept
     {
@@ -172,42 +173,6 @@ public:
         return internal_implements(f.id, typename Feature::feature_tag());
     }
 
-    /// Checks if the object implements a feature by a mixin.
-    /// Note that on `false` the object might still implement the feature but with a default implementation.
-    template <typename Feature>
-    bool implements_by_mixin(const Feature*) const noexcept
-    {
-        const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
-        I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
-        // intentionally disregarding the actual feature,
-        // because of potential multiple implementations
-        return internal_implements_by_mixin(f.id, typename Feature::feature_tag());
-    }
-
-    /// Checks if the object implements a feature with a default implementation
-    /// (`false` means that it either does not implement it at all, or it's implemented by a mixin)
-    template <typename Feature>
-    bool implements_with_default(const Feature*) const noexcept
-    {
-        const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
-        I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
-        // intentionally disregarding the actual feature,
-        // because of potential multiple implementations
-        return internal_implements(f.id, typename Feature::feature_tag()) &&
-               !internal_implements_by_mixin(f.id, typename Feature::feature_tag());
-    }
-
-    /// Returns the number of mixins in the object which implement a feature.
-    template <typename Feature>
-    size_t num_implementers(const Feature*) const noexcept
-    {
-        const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
-        I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
-        // intentionally disregarding the actual feature,
-        // because of potential multiple implementations
-        // the actual feature will be gotten from the feature registry in the domain
-        return internal_num_implementers(f.id, typename Feature::feature_tag());
-    }
     /////////////////////////////////////////////////////////////////
 
     /// Checks if the object belongs to a given type class
@@ -255,16 +220,8 @@ public:
 #endif
     /////////////////////////////////////////////////////////////////
 
-    /////////////////////////////////////////////////////////////////
-    // logging and diagnostics
-
-    /// Adds the names of the messages implemented by the object to the vector
-    void get_message_names(std::vector<const char*>& out_message_names) const;
-
-    /// Adds the names of the object's mixins to the vector
-    void get_mixin_names(std::vector<const char*>& out_mixin_names) const;
-
-    /////////////////////////////////////////////////////////////////
+    /// Get the object's type info
+    const internal::object_type_info& type_info() const { return *_type_info; }
 
     // the following need to be public in order for the message macros to work
 _dynamix_internal:
@@ -307,26 +264,7 @@ private:
     // destroys mixin and deallocates memory
     void delete_mixin(const mixin_type_info& mixin_info);
 
-    bool internal_implements(feature_id id, const internal::message_feature_tag&) const
-    {
-        return implements_message(id);
-    }
-
-    bool implements_message(feature_id id) const;
-
-    bool internal_implements_by_mixin(feature_id id, const internal::message_feature_tag&) const
-    {
-        return implements_message_by_mixin(id);
-    }
-
-    bool implements_message_by_mixin(feature_id id) const;
-
-    size_t internal_num_implementers(feature_id id, const internal::message_feature_tag&) const
-    {
-        return message_num_implementers(id);
-    }
-
-    size_t message_num_implementers(feature_id id) const;
+    bool internal_implements(feature_id id, const internal::message_feature_tag&) const;
 
     // optional allocator for this object
     object_allocator* _allocator = nullptr;

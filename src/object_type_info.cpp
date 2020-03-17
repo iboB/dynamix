@@ -369,5 +369,60 @@ void object_type_info::fill_call_table()
     }
 }
 
+bool object_type_info::implements_message_by_mixin(feature_id id) const
+{
+    auto& entry = _call_table[id];
+
+    if (!entry.top_bid_message)
+    {
+        // doesn't implement it at all
+        return false;
+    }
+
+    const auto& msg_data = domain::instance().message_data(id);
+
+    return entry.top_bid_message.data != msg_data.default_impl_data;
+}
+
+size_t object_type_info::message_num_implementers(feature_id id) const
+{
+    auto& entry = _call_table[id];
+
+    if (!entry.top_bid_message)
+    {
+        return 0;
+    }
+
+    if (domain::instance().message_data(id).mechanism == message_t::unicast)
+    {
+        return 1;
+    }
+    else
+    {
+        return entry.end - entry.begin;
+    }
+}
+
+void object_type_info::get_message_names(std::vector<const char*>& out_message_names) const
+{
+    const domain& dom = domain::instance();
+
+    for (size_t i = 0; i < DYNAMIX_MAX_MESSAGES; ++i)
+    {
+        if (implements_message(i))
+        {
+            out_message_names.push_back(dom.message_data(i).name);
+        }
+    }
+}
+
+void object_type_info::get_mixin_names(std::vector<const char*>& out_mixin_names) const
+{
+    for (const mixin_type_info* mixin_info : _compact_mixins)
+    {
+        out_mixin_names.push_back(mixin_info->name);
+    }
+}
+
 } // namespace internal
 } // namespace dynamix

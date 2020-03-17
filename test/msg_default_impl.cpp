@@ -1,5 +1,5 @@
 // DynaMix
-// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
+// Copyright (c) 2013-2020 Borislav Stanimirov, Zahary Karadjov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -50,8 +50,8 @@ TEST_CASE("basic_msgs")
 
     // empty objects implement no messages, even ones with a default implementation
     CHECK(!o.implements(basic_def_msg));
-    CHECK(!o.implements_by_mixin(basic_def_msg));
-    CHECK(!o.implements_with_default(basic_def_no_impl_msg));
+    CHECK(!o.type_info().implements_by_mixin(basic_def_msg));
+    CHECK(!o.type_info().implements_with_default(basic_def_no_impl_msg));
 
 #if DYNAMIX_USE_EXCEPTIONS
     CHECK_THROWS_AS(basic_def(o), bad_message_call);
@@ -64,11 +64,11 @@ TEST_CASE("basic_msgs")
     setn(o, 50);
 
     CHECK(o.implements(basic_def_no_impl_msg));
-    CHECK(!o.implements_by_mixin(basic_def_no_impl_msg));
-    CHECK(o.implements_with_default(basic_def_no_impl_msg));
+    CHECK(!o.type_info().implements_by_mixin(basic_def_no_impl_msg));
+    CHECK(o.type_info().implements_with_default(basic_def_no_impl_msg));
     CHECK(o.implements(basic_def_msg));
-    CHECK(!o.implements_by_mixin(basic_def_msg));
-    CHECK(o.implements_with_default(basic_def_msg));
+    CHECK(!o.type_info().implements_by_mixin(basic_def_msg));
+    CHECK(o.type_info().implements_with_default(basic_def_msg));
 
     CHECK(1110 == basic_def(o));
     CHECK(2111 == basic_def_no_impl(o));
@@ -78,8 +78,8 @@ TEST_CASE("basic_msgs")
         .add<mix_c>();
 
     CHECK(1000 == basic_def(o));
-    CHECK(o.implements_by_mixin(basic_def_msg));
-    CHECK(!o.implements_with_default(basic_def_msg));
+    CHECK(o.type_info().implements_by_mixin(basic_def_msg));
+    CHECK(!o.type_info().implements_with_default(basic_def_msg));
     CHECK(2001 == basic_def_no_impl(o));
     CHECK(55 == basic_1_def(o, 5));
 }
@@ -110,18 +110,18 @@ TEST_CASE("multi")
         .add<mix_c>();
 
     CHECK(o.implements(def_multi_msg));
-    CHECK(!o.implements_by_mixin(def_multi_msg));
-    CHECK(o.implements_with_default(def_multi_msg));
+    CHECK(!o.type_info().implements_by_mixin(def_multi_msg));
+    CHECK(o.type_info().implements_with_default(def_multi_msg));
     CHECK(400 == def_multi<combinators::sum>(o, 2));
 
     mutate(o)
         .add<mix_a>()
         .add<mix_b>();
 
-    CHECK(o.implements_by_mixin(def_multi_msg));
-    CHECK(!o.implements_with_default(def_multi_msg));
+    CHECK(o.type_info().implements_by_mixin(def_multi_msg));
+    CHECK(!o.type_info().implements_with_default(def_multi_msg));
     // two since the default implementation should be overriden
-    CHECK(o.num_implementers(def_multi_msg) == 2);
+    CHECK(o.type_info().num_implementers(def_multi_msg) == 2);
 
     setn(o, 3);
 

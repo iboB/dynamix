@@ -54,9 +54,61 @@ public:
     mixin_data_in_object* alloc_mixin_data(const object* obj) const;
     void dealloc_mixin_data(mixin_data_in_object* data, const object* obj) const;
 
-    bool implements_message(feature_id id) const { return !!_call_table[id].top_bid_message; }
+    /// Checks if the type implements a feature.
+    template <typename Feature>
+    bool implements(const Feature*) const noexcept
+    {
+        const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
+        I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
+        // intentionally disregarding the actual feature,
+        // because of potential multiple implementations
+        return internal_implements(f.id, typename Feature::feature_tag());
+    }
 
-    // if tc is a registered type_class is checks the _matching_type_classes member
+    /// Checks if the type implements a feature by a mixin.
+    /// Note that on `false` the type might still implement the feature but with a default implementation.
+    template <typename Feature>
+    bool implements_by_mixin(const Feature*) const noexcept
+    {
+        const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
+        I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
+        // intentionally disregarding the actual feature,
+        // because of potential multiple implementations
+        return internal_implements_by_mixin(f.id, typename Feature::feature_tag());
+    }
+
+    /// Checks if the type implements a feature with a default implementation
+    /// (`false` means that it either does not implement it at all, or it's implemented by a mixin)
+    template <typename Feature>
+    bool implements_with_default(const Feature*) const noexcept
+    {
+        const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
+        I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
+        // intentionally disregarding the actual feature,
+        // because of potential multiple implementations
+        return internal_implements(f.id, typename Feature::feature_tag()) &&
+            !internal_implements_by_mixin(f.id, typename Feature::feature_tag());
+    }
+
+    /// Returns the number of mixins in the type which implement a feature.
+    template <typename Feature>
+    size_t num_implementers(const Feature*) const noexcept
+    {
+        const Feature& f = static_cast<const Feature&>(_dynamix_get_mixin_feature_fast(static_cast<Feature*>(nullptr)));
+        I_DYNAMIX_ASSERT(f.id != INVALID_FEATURE_ID);
+        // intentionally disregarding the actual feature,
+        // because of potential multiple implementations
+        // the actual feature will be gotten from the feature registry in the domain
+        return internal_num_implementers(f.id, typename Feature::feature_tag());
+    }
+
+    /// Adds the names of the messages implemented by the type to the vector
+    void get_message_names(std::vector<const char*>& out_message_names) const;
+
+    /// Adds the names of the type's mixins to the vector
+    void get_mixin_names(std::vector<const char*>& out_mixin_names) const;
+
+    /// Checks if the type belongs to a type class
     bool is_a(const type_class& tc) const;
 
     // the following need to be public in order for the message macros to work
@@ -132,6 +184,27 @@ _dynamix_internal:
 
     // this should be called after the mixins have been initialized
     void fill_call_table();
+
+    bool internal_implements(feature_id id, const internal::message_feature_tag&) const
+    {
+        return implements_message(id);
+    }
+
+    bool implements_message(feature_id id) const { return !!_call_table[id].top_bid_message; }
+
+    bool internal_implements_by_mixin(feature_id id, const internal::message_feature_tag&) const
+    {
+        return implements_message_by_mixin(id);
+    }
+
+    bool implements_message_by_mixin(feature_id id) const;
+
+    size_t internal_num_implementers(feature_id id, const internal::message_feature_tag&) const
+    {
+        return message_num_implementers(id);
+    }
+
+    size_t message_num_implementers(feature_id id) const;
 
     // contains all registered type class ids which were match this type info
     // thus if a type class is registerd it will be faster to check whether it matches an info

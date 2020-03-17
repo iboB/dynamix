@@ -279,64 +279,9 @@ void object::delete_mixin(const mixin_type_info& mixin_info)
     data.clear();
 }
 
-bool object::implements_message(feature_id id) const
+bool object::internal_implements(feature_id id, const internal::message_feature_tag&) const
 {
     return _type_info->implements_message(id);
-}
-
-bool object::implements_message_by_mixin(feature_id id) const
-{
-    auto& entry = _type_info->_call_table[id];
-
-    if (!entry.top_bid_message)
-    {
-        // doesn't implement it at all
-        return false;
-    }
-
-    const auto& msg_data = domain::instance().message_data(id);
-
-    return entry.top_bid_message.data != msg_data.default_impl_data;
-}
-
-size_t object::message_num_implementers(feature_id id) const
-{
-    auto& entry = _type_info->_call_table[id];
-
-    if (!entry.top_bid_message)
-    {
-        return 0;
-    }
-
-    if (domain::instance().message_data(id).mechanism == message_t::unicast)
-    {
-        return 1;
-    }
-    else
-    {
-        return entry.end - entry.begin;
-    }
-}
-
-void object::get_message_names(std::vector<const char*>& out_message_names) const
-{
-    const domain& dom = domain::instance();
-
-    for (size_t i = 0; i < DYNAMIX_MAX_MESSAGES; ++i)
-    {
-        if (implements_message(i))
-        {
-            out_message_names.push_back(dom.message_data(i).name);
-        }
-    }
-}
-
-void object::get_mixin_names(std::vector<const char*>& out_mixin_names) const
-{
-    for (const mixin_type_info* mixin_info : _type_info->_compact_mixins)
-    {
-        out_mixin_names.push_back(mixin_info->name);
-    }
 }
 
 bool object::has(mixin_id id) const noexcept
