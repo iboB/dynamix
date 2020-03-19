@@ -325,9 +325,10 @@ void domain::unregister_mixin_type(const mixin_type_info& info)
     {
         if (i->first[info.id])
         {
-            // uh-oh there are still objects alive with this mixin?
-            // this is not supported
-            I_DYNAMIX_ASSERT(i->second->num_objects == 0);
+            // uh-oh there are still objects alive with this mixin? this is not supported
+            // I wish I could keep this assertion but it keeps firing on abnormal app termination
+            // we do support unregister with living objects if we're terminating
+            // I_DYNAMIX_ASSERT(i->second->num_objects == 0);
             i = _object_type_infos.erase(i);
         }
         else
