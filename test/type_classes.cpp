@@ -65,11 +65,12 @@ const dynamix::type_class move_and_shoot_and_ghost([](const dynamix::object_type
         && ti.has<ghost>();
 }, true);
 
-const dynamix::type_class move_and_ghost_and_tank([](const dynamix::object_type_info& ti) {
-    return ti.implements(move_msg)
-        && ti.has<ghost>()
-        && ti.has<tank>();
-}, true);
+DYNAMIX_TYPE_CLASS(move_and_ghost_and_tank);
+DYNAMIX_DEFINE_TYPE_CLASS(move_and_ghost_and_tank) {
+    return type.implements(move_msg)
+        && type.has<ghost>()
+        && type.has<tank>();
+}
 
 TEST_CASE("global")
 {
@@ -77,12 +78,12 @@ TEST_CASE("global")
     object gt; mutate(gt).add<ghost>().add<tank>();
     CHECK(gt._type_info->_matching_type_classes.size() == 2);
     CHECK(gt.is_a(move_and_shoot_and_ghost));
-    CHECK(gt.is_a(move_and_ghost_and_tank));
+    CHECK(gt.is_a<move_and_ghost_and_tank>());
 
     object gs; mutate(gs).add<ghost>().add<soldier>();
     CHECK(gs._type_info->_matching_type_classes.size() == 1);
     CHECK(gs.is_a(move_and_shoot_and_ghost));
-    CHECK_FALSE(gs.is_a(move_and_ghost_and_tank));
+    CHECK_FALSE(gs.is_a<move_and_ghost_and_tank>());
 }
 
 DYNAMIX_DEFINE_MESSAGE(move);

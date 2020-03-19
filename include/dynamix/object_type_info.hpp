@@ -111,6 +111,12 @@ public:
     /// Checks if the type belongs to a type class
     bool is_a(const type_class& tc) const;
 
+    template <typename TypeClass>
+    bool is_a() const
+    {
+        return is_a(TypeClass::_dynamix_type_class);
+    }
+
     // the following need to be public in order for the message macros to work
 _dynamix_internal:
     using mixin_collection::_mixins;

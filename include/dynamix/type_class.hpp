@@ -54,3 +54,10 @@ private:
 };
 
 }
+
+#define DYNAMIX_TYPE_CLASS(tc) struct tc { static const dynamix::type_class _dynamix_type_class; }
+
+#define DYNAMIX_DEFINE_TYPE_CLASS(tc) \
+    static bool _impl##tc(const dynamix::object_type_info&); \
+    const dynamix::type_class tc::_dynamix_type_class(_impl##tc, true); \
+    bool _impl##tc(const dynamix::object_type_info& type)

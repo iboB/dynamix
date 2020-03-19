@@ -178,6 +178,12 @@ public:
     /// Checks if the object belongs to a given type class
     bool is_a(const type_class& tc) const;
 
+    template <typename TypeClass>
+    bool is_a() const
+    {
+        return is_a(TypeClass::_dynamix_type_class);
+    }
+
     /////////////////////////////////////////////////////////////////
     // memory, mutation, and mixin management
 
