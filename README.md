@@ -2,9 +2,9 @@
 
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/) [![Standard](https://img.shields.io/badge/C%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Gitter](https://badges.gitter.im/iboB/dynamix.svg)](https://gitter.im/iboB/dynamix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-[![Travis CI](https://travis-ci.org/iboB/dynamix.svg?branch=master)](https://travis-ci.org/iboB/dynamix) [![AppVeyor](https://ci.appveyor.com/api/projects/status/02qjl0v3np4boo46?svg=true)](https://ci.appveyor.com/project/iboB/dynamix)
+![Build and Test](https://github.com/iboB/dynamix/workflows/Build%20and%20Test/badge.svg)
 
-[![Meeting CPP Badge](https://raw.githubusercontent.com/iboB/dynamix/master/doc/img/meeting_cpp_badge-scaled.png)](https://meetingcpp.com/index.php/br/items/a-cpp-review-community.html)
+<!-- [![Meeting CPP Badge](https://raw.githubusercontent.com/iboB/dynamix/master/doc/img/meeting_cpp_badge-scaled.png)](https://meetingcpp.com/index.php/br/items/a-cpp-review-community.html) -->
 
 DynaMix (*Dynamic Mixins*) is a new take on polymorphism. It lets the user compose and modify polymorphic objects at run time in C++.
 
