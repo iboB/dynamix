@@ -114,7 +114,7 @@ This software is distributed under the MIT Software License.
 
 See accompanying file LICENSE or copy [here](https://opensource.org/licenses/MIT).
 
-Copyright &copy; 2013-2020 [Borislav Stanimirov](http://github.com/iboB), [Zahary Karadjov](http://github.com/zah)
+Copyright &copy; 2013-2021 [Borislav Stanimirov](http://github.com/iboB), [Zahary Karadjov](http://github.com/zah)
 
 ### Logo
 The [DynaMix logo](https://github.com/iboB/dynamix/tree/master/doc/logos) is licensed under a Creative Commons Attribution 4.0 International License. Copyright &copy; 2018 [area55git](https://github.com/area55git)
