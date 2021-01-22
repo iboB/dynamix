@@ -91,10 +91,10 @@ TEST_CASE("lib")
 DynamicLib LoadPlugin(const char* name, object& o)
 {
     auto plugin = LoadDynamicLib(name);
-    REQUIRE(plugin);
+    CHECK(plugin);
 
     auto modify = reinterpret_cast<plugin_proc>(GetProc(plugin, "modify_object"));
-    REQUIRE(modify);
+    CHECK(modify);
 
     modify(&o);
 
@@ -104,7 +104,7 @@ DynamicLib LoadPlugin(const char* name, object& o)
 void ClosePlugin(DynamicLib plugin, object& o)
 {
     auto release = reinterpret_cast<plugin_proc>(GetProc(plugin, "release_object"));
-    REQUIRE(release);
+    CHECK(release);
 
     release(&o);
 

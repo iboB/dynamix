@@ -4,6 +4,11 @@
 #include <iostream>
 #include "doctest_fwd.h"
 
+#if !DYNAMIX_USE_EXCEPTIONS
+#   undef CHECK_NOTHROW
+#   define CHECK_NOTHROW(x) x
+#endif
+
 #if defined(DOCTEST_CONFIG_IMPLEMENT)
 #   include "doctest_impl.h"
 #endif
