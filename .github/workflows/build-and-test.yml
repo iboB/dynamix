@@ -41,10 +41,8 @@ jobs:
           - {os: windows-latest, btype: Debug, cmakeflags: '-DYNAMIX_SHARED_LIB=0', buildflags: ''}
           - {os: windows-latest, btype: RelWithDebInfo, cmakeflags: '-DYNAMIX_SHARED_LIB=0', buildflags: ''}
           # windows 64 bit only debig and release custom config
-          # Disabled until I can figure out this stupid problems
-          # GH Actions is messing up with my quotes
-          # - {os: windows-latest, btype: Debug, cmakeflags: '-DDYNAMIX_CUSTOM_CONFIG_FILE="\"${env:GITHUB_WORKSPACE}\test\custom_config\custom_config.hpp\"" -DCMAKE_CXX_FLAGS="/GR-"', buildflags: ''}
-          # - {os: windows-latest, btype: RelWithDebInfo, cmakeflags: '-DDYNAMIX_CUSTOM_CONFIG_FILE="\"${env:GITHUB_WORKSPACE}\test\custom_config\custom_config.hpp\"" -DCMAKE_CXX_FLAGS="/GR-"', buildflags: ''}
+          - {os: windows-latest, btype: Debug, cmakeflags: '"-DDYNAMIX_CUSTOM_CONFIG_FILE=$(''\"'')${env:GITHUB_WORKSPACE}\test\custom_config\custom_config.hpp$(''\"'')" -DCMAKE_CXX_FLAGS="/GR-"', buildflags: ''}
+          - {os: windows-latest, btype: RelWithDebInfo, cmakeflags: '"-DDYNAMIX_CUSTOM_CONFIG_FILE=$(''\"'')${env:GITHUB_WORKSPACE}\test\custom_config\custom_config.hpp$(''\"'')" -DCMAKE_CXX_FLAGS="/GR-"', buildflags: ''}
     steps:
       - name: Clone
         uses: actions/checkout@v2
