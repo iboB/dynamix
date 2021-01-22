@@ -22,7 +22,7 @@ option(DYNAMIX_CLANG_TIDY "Dynamix: use clang tidy" OFF)
 
 set(DEMO_SAN_FLAGS "")
 if(MSVC)
-    set(DEMO_WARNING_FLAGS "") # the default is fine here
+    set(DEMO_WARNING_FLAGS "/w34100")
 else()
     set(DEMO_WARNING_FLAGS "-Wall -Wextra -Wno-unused-variable")
     if(DYNAMIX_TSAN)
