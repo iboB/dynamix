@@ -50,6 +50,9 @@ option(DYNAMIX_BUILD_COMPILER_PERF "DynaMix: build compilation performance tests
 # Optionally disable this so dynamix doesn't get installed along with other projects which are using it
 option(DYNAMIX_CONFIGURE_INSTALL "DynaMix: add install configuration" ON)
 
+# Option to install headers
+option(DYNAMIX_CONFIGURE_INSTALL_HEADERS "DynaMix: add install configuration for the headers" ${is_demo})
+
 # demo
 
 if(DYNAMIX_DEMO)
@@ -214,5 +217,8 @@ if(DYNAMIX_CONFIGURE_INSTALL)
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     )
-    install(DIRECTORY include DESTINATION .)
+
+    if(DYNAMIX_CONFIGURE_INSTALL_HEADERS)
+        install(DIRECTORY include DESTINATION .)
+    endif()
 endif()
