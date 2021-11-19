@@ -124,7 +124,7 @@
 #if defined(DYNAMIX_DYNLIB)
 
 // dynamic link macros
-#   if defined(_MSC_VER)
+#   if defined(_WIN32)
 #       define DYNAMIX_SYMBOL_EXPORT __declspec(dllexport)
 #       define DYNAMIX_SYMBOL_IMPORT __declspec(dllimport)
 #   else
