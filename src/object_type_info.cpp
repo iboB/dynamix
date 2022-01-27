@@ -84,6 +84,7 @@ object_type_info::call_table_message object_type_info::make_call_table_message(m
     return ret;
 }
 
+__attribute__((no_sanitize("undefined")))
 void object_type_info::fill_call_table()
 {
     // first pass
