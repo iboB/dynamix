@@ -87,18 +87,17 @@ object_type_info::call_table_message object_type_info::make_call_table_message(m
 void object_type_info::fill_call_table()
 {
     // first pass
-    // find top bid messages and prepare to calculate message buffer length length
+    // find top bid messages and prepare to calculate message buffer length
 
-    intptr_t message_data_buffer_size = 0;
-
-    // in this pass we make use of the fact that _call_table begin starts as nullptr
-    // for a new type so we will use it as a counter
+    uint_fast32_t message_data_buffer_size = 0;
+    uint_fast32_t num_top_bidders_per_message[DYNAMIX_MAX_MESSAGES] = {};
 
     for (const mixin_type_info* info : _compact_mixins)
     {
         for (const internal::message_for_mixin& msg : info->message_infos)
         {
             call_table_entry& table_entry = _call_table[msg.message->id];
+            auto& num_top_bidders = num_top_bidders_per_message[msg.message->id];
 
             if (msg.message->mechanism == internal::message_t::unicast)
             {
@@ -114,26 +113,27 @@ void object_type_info::fill_call_table()
                     table_entry.top_bid_message = make_call_table_message(info->id, msg);
 
                     // also remove the top-priority size we've accumulated
-                    message_data_buffer_size -= reinterpret_cast<intptr_t>(table_entry.begin) / sizeof(*table_entry.begin);
-                    table_entry.begin = nullptr;
+                    I_DYNAMIX_ASSERT(message_data_buffer_size >= num_top_bidders);
+                    message_data_buffer_size -= num_top_bidders;
+                    num_top_bidders = 0;
                 }
                 else if (table_entry.top_bid_message.data->priority == msg.priority)
                 {
-                    if (!table_entry.begin)
+                    if (num_top_bidders == 0)
                     {
                         // same-priority message
                         // we will need a buffer for those if they're top-priority
                         // add one to the buffer for the first one too
                         ++message_data_buffer_size;
 
-                        // hacky usage of end to count top bidders
+                        // also count top bidders for this particular message
                         // we need this so we can update message_data_buffer_size if we encounter
                         // a message with a higher priority
-                        ++table_entry.begin;
+                        ++num_top_bidders;
                     }
 
                     ++message_data_buffer_size;
-                    ++table_entry.begin;
+                    ++num_top_bidders;
 
                     // we have multiple bidders for the same priority
                     if (table_entry.top_bid_message.data->bid < msg.bid)
@@ -142,9 +142,9 @@ void object_type_info::fill_call_table()
                     }
                 }
             }
-            if(msg.message->mechanism == internal::message_t::multicast)
+            else if (msg.message->mechanism == internal::message_t::multicast)
             {
-                if (!table_entry.begin)
+                if (num_top_bidders == 0)
                 {
                     // for each new mulicast message add one more element to the buffer
                     // it will be filled with nullptr so that we know when to stop when
@@ -156,9 +156,8 @@ void object_type_info::fill_call_table()
                     table_entry.top_bid_message = make_call_table_message(info->id, msg);
                 }
 
-                // again we use begin to set the size of the buffer this particular message needs
                 ++message_data_buffer_size;
-                ++table_entry.begin;
+                ++num_top_bidders;
             }
         }
     }
@@ -175,16 +174,16 @@ void object_type_info::fill_call_table()
         for (const internal::message_for_mixin& msg : info->message_infos)
         {
             call_table_entry& table_entry = _call_table[msg.message->id];
+            const auto num_top_bidders = num_top_bidders_per_message[msg.message->id];
 
-            if(table_entry.begin)
+            if (num_top_bidders)
             {
                 if (!table_entry.end)
                 {
-                    // begin is not null and end is null, so this message has not been updated
-                    // but needs to be
+                    // end is null, so this message has not been updated, but needs to be
 
                     auto begin = message_data_buffer_ptr;
-                    message_data_buffer_ptr += reinterpret_cast<intptr_t>(table_entry.begin) / sizeof(*table_entry.begin);
+                    message_data_buffer_ptr += num_top_bidders;
 
                     if (msg.message->mechanism == internal::message_t::multicast)
                     {
