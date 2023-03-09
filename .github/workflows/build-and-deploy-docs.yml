@@ -19,7 +19,8 @@ concurrency:
   cancel-in-progress: true
 
 defaults:
-  working-directory: doc
+  run:
+    working-directory: doc
 
 jobs:
   # Build job
@@ -34,6 +35,7 @@ jobs:
           ruby-version: '3.1' # Not needed with a .ruby-version file
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 0 # Increment this number if you need to re-download cached gems
+          working-directory: doc
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v2
@@ -45,6 +47,8 @@ jobs:
       - name: Upload artifact
         # Automatically uploads an artifact from the './_site' directory by default
         uses: actions/upload-pages-artifact@v1
+        with:
+          path: 'doc/_site/'
 
   # Deployment job
   deploy:
