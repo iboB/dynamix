@@ -1,5 +1,6 @@
+build/
+out/
+
+# ides
 .vscode/
 .vs/
-.mtime_cache/
-build/
-CMakeUserPresets.json

@@ -1,0 +1,3 @@
+# DynaMix Documentation
+
+Using Jekyll
