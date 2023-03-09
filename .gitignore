@@ -2,3 +2,4 @@
 .vs/
 .mtime_cache/
 build/
+CMakeUserPresets.json
