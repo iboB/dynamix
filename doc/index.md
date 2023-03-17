@@ -59,10 +59,11 @@ For more detailed, working examples see the tutorials and examples.
 - Compose objects from mixins at run time
 - Physically separate interface and implementation
 - Non-intrusive &ndash; mixins don't need to have a common parent or any special code inside
-- No external dependencies other than the standard library
-- Fast polymorphic calls &ndash; comparable to `std::function`
 - Mutate "live" objects by changing their composition at run time
-- Have multicast messages, which are handled by many mixins within an object
-- Possibility to have custom allocators to finely tune the memory and aim for cache-locality for critical parts of the code
-- Ability to have dynamic libraries that can enrich or modify objects, without modifying (or even rebuilding) the executable.
-- Thread safe message calls &ndash; as thread safe as the underlying methods.
+- Use `std::polymorphic_allocator` to allow fine-tuning allocations and achieving cache-locality in critical parts of the code
+- Create shared libraries and plugins which can enrich or modify objects, without modifying (or even rebuilding) the executable.
+- Add "hotswap" to a project while developing
+- Messages:
+    - Fast polymorphic calls &ndash; comparable to `std::function`
+    - Have multicast messages, which are handled by many mixins within an object
+    - Thread safe message calls &ndash; as thread safe as the underlying methods.
