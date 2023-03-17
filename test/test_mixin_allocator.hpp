@@ -23,7 +23,7 @@ public:
 #endif
         return static_cast<dynamix::byte_t*>(ret);
     }
-    virtual void dealloc_mixin_buf(dynamix::byte_t* ptr, const dynamix::mixin_info&) noexcept {
+    virtual void dealloc_mixin_buf(dynamix::byte_t* ptr, const dynamix::mixin_info&) noexcept override {
 #if defined(_MSC_VER)
         _aligned_free(ptr);
 #else

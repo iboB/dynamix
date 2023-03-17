@@ -156,13 +156,13 @@ private:
 
 // create a type mutation from list of mixins
 // there must be at least one (from which the relevant domain is retrieved)
-template <typename FirstMixin, typename... Rest>
-type_mutation make_type_mutation(const allocator& alloc = {}) {
-    compat::pmr::vector<const mixin_info*> mixins(alloc);
-    mixins = {&g::get_mixin_info<FirstMixin>(), &g::get_mixin_info<Rest>()...};
-    type_mutation ret(domain_from_info(*mixins.front()), alloc);
-    ret.mod_new_type().mixins = std::move(mixins);
-    return ret;
-}
+// template <typename FirstMixin, typename... Rest>
+// type_mutation make_type_mutation(const allocator& alloc = {}) {
+    // compat::pmr::vector<const mixin_info*> mixins(alloc);
+    // mixins = {&g::get_mixin_info<FirstMixin>(), &g::get_mixin_info<Rest>()...};
+    // type_mutation ret(domain_from_info(*mixins.front()), alloc);
+    // ret.mod_new_type().mixins = std::move(mixins);
+    // return ret;
+// }
 
 }

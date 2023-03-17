@@ -10,7 +10,7 @@ namespace dynamix {
 // init with ctor
 // prevent copy
 // allow construction with name
-struct common_feature_info : public feature_info {
+class common_feature_info : public feature_info {
 public:
     common_feature_info()
         : feature_info(dnmx_make_feature_info())
