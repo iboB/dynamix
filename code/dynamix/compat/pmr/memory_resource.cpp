@@ -16,6 +16,11 @@ class default_resource final : public memory_resource {
 #if defined(_MSC_VER)
         void* ret = _aligned_malloc(bytes, alignment);
 #else
+#if defined(__APPLE__)
+        // apple's implementation of aligned_alloc seems to return nullptr with alignments less than sizeof_ptr
+        // ... oh, apple...
+        if (alignment < sizeof_ptr) alignment = sizeof_ptr;
+#endif
         // aligned_alloc requires size to be a multiple of alignment
         auto size = dynamix::util::next_multiple(bytes, alignment);
         void* ret = aligned_alloc(alignment, size);
