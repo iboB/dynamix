@@ -1,8 +1,40 @@
 title: DynaMix
-description: A new take on polymorphism!
-theme: just-the-docs
+description: A new take on polymorphism
+url: "https://ibob.bg/dynamix"
+repository: iboB/dynamix # github metadata
 
-url: https://ibob.bg/dynamix
+theme: just-the-docs
+logo: /img/dynamix.png
+color_scheme: dynamix
 
 aux_links:
   GitHub Repository: https://github.com/iboB/dynamix
+
+callouts:
+  highlight:
+    color: yellow
+  important:
+    title: Important
+    color: blue
+  new:
+    title: New
+    color: green
+  note:
+    title: Note
+    color: purple
+  warning:
+    title: Warning
+    color: red
+
+# Footer
+
+# Back to top link
+back_to_top: true
+back_to_top_text: "<img src=\"/img/logo-footer.svg\" alt=\"Back to top\"/>"
+
+footer_content: "Copyright &copy; 2013-2023 Borislav Stanimirov, Zahary Karadjov. Distributed under <a href=\"https://github.com/iboB/dynamix/blob/master/LICENSE\">the MIT Software license.</a>"
+
+last_edit_timestamp: true
+last_edit_time_format: "%Y %b %-d %H:%M"
+
+gh_edit_link: false
