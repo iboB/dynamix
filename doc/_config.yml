@@ -1,6 +1,7 @@
 title: DynaMix
 description: A new take on polymorphism
-url: "https://ibob.bg/dynamix"
+baseurl: "/dynamix"
+url: "https://ibob.bg"
 repository: iboB/dynamix # github metadata
 
 theme: just-the-docs
@@ -30,7 +31,7 @@ callouts:
 
 # Back to top link
 back_to_top: true
-back_to_top_text: "<img src=\"/img/logo-footer.svg\" alt=\"Back to top\"/>"
+back_to_top_text: "<img src=\"/dynamix/img/logo-footer.svg\" alt=\"Back to top\"/>"
 
 footer_content: "Copyright &copy; 2013-2023 Borislav Stanimirov, Zahary Karadjov. Distributed under <a href=\"https://github.com/iboB/dynamix/blob/master/LICENSE\">the MIT Software license.</a>"
 
