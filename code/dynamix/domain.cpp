@@ -22,7 +22,6 @@
 #include <limits>
 #include <cassert>
 #include <shared_mutex>
-#include <memory_resource>
 
 namespace dynamix {
 
