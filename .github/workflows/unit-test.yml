@@ -1,0 +1,34 @@
+# Copyright (c) Borislav Stanimirov
+# SPDX-License-Identifier: MIT
+#
+name: Unit Test
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+jobs:
+  job:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        type: [Debug, RelWithDebInfo]
+    defaults:
+      run:
+        working-directory: ci
+    steps:
+      - name: Clone
+        uses: actions/checkout@v3
+      - name: VC Vars
+        # Setup vcvars on Windows
+        # MSVC's address sanitizer attaches dependencies to several DLLs which are not in PATH
+        # vcvars will add them to PATH and allow msvc asan executables to run
+        if: matrix.os == 'windows-latest'
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Configure ASAN
+        run: cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DSAN_ADDR=1
+      - name: Build ASAN
+        run: cmake --build . --config ${{ matrix.type }}
+      - name: Test ASAN
+        run: ctest -C ${{ matrix.type }} --output-on-failure

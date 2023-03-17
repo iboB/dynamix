@@ -1,8 +1,6 @@
 # [![DynaMix](https://s22.postimg.cc/u1sqhb7jl/README.jpg)](https://ibob.github.io/dynamix/)
 
-[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/) [![Standard](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-
-![Build and Test](https://github.com/iboB/dynamix/workflows/Build%20and%20Test/badge.svg)
+[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/) [![Standard](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build](https://github.com/iboB/dynamix/actions/workflows/unit-test.yml/badge.svg)](https://github.com/iboB/dynamix/actions/workflows/unit-test.yml)
 
 > *IMPORTANT* Version 2.0 is coming. It is a big change. The last version 1 release is [v1.4.0](https://github.com/iboB/dynamix/releases/tag/v1.4.0)
 
