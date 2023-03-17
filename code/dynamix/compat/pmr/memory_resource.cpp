@@ -3,8 +3,9 @@
 //
 #include "memory_resource.hpp"
 #if !DYNAMIX_HAS_PMR // no else (using std::pmr)
-#include <cstdlib>
 #include "../../alloc_util.hpp"
+#include <cstdlib>
+#include <new>
 
 namespace dynamix::compat::pmr {
 memory_resource::~memory_resource() = default; // export vtable
@@ -19,6 +20,7 @@ class default_resource final : public memory_resource {
         auto size = dynamix::util::next_multiple(bytes, alignment);
         void* ret = aligned_alloc(alignment, size);
 #endif
+        if (!ret) throw std::bad_alloc{};
         return ret;
 
     }
