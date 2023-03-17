@@ -1,70 +1,82 @@
-# DynaMix
-# Copyright (c) 2013-2018 Borislav Stanimirov, Zahary Karadjov
+# Copyright (c) Borislav Stanimirov
+# SPDX-License-Identifier: MIT
 #
-# Distributed under the MIT Software License
-# See accompanying file LICENSE.txt or copy at
-# https://opensource.org/licenses/MIT
-#
+CPMAddPackage(gh:iboB/doctest-util@0.1.0)
+CPMAddPackage(gh:ThrowTheSwitch/Unity@2.5.2)
 
-cmake_minimum_required(VERSION 3.2.2)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-add_library(doctest STATIC
-    doctest/doctest_fwd.h
-    doctest/doctest_impl.h
-    doctest/doctest.h
-    doctest/doctest_main.cc # .cc so it doesn't get identified as a test by the glob below
+add_library(doctest-unity STATIC
+    doctest-unity-main.cpp
 )
-set_target_properties(doctest PROPERTIES FOLDER tests/doctest)
 
-file(GLOB_RECURSE tests *.cpp)
+target_link_libraries(doctest-unity PUBLIC
+    unity::framework
+    doctest::headers
+)
 
-foreach(source ${tests})
-    get_filename_component(test ${source} NAME_WE)
+macro(dynamix_x_test test)
+    icm_add_test(
+        NAME dynamix-x-${test}
+        TARGET test-dynamix-x-${test}
+        LIBRARIES
+            doctest-unity
+            dynamix::dynamix
+        SOURCES
+            x-${test}.c
+            x-${test}.cpp
+        FOLDER test
+    )
+endmacro()
 
-    if(test MATCHES "^plugin_" OR test MATCHES "^dynlib_")
-        if(NOT DYNAMIX_SHARED_LIB)
-            # don't add plugins if DynaMix is a static library
-            continue()
-        endif()
+macro(dynamix_c_test test)
+    icm_add_test(
+        NAME dynamix-c-${test}
+        TARGET test-dynamix-c-${test}
+        LIBRARIES
+            unity::framework
+            dynamix::dynamix
+        SOURCES
+            ${ARGN}
+        FOLDER test
+    )
+endmacro()
 
-        set(lib "test_${test}")
+macro(dynamix_test test)
+    add_doctest_lib_test(${test} dynamix ${ARGN})
+endmacro()
 
-        add_library(${lib} SHARED ${source})
-        target_link_libraries(${lib} dynamix)
-        set_target_properties(${lib} PROPERTIES FOLDER tests)
-    elseif(test STREQUAL "split_msg_macros_def")
-        continue()
-    else()
-        if(NOT DYNAMIX_SHARED_LIB AND test STREQUAL "loader")
-            # loader test can only work when DynaMix is a shared library
-            continue()
-        endif()
+dynamix_x_test(sv)
 
-        if(test STREQUAL "split_msg_macros")
-            set(source ${source} split_msg_macros_def.cpp split_msg_macros_messages.inl)
-        endif()
+dynamix_test(bits-id t-bits-id.cpp)
+dynamix_test(alloc_util t-alloc_util.cpp)
+dynamix_test(bits-make_from_tuple t-bits-make_from_tuple.cpp)
 
-        set(executable "test_${test}")
+dynamix_test(feature_info_data t-feature_info_data.cpp)
 
-        add_executable(${executable} ${source})
-        target_link_libraries(${executable} dynamix doctest)
-        set_target_properties(${executable} PROPERTIES FOLDER tests)
-        add_test(NAME ${test} COMMAND $<TARGET_FILE:${executable}>)
-    endif()
-endforeach()
+dynamix_c_test(mixin_info_util t-mixin_info_util.c)
+dynamix_test(mixin_info_util t-mixin_info_util.cpp)
 
-target_link_libraries(test_thread ${CMAKE_THREAD_LIBS_INIT})
+dynamix_test(test_data t-test_data.cpp)
 
-if(DYNAMIX_SHARED_LIB)
-    # custom deps
-    target_link_libraries(test_loader test_dynlib_A)
-    target_link_libraries(test_plugin_A test_dynlib_A)
-    target_link_libraries(test_plugin_Amod test_dynlib_A)
-    target_link_libraries(test_plugin_B test_dynlib_A)
+dynamix_test(domain-empty t-domain-empty.cpp)
 
-    if(NOT WIN32)
-        target_link_libraries(test_loader dl)
-    endif()
+dynamix_test(mixin_info_data t-mixin_info_data.cpp)
+
+dynamix_test(domain-features t-domain-features.cpp)
+dynamix_test(domain-mixins t-domain-mixins.cpp)
+dynamix_test(type t-type.cpp)
+dynamix_test(type_mutation t-type_mutation.cpp)
+dynamix_test(mutation_rule t-mutation_rule.cpp)
+
+dynamix_test(object t-object.cpp)
+
+dynamix_c_test(domain t-domain.c)
+dynamix_c_test(type t-type.c)
+dynamix_c_test(object t-object.c)
+
+dynamix_test(define_mixin t-define_mixin.cpp)
+
+dynamix_test(msg t-msg.cpp)
+
+if(DYNAMIX_SHARED)
+    add_subdirectory(app-plugin)
 endif()

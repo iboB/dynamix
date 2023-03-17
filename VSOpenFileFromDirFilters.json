@@ -1,8 +1,8 @@
 {
-    "dirs": [
-        ".git",
-        ".vs",
-        "build",
-        "out"
-    ]
+  "dirs": [
+    ".git",
+    ".vs",
+    "build",
+    "out"
+  ]
 }

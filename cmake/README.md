@@ -1,1 +1,0 @@
-Some useful CMake macros.
