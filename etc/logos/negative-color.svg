@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X7 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="64.6195mm" height="22.462mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 6380 2218"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:none}
+    .fil3 {fill:#FEFEFE}
+    .fil1 {fill:#00AFEF}
+    .fil2 {fill:#0077BD}
+    .fil4 {fill:#FEFEFE;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="Capa_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_2560498152736">
+   <g>
+    <polygon class="fil0" points="544,1346 544,868 958,629 958,1107 "/>
+    <polygon class="fil1" points="958,1076 544,868 958,629 1373,868 "/>
+    <polygon class="fil2" points="958,478 544,239 958,0 1373,239 "/>
+    <polygon class="fil0" points="1373,868 958,629 958,1107 1373,1346 "/>
+    <polygon class="fil3" points="1920,554 1506,315 1506,793 1920,1032 "/>
+    <polygon class="fil3" points="0,554 414,315 414,793 0,1032 "/>
+    <polygon class="fil2" points="928,1138 544,868 544,1346 958,1585 "/>
+    <polygon class="fil2" points="414,1423 0,1184 0,1662 414,1902 "/>
+    <polygon class="fil2" points="1506,1423 1920,1184 1920,1662 1506,1902 "/>
+    <polygon class="fil3" points="958,1585 989,1138 1373,868 1373,1346 "/>
+    <polygon class="fil0" points="544,1346 961,1587 1373,1346 958,1107 "/>
+    <polygon class="fil3" points="544,1977 961,2218 1373,1977 958,1738 "/>
+   </g>
+   <path class="fil4" d="M2464 1333l261 0c80,0 141,-8 184,-35 63,-38 99,-107 99,-192 0,-139 -88,-221 -256,-221l-288 0 0 448zm104 -84l0 -284 185 0c98,0 148,48 148,140 0,111 -66,144 -199,144l-134 0zm737 84l90 0 0 -167 200 -200 -105 0 -133 137 -131 -137 -121 0 200 202 0 165zm377 0l81 0 0 -248 311 248 62 0 0 -367 -81 0 0 244 -312 -244 -61 0 0 367zm737 -148l82 -153 86 153 -168 0zm-174 148l89 0 46 -81 244 0 46 81 100 0 -221 -367 -86 0 -218 367zm649 0l84 0 0 -277c0,-15 -1,-30 -3,-48 7,18 17,32 27,46l169 225 21 0 168 -224c8,-10 17,-27 26,-47 -2,24 -3,39 -3,48l0 277 96 0 0 -448 -83 0 -207 271 -211 -271 -84 0 0 448zm772 0l90 0 0 -367 -90 0 0 367zm216 0l106 0 129 -137 141 137 122 0 -206 -199 167 -168 -103 0 -116 119 -124 -119 -120 0 185 179 -181 188z"/>
+  </g>
+ </g>
+</svg>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X7 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="64.6195mm" height="22.462mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 2839 987"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#FEFEFE}
+    .fil2 {fill:#FEFEFE;fill-rule:nonzero}
+    .fil1 {fill:#FEFEFE;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="Capa_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_2560388439824">
+   <g>
+    <polygon class="fil0" points="426,479 242,386 426,280 611,386 "/>
+    <polygon class="fil0" points="426,213 242,106 426,0 611,106 "/>
+    <polygon class="fil0" points="855,247 670,140 670,353 855,459 "/>
+    <polygon class="fil0" points="0,247 184,140 184,353 0,459 "/>
+    <polygon class="fil0" points="413,506 242,386 242,599 426,705 "/>
+    <polygon class="fil0" points="184,633 0,527 0,740 184,846 "/>
+    <polygon class="fil0" points="670,633 855,527 855,740 670,846 "/>
+    <polygon class="fil0" points="426,705 440,506 611,386 611,599 "/>
+    <polygon class="fil0" points="242,880 428,987 611,880 426,773 "/>
+   </g>
+   <g>
+    <path class="fil1" d="M1096 593l117 0c35,0 62,-3 82,-15 27,-17 44,-48 44,-86 0,-62 -40,-98 -114,-98l-129 0 0 199zm47 -37l0 -127 82 0c44,0 66,22 66,63 0,49 -30,64 -88,64l-60 0z"/>
+    <path class="fil2" d="M1471 593l40 0 0 -74 89 -89 -47 0 -59 61 -59 -61 -53 0 89 90 0 73zm167 0l37 0 0 -110 138 110 28 0 0 -163 -36 0 0 108 -139 -108 -28 0 0 163zm328 -66l37 -68 38 68 -75 0zm-77 66l40 0 20 -36 108 0 21 36 45 0 -99 -163 -38 0 -97 163zm289 0l37 0 0 -123c0,-7 0,-13 -1,-21 3,7 7,14 12,20l75 100 9 0 75 -100c4,-4 8,-11 12,-20 -1,10 -2,17 -2,21l0 123 43 0 0 -199 -37 0 -92 120 -94 -120 -37 0 0 199zm343 0l40 0 0 -163 -40 0 0 163zm96 0l48 0 57 -61 63 61 54 0 -92 -88 75 -75 -46 0 -52 53 -55 -53 -53 0 82 79 -81 84z"/>
+   </g>
+  </g>
+ </g>
+</svg>

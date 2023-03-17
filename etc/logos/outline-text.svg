@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X7 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="81.9982mm" height="29.494mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 3882 1396"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .str2 {stroke:#373435;stroke-width:56.8109;stroke-linecap:round;stroke-linejoin:round}
+    .str4 {stroke:#373435;stroke-width:56.8109;stroke-linecap:round;stroke-linejoin:round}
+    .str1 {stroke:#373435;stroke-width:56.8109;stroke-linecap:round;stroke-linejoin:round}
+    .str0 {stroke:#373435;stroke-width:56.8109;stroke-linecap:round;stroke-linejoin:round}
+    .str6 {stroke:#373435;stroke-width:56.8109;stroke-linecap:round;stroke-linejoin:round}
+    .str3 {stroke:#373435;stroke-width:56.8109;stroke-linecap:round;stroke-linejoin:round}
+    .str5 {stroke:#373435;stroke-width:56.8109;stroke-linecap:round;stroke-linejoin:round}
+    .fil0 {fill:none}
+    .fil1 {fill:#373435;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="Capa_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_2560393214928">
+   <g>
+    <polygon class="fil0 str0" points="607,678 357,553 607,408 857,553 "/>
+    <polygon class="fil0 str1" points="607,317 357,173 607,28 857,173 "/>
+    <polygon class="fil0 str2" points="1188,363 938,219 938,508 1188,652 "/>
+    <polygon class="fil0 str3" points="28,363 279,219 279,508 28,652 "/>
+    <polygon class="fil0 str0" points="589,716 357,553 357,841 607,986 "/>
+    <polygon class="fil0 str4" points="279,888 28,744 28,1032 279,1177 "/>
+    <polygon class="fil0 str5" points="938,888 1188,744 1188,1032 938,1177 "/>
+    <polygon class="fil0 str0" points="607,986 626,716 857,553 857,841 "/>
+    <polygon class="fil0 str6" points="357,1223 609,1368 857,1223 607,1078 "/>
+   </g>
+   <path class="fil1" d="M1516 834l158 0c48,0 85,-5 111,-21 38,-24 60,-66 60,-116 0,-84 -53,-134 -155,-134l-174 0 0 271zm63 -51l0 -172 112 0c59,0 89,29 89,85 0,67 -40,87 -119,87l-82 0zm446 51l54 0 0 -101 121 -121 -64 0 -80 82 -80 -82 -72 0 121 122 0 100zm227 0l49 0 0 -150 188 150 37 0 0 -222 -48 0 0 147 -189 -147 -37 0 0 222zm445 -90l50 -92 52 92 -102 0zm-105 90l54 0 28 -49 147 0 28 49 61 0 -134 -222 -52 0 -132 222zm392 0l51 0 0 -168c0,-9 -1,-18 -2,-29 5,11 10,20 17,28l101 136 13 0 102 -135c5,-7 10,-17 16,-29 -2,14 -2,24 -2,29l0 168 58 0 0 -271 -51 0 -124 163 -128 -163 -51 0 0 271zm467 0l54 0 0 -222 -54 0 0 222zm130 0l64 0 78 -83 85 83 74 0 -125 -121 101 -101 -62 0 -70 71 -75 -71 -72 0 111 108 -109 114z"/>
+  </g>
+ </g>
+</svg>

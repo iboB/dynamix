@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X7 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="57.7282mm" height="46.4878mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 5482 4414"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:none}
+    .fil1 {fill:#00AFEF}
+    .fil2 {fill:#0077BD}
+    .fil3 {fill:#3E4095}
+    .fil4 {fill:#3E4095;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="Capa_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_2560388466832">
+   <g>
+    <polygon class="fil0" points="2127,1884 2127,1215 2707,880 2707,1549 "/>
+    <polygon class="fil1" points="2707,1506 2127,1215 2707,880 3287,1215 "/>
+    <polygon class="fil2" points="2707,669 2127,335 2707,0 3287,335 "/>
+    <polygon class="fil0" points="3287,1215 2707,880 2707,1549 3287,1884 "/>
+    <polygon class="fil3" points="4053,775 3474,441 3474,1110 4053,1445 "/>
+    <polygon class="fil3" points="1366,775 1946,441 1946,1110 1366,1445 "/>
+    <polygon class="fil2" points="2664,1592 2128,1215 2128,1884 2707,2219 "/>
+    <polygon class="fil2" points="1946,1992 1366,1657 1366,2327 1946,2661 "/>
+    <polygon class="fil2" points="3474,1992 4053,1657 4053,2327 3474,2661 "/>
+    <polygon class="fil3" points="2707,2219 2750,1592 3287,1215 3287,1884 "/>
+    <polygon class="fil0" points="2127,1884 2710,2221 3287,1884 2707,1549 "/>
+    <polygon class="fil3" points="2127,2767 2710,3104 3287,2767 2707,2433 "/>
+   </g>
+   <path class="fil4" d="M0 4414l366 0c112,0 197,-11 258,-48 87,-54 138,-151 138,-269 0,-195 -124,-310 -358,-310l-404 0 0 627zm146 -118l0 -397 259 0c137,0 207,68 207,195 0,156 -93,202 -278,202l-188 0zm1032 118l126 0 0 -233 279 -281 -147 0 -186 192 -184 -192 -169 0 281 283 0 231zm527 0l114 0 0 -346 435 346 87 0 0 -514 -113 0 0 342 -437 -342 -86 0 0 514zm1031 -206l115 -214 121 214 -236 0zm-243 206l125 0 64 -113 341 0 64 113 141 0 -310 -514 -120 0 -305 514zm908 0l118 0 0 -388c0,-20 -1,-41 -4,-66 10,24 23,45 38,64l236 315 29 0 236 -314c11,-14 23,-38 37,-65 -4,32 -5,54 -5,66l0 388 135 0 0 -627 -117 0 -289 379 -296 -379 -118 0 0 627zm1081 0l125 0 0 -514 -125 0 0 514zm302 0l148 0 181 -192 197 192 172 0 -290 -278 235 -236 -145 0 -163 167 -172 -167 -168 0 259 250 -254 264z"/>
+  </g>
+ </g>
+</svg>

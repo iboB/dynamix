@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X7 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="57.7282mm" height="46.4878mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 2055 1655"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#373435}
+    .fil1 {fill:#373435;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="Capa_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_2560388465392">
+   <g>
+    <polygon class="fil0" points="1015,565 797,455 1015,330 1232,455 "/>
+    <polygon class="fil0" points="1015,251 797,125 1015,0 1232,125 "/>
+    <polygon class="fil0" points="1519,291 1302,165 1302,416 1519,542 "/>
+    <polygon class="fil0" points="512,291 729,165 729,416 512,542 "/>
+    <polygon class="fil0" points="999,597 797,455 797,706 1015,832 "/>
+    <polygon class="fil0" points="729,747 512,621 512,872 729,997 "/>
+    <polygon class="fil0" points="1302,747 1519,621 1519,872 1302,997 "/>
+    <polygon class="fil0" points="1015,832 1031,597 1232,455 1232,706 "/>
+    <polygon class="fil0" points="797,1037 1016,1163 1232,1037 1015,912 "/>
+   </g>
+   <path class="fil1" d="M0 1655l137 0c42,0 74,-5 97,-19 33,-20 52,-56 52,-100 0,-73 -47,-117 -135,-117l-151 0 0 236zm55 -45l0 -149 97 0c51,0 77,26 77,74 0,58 -34,75 -104,75l-70 0zm387 45l47 0 0 -88 104 -105 -55 0 -69 72 -69 -72 -64 0 106 106 0 87zm197 0l43 0 0 -130 163 130 32 0 0 -193 -42 0 0 128 -164 -128 -32 0 0 193zm387 -78l43 -80 45 80 -88 0zm-92 78l47 0 24 -43 128 0 24 43 53 0 -116 -193 -45 0 -115 193zm341 0l44 0 0 -146c0,-8 0,-15 -1,-25 3,9 8,17 14,24l88 118 11 0 89 -117c4,-6 8,-14 13,-25 -1,12 -2,21 -2,25l0 146 51 0 0 -236 -44 0 -108 143 -111 -143 -44 0 0 236zm405 0l47 0 0 -193 -47 0 0 193zm113 0l56 0 68 -72 73 72 65 0 -109 -105 88 -88 -54 0 -61 62 -65 -62 -63 0 97 94 -95 99z"/>
+  </g>
+ </g>
+</svg>
