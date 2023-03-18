@@ -59,11 +59,12 @@ inline hplugin load_plugin(std::string_view path, std::string_view lib) {
     std::string l{path};
     l += "/lib";
     l += lib;
-#if defined(__APPLE__)
-    l += ".dylib";
-#else
+//#if defined(__APPLE__)
+    // l += ".dylib";
+//#else
+    // cmake MODULE libraries have a .so extension on both linux and mac
     l += ".so";
-#endif
+// #endif
     return dlopen(l.c_str(), RTLD_NOW | RTLD_LOCAL);
 }
 #define unload_plugin dlclose
