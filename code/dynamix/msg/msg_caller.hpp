@@ -6,6 +6,7 @@
 #include "../feature_payload.hpp"
 #include "../exception.hpp"
 #include "../type.hpp"
+#include "../../dnmx/bits/no_sanitize.h"
 
 namespace dynamix {
 // caller for a specific signature
@@ -23,16 +24,27 @@ struct msg_caller {
 
     using func_t = Ret(*)(const void*, Args...);
 
-    static Ret call(const type::ftable_payload& pl, Object& obj, Args&&... args) {
-        // here we just use `const void*` while we must technically copy the const-ness of the object
-        // it's easier and more readable as is
-        // let's see if it will bite us
+    I_DYNAMIX_NO_SANITIZE("undefined")
+    // so, we don't sanitize the following function for ub
+    // we do do two instances of ub here, but it's safe and no compiler can make use of it and
+    // ruin our day:
+    // * the major one is that we allow a function of type `ret(Mixin* mixin_ptr, args...)` to be
+    //   assigned as a message payload and we cast it to `ret(const void* mixin_ptr, args...)` here
+    //   this is safe: there is no difference between Mixin* and const void* on assembly level
+    //   moreover there is not way for a compiler to know what we do with the function pointer when it's
+    //   added to a feature_for_mixin instance (and thus it cannot elliminate the call)
+    // * the minor one is that we cast to const void* indiscriminately while we technically must copy
+    //   the const-ness of the object
+    //   this, unlike the major one, is fixable but since we're doing this ub anyway, why bother?
+    //   moreover this disregard of constness, allows us to assign a non-const func to a const message
+    template <typename... CallArgs> // different arguments to allow casts when calling an individual payload
+    static Ret call(const type::ftable_payload& pl, Object& obj, CallArgs&&... args) {
         auto func = reinterpret_cast<func_t>(pl.payload);
 
         // unchecked mixin at index: we trust the macro and type generation
         auto mixin_data = obj.unchecked_get_at(pl.mixin_index);
 
-        return func(mixin_data, std::forward<Args>(args)...);
+        return func(mixin_data, std::forward<CallArgs>(args)...);
     }
 
     static Ret call_unicast(const common_feature_info& info, Object& obj, Args&&... args) {
@@ -56,10 +68,7 @@ struct msg_caller {
             // this way the same-prio multicast execution order follows the mixins order
             // and prio messages will higher prio be executed first
             for (auto i = fe.top_bid_back; i != fe.begin; --i) {
-                // not reusing call here, because we need to topy the arguments
-                auto func = reinterpret_cast<func_t>(i->payload);
-                auto mixin_data = obj.unchecked_get_at(i->mixin_index);
-                func(mixin_data, args...); // copy and ignore return value
+                call(*i, obj, args...); // args are copied! return value is ignored
             }
             // return first (top) result
             return call(*fe.begin, obj, std::forward<Args>(args)...);
