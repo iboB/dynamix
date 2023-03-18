@@ -29,7 +29,7 @@ struct basic_msg_traits<Msg, Ret(Obj, Args...)> {
         return caller::call_multicast(Msg::info, obj, std::forward<Args>(args)...);
     }
 
-    using void_t = q_const<is_const, void*>;
+    using void_t = q_const<is_const, void>*;
     using func_t = Ret(*)(void_t, Args...);
 
     static any make_payload_by(allocator, void*, func_t func) {
