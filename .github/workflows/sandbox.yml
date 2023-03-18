@@ -1,0 +1,23 @@
+name: Sandbox
+on: workflow_dispatch
+jobs:
+  job:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ci
+    steps:
+      - name: Clone
+        uses: actions/checkout@v3
+      - name: VC Vars
+        # Setup vcvars on Windows
+        # MSVC's address sanitizer attaches dependencies to several DLLs which are not in PATH
+        # vcvars will add them to PATH and allow msvc asan executables to run
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Configure ASAN
+        run: cmake .. -DSAN_ADDR=1
+      - name: Build ASAN
+        run: cmake --build . --config RelWithDebInfo --target dynamix-c-scratch
+      - name: Test ASAN
+        run: .\\bin\\Release\\dynamix-c-scratch.exe
+
