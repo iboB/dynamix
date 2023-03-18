@@ -24,6 +24,7 @@ struct msg_caller {
 
     using func_t = Ret(*)(const void*, Args...);
 
+	template <typename... CallArgs> // different arguments to allow casts when calling an individual payload
     I_DYNAMIX_NO_SANITIZE("undefined")
     // so, we don't sanitize the following function for ub
     // we do do two instances of ub here, but it's safe and no compiler can make use of it and
@@ -36,8 +37,7 @@ struct msg_caller {
     // * the minor one is that we cast to const void* indiscriminately while we technically must copy
     //   the const-ness of the object
     //   this, unlike the major one, is fixable but since we're doing this ub anyway, why bother?
-    //   moreover this disregard of constness, allows us to assign a non-const func to a const message
-    template <typename... CallArgs> // different arguments to allow casts when calling an individual payload
+    //   moreover this disregard of constness, allows us to assign a non-const func to a const message    
     static Ret call(const type::ftable_payload& pl, Object& obj, CallArgs&&... args) {
         auto func = reinterpret_cast<func_t>(pl.payload);
 
