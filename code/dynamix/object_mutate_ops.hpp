@@ -23,7 +23,7 @@ public:
 
     object_mutate_op* to_obj_mutate(object&) { return this; }
 
-    virtual bool overrides_init() const noexcept = 0;
+    virtual bool overrides_init() const noexcept; // true by default
     virtual void do_init(const mixin_info& info, mixin_index_t new_index, byte_t* new_mixin) = 0;
 };
 
