@@ -19,5 +19,5 @@ jobs:
       - name: Build ASAN
         run: cmake --build . --config RelWithDebInfo --target dynamix-c-scratch
       - name: Test ASAN
-        run: .\\bin\\Release\\dynamix-c-scratch.exe
+        run: .\bin\RelWithDebInfo\dynamix-c-scratch.exe
 

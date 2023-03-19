@@ -12,8 +12,8 @@ void feature(void) {
         f1 = dnmx_make_feature_info(),
         f2 = dnmx_make_feature_info();
 
-    f1.name = dnmx_make_sv_lit("jump");
-    f2.name = dnmx_make_sv_lit("jump");
+    f1.name = dnmx_make_sv_lit("asdf");
+    f2.name = dnmx_make_sv_lit("asdf");
 
     dnmx_domain_handle dom = dnmx_create_domain(dnmx_make_sv_lit("test"), (dnmx_domain_settings) { 0 }, 0, NULL);
     dnmx_register_feature(dom, &f1);
@@ -21,10 +21,17 @@ void feature(void) {
     // the next call fails, because because f2 has the same name as an already registered feature
     dnmx_register_feature(dom, &f2);
 
-    //const char* begin = "jump";
-    //const char* end = begin + strlen("jump");
-    dnmx_sv sv = dnmx_make_sv_lit("jump");
-    printf("%zu\n", dnmx_sv_len(sv));
+    {
+        // repro with string which was used before throwing the exception
+        dnmx_sv sv = dnmx_make_sv_lit("asdf");
+        printf("%zu\n", sv.end - sv.begin);
+    }
+
+    {
+        // no repro with string which was used before throwing the exception
+        dnmx_sv sv = dnmx_make_sv_lit("qwer");
+        printf("%zu\n", sv.end - sv.begin);
+    }
 
     dnmx_destroy_domain(dom);
 }
