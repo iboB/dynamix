@@ -73,7 +73,7 @@ The following projects are known to use DynaMix as a key piece of their software
 
 ## Documentation
 
-*TBD*
+The documentation is part of the repo in the [doc/](doc/) directory.
 
 ## Contributing
 
@@ -103,6 +103,6 @@ The last release of DynaMix v1 was [v1.4.0](https://github.com/iboB/dynamix/rele
 
 ## Boost.Mixin
 
-DynaMix was initially developed as [Boost.Mixin](https://github.com/iboB/boost.mixin) but is now a separate library, that doesn't depend on the Boost libraries Collection.
+DynaMix was initially developed as [Boost.Mixin](https://github.com/iboB/boost.mixin) but is now a separate library that doesn't depend on the Boost libraries Collection.
 
 ![Footer](https://s22.postimg.cc/gkvrylx9t/README_2.jpg)
