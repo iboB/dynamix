@@ -73,7 +73,7 @@ The following projects are known to use DynaMix as a key piece of their software
 
 ## Documentation
 
-The documentation is part of the repo in the [doc/](doc/) directory.
+The documentation is part of the repo in the [doc/](doc/README.md) directory.
 
 ## Contributing
 

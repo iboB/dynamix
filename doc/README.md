@@ -1,8 +1,8 @@
-# DynaMix
+# DynaMix Documentation Index
 
 *The documentation is still in progress*
 
-* Introduction
+* [Introduction](intro.md)
 * Basics
     * Adding DynaMix to a Project
     * Elements and Glossary 
@@ -14,15 +14,15 @@
     * Creating Plugins
     * Mutation Rules
 * Working with DynaMix
-    * Performance
+    * [Performance](working-with/perf.md)
     * Thread Safety
     * Debugging    
     * Tips and Tricks
     * Common Problems and Solutions
 * Annotated Demos
 * Misc    
-    * Differences Between v1 and v2    
+    * [FAQ](misc/faq.md)
+    * [Differences Between v1 and v2](misc/v2-vs-v1.md)
     * Implementation Notes
-    * Macros Rationale
     * History and Inspiration
-* Roadmap
+* [Roadmap](roadmap.md)
