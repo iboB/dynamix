@@ -2,9 +2,9 @@
 
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/) [![Standard](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build](https://github.com/iboB/dynamix/actions/workflows/unit-test.yml/badge.svg)](https://github.com/iboB/dynamix/actions/workflows/unit-test.yml)
 
-> *IMPORTANT* Version 2.0 is coming. It is a big change. The last version 1 release is [v1.4.0](https://github.com/iboB/dynamix/releases/tag/v1.4.0)
+> *IMPORTANT* v2 is here. It is a big change. The last v1 release was [v1.4.0](https://github.com/iboB/dynamix/releases/tag/v1.4.0)
 
-DynaMix (*Dynamic Mixins*) is an alternative take on object oriented programming and dynamic polymorphism. It lets the user compose and modify polymorphic objects at run time. The main target language is C++, but C is also supported.
+DynaMix (*Dynamic Mixins*) is an alternative take on object oriented programming and dynamic polymorphism. It lets users compose and modify polymorphic objects at run time. The main target language is C++, but C is also supported.
 
 The library is a means to create a project's **architecture** rather than achieve its purpose. It helps with *extensibility*, *readability*, *scalability* and *interoperability*. It focuses on **maximal performance** and **minimal memory overhead**.
 
@@ -16,7 +16,7 @@ DynaMix is applicable for the software architecture of systems with complex obje
 
 The library uses the type `dynamix::object` as a placeholder, whose instances can be extended with existing classes (mixins), thus providing a particular instance with the *mixin features* of all those types. Likely the most important types of *mixin features* are messages: functional objects which in C++-OOP terms can be thought of as methods. Mixin features are overridable and use late binding and singular dispatch. Unicasts and multicasts are possible.
 
-Here is a small example of what your code may look like if you use the library:
+Here is a small example of what code may look like using the library:
 
 ```c++
     // assuming my_objects.get_ally(0); is a way to get an ally to the
@@ -37,7 +37,7 @@ Here is a small example of what your code may look like if you use the library:
     fly(obj); // ...instead of obj.fly()
 
     // mutation
-    dynamix::mutate(obj
+    mutate(obj
         , dynamix::remove<ally>()
         , dynamix::add<enemy>()
     );
@@ -50,9 +50,9 @@ Here are some of the key features of the library:
 
 * Compose objects from mixins at run time
 * Physically separate interface and implementation
-* Non*intrusive &ndash; mixins don't need to have a common parent or any special code inside
+* Non-intrusive &ndash; mixins don't need to have a common parent or any special code inside
 * Mutate "live" objects by changing their composition at run time
-* Use `std::polymorphic_allocator` to allow fine*tuning allocations and achieving cache*locality in critical parts of the code
+* Use `std::polymorphic_allocator` to allow fine-tuning allocations and achieving cache locality in critical parts of the code
 * Create shared libraries and plugins which can enrich or modify objects, without modifying (or even rebuilding) the executable.
 * Add "hotswap" to a project while developing
 * Have complete runtime reflection by symbols or strings
