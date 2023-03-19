@@ -9,11 +9,19 @@ on:
     branches: [master]
 jobs:
   job:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.cfg.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest] #, macos-latest
-        type: [Debug, RelWithDebInfo]
+        cfg:
+          # ubuntu sanitizing address
+          - {os: ubuntu-latest, btype: Debug, cmakeflags: '-DSAN_ADDR=1', buildflags: '-- -j'}
+          - {os: ubuntu-latest, btype: RelWithDebInfo, cmakeflags: '-DSAN_ADDR=1', buildflags: '-- -j'}
+          # macos - no santizer (there are still some apple-specific sanitizer issues to fix)
+          - {os: macos-latest, btype: Debug, cmakeflags: '', buildflags: '-- -j'}
+          - {os: macos-latest, btype: RelWithDebInfo, cmakeflags: '', buildflags: '-- -j'}
+          # windows: no santizer with RelWithDebInfo (likely a msvc sanitizer bug... working on it)
+          - {os: windows-latest, btype: Debug, cmakeflags: '-DSAN_ADDR=1', buildflags: ''}
+          - {os: windows-latest, btype: RelWithDebInfo, cmakeflags: '', buildflags: ''}
     defaults:
       run:
         working-directory: ci
@@ -26,9 +34,9 @@ jobs:
         # vcvars will add them to PATH and allow msvc asan executables to run
         if: matrix.os == 'windows-latest'
         uses: ilammy/msvc-dev-cmd@v1
-      - name: Configure ASAN
-        run: cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DSAN_ADDR=1
-      - name: Build ASAN
-        run: cmake --build . --config ${{ matrix.type }}
-      - name: Test ASAN
-        run: ctest -C ${{ matrix.type }} --output-on-failure
+      - name: Configure
+        run: cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.cfg.btype }} ${{ matrix.cfg.cmakeflags }}
+      - name: Build
+        run: cmake --build . --config ${{ matrix.cfg.btype }} ${{ matrix.cfg.buildflags }}
+      - name: Test
+        run: ctest -C ${{ matrix.cfg.btype }} --output-on-failure
