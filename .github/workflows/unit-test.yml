@@ -17,9 +17,11 @@ jobs:
           - {os: ubuntu-latest, btype: Debug, cmakeflags: '-DSAN_ADDR=1', buildflags: '-- -j'}
           - {os: ubuntu-latest, btype: RelWithDebInfo, cmakeflags: '-DSAN_ADDR=1', buildflags: '-- -j'}
           # macos - no santizer (there are still some apple-specific sanitizer issues to fix)
+          # https://github.com/iboB/dynamix/issues/44
           - {os: macos-latest, btype: Debug, cmakeflags: '', buildflags: '-- -j'}
           - {os: macos-latest, btype: RelWithDebInfo, cmakeflags: '', buildflags: '-- -j'}
           # windows: no santizer with RelWithDebInfo (likely a msvc sanitizer bug... working on it)
+          # https://developercommunity.visualstudio.com/t/Address-sanitizer-in-Release-may-introdu/10314256?port=1025&fsid=c7b0f725-0959-4e2d-b63e-e4711eb92eca
           - {os: windows-latest, btype: Debug, cmakeflags: '-DSAN_ADDR=1', buildflags: ''}
           - {os: windows-latest, btype: RelWithDebInfo, cmakeflags: '', buildflags: ''}
     defaults:
@@ -32,7 +34,7 @@ jobs:
         # Setup vcvars on Windows
         # MSVC's address sanitizer attaches dependencies to several DLLs which are not in PATH
         # vcvars will add them to PATH and allow msvc asan executables to run
-        if: matrix.os == 'windows-latest'
+        if: matrix.cfg.os == 'windows-latest'
         uses: ilammy/msvc-dev-cmd@v1
       - name: Configure
         run: cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.cfg.btype }} ${{ matrix.cfg.cmakeflags }}
