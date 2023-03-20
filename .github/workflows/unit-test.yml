@@ -14,13 +14,14 @@ jobs:
     strategy:
       matrix:
         cfg:
-          # ubuntu sanitizing address
-          - {name: 'linux gcc dbg s:addr,ub,leak', os: ubuntu-latest, btype: Debug, cmakeflags: '-DSAN_ADDR=1', buildflags: '-- -j'}
+          # ubuntu sanitizing address, undefined, leak
+          - {name: 'linux gcc dbg s:addr,ub,leak', os: ubuntu-latest, btype: Debug, cmakeflags: '-DSAN_ADDR=1 -DSAN_UB=1 -DSAN_LEAK=1', buildflags: '-- -j'}
           - {name: 'linux gcc rel s:addr,ub,leak', os: ubuntu-latest, btype: RelWithDebInfo, cmakeflags: '-DSAN_ADDR=1', buildflags: '-- -j'}
-          # macos - no santizer (there are still some apple-specific sanitizer issues to fix)
+          # macos - no ub santizer (there are still some apple-specific ub sanitizer issues to fix)
           # https://github.com/iboB/dynamix/issues/44
-          - {name: 'mac clang dbg', os: macos-latest, btype: Debug, cmakeflags: '', buildflags: '-- -j'}
-          - {name: 'mac clang rel', os: macos-latest, btype: RelWithDebInfo, cmakeflags: '', buildflags: '-- -j'}
+          # also no leak sanitizer since it's not supported by apple
+          - {name: 'mac clang dbg s:addr', os: macos-latest, btype: Debug, cmakeflags: '-DSAN_ADDR=1', buildflags: '-- -j'}
+          - {name: 'mac clang rel s:addr', os: macos-latest, btype: RelWithDebInfo, cmakeflags: '-DSAN_ADDR=1', buildflags: '-- -j'}
           # windows: no santizer with RelWithDebInfo (likely a msvc sanitizer bug... working on it)
           # https://developercommunity.visualstudio.com/t/Address-sanitizer-in-Release-may-introdu/10314256?port=1025&fsid=c7b0f725-0959-4e2d-b63e-e4711eb92eca
           - {name: 'win msvc dbg s:addr', os: windows-latest, btype: Debug, cmakeflags: '-DSAN_ADDR=1', buildflags: ''}
