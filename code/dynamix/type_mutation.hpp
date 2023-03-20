@@ -49,23 +49,24 @@ public:
         template <typename Mixin>
         void add() { add(g::get_mixin_info<Mixin>()); }
 
-        void add_if_lacking(const mixin_info& info) {
-            if (has(info)) return;
+        bool add_if_lacking(const mixin_info& info) {
+            if (has(info)) return false;
             add(info);
+            return true;
         }
         template <typename Mixin>
         void add_if_lacking() { add_if_lacking(g::get_mixin_info<Mixin>()); }
 
         void to_back(const mixin_info& info);
-        void to_back(std::string_view name);
+        const mixin_info& to_back(std::string_view name);
         template <typename Mixin>
         void to_back() { to_back(g::get_mixin_info<Mixin>()); }
 
-        // silently ignore missing
-        void remove(const mixin_info& info) noexcept;
-        void remove(std::string_view name) noexcept;
+        // return false if missing
+        bool remove(const mixin_info& info) noexcept;
+        const mixin_info* remove(std::string_view name) noexcept;
         template <typename Mixin>
-        void remove() noexcept { remove(g::get_mixin_info<Mixin>()); }
+        bool remove() noexcept { return remove(g::get_mixin_info<Mixin>()); }
 
         // deduplicate mixins
         // will leave the latter entry if a duplicate exists
@@ -74,11 +75,11 @@ public:
         // these are linear searches so they may be slow
         // we don't have the indexes of a complete type here
         [[nodiscard]] bool has(const mixin_info& info) const noexcept;
-        [[nodiscard]] bool has(std::string_view name) const noexcept;
+        [[nodiscard]] const mixin_info* has(std::string_view name) const noexcept;
         [[nodiscard]] bool lacks(const mixin_info& info) const noexcept { return !has(info); }
         [[nodiscard]] bool lacks(std::string_view name) const noexcept { return !has(name); }
         [[nodiscard]] bool implements_strong(const feature_info& info) const noexcept;
-        [[nodiscard]] bool implements_strong(std::string_view name) const noexcept;
+        [[nodiscard]] const feature_info* implements_strong(std::string_view name) const noexcept;
         [[nodiscard]] bool implements(const feature_info& info) const noexcept;
 
         template <typename Mixin>
@@ -89,6 +90,9 @@ public:
         [[nodiscard]] bool implements_strong() const noexcept { return implements_strong(g::get_feature_info_fast<Feature>()); }
         template <typename Feature>
         [[nodiscard]] bool implements() const noexcept { return implements(g::get_feature_info_fast<Feature>()); }
+
+        dnmx_type_template_handle to_c_hanlde() noexcept { return reinterpret_cast<dnmx_type_template_handle>(this); }
+        static type_template* from_c_handle(dnmx_type_template_handle ha) noexcept { return reinterpret_cast<type_template*>(ha); }
     };
 
     // deduced mixins for the new type to be produced by this mutation
@@ -108,36 +112,35 @@ public:
     }
 
     // add if not already there
-    void add_if_lacking(const mixin_info& info) { m_new_type.add_if_lacking(info); }
-    const mixin_info& add_if_lacking(std::string_view name);
+    bool add_if_lacking(const mixin_info& info) { return m_new_type.add_if_lacking(info); }
+    const mixin_info* add_if_lacking(std::string_view name);
     template <typename Mixin>
-    const mixin_info& add_if_lacking() {
+    const bool add_if_lacking() {
         auto& info = g::get_mixin_info<Mixin>();
-        add_if_lacking(info);
-        return info;
+        return add_if_lacking(info);
     }
 
     void to_back(const mixin_info& info) { m_new_type.to_back(info); }
-    void to_back(std::string_view name) { m_new_type.to_back(name); }
+    const mixin_info& to_back(std::string_view name) { return m_new_type.to_back(name); }
     template <typename Mixin>
     void to_back() { to_back(g::get_mixin_info<Mixin>()); }
 
     // remove mixin, silently ignore missing
-    void remove(const mixin_info& info) noexcept { m_new_type.remove(info); }
-    void remove(std::string_view name) noexcept { m_new_type.remove(name); }
+    bool remove(const mixin_info& info) noexcept { return m_new_type.remove(info); }
+    const mixin_info* remove(std::string_view name) noexcept { return m_new_type.remove(name); }
     template <typename Mixin>
-    void remove() noexcept { remove(g::get_mixin_info<Mixin>()); }
+    bool remove() noexcept { return remove(g::get_mixin_info<Mixin>()); }
 
     // check if the mutation is adding a mixin to the base type
     [[nodiscard]] bool adding(const mixin_info& info) const noexcept;
-    [[nodiscard]] bool adding(std::string_view name) const noexcept;
+    [[nodiscard]] const mixin_info* adding(std::string_view name) const noexcept;
     template <typename Mixin>
     [[nodiscard]] bool adding() const noexcept { return adding(g::get_mixin_info<Mixin>()); }
     [[nodiscard]] bool adding_mixins() const noexcept; // adding anything at all?
 
     // check if the mutation is removing a mixin from the base type
     [[nodiscard]] bool removing(const mixin_info& info) const noexcept;
-    [[nodiscard]] bool removing(std::string_view name) const noexcept;
+    [[nodiscard]] const mixin_info* removing(std::string_view name) const noexcept;
     template <typename Mixin>
     [[nodiscard]] bool removing() const noexcept { return removing(g::get_mixin_info<Mixin>()); }
     [[nodiscard]] bool removing_mixins() const noexcept; // removing anything at all?
