@@ -69,6 +69,19 @@ const dnmx_mixin_info* dnmx_get_mixin_info_by_name(dnmx_domain_handle hd, dnmx_s
     return self->get_mixin_info(name.to_std());
 }
 
+dnmx_error_return_t dnmx_add_mutation_rule(dnmx_domain_handle hd, const dnmx_mutation_rule_info* info) {
+    try {
+        self->add_mutation_rule(*info);
+        return 0;
+    }
+    catch (std::exception&) {
+        return -1;
+    }
+}
+void dnmx_remove_mutation_rule(dnmx_domain_handle hd, const dnmx_mutation_rule_info* info) {
+    self->remove_mutation_rule(*info);
+}
+
 dnmx_type_handle dnmx_get_type_from_infos(dnmx_domain_handle hd, const dnmx_mixin_info* const* mixins, uint32_t num_mixins) {
     try {
         return &self->get_type({mixins, num_mixins});
