@@ -115,7 +115,7 @@ public:
     bool add_if_lacking(const mixin_info& info) { return m_new_type.add_if_lacking(info); }
     const mixin_info* add_if_lacking(std::string_view name);
     template <typename Mixin>
-    const bool add_if_lacking() {
+    bool add_if_lacking() {
         auto& info = g::get_mixin_info<Mixin>();
         return add_if_lacking(info);
     }

@@ -203,7 +203,7 @@ void mutations(void) {
         CHECK(&run == dnmx_type_template_implements_strong_by_name(new_type, dnmx_make_sv_lit("run")));
 
         dnmx_mixin_index_t num;
-        dnmx_mixin_info* const* infos = dnmx_type_template_get_mixins(new_type, &num);
+        const dnmx_mixin_info* const* infos = dnmx_type_template_get_mixins(new_type, &num);
         CHECK(num == 2);
         CHECK(infos[0] == &athlete);
         CHECK(infos[1] == &warrior);
