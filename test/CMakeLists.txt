@@ -44,6 +44,14 @@ macro(dynamix_test test)
     add_doctest_lib_test(${test} dynamix ${ARGN})
 endmacro()
 
+macro(dynamix_mt_test test)
+    add_doctest_lib_test(${test} dynamix
+        ${ARGN}
+        LIBRARIES ${CMAKE_THREAD_LIBS_INIT}
+        LABELS tsan
+    )
+endmacro()
+
 dynamix_x_test(sv)
 
 dynamix_test(bits-id t-bits-id.cpp)
@@ -79,4 +87,9 @@ dynamix_test(msg t-msg.cpp)
 
 if(DYNAMIX_SHARED)
     add_subdirectory(app-plugin)
+endif()
+
+find_package(Threads)
+if(Threads_FOUND)
+    dynamix_mt_test(domain-mt t-domain-mt.cpp)
 endif()
