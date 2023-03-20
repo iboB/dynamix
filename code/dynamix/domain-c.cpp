@@ -6,6 +6,8 @@
 #include "type.hpp"
 #include "type_mutation.hpp"
 
+#include <memory>
+
 using namespace dynamix;
 
 extern "C" {
