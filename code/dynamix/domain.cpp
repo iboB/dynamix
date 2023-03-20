@@ -148,7 +148,7 @@ public:
         if (enforce_unique_names) {
             // search in reverse order while also checking for name clashes
             // after this loop, the least free_id will be saved
-            for (dnmx_id_int_t i = sparse.size(); i-- > 0; ) {
+            for (dnmx_id_int_t i = dnmx_id_int_t(sparse.size()); i-- > 0; ) {
                 auto reg = sparse[i];
                 if (reg) {
                     assert(reg->iid() == i); // sanity check
@@ -479,7 +479,7 @@ public:
         }
 
         byte_size_t calc_ftable_byte_size() const noexcept {
-            return m_num_reachable_pls.size() * sizeof(type::ftable_entry) + m_num_total_pls * sizeof(type::ftable_payload);
+            return byte_size_t(m_num_reachable_pls.size() * sizeof(type::ftable_entry) + m_num_total_pls * sizeof(type::ftable_payload));
         }
 
         // we need a mutable entry while we build
@@ -557,13 +557,13 @@ public:
 
                 // check for clashes
                 if (!entry.begin->data->info->allow_clashes) {
-                    for (auto ptr = entry.begin; ptr != entry.end - 1; ++ptr) {
-                        const auto& cur = *ptr->data;
-                        const auto& next = *(ptr + 1)->data;
+                    for (auto ie = entry.begin; ie != entry.end - 1; ++ie) {
+                        const auto& cur = *ie->data;
+                        const auto& next = *(ie + 1)->data;
 
                         // same bid and prio = clash
                         if (cur.bid == next.bid && cur.priority == next.priority)
-                            if (ptr->data->bid == (ptr + 1)->data->bid) throw mutation_error("feature clash");
+                            if (ie->data->bid == (ie + 1)->data->bid) throw mutation_error("feature clash");
                     }
                 }
 
@@ -617,9 +617,9 @@ public:
         const ftable_build_helper ftable_helper(*this, mixins);
         const byte_size_t ftable_size = ftable_helper.calc_ftable_byte_size();
 
-        const byte_size_t mixins_buf_size = mixins.byte_size();
+        const byte_size_t mixins_buf_size = byte_size_t(mixins.byte_size());
 
-        const byte_size_t mixin_offsets_buf_size = mixins.size() * sizeof(uint32_t);
+        const byte_size_t mixin_offsets_buf_size = byte_size_t(mixins.size() * sizeof(uint32_t));
 
         const auto num_sparse = /*iile*/[&]() {
             auto max_by_id = std::max_element(mixins.begin(), mixins.end(), [](const mixin_info* a, const mixin_info* b) {
@@ -674,7 +674,7 @@ public:
         new_type->mixin_offsets = mixin_offsets;
 
         static_assert(alignof(object_mixin_data) == sizeof_ptr);
-        byte_size_t obj_buf_size = mixins.size() * sizeof(object_mixin_data); // base size
+        byte_size_t obj_buf_size = byte_size_t(mixins.size() * sizeof(object_mixin_data)); // base size
         byte_size_t obj_buf_alignment = sizeof_ptr; // base alignment
         for (size_t i = 0; i < mixins.size(); ++i) {
             const auto* m = mixins[i];

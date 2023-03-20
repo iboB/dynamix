@@ -47,7 +47,7 @@ typedef struct dnmx_ftable_entry {
     // utils
     explicit operator bool() const noexcept { return !!begin; }
     // itlib::span<const ftable_payload> top_prio_only() const noexcept { return itlib::span(begin, top_bid_back + 1); }
-    uint32_t size() const noexcept { return end - begin; }
+    uint32_t size() const noexcept { return uint32_t(end - begin); }
 #endif
 } dnmx_ftable_entry;
 

@@ -146,7 +146,7 @@ struct dnmx_mixin_info {
     }
     void set_features(itlib::span<const dnmx_feature_for_mixin> f) noexcept {
         features = f.data();
-        num_features = f.size();
+        num_features = uint32_t(f.size());
     }
 #endif
 };

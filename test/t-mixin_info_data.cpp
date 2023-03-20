@@ -123,8 +123,8 @@ struct complex_feature {
     };
     /* feature info */
     static const common_feature_info& get_info_safe() {
-        static common_feature_info info(dnmx_make_sv_lit("complex"));
-        return info;
+        static common_feature_info the_info(dnmx_make_sv_lit("complex"));
+        return the_info;
     }
     static const common_feature_info& info;
 };

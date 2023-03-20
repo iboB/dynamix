@@ -114,6 +114,9 @@ TEST_CASE("funcs") {
 
 struct byte { uint8_t val; };
 
+#if defined(_MSC_VER)
+#pragma warning(disable: 4324) // disable padding waring for type below
+#endif
 struct alignas(16) vec3 {
     double x, y, z;
 

@@ -19,5 +19,4 @@ namespace dynamix {
 }
 
 int main() {
-
 }

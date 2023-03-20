@@ -22,7 +22,7 @@ void basics(void) {
 
 #define SIZE 16
 void fill(char* buf) {
-    for (int i = 0; i < SIZE; ++i) {
+    for (char i = 0; i < SIZE; ++i) {
         buf[i] = i + 1;
     }
 }

@@ -563,8 +563,8 @@ TEST_CASE("mutate") {
 }
 
 TEST_CASE("more mutation errors") {
-    test_data::lifetimes lstats;
-    test_data::lt_sentry _ls(lstats);
+    test_data::lifetimes stats;
+    test_data::lt_sentry _ls(stats);
 
     {
         test_data::lifetimes lstats;
