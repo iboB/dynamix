@@ -15,7 +15,7 @@
 #include <doctest/util/lifetime_counter.hpp>
 
 #include <vector>
-#include <unordered_map>
+#include <deque>
 #include <memory>
 
 class test_data {
@@ -24,10 +24,10 @@ public:
         std::string default_payload_container;
     };
 
-    std::unordered_map<std::string_view, feature_data> features;
+    std::deque<feature_data> features;
 
     feature_data* mf(std::string_view name) {
-        auto& ret = features[name];
+        auto& ret = features.emplace_back();
         ret.name = dnmx_sv::from_std(name);
         return &ret;
     }
@@ -55,16 +55,16 @@ public:
 
     void register_all_features(dynamix::domain& dom) {
         for (auto& f : features) {
-            if (f.second.name == "unused_feature") continue;
-            if (f.second.id != dynamix::invalid_feature_id) continue;
-            dom.register_feature(f.second);
+            if (f.name == "unused_feature") continue;
+            if (f.id != dynamix::invalid_feature_id) continue;
+            dom.register_feature(f);
         }
     }
 
     void unregister_all_features(dynamix::domain& dom) {
         for (auto& f : features) {
-            if (f.second.id == dynamix::invalid_feature_id) continue;
-            dom.unregister_feature(f.second);
+            if (f.id == dynamix::invalid_feature_id) continue;
+            dom.unregister_feature(f);
         }
     }
 
@@ -186,7 +186,7 @@ public:
         int other = 5;
     };
 
-    std::unordered_map<std::string_view, dynamix::util::mixin_info_data> mixins;
+    std::deque<dynamix::util::mixin_info_data> mixins;
 
     struct feature_data_with_perks {
         feature_data_with_perks(const feature_data* i, int b = 0, int p = 0)
@@ -199,7 +199,7 @@ public:
 
     template <typename M>
     dynamix::util::mixin_info_data& mm(std::string_view name, std::vector<feature_data_with_perks> mfeatures) {
-        auto& ret = mixins[name];
+        auto& ret = mixins.emplace_back();
         dynamix::util::mixin_info_data_builder<M> builder(ret, name);
         for (auto& f : mfeatures) {
             std::string pl(ret.info.name.to_std());
@@ -239,16 +239,16 @@ public:
 
     void register_all_mixins(dynamix::domain& dom) {
         for (auto& f : mixins) {
-            if (f.second.info.name == "unused") continue;
-            if (f.second.info.id != dynamix::invalid_mixin_id) continue;
-            dom.register_mixin(f.second.info);
+            if (f.info.name == "unused") continue;
+            if (f.info.id != dynamix::invalid_mixin_id) continue;
+            dom.register_mixin(f.info);
         }
     }
 
     void unregister_all_mixins(dynamix::domain& dom) {
         for (auto& f : mixins) {
-            if (f.second.info.id == dynamix::invalid_mixin_id) continue;
-            dom.unregister_mixin(f.second.info);
+            if (f.info.id == dynamix::invalid_mixin_id) continue;
+            dom.unregister_mixin(f.info);
         }
     }
 
