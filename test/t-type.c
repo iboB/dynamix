@@ -303,6 +303,8 @@ void mutation_rules(void) {
         CHECK(dnmx_type_has(type, &athlete));
         CHECK_FALSE(dnmx_type_has(type, &warrior));
     }
+
+    dnmx_destroy_domain(dom);
 }
 
 int main(void) {
