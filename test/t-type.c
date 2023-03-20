@@ -6,6 +6,7 @@
 #include <dnmx/mixin_info.h>
 #include <dnmx/type.h>
 #include <dnmx/type_mutation.h>
+#include <dnmx/mutation_rule_info.h>
 
 #include "s-unity.h"
 
@@ -246,12 +247,62 @@ void mutations(void) {
         CHECK(t_as == dnmx_get_type_from_infos(dom, ar_as, 2));
     }
 
-    dnmx_destroy_domain(dom);
     CHECK(dnmx_get_num_types(dom) == 2);
+    dnmx_destroy_domain(dom);
 }
 
-void mutation_rules(void) {
+typedef struct mr_dep {
+    dnmx_mixin_info* primary;
+    dnmx_mixin_info* dependent;
+} mr_dep;
+dnmx_error_return_t apply_dep(dnmx_type_mutation_handle mut, uintptr_t user_data) {
+    mr_dep* dep = (mr_dep*)(user_data);
+    dnmx_type_template_handle new_type = dnmx_type_mutation_get_new_type(mut);
+    if (dnmx_type_template_has(new_type, dep->primary)) {
+        dnmx_type_template_add_if_lacking(new_type, dep->dependent);
+    }
+    return dnmx_result_success;
+}
 
+
+void mutation_rules(void) {
+    dnmx_mixin_info
+        athlete = dnmx_make_mixin_info(),
+        warrior = dnmx_make_mixin_info();
+
+    athlete.name = dnmx_make_sv_lit("athlete");
+    warrior.name = dnmx_make_sv_lit("warrior");
+    warrior.dependency = true;
+
+    dnmx_domain_handle dom = dnmx_create_domain(dnmx_make_sv_lit("test"), (dnmx_domain_settings) { 0 }, 0, NULL);
+    dnmx_register_mixin(dom, &athlete);
+    dnmx_register_mixin(dom, &warrior);
+
+    mr_dep dep = {&athlete, &warrior};
+    dnmx_mutation_rule_info rule = {0};
+    rule.user_data = (uintptr_t)&dep;
+    rule.apply = apply_dep;
+    dnmx_add_mutation_rule(dom, &rule);
+
+    const dnmx_mixin_info* ar_a[] = {&athlete};
+
+    {
+        dnmx_type_handle type = dnmx_get_type_from_infos(dom, ar_a, 1);
+        CHECK(type);
+        CHECK(dnmx_type_num_mixins(type) == 2);
+        CHECK(dnmx_type_has(type, &athlete));
+        CHECK(dnmx_type_has(type, &warrior));
+    }
+
+    dnmx_remove_mutation_rule(dom, &rule);
+
+    {
+        dnmx_type_handle type = dnmx_get_type_from_infos(dom, ar_a, 1);
+        CHECK(type);
+        CHECK(dnmx_type_num_mixins(type) == 1);
+        CHECK(dnmx_type_has(type, &athlete));
+        CHECK_FALSE(dnmx_type_has(type, &warrior));
+    }
 }
 
 int main(void) {
