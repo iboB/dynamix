@@ -47,21 +47,29 @@ void type_mutation::type_template::to_back(const mixin_info& info) {
     do_to_back(itlib::qfind(mixins, &info), mixins);
 }
 
-void type_mutation::type_template::to_back(std::string_view name) {
-    do_to_back(itlib::qfind_if(mixins, by_name), mixins);
+const mixin_info& type_mutation::type_template::to_back(std::string_view name) {
+    auto f = itlib::qfind_if(mixins, by_name);
+    do_to_back(f, mixins);
+    return *mixins.back();
 }
 
-void type_mutation::type_template::remove(const mixin_info& info) noexcept {
-    itlib::erase_first(mixins, &info);
+bool type_mutation::type_template::remove(const mixin_info& info) noexcept {
+    return itlib::erase_first(mixins, &info);
 }
-void type_mutation::type_template::remove(std::string_view name) noexcept {
-    itlib::erase_first_if(mixins, by_name);
+const mixin_info* type_mutation::type_template::remove(std::string_view name) noexcept {
+    auto f = itlib::qfind_if(mixins, by_name);
+    if (f == mixins.end()) return nullptr;
+    auto ret = *f;
+    mixins.erase(f);
+    return ret;
 }
 bool type_mutation::type_template::has(const mixin_info& info) const noexcept {
     return !!itlib::pfind(mixins, &info);
 }
-bool type_mutation::type_template::has(std::string_view name) const noexcept {
-    return !!itlib::pfind_if(mixins, by_name);
+const mixin_info* type_mutation::type_template::has(std::string_view name) const noexcept {
+    auto f = itlib::pfind_if(mixins, by_name);
+    if (f) return *f;
+    return nullptr;
 }
 
 #define fspan(features) itlib::make_stride_span_member_view(features.data(), features.size(), &feature_for_mixin::info)
@@ -74,13 +82,14 @@ bool type_mutation::type_template::implements_strong(const feature_info& info) c
     }
     return false;
 }
-bool type_mutation::type_template::implements_strong(std::string_view name) const noexcept {
+const feature_info* type_mutation::type_template::implements_strong(std::string_view name) const noexcept {
     for (auto m : mixins) {
         auto features = m->features_span();
         auto span = fspan(features);
-        if (itlib::pfind_if(span, by_name)) return true;
+        auto f = itlib::pfind_if(span, by_name);
+        if (f) return *f;
     }
-    return false;
+    return nullptr;
 }
 bool type_mutation::type_template::implements(const feature_info& info) const noexcept {
     if (info.default_payload) return true;
@@ -94,10 +103,10 @@ const mixin_info& type_mutation::add(std::string_view name) {
     return *info;
 }
 
-const mixin_info& type_mutation::add_if_lacking(std::string_view name) {
+const mixin_info* type_mutation::add_if_lacking(std::string_view name) {
     auto f = itlib::pfind_if(m_new_type.mixins, by_name);
-    if (f) return **f;
-    return add(name);
+    if (f) return nullptr;
+    return &add(name);
 }
 
 bool type_mutation::noop() const noexcept {
@@ -122,8 +131,8 @@ bool type_mutation::adding(const mixin_info& info) const noexcept {
     if (m_base.has(info)) return false; // already in base
     return m_new_type.has(info);
 }
-bool type_mutation::adding(std::string_view name) const noexcept {
-    if (m_base.has(name)) return false; // already in base
+const mixin_info* type_mutation::adding(std::string_view name) const noexcept {
+    if (m_base.has(name)) return nullptr; // already in base
     return m_new_type.has(name);
 }
 
@@ -131,9 +140,12 @@ bool type_mutation::removing(const mixin_info& info) const noexcept {
     if (!m_base.has(info)) return false; // not in base to remove
     return !m_new_type.has(info);
 }
-bool type_mutation::removing(std::string_view name) const noexcept {
-    if (!m_base.has(name)) return false; // not in base to remove
-    return !m_new_type.has(name);
+const mixin_info* type_mutation::removing(std::string_view name) const noexcept {
+    auto bi = m_base.index_of(name);
+    if (bi == invalid_mixin_index) return nullptr; // not in base to remove
+    auto info = m_base.mixins[bi];
+    if (m_new_type.has(*info)) return nullptr; // not removing
+    return info;
 }
 
 void type_mutation::type_template::dedup() noexcept {

@@ -77,7 +77,7 @@ TEST_CASE("type_mutation from type") {
         CHECK_FALSE(mut.removing_mixins());
         CHECK(mut.new_type().implements_strong(*t.render));
         CHECK_FALSE(mut.new_type().implements_strong(*t.get_name));
-        mut.add_if_lacking(*t.mesh);
+        CHECK_FALSE(mut.add_if_lacking(*t.mesh));
         CHECK(mut.noop());
         mut.remove("mesh");
         CHECK(mut.removing(*t.mesh));
@@ -89,7 +89,7 @@ TEST_CASE("type_mutation from type") {
         CHECK(mut.removing_mixins());
         CHECK_THROWS_WITH_AS(mut.to_back(*t.stats), "missing mixin", mutation_error);
         CHECK_FALSE(mut.adding("actor"));
-        mut.add_if_lacking(*t.actor);
+        CHECK(mut.add_if_lacking(*t.actor));
         CHECK(mut.adding("actor"));
         CHECK_FALSE(mut.noop());
         CHECK(mut.adding_mixins());
