@@ -4,6 +4,7 @@
 #include "../dnmx/domain.h"
 #include "domain.hpp"
 #include "type.hpp"
+#include "type_mutation.hpp"
 
 using namespace dynamix;
 
@@ -68,9 +69,20 @@ const dnmx_mixin_info* dnmx_get_mixin_info_by_name(dnmx_domain_handle hd, dnmx_s
     return self->get_mixin_info(name.to_std());
 }
 
-dnmx_type_handle dnmx_get_type(dnmx_domain_handle hd, const dnmx_mixin_info* const* mixins, uint32_t num_mixins) {
+dnmx_type_handle dnmx_get_type_from_infos(dnmx_domain_handle hd, const dnmx_mixin_info* const* mixins, uint32_t num_mixins) {
     try {
         return &self->get_type({mixins, num_mixins});
+    }
+    catch (std::exception&) {
+        return nullptr;
+    }
+}
+
+dnmx_type_handle dnmx_get_type(dnmx_domain_handle hd, dnmx_type_mutation_handle* hmut) {
+    try {
+        std::unique_ptr<type_mutation> pmut(type_mutation::from_c_handle(*hmut));
+        *hmut = nullptr;
+        return &self->get_type(std::move(*pmut));
     }
     catch (std::exception&) {
         return nullptr;

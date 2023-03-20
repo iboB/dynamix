@@ -5,6 +5,7 @@
 #include <dnmx/feature_info.h>
 #include <dnmx/mixin_info.h>
 #include <dnmx/type.h>
+#include <dnmx/type_mutation.h>
 
 #include "s-unity.h"
 
@@ -53,7 +54,7 @@ void simple(void) {
         shoot = dnmx_make_feature_info(),
         jump = dnmx_make_feature_info();
 
-    run.name = dnmx_make_sv_lit("name");
+    run.name = dnmx_make_sv_lit("run");
     run.allow_clashes = true;
     shoot.name = dnmx_make_sv_lit("shoot");
     jump.name = dnmx_make_sv_lit("jump");
@@ -88,7 +89,7 @@ void simple(void) {
     const dnmx_mixin_info* ar_ws[] = {&warrior, &shooter};
 
     CHECK(dnmx_get_num_types(dom) == 0);
-    dnmx_type_handle taw = dnmx_get_type(dom, ar_aw, 2);
+    dnmx_type_handle taw = dnmx_get_type_from_infos(dom, ar_aw, 2);
     dnmx_type_handle type = taw;
     T_NOT_NULL(type);
     CHECK(dnmx_get_num_types(dom) == 1);
@@ -119,18 +120,18 @@ void simple(void) {
         CHECK(fe.end - fe.begin == 2);
     }
 
-    dnmx_type_handle tas = dnmx_get_type(dom, ar_as, 2);
+    dnmx_type_handle tas = dnmx_get_type_from_infos(dom, ar_as, 2);
     T_NOT_NULL(tas);
     CHECK(tas != taw);
-    dnmx_type_handle tws = dnmx_get_type(dom, ar_ws, 2);
+    dnmx_type_handle tws = dnmx_get_type_from_infos(dom, ar_ws, 2);
     T_NULL(tws);
 
-    type = dnmx_get_type(dom, ar_aw, 2);
+    type = dnmx_get_type_from_infos(dom, ar_aw, 2);
     CHECK(type == taw);
 
     CHECK(dnmx_get_num_types(dom) == 2);
 
-    type = dnmx_get_type(dom, ar_aw, 1);
+    type = dnmx_get_type_from_infos(dom, ar_aw, 1);
     CHECK(type != taw);
     {
         dnmx_ftable_entry fe = dnmx_ftable_at(type, shoot.id);
@@ -142,9 +143,122 @@ void simple(void) {
     dnmx_destroy_domain(dom);
 }
 
+void mutations(void) {
+    dnmx_feature_info
+        run = dnmx_make_feature_info(),
+        shoot = dnmx_make_feature_info(),
+        jump = dnmx_make_feature_info();
+
+    run.name = dnmx_make_sv_lit("run");
+    run.allow_clashes = true;
+    shoot.name = dnmx_make_sv_lit("shoot");
+    jump.name = dnmx_make_sv_lit("jump");
+
+    dnmx_mixin_info
+        athlete = dnmx_make_mixin_info(),
+        warrior = dnmx_make_mixin_info(),
+        shooter = dnmx_make_mixin_info();
+
+    athlete.name = dnmx_make_sv_lit("athlete");
+    dnmx_feature_for_mixin ath_skills[] = {{&run}, {&jump}};
+    athlete.features = ath_skills;
+    athlete.num_features = 2;
+
+    warrior.name = dnmx_make_sv_lit("warrior");
+    dnmx_feature_for_mixin war_skills[] = {{&run}, {&shoot}};
+    warrior.features = war_skills;
+    warrior.num_features = 2;
+
+    shooter.name = dnmx_make_sv_lit("shooter");
+    dnmx_feature_for_mixin sho_skills[] = {{&shoot}};
+    shooter.features = sho_skills;
+    shooter.num_features = 1;
+
+    dnmx_domain_handle dom = dnmx_create_domain(dnmx_make_sv_lit("test"), (dnmx_domain_settings) { 0 }, 0, NULL);
+    dnmx_register_mixin(dom, &athlete);
+    dnmx_register_mixin(dom, &warrior);
+    dnmx_register_mixin(dom, &shooter);
+
+    {
+        dnmx_type_mutation_handle mut = dnmx_create_type_mutation_empty(dom);
+        CHECK(dnmx_type_mutation_is_noop(mut));
+        CHECK(dnmx_type_mutation_get_base(mut) == dnmx_get_empty_type(dom));
+        dnmx_destroy_unused_type_mutation(mut);
+    }
+
+    dnmx_type_handle t_aw;
+    {
+        dnmx_type_mutation_handle mut = dnmx_create_type_mutation_empty(dom);
+        dnmx_type_template_handle new_type = dnmx_type_mutation_get_new_type(mut);
+
+        CHECK(dnmx_type_template_add_if_lacking(new_type, &warrior));
+        CHECK(dnmx_type_template_add(new_type, &athlete));
+        CHECK_FALSE(dnmx_type_template_add_if_lacking(new_type, &warrior));
+        CHECK(&warrior == dnmx_type_template_to_back_by_name(new_type, dnmx_make_sv_lit("warrior")));
+
+        CHECK(dnmx_type_template_has(new_type, &warrior));
+        CHECK(&athlete == dnmx_type_template_has_by_name(new_type, dnmx_make_sv_lit("athlete")));
+        CHECK(dnmx_type_template_implements_strong(new_type, &shoot));
+        CHECK(&run == dnmx_type_template_implements_strong_by_name(new_type, dnmx_make_sv_lit("run")));
+
+        dnmx_mixin_index_t num;
+        dnmx_mixin_info* const* infos = dnmx_type_template_get_mixins(new_type, &num);
+        CHECK(num == 2);
+        CHECK(infos[0] == &athlete);
+        CHECK(infos[1] == &warrior);
+
+        CHECK(dnmx_type_mutation_is_adding_mixins(mut));
+        CHECK_FALSE(dnmx_type_mutation_is_removing_mixins(mut));
+        CHECK(&athlete == dnmx_type_mutation_is_adding_by_name(mut, dnmx_make_sv_lit("athlete")));
+        CHECK(dnmx_type_mutation_is_adding(mut, &warrior));
+        CHECK_FALSE(dnmx_type_mutation_is_adding(mut, &shooter));
+
+        t_aw = dnmx_get_type(dom, &mut);
+        CHECK_FALSE(mut);
+        CHECK(t_aw);
+    }
+
+    dnmx_type_handle t_as;
+    {
+        dnmx_type_mutation_handle mut = dnmx_create_type_mutation_from_type(t_aw);
+        dnmx_type_template_handle new_type = dnmx_type_mutation_get_new_type(mut);
+        CHECK_FALSE(dnmx_type_template_remove_by_name(new_type, dnmx_make_sv_lit("shooter")));
+        CHECK_FALSE(dnmx_type_template_remove(new_type, &shooter));
+        CHECK(&warrior == dnmx_type_template_remove_by_name(new_type, dnmx_make_sv_lit("warrior")));
+        CHECK(dnmx_type_template_add(new_type, &shooter));
+        CHECK(dnmx_type_mutation_is_removing_mixins(mut));
+        CHECK(dnmx_type_mutation_is_removing(mut, &warrior));
+        CHECK(&warrior == dnmx_type_mutation_is_removing_by_name(mut, dnmx_make_sv_lit("warrior")));
+        CHECK(dnmx_type_mutation_get_base(mut) == t_aw);
+        t_as = dnmx_get_type(dom, &mut);
+    }
+
+    {
+        dnmx_type_mutation_handle mut = dnmx_create_type_mutation_empty(dom);
+        const dnmx_mixin_info* ar_aw[] = {&athlete, &warrior};
+        dnmx_type_template_handle new_type = dnmx_type_mutation_get_new_type(mut);
+        dnmx_type_template_set_mixins(new_type, ar_aw, 2);
+        CHECK(t_aw == dnmx_get_type(dom, &mut));
+    }
+
+    {
+        const dnmx_mixin_info* ar_as[] = {&athlete, &shooter};
+        CHECK(t_as == dnmx_get_type_from_infos(dom, ar_as, 2));
+    }
+
+    dnmx_destroy_domain(dom);
+    CHECK(dnmx_get_num_types(dom) == 2);
+}
+
+void mutation_rules(void) {
+
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(empty);
     RUN_TEST(simple);
+    RUN_TEST(mutations);
+    RUN_TEST(mutation_rules);
     return UNITY_END();
 }

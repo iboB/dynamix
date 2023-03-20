@@ -167,19 +167,19 @@ void simple(void) {
     dnmx_register_mixin(dom, &mi_jumper.info);
 
     const dnmx_mixin_info* ar_aw[] = {&mi_athlete.info, &mi_warrior.info};
-    dnmx_type_handle taw = dnmx_get_type(dom, ar_aw, _countof(ar_aw));
+    dnmx_type_handle taw = dnmx_get_type_from_infos(dom, ar_aw, _countof(ar_aw));
     T_NOT_NULL(taw);
 
     const dnmx_mixin_info* ar_as[] = {&mi_athlete.info, &mi_shooter.info};
-    dnmx_type_handle tas = dnmx_get_type(dom, ar_as, _countof(ar_as));
+    dnmx_type_handle tas = dnmx_get_type_from_infos(dom, ar_as, _countof(ar_as));
     T_NOT_NULL(tas);
 
     const dnmx_mixin_info* ar_s[] = {&mi_shooter.info};
-    dnmx_type_handle ts = dnmx_get_type(dom, ar_s, _countof(ar_s));
+    dnmx_type_handle ts = dnmx_get_type_from_infos(dom, ar_s, _countof(ar_s));
     T_NOT_NULL(ts);
 
     const dnmx_mixin_info* ar_aj[] = {&mi_athlete.info, &mi_jumper.info};
-    dnmx_type_handle taj = dnmx_get_type(dom, ar_aj, _countof(ar_aj));
+    dnmx_type_handle taj = dnmx_get_type_from_infos(dom, ar_aj, _countof(ar_aj));
     T_NOT_NULL(taj);
 
     dnmx_object_handle clone = NULL;
