@@ -23,6 +23,7 @@ target_sources(dynamix PRIVATE
     dynamix/exception.cpp
     dynamix/type_class.cpp
     dynamix/type_mutation.cpp
+    dynamix/type_mutation-c.cpp
     dynamix/object_mutation.cpp
     dynamix/object_mutate_ops.cpp
 

@@ -11,6 +11,7 @@
 #include "mixin_id.h"
 
 #include "type_handle.h"
+#include "type_mutation_handle.h"
 
 #include "error_return.h"
 
@@ -50,7 +51,9 @@ DYNAMIX_API const dnmx_feature_info* dnmx_get_feature_info_by_name(dnmx_domain_h
 DYNAMIX_API const dnmx_mixin_info* dnmx_get_mixin_info_by_id(dnmx_domain_handle hd, dnmx_mixin_id id);
 DYNAMIX_API const dnmx_mixin_info* dnmx_get_mixin_info_by_name(dnmx_domain_handle hd, dnmx_sv name);
 
-DYNAMIX_API dnmx_type_handle dnmx_get_type(dnmx_domain_handle hd, const dnmx_mixin_info* const* mixins, uint32_t num_mixins);
+DYNAMIX_API dnmx_type_handle dnmx_get_type_from_infos(dnmx_domain_handle hd, const dnmx_mixin_info* const* mixins, uint32_t num_mixins);
+DYNAMIX_API dnmx_type_handle dnmx_get_type(dnmx_domain_handle hd, dnmx_type_mutation_handle* hmut); // consumes mutation
+
 DYNAMIX_API dnmx_type_handle dnmx_get_empty_type(dnmx_domain_handle hd);
 DYNAMIX_API size_t dnmx_get_num_types(dnmx_domain_handle hd);
 DYNAMIX_API void dnmx_garbage_collect_types(dnmx_domain_handle hd);

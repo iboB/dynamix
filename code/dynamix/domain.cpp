@@ -392,7 +392,7 @@ public:
         }
     }
 
-    const type& get_type(type_mutation&& mutation) {
+    const type& get_type(type_mutation& mutation) {
         type_query original_query(m_allocator); // prepare original query with our allocator
         const type* found = nullptr;
 
@@ -423,7 +423,7 @@ public:
             return *found;
         }
 
-        return create_type(std::move(mutation), std::move(original_query));
+        return create_type(mutation, std::move(original_query));
     }
 
     const type& get_type(itlib::span<const mixin_info* const> mixins) {
@@ -439,7 +439,7 @@ public:
         // TODO: optimize
         type_mutation mut(m_empty_type, m_allocator);
         mut.mod_new_type().mixins.assign(mixins.begin(), mixins.end());
-        return get_type(std::move(mut));
+        return get_type(mut);
     }
 
     struct ftable_build_helper {
@@ -582,7 +582,7 @@ public:
     };
 
     // create type for a given mutation requested by a given query
-    const type& create_type(type_mutation&& mutation, type_query&& query) {
+    const type& create_type(type_mutation& mutation, type_query&& query) {
         itlib::span mixins(mutation.new_type().mixins);
 
         // first check validity
@@ -797,7 +797,7 @@ void domain::remove_mutation_rule(const mutation_rule_info& info) noexcept {
 }
 
 const type& domain::get_type(type_mutation&& mutation) {
-    return m_impl->get_type(std::move(mutation));
+    return m_impl->get_type(mutation);
 }
 
 const type& domain::get_type(itlib::span<const mixin_info* const> mixins) {
