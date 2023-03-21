@@ -23,7 +23,7 @@ void basics(void) {
 #define SIZE 16
 void fill(char* buf) {
     for (char i = 0; i < SIZE; ++i) {
-        buf[i] = i + 1;
+        buf[(int)i] = i + 1;
     }
 }
 bool is_filled(const char* buf) {
