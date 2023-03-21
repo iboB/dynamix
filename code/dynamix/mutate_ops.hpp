@@ -85,13 +85,13 @@ struct add_mixin_op_with_args final : mutate_op_just_add_by_info, public object_
 // functions
 
 namespace mutate_ops {
-mutate_op_remove_by_info remove(const dynamix::mixin_info& info) { return mutate_op_remove_by_info(info); }
-mutate_op_remove_by_name remove(std::string_view name) { return mutate_op_remove_by_name(name); }
+inline mutate_op_remove_by_info remove(const dynamix::mixin_info& info) { return mutate_op_remove_by_info(info); }
+inline mutate_op_remove_by_name remove(std::string_view name) { return mutate_op_remove_by_name(name); }
 template <typename Mixin>
 mutate_op_remove_by_info remove() { return mutate_op_remove_by_info(g::get_mixin_info<Mixin>()); }
 
-mutate_op_just_add_by_info add(const dynamix::mixin_info& info) { return mutate_op_just_add_by_info(info); }
-mutate_op_just_add_by_name add(std::string_view name) { return mutate_op_just_add_by_name(name); }
+inline mutate_op_just_add_by_info add(const dynamix::mixin_info& info) { return mutate_op_just_add_by_info(info); }
+inline mutate_op_just_add_by_name add(std::string_view name) { return mutate_op_just_add_by_name(name); }
 template <typename Mixin>
 mutate_op_just_add_by_info add() { return mutate_op_just_add_by_info(g::get_mixin_info<Mixin>()); }
 
@@ -107,8 +107,8 @@ add_mixin_op_with_func_by_name<ConstructNew_Func> add(std::string_view name, Con
 template <typename Mixin, typename... Args>
 add_mixin_op_with_args<Mixin, Args...> add(Args&&... args) { return add_mixin_op_with_args<Mixin, Args...>(std::forward<Args>(args)...); }
 
-mutate_op_to_back_by_info to_back(const dynamix::mixin_info& info) { return mutate_op_to_back_by_info(info); }
-mutate_op_to_back_by_name to_back(std::string_view name) { return mutate_op_to_back_by_name(name); }
+inline mutate_op_to_back_by_info to_back(const dynamix::mixin_info& info) { return mutate_op_to_back_by_info(info); }
+inline mutate_op_to_back_by_name to_back(std::string_view name) { return mutate_op_to_back_by_name(name); }
 template <typename Mixin>
 mutate_op_to_back_by_info to_back() { return mutate_op_to_back_by_info(g::get_mixin_info<Mixin>()); }
 }
