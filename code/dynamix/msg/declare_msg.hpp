@@ -26,13 +26,13 @@ template <typename Msg> struct msg_traits;
 #define DYNAMIX_DECLARE_SIMPLE_MSG(msg_name, ...) \
     DYNAMIX_DECLARE_EXPORTED_SIMPLE_MSG(I_DNMX_PP_EMPTY(), msg_name, __VA_ARGS__)
 
-#define DYNAMIX_DECLARE_EXPORTED_MSG_EX(export, msg_name, func_name, msg_traits, return_type, args) \
+#define DYNAMIX_DECLARE_EXPORTED_MSG_EX(export, msg_name, msg_traits, func_name, return_type, args) \
     DYNAMIX_BASIC_DECLARE_MSG(export, msg_name, msg_traits, return_type args); \
     export return_type func_name args
 
 #define DYNAMIX_DECLARE_EXPORTED_MSG(export, msg_name, func_name, return_type, args) \
     template <typename Msg> struct DYNAMIX_FUNC_TRAITS_NAME(func_name); \
-    DYNAMIX_DECLARE_EXPORTED_MSG_EX(export, msg_name, func_name, DYNAMIX_FUNC_TRAITS_NAME(func_name), return_type, args);
+    DYNAMIX_DECLARE_EXPORTED_MSG_EX(export, msg_name, DYNAMIX_FUNC_TRAITS_NAME(func_name), func_name, return_type, args);
 
 #define DYNAMIX_DECLARE_MSG(msg_name, func_name, return_type, args) \
     DYNAMIX_DECLARE_EXPORTED_MSG(I_DNMX_PP_EMPTY(), msg_name, func_name, return_type, args)
