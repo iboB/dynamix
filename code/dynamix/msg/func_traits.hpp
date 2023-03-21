@@ -23,4 +23,4 @@
         } \
     }; \
     template <typename Msg> \
-    struct I_DYNAMIX_FUNC_TRAITS(func_name) : public I_DYNAMIX_BASIC_FUNC_TRAITS(func_name)<Msg, typename Msg::signature> {}
+    struct DYNAMIX_FUNC_TRAITS_NAME(func_name) : public I_DYNAMIX_BASIC_FUNC_TRAITS(func_name)<Msg, typename Msg::signature> {}
