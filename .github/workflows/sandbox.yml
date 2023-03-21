@@ -1,3 +1,6 @@
+# Copyright (c) Borislav Stanimirov
+# SPDX-License-Identifier: MIT
+#
 name: Sandbox
 on: workflow_dispatch
 jobs:

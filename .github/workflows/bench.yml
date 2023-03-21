@@ -1,0 +1,25 @@
+# Copyright (c) Borislav Stanimirov
+# SPDX-License-Identifier: MIT
+#
+name: Benchmark
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+jobs:
+  benchmark:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        working-directory: ci
+    steps:
+      - name: Clone
+        uses: actions/checkout@v3
+      - name: Configure
+        run: cmake .. -DCMAKE_BUILD_TYPE=Release
+      - name: Unicast messages
+        run: cmake --build . --config Release --target=run-bench-dynamix-msg-unicast
