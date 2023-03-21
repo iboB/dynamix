@@ -59,6 +59,10 @@ if(DYNAMIX_BUILD_TESTS)
     add_subdirectory(test)
 endif()
 
+if(DYNAMIX_BUILD_BENCH)
+    add_subdirectory(bench)
+endif()
+
 if(DYNAMIX_BUILD_EXAMPLES)
     add_subdirectory(example)
 endif()
