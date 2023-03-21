@@ -3,6 +3,7 @@
 //
 #pragma once
 #include "common_mixin_info.hpp"
+#include "common_feature_info.hpp"
 #include "mixin_info_util.hpp"
 #include "feature_for_mixin.hpp"
 #include "allocator.hpp"

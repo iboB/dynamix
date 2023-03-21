@@ -126,9 +126,9 @@ struct complex_feature {
         static common_feature_info the_info(dnmx_make_sv_lit("complex"));
         return the_info;
     }
-    static const common_feature_info& info;
+    static const feature_info& info;
 };
-const common_feature_info& complex_feature::info = complex_feature::get_info_safe();
+const feature_info& complex_feature::info = complex_feature::get_info_safe();
 
 TEST_CASE("mixin_info_data build features") {
     common_feature_info simple_feature(dnmx_make_sv_lit("simple feature"));

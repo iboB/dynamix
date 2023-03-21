@@ -4,6 +4,7 @@
 #pragma once
 #include "msg_traits.hpp"
 #include "msg_macros.hpp"
+#include "../common_feature_info.hpp"
 
 #define DYNAMIX_DEFINE_SIMPLE_MSG_EX(msg_name, mechanism, clash, default_impl) \
     msg_name::traits::sig_t& msg_name::call = msg_name::traits::I_DNMX_PP_CAT(call_, mechanism); \
@@ -11,7 +12,7 @@
         static ::dynamix::common_feature_info the_info(dnmx_make_sv_lit(I_DNMX_PP_STRINGIZE(msg_name)), clash, (void*)(static_cast<msg_name::traits::sig_t*>(default_impl))); \
         return the_info; \
     } \
-    const ::dynamix::common_feature_info& msg_name::info = msg_name::get_info_safe()
+    const ::dynamix::feature_info& msg_name::info = msg_name::get_info_safe()
 
 #define DYNAMIX_DEFINE_SIMPLE_MSG(msg_name, mechanism) \
     DYNAMIX_DEFINE_SIMPLE_MSG_EX(msg_name, mechanism, true, nullptr)

@@ -57,25 +57,25 @@ struct name_feature_traits;
 struct feature_aaa {
     using traits = name_feature_traits<feature_aaa>;
     static const dynamix::common_feature_info& get_info_safe();
-    static const dynamix::common_feature_info& info;
+    static const dynamix::feature_info& info;
 };
 
 struct feature_bbb {
     using traits = name_feature_traits<feature_bbb>;
     static const dynamix::common_feature_info& get_info_safe();
-    static const dynamix::common_feature_info& info;
+    static const dynamix::feature_info& info;
 };
 
 struct feature_ccc {
     using traits = name_feature_traits<feature_ccc>;
     static const dynamix::common_feature_info& get_info_safe();
-    static const dynamix::common_feature_info& info;
+    static const dynamix::feature_info& info;
 };
 
 struct feature_ddd {
     using traits = name_feature_traits<feature_ddd>;
     static const dynamix::common_feature_info& get_info_safe();
-    static const dynamix::common_feature_info& info;
+    static const dynamix::feature_info& info;
 };
 
 template <typename F>
@@ -190,6 +190,12 @@ TEST_CASE("declared mixins only") {
     auto obj3 = std::move(obj2);
     CHECK(obj2.empty());
     CHECK(obj3.get<bob>() == o2bob);
+
+    {
+        const auto& cobj3 = obj3;
+        CHECK(cobj3.has<bob>());
+        CHECK(cobj3.get<bob>() == o2bob);
+    }
 
     CHECK(as.living == 2);
     CHECK(as.d_ctr == 1);
@@ -367,23 +373,23 @@ const dynamix::common_feature_info& feature_aaa::get_info_safe() {
     static dynamix::common_feature_info fi(dnmx_make_sv_lit("aaa"), true);
     return fi;
 }
-const dynamix::common_feature_info& feature_aaa::info = feature_aaa::get_info_safe();
+const dynamix::feature_info& feature_aaa::info = feature_aaa::get_info_safe();
 
 const dynamix::common_feature_info& feature_bbb::get_info_safe() {
     static dynamix::common_feature_info fi(dnmx_make_sv_lit("bbb"));
     return fi;
 }
-const dynamix::common_feature_info& feature_bbb::info = feature_bbb::get_info_safe();
+const dynamix::feature_info& feature_bbb::info = feature_bbb::get_info_safe();
 
 const dynamix::common_feature_info& feature_ccc::get_info_safe() {
     static dynamix::compat::pmr::string dpl = "asdf";
     static dynamix::common_feature_info fi(dnmx_make_sv_lit("ccc"), true, &dpl);
     return fi;
 }
-const dynamix::common_feature_info& feature_ccc::info = feature_ccc::get_info_safe();
+const dynamix::feature_info& feature_ccc::info = feature_ccc::get_info_safe();
 
 const dynamix::common_feature_info& feature_ddd::get_info_safe() {
     static dynamix::common_feature_info fi(dnmx_make_sv_lit("ddd"), true);
     return fi;
 }
-const dynamix::common_feature_info& feature_ddd::info = feature_ddd::get_info_safe();
+const dynamix::feature_info& feature_ddd::info = feature_ddd::get_info_safe();

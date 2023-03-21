@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 //
 #pragma once
+#include "../feature_info_fwd.hpp"
 #include "../../dnmx/msg/msg_macros.h"
 #include "../../dnmx/bits/pp.h"
 #include "msg_macros.hpp"
@@ -16,7 +17,7 @@ template <typename Msg> struct msg_traits;
         using signature = __VA_ARGS__; \
         using traits = msg_traits<msg_name>; \
         static const ::dynamix::common_feature_info& get_info_safe(); \
-        static const ::dynamix::common_feature_info& info; \
+        static const ::dynamix::feature_info& info; \
         static signature& call; \
     }
 

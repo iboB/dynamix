@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 //
 #pragma once
-#include "../common_feature_info.hpp"
+#include "../feature_info.hpp"
 #include "../feature_payload.hpp"
 #include "../exception.hpp"
 #include "../type.hpp"
@@ -13,7 +13,7 @@ namespace dynamix {
 // also templated by object to preserve const-ness
 template <typename Object, typename Ret, typename... Args>
 struct msg_caller {
-    static Ret try_default_payload(const common_feature_info& info, Object& obj, Args&&... args) {
+    static Ret try_default_payload(const feature_info& info, Object& obj, Args&&... args) {
         if (!info.default_payload) throw bad_feature_access("dynamix message");
 
         // we have a default payload
@@ -37,7 +37,7 @@ struct msg_caller {
     // * the minor one is that we cast to const void* indiscriminately while we technically must copy
     //   the const-ness of the object
     //   this, unlike the major one, is fixable but since we're doing this ub anyway, why bother?
-    //   moreover this disregard of constness, allows us to assign a non-const func to a const message    
+    //   moreover this disregard of constness, allows us to assign a non-const func to a const message
     static Ret call(const type::ftable_payload& pl, Object& obj, CallArgs&&... args) {
         auto func = reinterpret_cast<func_t>(pl.payload);
 
@@ -47,7 +47,7 @@ struct msg_caller {
         return func(mixin_data, std::forward<CallArgs>(args)...);
     }
 
-    static Ret call_unicast(const common_feature_info& info, Object& obj, Args&&... args) {
+    static Ret call_unicast(const feature_info& info, Object& obj, Args&&... args) {
         const type& t = obj.get_type();
 
         auto fe = t.ftable_at(info.id); // ftable entry
@@ -59,7 +59,7 @@ struct msg_caller {
         return try_default_payload(info, obj, std::forward<Args>(args)...);
     }
 
-    static Ret call_multicast(const common_feature_info& info, Object& obj, Args&&... args) {
+    static Ret call_multicast(const feature_info& info, Object& obj, Args&&... args) {
         const type& t = obj.get_type();
 
         auto fe = t.ftable_at(info.id); // ftable entry
