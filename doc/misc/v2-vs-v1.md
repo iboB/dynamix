@@ -11,3 +11,5 @@ This is a list of the most notable differences between v1 and v2:
     * A `mixin_allocator` is assigned to this mixin
     * `mixin_info::force_external` is set to true
 * V2 uses `std::pmr::polymorphic_allocator` for all allocations. V1 used to have dedicated allocators like `domain_allocator`, `object_allocator` and more. The only non-pmr allocator in V2 is the optional `mixin_allocator`
+* V2 message definitions are a bit more verbose. V1 used to allow defining messages with a declare macro and a define macro which only used the message name. V2 messages, require an additional traits macro, and the definition requires the signature as well.
+

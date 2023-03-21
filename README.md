@@ -66,6 +66,7 @@ Here are some of the key features of the library:
 The following projects are known to use DynaMix as a key piece of their software architecture:
 
 * [A3I](https://ibob.bg/blog/2022/01/25/what-we-do-at-viewray/) by ViewRay (Released 2022) - A medical system for cancer treatment
+* [huse](https://github.com/iboB/huse) - a polymorphic serialization library
 * [War Planet Online: Global Conquest](http://warplanetonline.com/) by Gameloft (Released 2017) - An MMORTS for Android and iOS.
 * [Blitz Brigade: Rival Tactics](http://www.rival-tactics.com/) by Gameloft (Released 2017) - A multiplayer RTS for Android, iOS, and Windows.
 * [Swords & Crossbones: An Epic Pirate Story](http://store.steampowered.com/app/383720/Swords__Crossbones_An_Epic_Pirate_Story/) by Epic Devs LLC (Released 2014) - A strategy/exploration game for Android, iOS, and PC.
@@ -100,6 +101,8 @@ The [DynaMix logo](https://github.com/iboB/dynamix/tree/master/doc/logos) is lic
 DynaMix v2 is a complete rewrite and though it has the same idea as v1, it is incompatible with it, and has a different interface, and different implementation for most features, and different terminology for some.
 
 The last release of DynaMix v1 was [v1.4.0](https://github.com/iboB/dynamix/releases/tag/v1.4.0). The documentation is available [here](https://ibob.bg/dynamix/v1/index.html)
+
+A list of the most notable differences between v1 and v2 can be found [here](doc/misc/v2-vs-v1.md).
 
 ## Boost.Mixin
 

@@ -5,22 +5,22 @@
 * [Introduction](intro.md)
 * Basics
     * Adding DynaMix to a Project
-    * Elements and Glossary 
+    * [Elements and Glossary](basics/glossary.md)
     * C++ Basics
     * C Basics
 * Advanced Topics
-    * Custom Features
     * Custom Allocators
     * Creating Plugins
     * Mutation Rules
+    * Custom Features
 * Working with DynaMix
     * [Performance](working-with/perf.md)
     * Thread Safety
-    * Debugging    
+    * Debugging
     * Tips and Tricks
     * Common Problems and Solutions
 * Annotated Demos
-* Misc    
+* Misc
     * [FAQ](misc/faq.md)
     * [Differences Between v1 and v2](misc/v2-vs-v1.md)
     * Implementation Notes
