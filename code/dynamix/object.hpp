@@ -144,15 +144,15 @@ public:
     using dnmx_basic_object::unchecked_get_at;
 
     template <typename Mixin>
-    bool has() {
+    bool has() const noexcept {
         return has(g::get_mixin_info<Mixin>());
     }
     template <typename Mixin>
-    Mixin* get() {
+    Mixin* get() noexcept {
         return static_cast<Mixin*>(get(g::get_mixin_info<Mixin>()));
     }
     template <typename Mixin>
-    const Mixin* get() const {
+    const Mixin* get() const noexcept {
         return static_cast<const Mixin*>(get(g::get_mixin_info<Mixin>()));
     }
 
