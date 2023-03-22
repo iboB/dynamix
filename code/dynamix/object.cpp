@@ -111,7 +111,7 @@ void object::copy_from(const object& o) {
             auto err = info.copy_init(&info, new_mixin, source);
             if (err) throw mutation_user_error("copy_init user", err);
         },
-        [&](const mixin_info& info, mixin_index_t index, byte_t* mixin, mixin_index_t /*old index*/) {
+        [&](const mixin_info& info, mixin_index_t index, byte_t* mixin) {
             auto source = o.m_mixin_data[index].mixin;
             auto err = info.copy_asgn(&info, mixin, source);
             if (err) throw mutation_user_error("copy_asgn user", err);

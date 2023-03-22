@@ -25,7 +25,7 @@ public:
     object_mutation(object_mutation&&) noexcept = delete; // allow factory constructors
     object_mutation& operator=(object_mutation&&) = delete;
 
-    static void empty_udpate_func(const mixin_info&, mixin_index_t, byte_t*, mixin_index_t) {}
+    static void empty_udpate_func(const mixin_info&, mixin_index_t, byte_t*) {}
 
     // update next mixin (in order of construction) after the one reached by the last piecewise call
     //
@@ -34,7 +34,7 @@ public:
     // DANGER: don't return if the mixin is not constructed! to abort, throw an exception.
     //
     // * call update_common if the mixin is common
-    // void update_common(const mixin_info& info, mixin_index_t new_index, byte_t* common_mixin, mixin_index_t old_index)
+    // void update_common(const mixin_info& info, mixin_index_t new_index, byte_t* common_mixin)
     template <typename ConstructNew_Func, typename UpdateCommon_Func>
     void update_next_mixin(ConstructNew_Func&& construct_new, UpdateCommon_Func&& update_common) {
         if (m_complete) return;
@@ -44,7 +44,7 @@ public:
             // matching
             auto oi = m_old_type->sparse_mixin_indices[info.iid()];
             auto old_mixin = m_old_mixin_data[oi].mixin;
-            update_common(info, ti, old_mixin, oi);
+            update_common(info, ti, old_mixin);
         }
         else {
             // new
