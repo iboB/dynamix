@@ -3,6 +3,7 @@
 //
 #include "../dnmx/type.h"
 #include "type.hpp"
+#include "mixin_info.hpp"
 
 using namespace dynamix;
 
@@ -23,6 +24,14 @@ bool dnmx_type_has(dnmx_type_handle ht, const dnmx_mixin_info* info) {
 }
 bool dnmx_type_has_by_name(dnmx_type_handle ht, dnmx_sv name) {
     return self->has(name.to_std());
+}
+
+dnmx_mixin_index_t dnmx_type_index_of(dnmx_type_handle ht, const dnmx_mixin_info* info) {
+    return self->index_of(info->id);
+}
+
+dnmx_mixin_index_t dnmx_type_index_of_name(dnmx_type_handle ht, dnmx_sv name) {
+    return self->index_of(name.to_std());
 }
 
 bool dnmx_type_implements_strong(dnmx_type_handle ht, const dnmx_feature_info* info) {
