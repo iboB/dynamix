@@ -7,6 +7,7 @@
 #include <dnmx/type.h>
 #include <dnmx/object.h>
 #include <dnmx/mixin_info_util.h>
+#include <dnmx/mutate.h>
 
 #include "s-unity.h"
 
@@ -263,8 +264,164 @@ void simple(void) {
     dnmx_destroy_domain(dom);
 }
 
-void mutate_to(void) {
+typedef struct datainfos {
+    dnmx_mixin_info i_warrior;
+    dnmx_mixin_info i_athlete;
+    dnmx_mixin_info i_shooter;
+    dnmx_mixin_info i_jumper;
+    dnmx_type_handle taw;
+    dnmx_type_handle tas;
+    dnmx_type_handle tasj;
+    dnmx_type_handle tsaw;
+} test_data;
 
+void make_test_data(test_data* ti, dnmx_domain_handle dom) {
+    DNMX_COMMON_INIT_MI(ti->i_warrior, warrior);
+    ti->i_warrior.compare = dnmx_mixin_common_cmp_func;
+    T_SUCCESS(dnmx_register_mixin(dom, &ti->i_warrior));
+
+    DNMX_COMMON_INIT_MI(ti->i_athlete, athlete);
+    ti->i_athlete.init = init_athlete;
+    ti->i_athlete.compare = dnmx_mixin_common_cmp_func;
+    T_SUCCESS(dnmx_register_mixin(dom, &ti->i_athlete));
+
+    DNMX_COMMON_INIT_MI(ti->i_shooter, shooter);
+    T_SUCCESS(dnmx_register_mixin(dom, &ti->i_shooter));
+
+    DNMX_COMMON_INIT_MI(ti->i_jumper, jumper);
+    T_SUCCESS(dnmx_register_mixin(dom, &ti->i_jumper));
+
+    const dnmx_mixin_info* ar_aw[] = {&ti->i_athlete, &ti->i_warrior};
+    ti->taw = dnmx_get_type_from_infos(dom, ar_aw, _countof(ar_aw));
+    T_NOT_NULL(ti->taw);
+
+    const dnmx_mixin_info* ar_as[] = {&ti->i_athlete, &ti->i_shooter};
+    ti->tas = dnmx_get_type_from_infos(dom, ar_as, _countof(ar_as));
+    T_NOT_NULL(ti->tas);
+
+    const dnmx_mixin_info* ar_asj[] = {&ti->i_athlete, &ti->i_shooter, &ti->i_jumper};
+    ti->tasj = dnmx_get_type_from_infos(dom, ar_asj, _countof(ar_asj));
+    T_NOT_NULL(ti->tasj);
+
+    const dnmx_mixin_info* ar_saw[] = {&ti->i_shooter, &ti->i_athlete, &ti->i_warrior};
+    ti->tsaw = dnmx_get_type_from_infos(dom, ar_saw, _countof(ar_saw));
+    T_NOT_NULL(ti->tsaw);
+}
+
+dnmx_error_return_t update_warrior(const dnmx_mixin_info* info, uintptr_t user_data, dnmx_mixin_index_t index, void* mixin) {
+    (void)index;
+    T_SV_EXPECT("warrior", info->name);
+    if (user_data == 666) return -1;
+    warrior* w = mixin;
+    w->target_x = 1;
+    w->target_y = 2;
+    w->speed = 55;
+    return dnmx_result_success;
+}
+
+dnmx_error_return_t update_athlete(const dnmx_mixin_info* info, uintptr_t user_data, dnmx_mixin_index_t index, void* mixin) {
+    (void)index;
+    T_SV_EXPECT("athlete", info->name);
+    if (user_data == 666) return -1;
+    athlete* a = mixin;
+    a->speed = 22;
+    a->target_name = dnmx_make_sv_lit("new york");
+    return dnmx_result_success;
+}
+
+dnmx_error_return_t update_shooter(const dnmx_mixin_info* info, uintptr_t user_data, dnmx_mixin_index_t index, void* mixin) {
+    (void)index;
+    T_SV_EXPECT("shooter", info->name);
+    if (user_data == 666) return -1;
+    shooter* s = mixin;
+    s->target_x = 10;
+    s->target_y = 42;
+    return dnmx_result_success;
+}
+
+dnmx_error_return_t update_jumper(const dnmx_mixin_info* info, uintptr_t user_data, dnmx_mixin_index_t index, void* mixin) {
+    (void)index;
+    T_SV_EXPECT("jumper", info->name);
+    if (user_data == 666) return -1;
+    jumper* j = mixin;
+    j->height = 111;
+    return dnmx_result_success;
+}
+
+void mutate_to(void) {
+    dnmx_domain_handle dom = dnmx_create_domain(dnmx_make_sv_lit("test"), (dnmx_domain_settings){0}, 0, NULL);
+    test_data t = {0};
+    make_test_data(&t, dom);
+
+    {
+        dnmx_object_handle obj = dnmx_create_object_default(t.taw);
+        dnmx_mutate_to(obj, t.taw, NULL, 0);
+        CHECK(dnmx_object_get_type(obj) == t.taw);
+
+        {
+            const warrior* w = dnmx_object_get(obj, &t.i_warrior);
+            CHECK(w->speed == 0);
+        }
+
+        {
+            dnmx_mutate_to_override overrides[] = {
+                {.mixin = &t.i_jumper, .init_new = update_jumper},
+                {.mixin = &t.i_warrior, .init_new = update_warrior, .update_common = update_warrior, .user_data = 666},
+                {.mixin = &t.i_athlete, .update_common = update_athlete},
+                {.mixin = &t.i_shooter, .init_new = update_shooter},
+            };
+            T_SUCCESS(dnmx_mutate_to(obj, t.tasj, overrides, _countof(overrides)));
+        }
+        CHECK(dnmx_object_get_type(obj) == t.tasj);
+        T_NULL(dnmx_object_get(obj, &t.i_warrior));
+
+        {
+            const athlete* a = dnmx_object_get(obj, &t.i_athlete);
+            CHECK(a->speed == 22);
+        }
+
+        {
+            shooter* s = dnmx_object_get_mut(obj, &t.i_shooter);
+            CHECK(s->target_y == 42);
+            s->target_y = -5;
+        }
+
+        {
+            const jumper* j = dnmx_object_get(obj, &t.i_jumper);
+            CHECK(j->height == 111);
+        }
+
+        {
+            dnmx_mutate_to_override overrides[] = {
+                {.mixin = &t.i_warrior, .init_new = update_warrior, .update_common = update_warrior, .user_data = 666},
+            };
+            T_FAIL(dnmx_mutate_to(obj, t.tsaw, overrides, _countof(overrides)));
+            overrides[0].user_data = 5;
+            overrides[0].update_common = NULL;
+            T_SUCCESS(dnmx_mutate_to(obj, t.tsaw, overrides, _countof(overrides)));
+
+            T_NULL(dnmx_object_get(obj, &t.i_jumper));
+
+            {
+                const athlete* a = dnmx_object_get(obj, &t.i_athlete);
+                CHECK(a->speed == 22);
+            }
+
+            {
+                const shooter* s = dnmx_object_get(obj, &t.i_shooter);
+                CHECK(s->target_y == -5);
+            }
+
+            {
+                const warrior* w = dnmx_object_get(obj, &t.i_warrior);
+                CHECK(w->speed == 55);
+            }
+        }
+
+        dnmx_destroy_object(obj);
+    }
+
+    dnmx_destroy_domain(dom);
 }
 
 int main(void) {
