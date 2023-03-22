@@ -8,8 +8,6 @@
 #include "exception.hpp"
 #include "object_mutation.hpp"
 
-#include <itlib/sentry.hpp>
-
 namespace dynamix {
 
 object::object(domain& dom, const allocator& alloc) noexcept
