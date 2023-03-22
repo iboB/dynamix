@@ -3,7 +3,7 @@
 //
 #include "test_data.hpp"
 
-#include <itlib/qalgorithm.hpp>
+#include <algorithm>
 
 // test_data sanity checks
 

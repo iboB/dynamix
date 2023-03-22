@@ -9,8 +9,6 @@
 
 #include <doctest/doctest.h>
 
-#include <itlib/qalgorithm.hpp>
-
 using namespace dynamix;
 
 TEST_SUITE_BEGIN("dynamix");

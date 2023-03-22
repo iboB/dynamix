@@ -13,8 +13,6 @@
 
 #include <doctest/doctest.h>
 
-#include <itlib/qalgorithm.hpp>
-
 #include <optional>
 
 using namespace dynamix;
