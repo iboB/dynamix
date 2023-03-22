@@ -23,6 +23,9 @@ DYNAMIX_API dnmx_mixin_index_t dnmx_type_num_mixins(dnmx_type_handle ht);
 DYNAMIX_API bool dnmx_type_has(dnmx_type_handle ht, const dnmx_mixin_info* info);
 DYNAMIX_API bool dnmx_type_has_by_name(dnmx_type_handle ht, dnmx_sv name);
 
+DYNAMIX_API dnmx_mixin_index_t dnmx_type_index_of(dnmx_type_handle ht, const dnmx_mixin_info* info);
+DYNAMIX_API dnmx_mixin_index_t dnmx_type_index_of_name(dnmx_type_handle ht, dnmx_sv name);
+
 DYNAMIX_API bool dnmx_type_implements_strong(dnmx_type_handle ht, const dnmx_feature_info* info);
 DYNAMIX_API bool dnmx_type_implements_strong_by_name(dnmx_type_handle ht, dnmx_sv name);
 

@@ -24,7 +24,9 @@ void empty(void) {
 
     dnmx_mixin_info em = dnmx_make_mixin_info();
     CHECK_FALSE(dnmx_type_has(type, &em));
+    CHECK(dnmx_type_index_of(type, &em) == dnmx_invalid_mixin_index);
     CHECK_FALSE(dnmx_type_has_by_name(type, dnmx_make_sv_lit("bar")));
+    CHECK(dnmx_type_index_of_name(type, dnmx_make_sv_lit("bar")) == dnmx_invalid_mixin_index);
 
     dnmx_feature_info ef = dnmx_make_feature_info();
     CHECK_FALSE(dnmx_type_implements_strong(type, &ef));
@@ -99,9 +101,13 @@ void simple(void) {
     CHECK(dnmx_type_num_mixins(type) == 2);
 
     CHECK(dnmx_type_has(type, &athlete));
+    CHECK(dnmx_type_index_of(type, &athlete) == 0);
     CHECK(dnmx_type_has_by_name(type, dnmx_make_sv_lit("warrior")));
+    CHECK(dnmx_type_index_of_name(type, dnmx_make_sv_lit("warrior")) == 1);
     CHECK_FALSE(dnmx_type_has(type, &shooter));
+    CHECK(dnmx_type_index_of(type, &shooter) == dnmx_invalid_mixin_index);
     CHECK_FALSE(dnmx_type_has_by_name(type, dnmx_make_sv_lit("shooter")));
+    CHECK(dnmx_type_index_of_name(type, dnmx_make_sv_lit("shooter")) == dnmx_invalid_mixin_index);
 
     CHECK(dnmx_type_implements_strong(type, &run));
     CHECK(dnmx_type_implements_strong_by_name(type, dnmx_make_sv_lit("shoot")));
