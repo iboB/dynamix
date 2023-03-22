@@ -27,6 +27,8 @@ target_sources(dynamix PRIVATE
     dynamix/object_mutation.cpp
     dynamix/object_mutate_ops.cpp
 
+    dynamix/mutate-c.cpp
+
     dynamix/compat/pmr/memory_resource.cpp
 
     "dynamix/domain-c.cpp"

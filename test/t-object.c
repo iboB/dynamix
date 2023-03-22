@@ -263,9 +263,14 @@ void simple(void) {
     dnmx_destroy_domain(dom);
 }
 
+void mutate_to(void) {
+
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(empty);
     RUN_TEST(simple);
+    RUN_TEST(mutate_to);
     return UNITY_END();
 }

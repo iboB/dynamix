@@ -26,6 +26,7 @@ public:
     object_mutation& operator=(object_mutation&&) = delete;
 
     static void empty_udpate_func(const mixin_info&, mixin_index_t, byte_t*) {}
+    static void default_init_mixin(const mixin_info&, mixin_index_t, byte_t*);
 
     // update next mixin (in order of construction) after the one reached by the last piecewise call
     //
