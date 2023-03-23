@@ -39,7 +39,7 @@ typedef struct dnmx_mutate_op {
 } dnmx_mutate_op;
 DYNAMIX_API dnmx_error_return_t dnmx_mutate(dnmx_object_handle obj, const dnmx_mutate_op* ops, uint32_t num_mutate_ops);
 
-// quick one-off syntax
+// shorthand one-off syntax
 DYNAMIX_API dnmx_error_return_t dnmx_mutate_add(dnmx_object_handle obj, const dnmx_mixin_info* info, dnmx_mutate_func init_override);
 DYNAMIX_API dnmx_error_return_t dnmx_mutate_add_by_name(dnmx_object_handle obj, dnmx_sv name, dnmx_mutate_func init_override);
 DYNAMIX_API dnmx_error_return_t dnmx_mutate_remove(dnmx_object_handle obj, const dnmx_mixin_info* info);

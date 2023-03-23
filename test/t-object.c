@@ -424,10 +424,33 @@ void mutate_to(void) {
     dnmx_destroy_domain(dom);
 }
 
+void mutate(void) {
+    dnmx_domain_handle dom = dnmx_create_domain(dnmx_make_sv_lit("test"), (dnmx_domain_settings) { 0 }, 0, NULL);
+    test_data t = {0};
+    make_test_data(&t, dom);
+
+    {
+        dnmx_object_handle obj = dnmx_create_object_empty(dom);
+        {
+            dnmx_mutate_op ops[] = {
+                {.type = dnmx_mutate_op_add, .mixin = &t.i_athlete},
+                {.type = dnmx_mutate_op_add, .mixin = &t.i_warrior, .init_override = update_warrior},
+            };
+            T_SUCCESS(dnmx_mutate(obj, ops, _countof(ops)));
+        }
+        CHECK(dnmx_object_get_type(obj) == t.taw);
+
+        dnmx_destroy_object(obj);
+    }
+
+    dnmx_destroy_domain(dom);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(empty);
     RUN_TEST(simple);
     RUN_TEST(mutate_to);
+    RUN_TEST(mutate);
     return UNITY_END();
 }
