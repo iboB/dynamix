@@ -365,7 +365,7 @@ void mutate_to(void) {
 
         {
             dnmx_mutate_to_override overrides[] = {
-                {.mixin = &t.i_jumper, .init_new = update_jumper, .user_data = 111},
+                {.mixin_name = dnmx_make_sv_lit("jumper"), .init_new = update_jumper, .user_data = 111},
                 {.mixin = &t.i_warrior, .init_new = update_warrior, .update_common = update_warrior, .user_data = 666},
                 {.mixin = &t.i_athlete, .update_common = update_athlete},
                 {.mixin = &t.i_shooter, .init_new = update_shooter},
@@ -434,7 +434,7 @@ void mutate(void) {
         dnmx_object_handle obj = dnmx_create_object_empty(dom);
         {
             dnmx_mutate_op ops[] = {
-                {.type = dnmx_mutate_op_add, .mixin = &t.i_athlete},
+                {.type = dnmx_mutate_op_add, .mixin_name = dnmx_make_sv_lit("athlete")},
                 {.type = dnmx_mutate_op_add, .mixin = &t.i_warrior, .init_override = update_warrior},
             };
             T_SUCCESS(dnmx_mutate(obj, ops, _countof(ops)));
@@ -454,7 +454,7 @@ void mutate(void) {
         {
             dnmx_mutate_op ops[] = {
                 {.type = dnmx_mutate_op_remove, .mixin = &t.i_warrior},
-                {.type = dnmx_mutate_op_add, .mixin = &t.i_shooter, .init_override = update_shooter, .user_data = 666},
+                {.type = dnmx_mutate_op_add, .mixin_name = dnmx_make_sv_lit("shooter"), .init_override = update_shooter, .user_data = 666},
                 {.type = dnmx_mutate_op_add, .mixin = &t.i_jumper, .init_override = update_jumper, .user_data = 50},
             };
             T_FAIL(dnmx_mutate(obj, ops, _countof(ops)));
@@ -483,7 +483,7 @@ void mutate(void) {
         {
             dnmx_mutate_op ops[] = {
                 {.type = dnmx_mutate_op_to_back, .mixin = &t.i_athlete},
-                {.type = dnmx_mutate_op_remove, .mixin = &t.i_jumper},
+                {.type = dnmx_mutate_op_remove, .mixin_name = dnmx_make_sv_lit("jumper")},
                 {.type = dnmx_mutate_op_add, .mixin = &t.i_warrior},
             };
             T_SUCCESS(dnmx_mutate(obj, ops, _countof(ops)));

@@ -26,11 +26,10 @@ typedef struct dnmx_mutate_to_override {
 DYNAMIX_API dnmx_error_return_t dnmx_mutate_to(dnmx_object_handle obj, dnmx_type_handle type, const dnmx_mutate_to_override* overrides, uint32_t num_overrides);
 
 enum dnmx_mutate_op_type {
-    dnmx_mutate_op_add,
-    dnmx_mutate_op_remove,
-    dnmx_mutate_op_to_back,
+    dnmx_mutate_op_add, // add mixin
+    dnmx_mutate_op_remove, // remove mixin
+    dnmx_mutate_op_to_back, // move mixin to back
 };
-
 typedef struct dnmx_mutate_op {
     int type; // dnmx_mutate_op_type
     const dnmx_mixin_info* mixin; // can be null, in which case mixin_name is checked
@@ -39,12 +38,6 @@ typedef struct dnmx_mutate_op {
     uintptr_t user_data; // user data for this op
 } dnmx_mutate_op;
 DYNAMIX_API dnmx_error_return_t dnmx_mutate(dnmx_object_handle obj, const dnmx_mutate_op* ops, uint32_t num_mutate_ops);
-
-// shorthand one-off syntax
-DYNAMIX_API dnmx_error_return_t dnmx_mutate_add(dnmx_object_handle obj, const dnmx_mixin_info* info, dnmx_mutate_func init_override);
-DYNAMIX_API dnmx_error_return_t dnmx_mutate_add_by_name(dnmx_object_handle obj, dnmx_sv name, dnmx_mutate_func init_override);
-DYNAMIX_API dnmx_error_return_t dnmx_mutate_remove(dnmx_object_handle obj, const dnmx_mixin_info* info);
-DYNAMIX_API dnmx_error_return_t dnmx_mutate_remove_by_name(dnmx_object_handle obj, dnmx_sv name);
 
 #if defined(__cplusplus)
 }
