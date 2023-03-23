@@ -28,7 +28,8 @@ dnmx_error_return_t dnmx_mutate_to(dnmx_object_handle obj, dnmx_type_handle ht, 
         for (mixin_index_t i = 0; i < t.num_mixins(); ++i) {
             auto* m = t.mixins[i];
             auto o = itlib::pfind_if(overrides, [&](const dnmx_mutate_to_override& ov) {
-                return ov.mixin == m;
+                if (ov.mixin) return ov.mixin == m;
+                return ov.mixin_name == m->name;
             });
             if (!o) continue; // not overridden
 
@@ -73,16 +74,18 @@ DYNAMIX_API dnmx_error_return_t dnmx_mutate(dnmx_object_handle ho, const dnmx_mu
         type_mutation type_mut(obj->get_type());
 
         for (auto& op : ops) {
-            if (!op.mixin) return -1;
             switch (op.type) {
             case dnmx_mutate_op_add:
-                type_mut.add(*op.mixin);
+                if (op.mixin) type_mut.add(*op.mixin);
+                else type_mut.add(op.mixin_name.to_std());
                 break;
             case dnmx_mutate_op_remove:
-                type_mut.remove(*op.mixin);
+                if (op.mixin) type_mut.remove(*op.mixin);
+                else type_mut.remove(op.mixin_name.to_std());
                 break;
             case dnmx_mutate_op_to_back:
-                type_mut.to_back(*op.mixin);
+                if (op.mixin) type_mut.to_back(*op.mixin);
+                else type_mut.to_back(op.mixin_name.to_std());
                 break;
             default:
                 return -1;
@@ -97,9 +100,11 @@ DYNAMIX_API dnmx_error_return_t dnmx_mutate(dnmx_object_handle ho, const dnmx_mu
         for (mixin_index_t i = 0; i < t.num_mixins(); ++i) {
             auto* m = t.mixins[i];
             auto o = itlib::pfind_if(ops, [&](const dnmx_mutate_op& op) {
-                return op.type == dnmx_mutate_op_add // only collect add ops
-                    && op.mixin == m                 // ... for the mixin in question
-                    && op.init_override;             // ... which have an init override
+                if (op.type != dnmx_mutate_op_add) return false; // only collect add ops
+                if (!op.init_override) return false; // ... which have an init override
+                // ... for the mixin in question
+                if (op.mixin) return op.mixin == m;
+                return op.mixin_name == m->name;
             });
             if (!o) continue; // not overridden
 
