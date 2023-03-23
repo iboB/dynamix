@@ -92,4 +92,6 @@ endif()
 find_package(Threads)
 if(Threads_FOUND)
     dynamix_mt_test(domain-mt t-domain-mt.cpp)
+
+    dynamix_mt_test(fuzz-features fuzz-features.cpp)
 endif()

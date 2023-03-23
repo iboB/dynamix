@@ -64,7 +64,8 @@ public:
         return *this;
     }
 
-    self& default_payload(feature_payload pl) {
+    template <typename Payload>
+    self& default_payload_by(Payload& pl) {
         return default_payload(fwd_any(pl));
     }
 
