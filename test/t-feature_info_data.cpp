@@ -26,7 +26,7 @@ TEST_CASE("feature_info_data builder") {
 
     CHECK_FALSE(info.default_payload);
     int pl0 = 4;
-    b.default_payload(&pl0);
+    b.default_payload_by(pl0);
     CHECK(info.default_payload == &pl0);
     CHECK(info.default_payload == data.default_payload_storage.get());
 
@@ -34,7 +34,7 @@ TEST_CASE("feature_info_data builder") {
     CHECK(*static_cast<int*>(info.default_payload) == 43);
     CHECK(info.default_payload == data.default_payload_storage.get());
 
-    b.default_payload(&pl0);
+    b.default_payload_by(pl0);
     CHECK(info.default_payload == &pl0);
     CHECK(info.default_payload == data.default_payload_storage.get());
 }
