@@ -344,7 +344,7 @@ dnmx_error_return_t update_jumper(const dnmx_mixin_info* info, uintptr_t user_da
     T_SV_EXPECT("jumper", info->name);
     if (user_data == 666) return -1;
     jumper* j = mixin;
-    j->height = 111;
+    j->height = (float)user_data;
     return dnmx_result_success;
 }
 
@@ -365,7 +365,7 @@ void mutate_to(void) {
 
         {
             dnmx_mutate_to_override overrides[] = {
-                {.mixin = &t.i_jumper, .init_new = update_jumper},
+                {.mixin = &t.i_jumper, .init_new = update_jumper, .user_data = 111},
                 {.mixin = &t.i_warrior, .init_new = update_warrior, .update_common = update_warrior, .user_data = 666},
                 {.mixin = &t.i_athlete, .update_common = update_athlete},
                 {.mixin = &t.i_shooter, .init_new = update_shooter},
@@ -396,6 +396,7 @@ void mutate_to(void) {
                 {.mixin = &t.i_warrior, .init_new = update_warrior, .update_common = update_warrior, .user_data = 666},
             };
             T_FAIL(dnmx_mutate_to(obj, t.tsaw, overrides, _countof(overrides)));
+            CHECK(dnmx_object_get_type(obj) == t.tasj);
             overrides[0].user_data = 5;
             overrides[0].update_common = NULL;
             T_SUCCESS(dnmx_mutate_to(obj, t.tsaw, overrides, _countof(overrides)));
@@ -404,7 +405,7 @@ void mutate_to(void) {
 
             {
                 const athlete* a = dnmx_object_get(obj, &t.i_athlete);
-                CHECK(a->speed == 22);
+                T_SV_EXPECT("new york", a->target_name);
             }
 
             {
@@ -439,6 +440,60 @@ void mutate(void) {
             T_SUCCESS(dnmx_mutate(obj, ops, _countof(ops)));
         }
         CHECK(dnmx_object_get_type(obj) == t.taw);
+
+        {
+            const athlete* a = dnmx_object_get(obj, &t.i_athlete);
+            T_SV_EXPECT("pernik", a->target_name);
+        }
+
+        {
+            const warrior* w = dnmx_object_get(obj, &t.i_warrior);
+            CHECK(w->speed == 55);
+        }
+
+        {
+            dnmx_mutate_op ops[] = {
+                {.type = dnmx_mutate_op_remove, .mixin = &t.i_warrior},
+                {.type = dnmx_mutate_op_add, .mixin = &t.i_shooter, .init_override = update_shooter, .user_data = 666},
+                {.type = dnmx_mutate_op_add, .mixin = &t.i_jumper, .init_override = update_jumper, .user_data = 50},
+            };
+            T_FAIL(dnmx_mutate(obj, ops, _countof(ops)));
+            CHECK(dnmx_object_get_type(obj) == t.taw);
+            ops[1].user_data = 4;
+            T_SUCCESS(dnmx_mutate(obj, ops, _countof(ops)));
+            CHECK(dnmx_object_get_type(obj) == t.tasj);
+        }
+
+        {
+            const athlete* a = dnmx_object_get(obj, &t.i_athlete);
+            T_SV_EXPECT("pernik", a->target_name);
+        }
+
+        {
+            shooter* s = dnmx_object_get_mut(obj, &t.i_shooter);
+            CHECK(s->target_y == 42);
+            s->target_y = 23;
+        }
+
+        {
+            const jumper* j = dnmx_object_get(obj, &t.i_jumper);
+            CHECK(j->height == 50);
+        }
+
+        {
+            dnmx_mutate_op ops[] = {
+                {.type = dnmx_mutate_op_to_back, .mixin = &t.i_athlete},
+                {.type = dnmx_mutate_op_remove, .mixin = &t.i_jumper},
+                {.type = dnmx_mutate_op_add, .mixin = &t.i_warrior},
+            };
+            T_SUCCESS(dnmx_mutate(obj, ops, _countof(ops)));
+            CHECK(dnmx_object_get_type(obj) == t.tsaw);
+        }
+
+        {
+            const shooter* s = dnmx_object_get(obj, &t.i_shooter);
+            CHECK(s->target_y == 23);
+        }
 
         dnmx_destroy_object(obj);
     }
