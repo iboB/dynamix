@@ -65,12 +65,13 @@ Here are some of the key features of the library:
 
 The following projects are known to use DynaMix as a key piece of their software architecture:
 
-* [A3I](https://ibob.bg/blog/2022/01/25/what-we-do-at-viewray/) by ViewRay (Released 2022) - A medical system for cancer treatment
-* [huse](https://github.com/iboB/huse) - a polymorphic serialization library
-* [War Planet Online: Global Conquest](http://warplanetonline.com/) by Gameloft (Released 2017) - An MMORTS for Android and iOS.
-* [Blitz Brigade: Rival Tactics](http://www.rival-tactics.com/) by Gameloft (Released 2017) - A multiplayer RTS for Android, iOS, and Windows.
-* [Swords & Crossbones: An Epic Pirate Story](http://store.steampowered.com/app/383720/Swords__Crossbones_An_Epic_Pirate_Story/) by Epic Devs LLC (Released 2014) - A strategy/exploration game for Android, iOS, and PC.
-* [Earthrise](https://www.play-earthrise.com/) by Masthead Studios (Released 2011) - An MMORPG (no longer supported). Uses an early proprietary prototype version of the library with a similar interface and a different implementation.
+* [A3I](https://ibob.bg/blog/2022/01/25/what-we-do-at-viewray/) by ViewRay (Released 2022) - A medical system for cancer treatment. Uses v2
+* [huse](https://github.com/iboB/huse) - a polymorphic serialization library. Uses v2
+* [Heroes of the Dark](https://www.gameloft.com/game/heroes-of-the-dark) by Gameloft (Released 2021) - An RPG for Android, iOS, and Windows. Uses v1
+* [War Planet Online: Global Conquest](http://warplanetonline.com/) by Gameloft (Released 2017) - An MMORTS for mobile devices and PCs. Uses v1
+* [Blitz Brigade: Rival Tactics](http://www.rival-tactics.com/) by Gameloft (Released 2017) - A multiplayer RTS for Android, iOS, and Windows. Uses v1
+* [Swords & Crossbones: An Epic Pirate Story](http://store.steampowered.com/app/383720/Swords__Crossbones_An_Epic_Pirate_Story/) by Epic Devs LLC (Released 2014) - A strategy/exploration game for Android, iOS, and PC. Uses v1
+* [Earthrise](https://web.archive.org/web/20160730224855/http://play-earthrise.com/) by Masthead Studios (Released 2011) - An MMORPG (no longer supported). Uses an early proprietary prototype version of the library with a similar interface and a different implementation.
 
 ## Documentation
 
