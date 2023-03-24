@@ -558,6 +558,36 @@ TEST_CASE("mutate") {
         CHECK(obj.has(*t.actor));
         qget(obj, actor)->name = "foo";
     }
+
+    {
+        object obj(dom);
+        mutate(obj).add(*t.movable).add("procedural_geometry");
+        auto& t_mp = obj.get_type();
+        CHECK(obj.num_mixins() == 2);
+        CHECK(obj.has(*t.movable));
+        CHECK(t_mp.index_of("movable") == 0);
+        CHECK(obj.has(*t.procedural_geometry));
+
+        mutate(obj).remove("movable").add(*t.empty);
+        CHECK(obj.num_mixins() == 2);
+        CHECK(obj.has(*t.empty));
+        CHECK(obj.has(*t.procedural_geometry));
+        CHECK(obj.get_type().index_of("empty") == 1);
+
+        mutate(obj).remove(*t.empty);
+        CHECK(obj.num_mixins() == 1);
+        CHECK(obj.has(*t.procedural_geometry));
+
+        mutate(obj)
+            .add(*t.actor)
+            .add(*t.movable)
+            .remove("actor")
+            .to_back(*t.procedural_geometry);
+        CHECK(obj.get_type() == t_mp);
+
+        CHECK_THROWS_WITH_AS(mutate(obj).add("actor"), "missing default init", mutation_error);
+        CHECK(obj.get_type() == t_mp);
+    }
 }
 
 TEST_CASE("more mutation errors") {

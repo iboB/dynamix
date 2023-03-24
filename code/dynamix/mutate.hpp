@@ -23,11 +23,20 @@ void mutate(object& obj, Ops&&... ops) {
 class gradual_mutation {
     type_mutation m_type_mut;
     object& m_obj;
+    bool m_applied = false;
 public:
     gradual_mutation(object& obj)
         : m_type_mut(obj.get_type())
         , m_obj(obj)
     {}
+    ~gradual_mutation() noexcept(false) {
+        if (std::uncaught_exceptions()) return;
+        if (m_applied) return;
+        apply();
+    }
+
+    gradual_mutation(const gradual_mutation&) = delete;
+    gradual_mutation& operator=(const gradual_mutation&) = delete;
 
     using self_t = gradual_mutation;
 
@@ -35,6 +44,47 @@ public:
     self_t& add() {
         m_type_mut.add<Mixin>();
         return *this;
+    }
+    self_t& add(const mixin_info& info) {
+        m_type_mut.add(info);
+        return *this;
+    }
+    self_t& add(std::string_view name) {
+        m_type_mut.add(name);
+        return *this;
+    }
+
+    template <typename Mixin>
+    self_t& remove() {
+        m_type_mut.remove<Mixin>();
+        return *this;
+    }
+    self_t& remove(const mixin_info& info) {
+        m_type_mut.remove(info);
+        return *this;
+    }
+    self_t& remove(std::string_view name) {
+        m_type_mut.remove(name);
+        return *this;
+    }
+
+    template <typename Mixin>
+    self_t& to_back() {
+        m_type_mut.to_back<Mixin>();
+        return *this;
+    }
+    self_t& to_back(const mixin_info& info) {
+        m_type_mut.to_back(info);
+        return *this;
+    }
+    self_t& to_back(std::string_view name) {
+        m_type_mut.to_back(name);
+        return *this;
+    }
+
+    void apply() {
+        auto& type = m_obj.get_domain().get_type(std::move(m_type_mut));
+        m_obj.reset_type(type);
     }
 };
 gradual_mutation mutate(object& obj) {
