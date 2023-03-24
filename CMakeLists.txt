@@ -3,7 +3,7 @@
 #
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
-project(dynamix2
+project(dynamix
     LANGUAGES C CXX
 )
 
