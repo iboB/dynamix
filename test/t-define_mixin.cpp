@@ -163,10 +163,9 @@ TEST_CASE("declared mixins only") {
 
     auto ntypes = dynamix::g::get_domain<test>().num_types();
     auto nqueries = dynamix::g::get_domain<test>().num_type_queries();
-    dynamix::mutate(obj,
-        dynamix::add<bob>(),
-        dynamix::to_back<alice>()
-    );
+    dynamix::mutate(obj)
+        .add<bob>()
+        .to_back<alice>();
     {
         auto& t = obj.get_type();
         CHECK(t.num_mixins() == 3);
