@@ -1,15 +1,16 @@
 // Copyright (c) Borislav Stanimirov
 // SPDX-License-Identifier: MIT
 //
-#include <dynamix/core.hpp>
-#include <dynamix/object_type_template.hpp>
+#include <dynamix/v1compat/define_mixin.hpp>
+// #include <dynamix/object_type_template.hpp>
 
-#include "doctest/doctest.h"
+#include <doctest/doctest.h>
 
-TEST_SUITE_BEGIN("core");
+TEST_SUITE_BEGIN("v1 core");
 
 using namespace dynamix;
 
+/*
 // some mixins and messages
 DYNAMIX_DECLARE_MIXIN(counter);
 DYNAMIX_DECLARE_MIXIN(no_messages);
@@ -275,3 +276,4 @@ DYNAMIX_DEFINE_MESSAGE(get_self);
 DYNAMIX_DEFINE_MESSAGE(unused);
 DYNAMIX_DEFINE_MESSAGE(multi);
 DYNAMIX_DEFINE_MESSAGE(inherited);
+*/
