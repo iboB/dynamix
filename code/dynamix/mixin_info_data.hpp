@@ -192,6 +192,10 @@ public:
         m_data.mutation_rule_infos.push_back(&m_data.mutation_rule_info_storage.back());
         return *this;
     }
+
+    // noop: useful for extending mixin macro with custom features and feature sets
+    template <typename T>
+    self& noop(T&&) { return *this; }
 };
 
 }
