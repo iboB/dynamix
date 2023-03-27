@@ -1,6 +1,7 @@
 // Copyright (c) Borislav Stanimirov
 // SPDX-License-Identifier: MIT
 //
+#include <dynamix/v1compat/declare_mixin.hpp>
 #include <dynamix/v1compat/define_mixin.hpp>
 // #include <dynamix/object_type_template.hpp>
 
@@ -10,21 +11,19 @@ TEST_SUITE_BEGIN("v1 core");
 
 using namespace dynamix;
 
-/*
+
 // some mixins and messages
-DYNAMIX_DECLARE_MIXIN(counter);
-DYNAMIX_DECLARE_MIXIN(no_messages);
-DYNAMIX_DECLARE_MIXIN(type_checker);
-//DYNAMIX_DECLARE_MIXIN(overrider);
-//DYNAMIX_DECLARE_MIXIN(foo);
-//DYNAMIX_DECLARE_MIXIN(bar);
+DYNAMIX_V1_DECLARE_MIXIN(counter);
+DYNAMIX_V1_DECLARE_MIXIN(no_messages);
+DYNAMIX_V1_DECLARE_MIXIN(type_checker);
 
-DYNAMIX_MESSAGE_0(void, dummy);
-DYNAMIX_CONST_MESSAGE_0(const void*, get_self);
-DYNAMIX_MESSAGE_0(void, unused);
-DYNAMIX_MULTICAST_MESSAGE_1(void, multi, int&, n)
-DYNAMIX_MESSAGE_0(int, inherited);
-
+/*
+DYNAMIX_V1_MESSAGE_0(void, dummy);
+DYNAMIX_V1_CONST_MESSAGE_0(const void*, get_self);
+DYNAMIX_V1_MESSAGE_0(void, unused);
+DYNAMIX_V1_MULTICAST_MESSAGE_1(void, multi, int&, n)
+DYNAMIX_V1_MESSAGE_0(int, inherited);
+*/
 class no_messages
 {
 };
@@ -75,7 +74,7 @@ public:
     }
 
 };
-
+/*
 TEST_CASE("mixin_type_info")
 {
     {
@@ -266,14 +265,15 @@ TEST_CASE("type_template")
     // applying a type template should reset the object
     CHECK(o3.get<counter>()->get_count() == 0);
 }
+*/
+DYNAMIX_V1_DEFINE_MIXIN(no_messages, none);
+/*
+DYNAMIX_V1_DEFINE_MIXIN(counter, dummy_msg& multi_msg& user_data(33));
+DYNAMIX_V1_DEFINE_MIXIN(type_checker, get_self_msg& user_data(44)& multi_msg& inherited_msg);
 
-DYNAMIX_DEFINE_MIXIN(no_messages, none);
-DYNAMIX_DEFINE_MIXIN(counter, dummy_msg& multi_msg& user_data(33));
-DYNAMIX_DEFINE_MIXIN(type_checker, get_self_msg& user_data(44)& multi_msg& inherited_msg);
-
-DYNAMIX_DEFINE_MESSAGE(dummy);
-DYNAMIX_DEFINE_MESSAGE(get_self);
-DYNAMIX_DEFINE_MESSAGE(unused);
-DYNAMIX_DEFINE_MESSAGE(multi);
-DYNAMIX_DEFINE_MESSAGE(inherited);
+DYNAMIX_V1_DEFINE_MESSAGE(dummy);
+DYNAMIX_V1_DEFINE_MESSAGE(get_self);
+DYNAMIX_V1_DEFINE_MESSAGE(unused);
+DYNAMIX_V1_DEFINE_MESSAGE(multi);
+DYNAMIX_V1_DEFINE_MESSAGE(inherited);
 */

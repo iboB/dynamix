@@ -6,14 +6,15 @@
 #include <dynamix/define_mixin.hpp>
 
 namespace dynamix {
-struct none {};
-namespace impl {
+struct none_t {};
+inline none_t none;
+namespace v1compat {
 template <typename Mixin>
 class feature_parser : public util::mixin_info_data_builder<Mixin> {
     using super = util::mixin_info_data_builder<Mixin>;
 public:
     feature_parser(util::mixin_info_data& data, dnmx_sv name) noexcept
-        : util::mixin_info_data_builder(data, name)
+        : super(data, name)
     {}
 
     template <typename Feature>
@@ -22,7 +23,7 @@ public:
         return *this;
     }
 
-    feature_parser& operator&(none) {
+    feature_parser& operator&(none_t) {
         return *this;
     }
 };
