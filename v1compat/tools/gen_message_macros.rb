@@ -10,7 +10,6 @@ OUT_FILE = INCLUDE + 'template_message_macros.ipp'
 LEGACY_OUT_FILE = INCLUDE + 'legacy_message_macros.ipp'
 ARITY_FNAME = 'arity_message_macros.ipp'
 ARITY_OUT_FILE = INCLUDE + ARITY_FNAME
-SPLIT_OUT_FILE = INCLUDE + 'split_message_macros.ipp'
 NO_ARITY_OUT_FILE = INCLUDE + 'no_arity_message_macros.ipp'
 SHORT_OUT_FILE = INCLUDE + 'short_message_macros.ipp'
 UNDEF_OUT_FILE= INCLUDE + 'undef_message_macros.ipp'
@@ -77,17 +76,6 @@ File.open(LEGACY_OUT_FILE, 'w') do |f|
   MAX_ARITY.times do |i|
     params = params_for_arity(i)
     f.write(LEGACY_DECL % params)
-  end
-  f.puts("#include \"#{ARITY_FNAME}\"")
-end
-
-SPLIT_DECL = File.open('split_message_macros_template', 'r').read
-
-File.open(SPLIT_OUT_FILE, 'w') do |f|
-  f.write(HEADER)
-  MAX_ARITY.times do |i|
-    params = params_for_arity(i)
-    f.write(SPLIT_DECL % params)
   end
   f.puts("#include \"#{ARITY_FNAME}\"")
 end
