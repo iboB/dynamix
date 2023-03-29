@@ -3,6 +3,7 @@
 //
 #include <dynamix/v1compat/declare_mixin.hpp>
 #include <dynamix/v1compat/define_mixin.hpp>
+#include <dynamix/v1compat/declare_message.hpp>
 // #include <dynamix/object_type_template.hpp>
 
 #include <doctest/doctest.h>
@@ -17,8 +18,8 @@ DYNAMIX_V1_DECLARE_MIXIN(counter);
 DYNAMIX_V1_DECLARE_MIXIN(no_messages);
 DYNAMIX_V1_DECLARE_MIXIN(type_checker);
 
-/*
 DYNAMIX_V1_MESSAGE_0(void, dummy);
+/*
 DYNAMIX_V1_CONST_MESSAGE_0(const void*, get_self);
 DYNAMIX_V1_MESSAGE_0(void, unused);
 DYNAMIX_V1_MULTICAST_MESSAGE_1(void, multi, int&, n)

@@ -7,7 +7,6 @@
 INCLUDE = '../code/dynamix/v1compat/gen/'
 MAX_ARITY = File.open('arity').read.strip.to_i + 1
 OUT_FILE = INCLUDE + 'template_message_macros.ipp'
-LEGACY_OUT_FILE = INCLUDE + 'legacy_message_macros.ipp'
 ARITY_FNAME = 'arity_message_macros.ipp'
 ARITY_OUT_FILE = INCLUDE + ARITY_FNAME
 NO_ARITY_OUT_FILE = INCLUDE + 'no_arity_message_macros.ipp'
@@ -69,17 +68,6 @@ File.open(OUT_FILE, 'w') do |f|
   f.puts("#include \"#{ARITY_FNAME}\"")
 end
 
-LEGACY_DECL = File.open('legacy_message_macros_template', 'r').read
-
-File.open(LEGACY_OUT_FILE, 'w') do |f|
-  f.write(HEADER)
-  MAX_ARITY.times do |i|
-    params = params_for_arity(i)
-    f.write(LEGACY_DECL % params)
-  end
-  f.puts("#include \"#{ARITY_FNAME}\"")
-end
-
 ARITY_DECL = File.open('arity_message_macros_template', 'r').read
 
 File.open(ARITY_OUT_FILE, 'w') do |f|
@@ -126,7 +114,7 @@ end
 # short macros
 
 shorten = {
-  'DYNAMIX_' => '',
+  'DYNAMIX_V1_' => '',
   'MESSAGE' => 'MSG',
   'CONST' => 'C',
   'MULTICAST' => 'MULTI',
