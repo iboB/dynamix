@@ -3,6 +3,7 @@
 //
 #pragma once
 #include <dynamix/msg/func_traits.hpp>
+#include <dynamix/object.hpp>
 
 #define I_DYNAMIX_V1_MSG_STRUCT_NAME(msg_name) I_DNMX_PP_CAT(msg_name, _msg_t)
 #define I_DYNAMIX_V1_MESSAGE_TAG(msg_name) I_DNMX_PP_CAT(msg_name, _msg)

@@ -61,6 +61,6 @@
         static ::dynamix::common_feature_info the_info(dnmx_make_sv_lit(I_DNMX_PP_STRINGIZE(I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name))), clash, (void*)(static_cast<I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::traits::sig_t*>(I_DYNAMIX_V1_DEFAULT_IMPL_FUNC_NAME(message_name)))); \
         return the_info; \
     } \
-    const ::dynamix::feature_info& I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::info = msg_name::get_info_safe(); \
+    const ::dynamix::feature_info& I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::info = I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::get_info_safe(); \
     I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name) * I_DYNAMIX_V1_MESSAGE_TAG(message_name) = nullptr; \
     return_type I_DYNAMIX_V1_DEFAULT_IMPL_FUNC_NAME(message_name)(I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::traits::obj_t& obj %{coma_args_signature})

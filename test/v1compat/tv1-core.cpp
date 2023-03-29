@@ -4,6 +4,7 @@
 #include <dynamix/v1compat/declare_mixin.hpp>
 #include <dynamix/v1compat/define_mixin.hpp>
 #include <dynamix/v1compat/declare_message.hpp>
+#include <dynamix/v1compat/define_message.hpp>
 // #include <dynamix/object_type_template.hpp>
 
 #include <doctest/doctest.h>
@@ -19,12 +20,11 @@ DYNAMIX_V1_DECLARE_MIXIN(no_messages);
 DYNAMIX_V1_DECLARE_MIXIN(type_checker);
 
 DYNAMIX_V1_MESSAGE_0(void, dummy);
-/*
 DYNAMIX_V1_CONST_MESSAGE_0(const void*, get_self);
 DYNAMIX_V1_MESSAGE_0(void, unused);
-DYNAMIX_V1_MULTICAST_MESSAGE_1(void, multi, int&, n)
+DYNAMIX_V1_MULTICAST_MESSAGE_1(void, multi, int&, n);
 DYNAMIX_V1_MESSAGE_0(int, inherited);
-*/
+
 class no_messages
 {
 };
@@ -268,13 +268,11 @@ TEST_CASE("type_template")
 }
 */
 DYNAMIX_V1_DEFINE_MIXIN(no_messages, none);
-/*
-DYNAMIX_V1_DEFINE_MIXIN(counter, dummy_msg& multi_msg& user_data(33));
-DYNAMIX_V1_DEFINE_MIXIN(type_checker, get_self_msg& user_data(44)& multi_msg& inherited_msg);
+// DYNAMIX_V1_DEFINE_MIXIN(counter, dummy_msg & multi_msg & user_data(33));
+// DYNAMIX_V1_DEFINE_MIXIN(type_checker, get_self_msg& user_data(44)& multi_msg& inherited_msg);
 
 DYNAMIX_V1_DEFINE_MESSAGE(dummy);
 DYNAMIX_V1_DEFINE_MESSAGE(get_self);
 DYNAMIX_V1_DEFINE_MESSAGE(unused);
 DYNAMIX_V1_DEFINE_MESSAGE(multi);
 DYNAMIX_V1_DEFINE_MESSAGE(inherited);
-*/
