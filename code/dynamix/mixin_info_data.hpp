@@ -122,7 +122,8 @@ public:
         return *this;
     }
 
-    self& implements_by(const feature_info& info, feature_payload pl, builder_perks perks_a = {}, builder_perks perks_b = {}) {
+    template <typename Payload>
+    self& implements_by(const feature_info& info, Payload& pl, builder_perks perks_a = {}, builder_perks perks_b = {}) {
         return implements_with_payload(info, fwd_any(pl), perks_a, perks_b);
     }
 
