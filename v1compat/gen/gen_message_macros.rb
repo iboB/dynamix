@@ -10,7 +10,8 @@ OUT_FILE = INCLUDE + 'template_message_macros.ipp'
 ARITY_OUT_FILE = INCLUDE + 'arity_message_macros.ipp'
 NO_ARITY_OUT_FILE = INCLUDE + 'no_arity_message_macros.ipp'
 SHORT_OUT_FILE = INCLUDE + 'short_message_macros.ipp'
-UNDEF_OUT_FILE= INCLUDE + 'undef_message_macros.ipp'
+UNDEF_OUT_FILE = INCLUDE + 'undef_message_macros.ipp'
+COMBINATOR_OUT_FILE= INCLUDE + 'create_combinator_call.ipp'
 
 HEADER = <<DATA
 // Copyright (c) Borislav Stanimirov
@@ -168,4 +169,17 @@ File.open(UNDEF_OUT_FILE, 'w') do |f|
   f.write(HEADER)
   f.write(output.join("\n"))
   f.puts
+end
+
+#########################
+# undefs
+
+COMBINATOR_DECL = File.open('create_combinator_call_template', 'r').read
+
+File.open(COMBINATOR_OUT_FILE, 'w') do |f|
+  f.write(HEADER)
+  MAX_ARITY.times do |i|
+    params = params_for_arity(i)
+    f.write(COMBINATOR_DECL % params)
+  end
 end

@@ -2,7 +2,7 @@
 
 ## Compatibility Library
 
-Likely the easiest begin the migration v1 to v2 is to use the compatibility library. It provides a compatibility domain instance, and compatibility macros for defining messages and mixins. 
+Likely the easiest begin the migration v1 to v2 is to use the compatibility library. It provides a compatibility domain instance, object, and compatibility macros for defining messages and mixins. 
 
 A compatibility library is included in this repo: `v1compat`. In CMake it's aliased as `dynamix::v1compat`. It is not a header only library. One needs to link with it to use it. 
 
@@ -17,5 +17,5 @@ The compatibility library does not offer any solutions for the following differe
 * v1-style mutation rules are not supported
 * When the declaring message overloads the "original" message (i. e. at least one not declared as an overload for the same function name) must be visible.
 * v1 helpers like `object_type_template`, `same_type_mutator`, `single_object_mutator` are not available (and they don't make much sense in v2)
-* v1 multicast combinator calls are not immediately provided. Instead one must add the macro `DYNAMIX_V1_DEFINE_MULTICAST_COMBINATOR_CALL` for the messages that need them.
-* Accessing the object in a default implementation does happen through `dm_this`. Instead an argument `self` is automatically provided. The type is `object&` or `const object&` for const messages.
+* v1 multicast combinator calls are not immediately provided. Instead one must add the macro `DYNAMIX_V1_CREATE_COMBINATOR_CALL_<N>` for the messages that need them.
+* Accessing the object in a default implementation does *not* happen through `dm_this`. Instead an argument `self` is automatically provided. The type is `object&` or `const object&` for const messages.

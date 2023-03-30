@@ -11,3 +11,4 @@
 
 #include "gen/template_message_macros.ipp"
 #include "gen/arity_message_macros.ipp"
+#include "gen/create_combinator_call.ipp"

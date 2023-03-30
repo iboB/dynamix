@@ -6,7 +6,7 @@
 // https://opensource.org/licenses/MIT
 //
 #include <dynamix/v1compat/core.hpp>
-//#include <dynamix/v1compat/combinators.hpp>
+#include <dynamix/v1compat/combinators.hpp>
 
 #include <doctest/doctest.h>
 
@@ -17,6 +17,7 @@ using namespace dynamix::v1compat;
 DYNAMIX_V1_MESSAGE_1(void, set_a, int, val);
 DYNAMIX_V1_MESSAGE_1(void, set_b, int, val);
 DYNAMIX_V1_CONST_MULTICAST_MESSAGE_0(int, multi);
+DYNAMIX_V1_CREATE_COMBINATOR_CALL_0(int, multi);
 
 struct a {
     int ia;
@@ -67,20 +68,20 @@ void b_set_b(void* vself, int val) {
 DYNAMIX_V1_DEFINE_MIXIN(b, multi_msg & bind(set_b_msg, b_set_b));
 
 TEST_CASE("bind msg") {
-    //object ab;
-    //mutate(ab).add<a>().add<b>();
-    //set_a(ab, 1);
-    //CHECK(ab.get<a>()->ia == 1);
-    //set_b(ab, 2);
-    //CHECK(ab.get<b>()->ib == 2);
-    //CHECK(multi<combinators::sum>(ab) == 3);
+    object ab;
+    mutate(ab).add<a>().add<b>();
+    set_a(ab, 1);
+    CHECK(ab.get<a>()->ia == 1);
+    set_b(ab, 2);
+    CHECK(ab.get<b>()->ib == 2);
+    CHECK(multi<combinators::sum>(ab) == 3);
 
-    //object a2b;
-    //mutate(a2b).add<a2>().add<b>();
-    //set_a(a2b, 1);
-    //CHECK(a2b.get<a2>()->ia2 == 2);
-    //set_b(a2b, 2);
-    //CHECK(multi<combinators::sum>(a2b) == 5);
+    object a2b;
+    mutate(a2b).add<a2>().add<b>();
+    set_a(a2b, 1);
+    CHECK(a2b.get<a2>()->ia2 == 2);
+    set_b(a2b, 2);
+    CHECK(multi<combinators::sum>(a2b) == 5);
 }
 
 DYNAMIX_V1_DEFINE_MESSAGE(set_a);

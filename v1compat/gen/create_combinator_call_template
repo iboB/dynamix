@@ -1,0 +1,15 @@
+
+#define DYNAMIX_V1_CREATE_COMBINATOR_CALL_%{arity}(return_type, message %{args_coma}) \
+    template <typename Combinator> \
+    void message(I_DYNAMIX_V1_MSG_STRUCT_NAME(message)::traits::obj_t& _d_obj %{coma_args_signature}, Combinator& _d_combinator) \
+    { \
+        /* not forwarded arguments. We DO want an error if some of them are rvalue references */ \
+        I_DYNAMIX_V1_MSG_STRUCT_NAME(message)::traits::caller::call_with_v1_combinator(I_DYNAMIX_V1_MSG_STRUCT_NAME(message)::info, _d_combinator, _d_obj %{coma_fwd_args}); \
+    } \
+    template <template <typename> class Combinator> \
+    typename Combinator<return_type>::result_type message(I_DYNAMIX_V1_MSG_STRUCT_NAME(message)::traits::obj_t& _d_obj %{coma_args_signature}) \
+    { \
+        Combinator<return_type> _d_combinator; \
+        I_DYNAMIX_V1_MSG_STRUCT_NAME(message)::traits::caller::call_with_v1_combinator(I_DYNAMIX_V1_MSG_STRUCT_NAME(message)::info, _d_combinator, _d_obj %{coma_fwd_args}); \
+        return _d_combinator.result(); \
+    } \

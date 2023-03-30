@@ -18,6 +18,7 @@ set(generatedFiles
     ${genOutDir}/no_arity_message_macros.ipp
     ${genOutDir}/short_message_macros.ipp
     ${genOutDir}/undef_message_macros.ipp
+    ${genOutDir}/create_combinator_call.ipp
 )
 
 if(DYNAMIX_V1COMPAT_GENERATE_CODE)
@@ -39,6 +40,7 @@ if(DYNAMIX_V1COMPAT_GENERATE_CODE)
             gen/no_arity_message_macros_template
             gen/short_message_macros_template
             gen/undef_message_macros_template
+            gen/create_combinator_call_template
     )
 endif()
 
