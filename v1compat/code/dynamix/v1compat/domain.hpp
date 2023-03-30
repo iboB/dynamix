@@ -8,4 +8,7 @@
 namespace dynamix::v1compat {
 struct domain_tag;
 DYNAMIX_DECLARE_EXPORTED_DOMAIN(DYNAMIX_V1COMPAT_API, domain_tag);
+struct DYNAMIX_V1COMPAT_API domain {
+    static dynamix::domain& instance() noexcept;
+};
 }

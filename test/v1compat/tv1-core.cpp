@@ -9,7 +9,6 @@ TEST_SUITE_BEGIN("v1 core");
 
 using namespace dynamix::v1compat;
 
-
 // some mixins and messages
 DYNAMIX_V1_DECLARE_MIXIN(counter);
 DYNAMIX_V1_DECLARE_MIXIN(no_messages);
@@ -192,7 +191,7 @@ TEST_CASE("multicast") {
 
 TEST_CASE("type_template") {
     // v2!: no more type templates
-    auto& dom = dynamix::g::get_domain<domain_tag>();
+    auto& dom = domain::instance();
     dynamix::type_mutation mut(dom);
     mut.add<counter>();
     mut.add<no_messages>();

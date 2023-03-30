@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 //
 #pragma once
-#include "v1domain.hpp"
+#include "domain.hpp"
 #include <dynamix/define_mixin.hpp>
 
 namespace dynamix::v1compat {
@@ -15,6 +15,25 @@ struct user_data {
     uintptr_t data;
 };
 
+struct bound_impl {
+    const feature_info& info;
+    void* payload;
+};
+
+template <typename Message, typename Func>
+bound_impl bind(Message*, Func f) {
+    typename Message::traits::func_t fc = f;
+    return {
+        g::get_feature_info_safe<Message>(),
+        reinterpret_cast<feature_payload>(fc)
+    };
+}
+
+struct mixin_name {
+    std::string_view name;
+    mixin_name(std::string_view n) : name(n) {}
+};
+
 template <typename Mixin>
 class feature_parser : public util::mixin_info_data_builder<Mixin> {
     using super = util::mixin_info_data_builder<Mixin>;
@@ -23,9 +42,9 @@ public:
         : super(data, name)
     {}
 
-    template <typename Feature>
-    feature_parser& operator&(Feature*) {
-        super::template implements<Feature>();
+    template <typename Message>
+    feature_parser& operator&(Message*) {
+        super::template implements<Message>();
         return *this;
     }
 
@@ -35,6 +54,16 @@ public:
 
     feature_parser& operator&(user_data d) {
         super::user_data(d.data);
+        return *this;
+    }
+
+    feature_parser& operator&(bound_impl b) {
+        super::implements_by(b.info, b.payload);
+        return *this;
+    }
+
+    feature_parser& operator&(mixin_name n) {
+        super::name(n.name);
         return *this;
     }
 };

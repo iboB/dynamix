@@ -104,6 +104,7 @@ public:
     // add mixin
     void add(const mixin_info& info) { m_new_type.add(info); }
     const mixin_info& add(std::string_view name);
+    const mixin_info* safe_add(std::string_view name); // no bad_mutation if name is not a registered mixin
     template <typename Mixin>
     const mixin_info& add() {
         auto& info = g::get_mixin_info<Mixin>();
@@ -114,6 +115,7 @@ public:
     // add if not already there
     bool add_if_lacking(const mixin_info& info) { return m_new_type.add_if_lacking(info); }
     const mixin_info* add_if_lacking(std::string_view name);
+    const mixin_info* safe_add_if_lacking(std::string_view name); // no bad_mutation if name is not a registered mixin
     template <typename Mixin>
     bool add_if_lacking() {
         auto& info = g::get_mixin_info<Mixin>();
