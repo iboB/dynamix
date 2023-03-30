@@ -5,13 +5,16 @@
 #include <dynamix/v1compat/define_mixin.hpp>
 #include <dynamix/v1compat/declare_message.hpp>
 #include <dynamix/v1compat/define_message.hpp>
+#include <dynamix/v1compat/object.hpp>
+
+#include <dynamix/mutate.hpp>
 // #include <dynamix/object_type_template.hpp>
 
 #include <doctest/doctest.h>
 
 TEST_SUITE_BEGIN("v1 core");
 
-using namespace dynamix;
+using namespace dynamix::v1compat;
 
 
 // some mixins and messages
@@ -75,28 +78,28 @@ public:
     }
 
 };
-/*
+
 TEST_CASE("mixin_type_info")
 {
     {
-        auto& info = _dynamix_get_mixin_type_info((no_messages*)nullptr);
-        CHECK(info.is_valid());
+        auto& info = dynamix::g::get_mixin_info<no_messages>();
+        CHECK(info.registered());
         CHECK(info.user_data == 0);
-        CHECK(info.message_infos.empty());
+        CHECK(info.features_span().empty());
     }
 
     {
-        auto& info = _dynamix_get_mixin_type_info((counter*)nullptr);
-        CHECK(info.is_valid());
+        auto& info = dynamix::g::get_mixin_info<counter>();
+        CHECK(info.registered());
         CHECK(info.user_data == 33);
-        CHECK(info.message_infos.size() == 2);
+        CHECK(info.features_span().size() == 2);
     }
 
     {
-        auto& info = _dynamix_get_mixin_type_info((type_checker*)nullptr);
-        CHECK(info.is_valid());
+        auto& info = dynamix::g::get_mixin_info<type_checker>();
+        CHECK(info.registered());
         CHECK(info.user_data == 44);
-        CHECK(info.message_infos.size() == 3);
+        CHECK(info.features_span().size() == 3);
     }
 }
 
@@ -134,8 +137,9 @@ TEST_CASE("basic_message")
 
     CHECK(get_self(o) == o.get<type_checker>());
 
+    // no longer supported:
     // works as ptr too
-    CHECK(get_self(&o) == o.get<type_checker>());
+    // CHECK(get_self(&o) == o.get<type_checker>());
 
     // issue #20
     CHECK(inherited(o) == 22);
@@ -149,59 +153,40 @@ TEST_CASE("complex_apply_mutation")
     CHECK_FALSE(o.get<counter>());
     CHECK(!o.implements(dummy_msg));
     CHECK(!o.implements(unused_msg));
-    CHECK(o.type_info().num_implementers(dummy_msg) == 0);
 
-    single_object_mutator mutation(o);
-
-    mutation.add<no_messages>();
-    mutation.apply();
+    mutate(o).add<no_messages>();
     CHECK(o.has<no_messages>());
     CHECK(o.get<no_messages>());
     CHECK(!o.implements(dummy_msg));
-    CHECK(o.type_info().num_implementers(dummy_msg) == 0);
 
-    mutation.add<counter>();
-    mutation.apply();
+    mutate(o).add<counter>();
 
     CHECK(o.has<counter>());
     CHECK(o.get<counter>());
     CHECK(o.implements(dummy_msg));
-    CHECK(o.type_info().num_implementers(dummy_msg) == 1);
     CHECK(o.get<counter>()->get_count() == 0);
     o.get<counter>()->count_uni();
     CHECK(o.get<counter>()->get_count() == 1);
 
-    mutation.remove<counter>();
-    mutation.cancel();
-    mutation.apply();
-    // cancelled mutations should do nothing
-    CHECK(o.has<counter>());
-    CHECK(o.get<counter>());
-    CHECK(o.get<counter>()->get_count() == 1);
-
-    mutation.add<counter>();
-    mutation.remove<counter>();
-    mutation.apply();
+    mutate(o).add<counter>().remove<counter>();
     // adding and removing the same thing should do nothing
     CHECK(o.has<counter>());
     CHECK(o.get<counter>());
     CHECK(o.get<counter>()->get_count() == 1);
 
-    mutation.add<counter>();
-    mutation.apply();
-    // adding something that's there should be fine
+    // v2!: add_if_lacking
+    mutate(o).add_if_lacking<counter>();
+
     CHECK(o.has<counter>());
     CHECK(o.get<counter>());
     // adding something that's already there shouldn't recreate the mixin
     CHECK(o.get<counter>()->get_count() == 1);
 
-    mutation.remove<counter>();
-    mutation.apply();
+    mutate(o).remove<counter>();
     CHECK(!o.has<counter>());
     CHECK_FALSE(o.get<counter>());
 
     CHECK(!o.implements(dummy_msg));
-    CHECK(o.type_info().num_implementers(dummy_msg) == 0);
 }
 
 TEST_CASE("multicast")
@@ -229,16 +214,16 @@ TEST_CASE("multicast")
 
 TEST_CASE("type_template")
 {
-    object_type_template type;
+    // v2!: no more type templates
+    auto& dom = dynamix::g::get_domain<domain_tag>();
+    dynamix::type_mutation mut(dom);
+    mut.add<counter>();
+    mut.add<no_messages>();
 
-    type
-        .add<counter>()
-        .add<no_messages>()
-        .create();
+    CHECK(mut.adding<counter>());
+    CHECK(mut.adding<no_messages>());
 
-    auto& mut = type.mutation();
-    CHECK(mut.is_adding<counter>());
-    CHECK(mut.is_adding<no_messages>());
+    const dynamix::type& type = dom.get_type(std::move(mut));
 
     object o1(type);
     CHECK(o1.has<no_messages>());
@@ -246,30 +231,28 @@ TEST_CASE("type_template")
     CHECK(o1.has<counter>());
     CHECK(o1.get<counter>());
     CHECK(o1.implements(dummy_msg));
-    CHECK(o1.type_info().num_implementers(dummy_msg) == 1);
 
     object o2;
-    type.apply_to(o2);
+    o2.reset_type(type);
     CHECK(o2.has<no_messages>());
     CHECK(o2.get<no_messages>());
     CHECK(o2.has<counter>());
     CHECK(o2.get<counter>());
     CHECK(o2.implements(dummy_msg));
-    CHECK(o2.type_info().num_implementers(dummy_msg) == 1);
 
     object o3;
     mutate(o3)
         .add<counter>();
     o3.get<counter>()->count_uni();
     CHECK(o3.get<counter>()->get_count() == 1);
-    type.apply_to(o3);
-    // applying a type template should reset the object
-    CHECK(o3.get<counter>()->get_count() == 0);
+    o3.reset_type(type);
+    // v2!: applying a type template no longer should resets the object
+    CHECK(o3.get<counter>()->get_count() == 1);
 }
-*/
+
 DYNAMIX_V1_DEFINE_MIXIN(no_messages, none);
-// DYNAMIX_V1_DEFINE_MIXIN(counter, dummy_msg & multi_msg & user_data(33));
-// DYNAMIX_V1_DEFINE_MIXIN(type_checker, get_self_msg& user_data(44)& multi_msg& inherited_msg);
+DYNAMIX_V1_DEFINE_MIXIN(counter, dummy_msg & multi_msg & user_data(33));
+DYNAMIX_V1_DEFINE_MIXIN(type_checker, get_self_msg & user_data(44) & multi_msg & inherited_msg);
 
 DYNAMIX_V1_DEFINE_MESSAGE(dummy);
 DYNAMIX_V1_DEFINE_MESSAGE(get_self);

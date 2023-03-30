@@ -44,5 +44,6 @@ endif()
 
 target_sources(dynamix-v1compat PRIVATE
     code/dynamix/v1compat/v1domain.cpp
+    code/dynamix/v1compat/object.cpp
     ${generatedFiles}
 )
