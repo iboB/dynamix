@@ -28,7 +28,7 @@ include(icm_dev_mode)
 # options
 
 option(DYNAMIX_STATIC "DynaMix: build as a static library" OFF)
-option(DYNAMIX_BUILD_V1_COMPAT "DynaMix: build v1 compatibility lib" ON)
+option(DYNAMIX_BUILD_V1COMPAT "DynaMix: build v1 compatibility lib" ON)
 option(DYNAMIX_BUILD_TESTS "DynaMix: enable testing and build tests" ${ICM_DEV_MODE})
 option(DYNAMIX_BUILD_EXAMPLES "DynaMix: build examples" ${ICM_DEV_MODE})
 option(DYNAMIX_BUILD_SCRATCH "DynaMix: build scratch project (dev experiments)" ${ICM_DEV_MODE})
@@ -51,7 +51,7 @@ endif()
 
 add_subdirectory(code)
 
-if(DYNAMIX_BUILD_V1_COMPAT)
+if(DYNAMIX_BUILD_V1COMPAT)
     add_subdirectory(v1compat)
 endif()
 

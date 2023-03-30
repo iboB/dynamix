@@ -5,7 +5,7 @@
 # script generating message declaration macros
 
 INCLUDE = '../code/dynamix/v1compat/gen/'
-MAX_ARITY = File.open('arity').read.strip.to_i + 1
+MAX_ARITY = (ARGV[0].to_i || File.open('arity').read.strip.to_i) + 1
 OUT_FILE = INCLUDE + 'template_message_macros.ipp'
 ARITY_FNAME = 'arity_message_macros.ipp'
 ARITY_OUT_FILE = INCLUDE + ARITY_FNAME

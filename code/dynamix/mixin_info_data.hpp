@@ -106,6 +106,12 @@ public:
         return uses_allocator(make_any<Alloc>(m_data.get_allocator()));
     }
 
+    // user data
+    self& user_data(uintptr_t data) {
+        m_data.info.user_data = data;
+        return *this;
+    }
+
     // dependency status
     self& dependency(bool b = true) {
         m_data.info.dependency = b;

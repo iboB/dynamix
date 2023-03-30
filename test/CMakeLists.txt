@@ -97,6 +97,6 @@ if(Threads_FOUND)
     dynamix_mt_test(fuzz-mixins fuzz-mixins.cpp)
 endif()
 
-if(DYNAMIX_BUILD_V1_COMPAT)
+if(DYNAMIX_BUILD_V1COMPAT)
     add_subdirectory(v1compat)
 endif()
