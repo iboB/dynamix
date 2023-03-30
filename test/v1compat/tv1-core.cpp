@@ -1,14 +1,7 @@
 // Copyright (c) Borislav Stanimirov
 // SPDX-License-Identifier: MIT
 //
-#include <dynamix/v1compat/declare_mixin.hpp>
-#include <dynamix/v1compat/define_mixin.hpp>
-#include <dynamix/v1compat/declare_message.hpp>
-#include <dynamix/v1compat/define_message.hpp>
-#include <dynamix/v1compat/object.hpp>
-
-#include <dynamix/mutate.hpp>
-// #include <dynamix/object_type_template.hpp>
+#include <dynamix/v1compat/core.hpp>
 
 #include <doctest/doctest.h>
 
@@ -28,12 +21,9 @@ DYNAMIX_V1_MESSAGE_0(void, unused);
 DYNAMIX_V1_MULTICAST_MESSAGE_1(void, multi, int&, n);
 DYNAMIX_V1_MESSAGE_0(int, inherited);
 
-class no_messages
-{
-};
+class no_messages {};
 
-class counter
-{
+class counter {
 public:
     counter()
         : _count(0)
@@ -46,8 +36,7 @@ public:
 
     int get_count() const { return _count; }
 
-    void multi(int& n)
-    {
+    void multi(int& n) {
         ++n;
     }
 
@@ -56,31 +45,24 @@ private:
 };
 
 // issue #20 test
-struct parent
-{
-    int inherited()
-    {
+struct parent {
+    int inherited() {
         return 22;
     }
 };
 
-class type_checker : public parent
-{
+class type_checker : public parent {
 public:
-    const void* get_self() const
-    {
+    const void* get_self() const {
         return this;
     }
 
-    void multi(int& n)
-    {
+    void multi(int& n) {
         n += 2;
     }
-
 };
 
-TEST_CASE("mixin_type_info")
-{
+TEST_CASE("mixin_type_info") {
     {
         auto& info = dynamix::g::get_mixin_info<no_messages>();
         CHECK(info.registered());
@@ -103,8 +85,7 @@ TEST_CASE("mixin_type_info")
     }
 }
 
-TEST_CASE("simple_inline_mutation")
-{
+TEST_CASE("simple_inline_mutation") {
     object o;
 
     CHECK(o.empty());
@@ -130,8 +111,7 @@ TEST_CASE("simple_inline_mutation")
     CHECK(o.empty());
 }
 
-TEST_CASE("basic_message")
-{
+TEST_CASE("basic_message") {
     object o;
     mutate(o).add<type_checker>();
 
@@ -145,8 +125,7 @@ TEST_CASE("basic_message")
     CHECK(inherited(o) == 22);
 }
 
-TEST_CASE("complex_apply_mutation")
-{
+TEST_CASE("complex_apply_mutation") {
     object o;
 
     CHECK(!o.has<counter>());
@@ -189,8 +168,7 @@ TEST_CASE("complex_apply_mutation")
     CHECK(!o.implements(dummy_msg));
 }
 
-TEST_CASE("multicast")
-{
+TEST_CASE("multicast") {
     object o;
 
     mutate(o)
@@ -212,8 +190,7 @@ TEST_CASE("multicast")
     CHECK(n == 6);
 }
 
-TEST_CASE("type_template")
-{
+TEST_CASE("type_template") {
     // v2!: no more type templates
     auto& dom = dynamix::g::get_domain<domain_tag>();
     dynamix::type_mutation mut(dom);
