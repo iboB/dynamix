@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include <dynamix/v1compat/core.hpp>
+#include <dynamix/exception.hpp>
 #include <algorithm>
 #include <doctest/doctest.h>
 
@@ -51,9 +52,7 @@ TEST_CASE("v1 mixin_types") {
     CHECK_NOTHROW(mut.add(*ominfo));
     CHECK_NOTHROW(mut.add(*tinfo));
 
-#if DYNAMIX_V1_USE_EXCEPTIONS
-    CHECK_THROWS_AS(mut.add("third"), bad_mutation);
-#endif
+    CHECK_THROWS_AS(mut.add("third"), dynamix::mutation_error);
 
     mut.apply();
 

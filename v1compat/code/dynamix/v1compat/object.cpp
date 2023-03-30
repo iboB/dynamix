@@ -10,8 +10,17 @@ object::object() noexcept
     : dynamix::object(domain::instance())
 {}
 
-bool object::implements(const feature_info& f) const noexcept
-{
+bool object::implements(const feature_info& f) const noexcept {
     return get_type().implements(f);
+}
+
+bool object::copyable() const noexcept {
+    return get_type().copyable();
+}
+
+object object::copy() const {
+    object ret;
+    ret.copy_from(*this);
+    return ret;
 }
 }

@@ -8,5 +8,4 @@
 #include "define_mixin.hpp"
 #include "declare_message.hpp"
 #include "define_message.hpp"
-
-#include <dynamix/mutate.hpp>
+#include "mutate.hpp"

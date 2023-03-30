@@ -19,6 +19,10 @@ public:
         return implements(Feature::info);
     }
 
+    bool copyable() const noexcept;
+
+    object copy() const;
+
     static object* of(void* mixin) {
         return static_cast<object*>(dynamix::object_of(mixin));
     }
