@@ -14,9 +14,9 @@ static constexpr int SIZE = 1000;
 
 struct mixin_generator {
     dynamix::domain& dom;
-    std::string base_name;
-    std::minstd_rand rnd;
     const std::deque<dynamix::util::feature_info_data>& features;
+    std::string base_name;
+    std::minstd_rand rnd;    
     std::deque<dynamix::util::mixin_info_data> mixins;
 
     mixin_generator(dynamix::domain& d, std::string_view name, const std::deque<dynamix::util::feature_info_data>& features, uint32_t seed)
