@@ -12,4 +12,4 @@
         Combinator<return_type> _d_combinator; \
         I_DYNAMIX_V1_MSG_STRUCT_NAME(message)::traits::caller::call_with_v1_combinator(I_DYNAMIX_V1_MSG_STRUCT_NAME(message)::info, _d_combinator, _d_obj %{coma_fwd_args}); \
         return _d_combinator.result(); \
-    } \
+    }
