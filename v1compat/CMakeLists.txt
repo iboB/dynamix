@@ -11,7 +11,7 @@ target_link_libraries(dynamix-v1compat PUBLIC
 
 option(DYNAMIX_V1COMPAT_GENERATE_CODE "DynaMix-v1compat: generate message macros with cmake" ON)
 
-set(genOutDir code/dynamix/v1compat/gen)
+set(genOutDir ${CMAKE_CURRENT_SOURCE_DIR}/code/dynamix/v1compat/gen)
 set(generatedFiles
     ${genOutDir}/template_message_macros.ipp
     ${genOutDir}/arity_message_macros.ipp
