@@ -18,10 +18,10 @@ bool has_next_bidder(Message*, Mixin* mixin) {
 template <typename Message, typename Mixin, typename... Args>
 auto call_next_bidder(Message*, Mixin* mixin, Args&&... args) -> typename msg_traits<Message>::ret_t {
     if constexpr (Message::multicast) {
-        return call_next_bidder_set<Message>(mixin, std::forward<Args>(args));
+        return call_next_bidder_set<Message>(mixin, std::forward<Args>(args)...);
     }
     else {
-        return call_next_impl_msg<Message>(mixin, std::forward<Args>(args));
+        return call_next_impl_msg<Message>(mixin, std::forward<Args>(args)...);
     }
 }
 }
