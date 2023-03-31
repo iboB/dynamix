@@ -68,7 +68,6 @@ public:
         return *this;
     }
 
-
     template <typename Mixin>
     self_t& remove() {
         m_type_mut.remove<Mixin>();
