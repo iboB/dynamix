@@ -106,6 +106,12 @@ public:
         return uses_allocator(make_any<Alloc>(m_data.get_allocator()));
     }
 
+    // user data
+    self& user_data(uintptr_t data) {
+        m_data.info.user_data = data;
+        return *this;
+    }
+
     // dependency status
     self& dependency(bool b = true) {
         m_data.info.dependency = b;
@@ -122,7 +128,8 @@ public:
         return *this;
     }
 
-    self& implements_by(const feature_info& info, feature_payload pl, builder_perks perks_a = {}, builder_perks perks_b = {}) {
+    template <typename Payload>
+    self& implements_by(const feature_info& info, Payload& pl, builder_perks perks_a = {}, builder_perks perks_b = {}) {
         return implements_with_payload(info, fwd_any(pl), perks_a, perks_b);
     }
 
@@ -192,6 +199,10 @@ public:
         m_data.mutation_rule_infos.push_back(&m_data.mutation_rule_info_storage.back());
         return *this;
     }
+
+    // noop: useful for extending mixin macro with custom features and feature sets
+    template <typename T>
+    self& noop(T&&) { return *this; }
 };
 
 }

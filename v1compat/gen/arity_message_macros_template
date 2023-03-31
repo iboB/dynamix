@@ -1,0 +1,67 @@
+
+#define DYNAMIX_V1_MESSAGE_%{arity}(return_type, message %{args_coma}) \
+    DYNAMIX_MAKE_FUNC_TRAITS(message); \
+    I_DYNAMIX_MESSAGE%{arity}_UNI(I_DNMX_PP_EMPTY(), message, message, return_type, I_DNMX_PP_EMPTY() %{args_coma})
+
+#define DYNAMIX_V1_CONST_MESSAGE_%{arity}(return_type, message %{args_coma}) \
+    DYNAMIX_MAKE_FUNC_TRAITS(message); \
+    I_DYNAMIX_MESSAGE%{arity}_UNI(I_DNMX_PP_EMPTY(), message, message, return_type, const %{args_coma})
+
+#define DYNAMIX_V1_MULTICAST_MESSAGE_%{arity}(return_type, message %{args_coma}) \
+    DYNAMIX_MAKE_FUNC_TRAITS(message); \
+    I_DYNAMIX_MESSAGE%{arity}_MULTI(I_DNMX_PP_EMPTY(), message, message, return_type, I_DNMX_PP_EMPTY() %{args_coma})
+
+#define DYNAMIX_V1_CONST_MULTICAST_MESSAGE_%{arity}(return_type, message %{args_coma}) \
+    DYNAMIX_MAKE_FUNC_TRAITS(message); \
+    I_DYNAMIX_MESSAGE%{arity}_MULTI(I_DNMX_PP_EMPTY(), message, message, return_type, const %{args_coma})
+
+#define DYNAMIX_V1_EXPORTED_MESSAGE_%{arity}(export, return_type, message %{args_coma}) \
+    DYNAMIX_MAKE_FUNC_TRAITS(message); \
+    I_DYNAMIX_MESSAGE%{arity}_UNI(export, message, message, return_type, I_DNMX_PP_EMPTY() %{args_coma})
+
+#define DYNAMIX_V1_EXPORTED_CONST_MESSAGE_%{arity}(export, return_type, message %{args_coma}) \
+    DYNAMIX_MAKE_FUNC_TRAITS(message); \
+    I_DYNAMIX_MESSAGE%{arity}_UNI(export, message, message, return_type, const %{args_coma})
+
+#define DYNAMIX_V1_EXPORTED_MULTICAST_MESSAGE_%{arity}(export, return_type, message %{args_coma}) \
+    DYNAMIX_MAKE_FUNC_TRAITS(message); \
+    I_DYNAMIX_MESSAGE%{arity}_MULTI(export, message, message, return_type, I_DNMX_PP_EMPTY() %{args_coma})
+
+#define DYNAMIX_V1_EXPORTED_CONST_MULTICAST_MESSAGE_%{arity}(export, return_type, message %{args_coma}) \
+    DYNAMIX_MAKE_FUNC_TRAITS(message); \
+    I_DYNAMIX_MESSAGE%{arity}_MULTI(export, message, message, return_type, const %{args_coma})
+
+#define DYNAMIX_V1_MESSAGE_%{arity}_OVERLOAD(message_name, return_type, method_name %{args_coma}) \
+    I_DYNAMIX_MESSAGE%{arity}_UNI(I_DNMX_PP_EMPTY(), message_name, method_name, return_type, I_DNMX_PP_EMPTY() %{args_coma})
+
+#define DYNAMIX_V1_CONST_MESSAGE_%{arity}_OVERLOAD(message_name, return_type, method_name %{args_coma}) \
+    I_DYNAMIX_MESSAGE%{arity}_UNI(I_DNMX_PP_EMPTY(), message_name, method_name, return_type, const %{args_coma})
+
+#define DYNAMIX_V1_MULTICAST_MESSAGE_%{arity}_OVERLOAD(message_name, return_type, method_name %{args_coma}) \
+    I_DYNAMIX_MESSAGE%{arity}_MULTI(I_DNMX_PP_EMPTY(), message_name, method_name, return_type, I_DNMX_PP_EMPTY() %{args_coma})
+
+#define DYNAMIX_V1_CONST_MULTICAST_MESSAGE_%{arity}_OVERLOAD(message_name, return_type, method_name %{args_coma}) \
+    I_DYNAMIX_MESSAGE%{arity}_MULTI(I_DNMX_PP_EMPTY(), message_name, method_name, return_type, const %{args_coma})
+
+#define DYNAMIX_V1_EXPORTED_MESSAGE_%{arity}_OVERLOAD(export, message_name, return_type, method_name %{args_coma}) \
+    I_DYNAMIX_MESSAGE%{arity}_UNI(export, message_name, method_name, return_type, I_DNMX_PP_EMPTY() %{args_coma})
+
+#define DYNAMIX_V1_EXPORTED_CONST_MESSAGE_%{arity}_OVERLOAD(export, message_name, return_type, method_name %{args_coma}) \
+    I_DYNAMIX_MESSAGE%{arity}_UNI(export, message_name, method_name, return_type, const %{args_coma})
+
+#define DYNAMIX_V1_EXPORTED_MULTICAST_MESSAGE_%{arity}_OVERLOAD(export, message_name, return_type, method_name %{args_coma}) \
+    I_DYNAMIX_MESSAGE%{arity}_MULTI(export, message_name, method_name, return_type, I_DNMX_PP_EMPTY() %{args_coma})
+
+#define DYNAMIX_V1_EXPORTED_CONST_MULTICAST_MESSAGE_%{arity}_OVERLOAD(export, message_name, return_type, method_name %{args_coma}) \
+    I_DYNAMIX_MESSAGE%{arity}_MULTI(export, message_name, method_name, return_type, const %{args_coma})
+
+#define DYNAMIX_V1_DEFINE_MESSAGE_%{arity}_WITH_DEFAULT_IMPL(return_type, message_name %{args_coma}) \
+    static return_type I_DYNAMIX_V1_DEFAULT_IMPL_FUNC_NAME(message_name)(I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::traits::obj_t& %{coma_args_signature}); \
+    const ::dynamix::common_feature_info& I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::get_info_safe() { \
+        static ::dynamix::common_feature_info the_info(dnmx_make_sv_lit(I_DNMX_PP_STRINGIZE(I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name))), multicast, (void*) \
+            (static_cast<I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::traits::sig_t*>(I_DYNAMIX_V1_DEFAULT_IMPL_FUNC_NAME(message_name)))); \
+        return the_info; \
+    } \
+    const ::dynamix::feature_info& I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::info = I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::get_info_safe(); \
+    I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name) * I_DYNAMIX_V1_MESSAGE_TAG(message_name) = nullptr; \
+    return_type I_DYNAMIX_V1_DEFAULT_IMPL_FUNC_NAME(message_name)(I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::traits::obj_t& dm_self %{coma_args_signature})

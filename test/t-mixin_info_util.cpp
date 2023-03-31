@@ -6,6 +6,8 @@
 
 #include <doctest/util/lifetime_counter.hpp>
 
+#include <splat/warnings.h>
+
 #define long_string "something long... really long... yeah hoho"
 
 struct cnt : public doctest::util::lifetime_counter<cnt> {
@@ -114,9 +116,7 @@ TEST_CASE("funcs") {
 
 struct byte { uint8_t val; };
 
-#if defined(_MSC_VER)
-#pragma warning(disable: 4324) // disable padding waring for type below
-#endif
+DISABLE_MSVC_WARNING(4324) // disable padding waring for type below
 struct alignas(16) vec3 {
     double x, y, z;
 

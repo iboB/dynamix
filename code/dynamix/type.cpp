@@ -39,20 +39,42 @@ bool type::implements(const feature_info& info) const noexcept {
     return implements_strong(info.id);
 }
 
+namespace {
+const type::ftable_payload* find_implementer(const type::ftable_entry& fe, mixin_index_t mixin_index) noexcept {
+    for (auto i = fe.begin; i != fe.end; ++i) {
+        if (i->mixin_index == mixin_index) return i;
+    }
+    return nullptr;
+}
+}
+
 const type::ftable_payload* type::find_next_implementer(const feature_info& feature, const mixin_info& mixin) const noexcept {
     auto fe = ftable_at(feature.id);
     if (!fe) return nullptr; // type does not implement feature
 
     auto mixin_index = index_of(mixin.id);
-    for (auto i = fe.begin; i != fe.end; ++i) {
-        if (i->mixin_index != mixin_index) continue;
-        ++i;
-        if (i == fe.end) return nullptr; // provided mixin was the last - there is no next implementer
-        return i;
-    }
+    auto f = find_implementer(fe, mixin_index);
+    if (!f) return nullptr; // type does not implement feature for provided mixin
+    ++f;
+    if (f == fe.end) return nullptr; // provided mixin was the last - there is no next implementer
+    return f;
+}
 
-    // entry for provided mixin was not found
-    return nullptr;
+itlib::span<const type::ftable_payload> type::find_next_bidder_set(const feature_info& feature, const mixin_info& mixin) const noexcept {
+    auto fe = ftable_at(feature.id);
+    if (!fe) return {}; // type does not implement feature
+
+    auto mixin_index = index_of(mixin.id);
+    auto f = find_implementer(fe, mixin_index);
+    if (!f) return {}; // type does not implement feature for provided mixin
+    auto fbid = f->data->bid;
+    while (f != fe.end && f->data->bid == fbid) ++f; // find the end of the current bidder set
+    if (f == fe.end) return {}; // provided mixin was of the last bidder set - there is no next one
+
+    auto begin = f;
+    auto end = begin + 1;
+    while (end != fe.end && end->data->bid == f->data->bid) ++end; // find the end of the next bidder set
+    return {begin, end};
 }
 
 int type::compare(const type& other) const noexcept {

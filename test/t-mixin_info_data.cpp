@@ -138,7 +138,7 @@ TEST_CASE("mixin_info_data build features") {
     const auto& info = data.info;
 
     int pl0 = 5;
-    b.implements_by(simple_feature, &pl0, order_priority(6), 5_bid);
+    b.implements_by(simple_feature, pl0, order_priority(6), 5_bid);
     CHECK(info.num_features == 1);
     CHECK(data.feature_payloads.size() == 1);
     CHECK(info.features == data.feature_payloads.data());

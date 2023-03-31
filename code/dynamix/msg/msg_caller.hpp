@@ -76,5 +76,27 @@ struct msg_caller {
 
         return try_default_payload(info, obj, std::forward<Args>(args)...);
     }
+
+    template <typename V1Combinator>
+    static void call_with_v1_combinator(const feature_info& info, V1Combinator& combinator, Object& obj, Args&&... args) {
+        const type& t = obj.get_type();
+
+        auto fe = t.ftable_at(info.id); // ftable entry
+
+        if /*likely*/ (fe) {
+            combinator.set_num_results(size_t(fe.top_bid_back - fe.begin) + 1);
+
+            for (auto i = fe.top_bid_back; i != fe.begin; --i) {
+                if (!combinator.add_result(call(*i, obj, args...))) { // args are copied!
+                    return;
+                };
+            }
+            combinator.add_result(call(*fe.begin, obj, std::forward<Args>(args)...));
+        }
+        else {
+            combinator.set_num_results(1);
+            combinator.add_result(try_default_payload(info, obj, std::forward<Args>(args)...));
+        }
+    }
 };
 }

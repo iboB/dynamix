@@ -55,6 +55,20 @@ public:
     }
 
     template <typename Mixin>
+    self_t& add_if_lacking() {
+        m_type_mut.add_if_lacking<Mixin>();
+        return *this;
+    }
+    self_t& add_if_lacking(const mixin_info& info) {
+        m_type_mut.add_if_lacking(info);
+        return *this;
+    }
+    self_t& add_if_lacking(std::string_view name) {
+        m_type_mut.add_if_lacking(name);
+        return *this;
+    }
+
+    template <typename Mixin>
     self_t& remove() {
         m_type_mut.remove<Mixin>();
         return *this;

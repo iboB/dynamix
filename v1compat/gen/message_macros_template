@@ -1,0 +1,22 @@
+#define I_DYNAMIX_MESSAGE%{arity}_DECL(export, message_name, is_multicast, method_name, return_type, constness %{args_coma}) \
+    struct export I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name) { \
+        using signature = return_type(constness ::dynamix::object& %{coma_arg_types}); \
+        using traits = DYNAMIX_FUNC_TRAITS_NAME(method_name)<I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)>; \
+        static const ::dynamix::common_feature_info& get_info_safe(); \
+        static const ::dynamix::feature_info& info; \
+        static inline constexpr bool multicast = is_multicast; \
+    }; \
+    extern export I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name) * I_DYNAMIX_V1_MESSAGE_TAG(message_name)
+
+
+#define I_DYNAMIX_MESSAGE%{arity}_UNI(export, message_name, method_name, return_type, constness %{args_coma}) \
+    I_DYNAMIX_MESSAGE%{arity}_DECL(export, message_name, false, method_name, return_type, constness %{args_coma}); \
+    inline return_type method_name(constness ::dynamix::object& _d_obj %{coma_args_signature}) {\
+        return I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::traits::caller::call_unicast(I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::info, _d_obj %{coma_fwd_args}); \
+    }
+
+#define I_DYNAMIX_MESSAGE%{arity}_MULTI(export, message_name, method_name, return_type, constness %{args_coma}); \
+    I_DYNAMIX_MESSAGE%{arity}_DECL(export, message_name, true, method_name, return_type, constness %{args_coma}); \
+    inline return_type method_name(constness ::dynamix::object& _d_obj %{coma_args_signature})  {\
+        return I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::traits::caller::call_multicast(I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::info, _d_obj %{coma_fwd_args}); \
+    }

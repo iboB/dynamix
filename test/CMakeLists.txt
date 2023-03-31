@@ -94,4 +94,9 @@ if(Threads_FOUND)
     dynamix_mt_test(domain-mt t-domain-mt.cpp)
 
     dynamix_mt_test(fuzz-features fuzz-features.cpp)
+    dynamix_mt_test(fuzz-mixins fuzz-mixins.cpp)
+endif()
+
+if(DYNAMIX_BUILD_V1COMPAT)
+    add_subdirectory(v1compat)
 endif()

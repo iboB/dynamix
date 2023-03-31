@@ -96,11 +96,23 @@ bool type_mutation::type_template::implements(const feature_info& info) const no
     return implements_strong(info);
 }
 
-const mixin_info& type_mutation::add(std::string_view name) {
+const mixin_info* type_mutation::safe_add(std::string_view name) {
     auto info = get_domain().get_mixin_info(name);
-    if (!info) throw mutation_error("missing mixin name");
+    if (!info) return nullptr;
     add(*info);
+    return info;
+}
+
+const mixin_info& type_mutation::add(std::string_view name) {
+    auto info = safe_add(name);
+    if (!info) throw mutation_error("missing mixin name");
     return *info;
+}
+
+const mixin_info* type_mutation::safe_add_if_lacking(std::string_view name) {
+    auto f = itlib::pfind_if(m_new_type.mixins, by_name);
+    if (f) return nullptr;
+    return safe_add(name);
 }
 
 const mixin_info* type_mutation::add_if_lacking(std::string_view name) {

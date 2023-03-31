@@ -35,12 +35,14 @@ struct mixin_info_data_instance {
 
 #define I_DYNAMIX_MIXIN_INFO_VAR(mixin) I_DNMX_PP_CAT(_dynamix_mixin_info_data_, mixin)
 
-#define DYNAMIX_DEFINE_MIXIN(domain_tag, mixin) \
+#define DYNAMIX_DEFINE_MIXIN_EX(domain_tag, mixin, builder) \
 static const ::dynamix::util::mixin_info_data& I_DYNAMIX_MIXIN_INFO_VAR(mixin) = ::dynamix::impl::mixin_info_data_instance<domain_tag, mixin>::the_data_safe(); \
 const ::dynamix::mixin_info& _dynamix_get_mixin_info(mixin*) { \
     return I_DYNAMIX_MIXIN_INFO_VAR(mixin).info; \
 } \
 using namespace ::dynamix::util::builder_literals; \
 static ::dynamix::impl::mixin_info_data_instance<domain_tag, mixin> I_DNMX_PP_CAT(_dynamix_mixin_info_data_instance_for_, mixin) = \
-    ::dynamix::util::mixin_info_data_builder<mixin>(::dynamix::impl::mixin_info_data_instance<domain_tag, mixin>::the_data_safe(), dnmx_make_sv_lit(I_DNMX_PP_STRINGIZE(mixin)))
+    builder<mixin>(::dynamix::impl::mixin_info_data_instance<domain_tag, mixin>::the_data_safe(), dnmx_make_sv_lit(I_DNMX_PP_STRINGIZE(mixin)))
 
+#define DYNAMIX_DEFINE_MIXIN(domain_tag, mixin) \
+    DYNAMIX_DEFINE_MIXIN_EX(domain_tag, mixin, ::dynamix::util::mixin_info_data_builder)

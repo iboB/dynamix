@@ -95,7 +95,7 @@ public:
     template <typename Feature>
     [[nodiscard]] bool implements() const noexcept { return implements(g::get_feature_info_fast<Feature>()); }
 
-    // find the implemeter of feature after mixins
+    // find the implemeter of feature after mixin
     // if:
     //  the mixin is a part of this type
     //  the mixin implements the feature
@@ -103,6 +103,15 @@ public:
     //  -- returns the next overridden implementer
     // if any of the conditions is not true, returns nullptr
     const ftable_payload* find_next_implementer(const feature_info& feature, const mixin_info& mixin) const noexcept;
+
+    // find the next bidder set for feature after mixin
+    // if:
+    //  the mixin is a part of this type
+    //  the mixin implements the feature
+    //  has overridden by a higher bid any other mixins which implements it
+    //  -- returns the overridden implementers with the next bid
+    // if any of the conditions is not true, returns an empty span
+    itlib::span<const ftable_payload> find_next_bidder_set(const feature_info& feature, const mixin_info& mixin) const noexcept;
 
     // type class
     [[nodiscard]] bool is_of(const type_class& tc) const noexcept {
