@@ -13,4 +13,4 @@ This is a list of the most notable differences between v1 and v2:
     * `mixin_info::force_external` is set to true
 * V2 uses `std::pmr::polymorphic_allocator` for all allocations. V1 used to have dedicated allocators like `domain_allocator`, `object_allocator` and more. The only non-pmr allocator in V2 is the optional `mixin_allocator`
 * V2 message definitions are a bit more verbose. V1 used to allow defining messages with a declare macro and a define macro which only used the message name. V2 messages, require an additional traits macro, and the definition requires the signature as well.
-
+* V2 unicast priority is inverted. With V1 bigger priority values would put the implementation to the front of the bid group, V2 puts it at the back. Note however that this does not affect multicast execution order. V2 multicasts are executed from back to front.

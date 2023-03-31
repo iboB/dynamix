@@ -7,12 +7,7 @@
 namespace dynamix::v1compat {
 template <typename Message, typename Mixin>
 bool has_next_bidder(Message*, Mixin* mixin) {
-    if constexpr (Message::multicast) {
-        return has_next_bidder_set<Message>(mixin);
-    }
-    else {
-        return has_next_impl_msg<Message>(mixin);
-    }
+    return has_next_bidder_set<Message>(mixin);
 }
 
 template <typename Message, typename Mixin, typename... Args>
@@ -21,7 +16,7 @@ auto call_next_bidder(Message*, Mixin* mixin, Args&&... args) -> typename msg_tr
         return call_next_bidder_set<Message>(mixin, std::forward<Args>(args)...);
     }
     else {
-        return call_next_impl_msg<Message>(mixin, std::forward<Args>(args)...);
+        return call_next_bidder_top<Message>(mixin, std::forward<Args>(args)...);
     }
 }
 }

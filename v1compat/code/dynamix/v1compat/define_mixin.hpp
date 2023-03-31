@@ -34,6 +34,61 @@ struct mixin_name {
     mixin_name(std::string_view n) : name(n) {}
 };
 
+// templated so the type can be passed along with the perks
+template <typename Message>
+struct message_perks
+{
+    int32_t bid = 0;
+    int32_t priority = 0;
+};
+
+template <typename Message>
+message_perks<Message> upriority(int p, Message*) {
+    message_perks<Message> mp;
+    mp.priority = p;
+    return mp;
+}
+
+template <typename Message>
+message_perks<Message> priority(int p, Message* msg)
+{
+    if constexpr (!Message::multicast) {
+        [[maybe_unused]] [[deprecated("unicast priority is inverted")]] int x = 0;
+    }
+    return upriority(p, msg);
+}
+
+template <typename Message>
+message_perks<Message> bid(int b, Message*)
+{
+    message_perks<Message> mp;
+    mp.bid = b;
+    return mp;
+}
+
+template <typename Message, template <typename> class Perks>
+Perks<Message> upriority(int p, Perks<Message> perks)
+{
+    perks.priority = p;
+    return perks;
+}
+
+template <typename Message, template <typename> class Perks>
+Perks<Message> priority(int p, Perks<Message> perks)
+{
+    if constexpr (!Message::multicast) {
+        [[maybe_unused]] [[deprecated("unicast priority is inverted")]] int x = 0;
+    }
+    return upriority(p, perks);
+}
+
+template <typename Message, template <typename> class Perks>
+Perks<Message> bid(int b, Perks<Message> perks)
+{
+    perks.bid = b;
+    return perks;
+}
+
 template <typename Mixin>
 class feature_parser : public util::mixin_info_data_builder<Mixin> {
     using super = util::mixin_info_data_builder<Mixin>;
@@ -64,6 +119,13 @@ public:
 
     feature_parser& operator&(mixin_name n) {
         super::name(n.name);
+        return *this;
+    }
+
+    template <typename Message>
+    feature_parser& operator&(message_perks<Message> mp)
+    {
+        super::template implements<Message>(util::builder_literals::feature_bid_priority(mp.bid, mp.priority));
         return *this;
     }
 };

@@ -50,9 +50,7 @@ TEST_CASE("basic_msgs")
     CHECK(!o.get_type().implements_strong<basic_def_msg_t>());
     // v2!: no implements with default
 
-#if DYNAMIX_V1_USE_EXCEPTIONS
-    CHECK_THROWS_AS(basic_def(o), bad_message_call);
-#endif
+    CHECK_THROWS_AS(basic_def(o), dynamix::bad_feature_access);
 
     mutate(o)
         .add<mix_a>()

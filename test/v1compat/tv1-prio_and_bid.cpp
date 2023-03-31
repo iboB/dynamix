@@ -35,9 +35,9 @@ TEST_CASE("different_priority") {
         .add<d>();
 
     CHECK(o.implements(priority_trace_msg));
-    CHECK(o.type_info().num_implementers(priority_trace_msg) == 4);
+    // v2!: no num_implementers
 
-    ostringstream sout;
+    std::ostringstream sout;
     priority_trace(o, sout);
     CHECK(sout.str() == "210-1");
 }
@@ -52,9 +52,9 @@ TEST_CASE("same_priority") {
         .add<d>();
 
     CHECK(o.implements(trace_msg));
-    CHECK(o.type_info().num_implementers(trace_msg) == 4);
+    // v2!: no num_implementers
 
-    ostringstream sout;
+    std::ostringstream sout;
     trace(o, sout);
     CHECK(sout.str() == "abcd");
 }
@@ -68,19 +68,17 @@ TEST_CASE("bids") {
         .add<c>()
         .add<d>();
 
-    ostringstream sout;
+    std::ostringstream sout;
     bids_uni(o, sout);
     CHECK(sout.str() == "abc");
 
-#if DYNAMIX_V1_USE_EXCEPTIONS
-    CHECK_THROWS_AS(bids_bad_uni(o, sout), bad_next_bidder_call);
-#endif
+    CHECK_THROWS_AS(bids_bad_uni(o, sout), dynamix::bad_feature_access);
 
-    sout.str(string());
+    sout.str(std::string());
     bids_multi_override(o, sout);
     CHECK(sout.str() == "cd");
 
-    sout.str(string());
+    sout.str(std::string());
     bids_multi(o, sout);
     CHECK(sout.str() == "bacd");
 
@@ -88,15 +86,13 @@ TEST_CASE("bids") {
         .remove<c>()
         .remove<d>();
 
-#if DYNAMIX_V1_USE_EXCEPTIONS
-    CHECK_THROWS_AS(bids_uni(o, sout), bad_next_bidder_call);
-#endif
+    CHECK_THROWS_AS(bids_uni(o, sout), dynamix::bad_feature_access);
 
-    sout.str(string());
+    sout.str(std::string());
     bids_multi_override(o, sout);
     CHECK(sout.str() == "ab");
 
-    sout.str(string());
+    sout.str(std::string());
     bids_multi(o, sout);
     CHECK(sout.str() == "ba");
 }
@@ -214,17 +210,18 @@ public:
 };
 
 // this order should be important if the messages aren't sorted by mixin name
+// v2!: unicast priority is inverted, upriority is used for unicast priority
 DYNAMIX_V1_DEFINE_MIXIN(b,
-    trace_msg& priority(2, priority_trace_msg)
-    & priority(1, bid(1, bids_uni_msg))& priority(-1, bids_bad_uni_msg)& bids_multi_override_msg& bid(1, bids_multi_msg));
+    trace_msg & priority(2, priority_trace_msg)
+    & upriority(-1, bid(1, bids_uni_msg)) & upriority(1, bids_bad_uni_msg) & bids_multi_override_msg & bid(1, bids_multi_msg));
 DYNAMIX_V1_DEFINE_MIXIN(a,
-    trace_msg& priority(-1, priority_trace_msg)
-    & bid(2, priority(1, bids_uni_msg))& bids_bad_uni_msg& bids_multi_override_msg& bids_multi_msg);
+    trace_msg & priority(-1, priority_trace_msg)
+    & bid(2, upriority(-1, bids_uni_msg)) & bids_bad_uni_msg & bids_multi_override_msg & bids_multi_msg);
 DYNAMIX_V1_DEFINE_MIXIN(c,
-    trace_msg& priority(1, priority_trace_msg)
-    & priority(1, bids_uni_msg)& bid(1, bids_multi_override_msg)& bids_multi_msg);
+    trace_msg & priority(1, priority_trace_msg)
+    & upriority(-1, bids_uni_msg) & bid(1, bids_multi_override_msg) & bids_multi_msg);
 DYNAMIX_V1_DEFINE_MIXIN(d,
-    trace_msg& priority_trace_msg& bids_uni_msg& bid(1, bids_multi_override_msg)& bid(1, bids_multi_msg));
+    trace_msg & priority_trace_msg & bids_uni_msg & bid(1, bids_multi_override_msg) & bid(1, bids_multi_msg));
 
 DYNAMIX_V1_DEFINE_MESSAGE(trace);
 DYNAMIX_V1_DEFINE_MESSAGE(priority_trace);
