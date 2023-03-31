@@ -204,6 +204,30 @@ TEST_CASE("next impl") {
         CHECK(get_int::call(obj) == 99);
         CHECK(inherited_func(obj, 0) == 100);
     }
+    {
+        test_obj obj;
+        mutate(obj, add<next_impl>());
+        int sum = 0;
+        CHECK_THROWS_WITH_AS(simple_mc::call(obj, sum), "next bidder set", dynamix::bad_feature_access);
+    }
+    {
+        test_obj obj;
+        mutate(obj
+            , add<multicaster>(95)
+            , add<over>()
+            , add<next_impl>()
+            , add<common>()
+        );
+        CHECK(get_int::call(obj) == 1);
+
+        int sum = 1;
+        CHECK(simple_mc::call(obj, sum) == 5);
+        CHECK(sum == 6);
+
+        sum = 0;
+        CHECK(simple_mc::call(obj, sum) == 1);
+        CHECK(sum == 96);
+    }
 }
 
 #include <dynamix/msg/func_traits.hpp>
@@ -297,11 +321,22 @@ public:
     int inherited_func(int i) const {
         return DYNAMIX_CALL_NEXT_IMPL_MSG(inherited_msg, i + 1);
     }
+
+    int mc(int& sum) const {
+        if (sum == 0) {
+            return DYNAMIX_CALL_NEXT_BIDDER_SET(simple_mc, sum);
+        }
+        sum += 5;
+        return 5;
+    }
 };
 
 DYNAMIX_DEFINE_MIXIN(test, next_impl)
     .implements<inherited_msg>()
     .implements_by<get_int>([](next_impl* ni) { return ni->double_get_int(); })
+    .implements_by<simple_mc>([](const next_impl* ni, int& sum) {
+        return ni->mc(sum);
+    }, 5_bid)
 ;
 
 #include <dynamix/msg/define_msg.hpp>

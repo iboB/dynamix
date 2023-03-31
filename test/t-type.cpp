@@ -205,7 +205,9 @@ void test_simple_types(test_data& t, domain& dom) {
         test_unique_features_in_ftable(type_asim, *t.mesh, {{t.render, 0, -2}});
 
         CHECK_FALSE(type_asim.find_next_implementer(*t.unused_feature, *t.mesh));
+        CHECK(type_asim.find_next_bidder_set(*t.unused_feature, *t.mesh).empty());
         CHECK_FALSE(type_asim.find_next_implementer(*t.render, *t.mesh));
+        CHECK(type_asim.find_next_bidder_set(*t.render, *t.mesh).empty());
 
         {
             auto fte = type_asim.ftable_at(t.serialize->id);
@@ -220,8 +222,10 @@ void test_simple_types(test_data& t, domain& dom) {
                 CHECK(next);
                 CHECK(next == fte.begin + 1);
             }
+            CHECK(type_asim.find_next_bidder_set(*t.serialize, *t.mesh).empty());
 
             CHECK_FALSE(type_asim.find_next_implementer(*t.serialize, *t.stats));
+            CHECK(type_asim.find_next_bidder_set(*t.serialize, *t.stats).empty());
         }
     }
 
@@ -291,6 +295,9 @@ void test_simple_types(test_data& t, domain& dom) {
             CHECK(fte.top_bid_back + 1 == fte.end);
 
             test_feature_implementers(type, *t.render, {{t.mesh, 0, -2}, t.invisible});
+
+            CHECK(type.find_next_bidder_set(*t.render, *t.mesh).empty());
+            CHECK(type.find_next_bidder_set(*t.render, *t.invisible).empty());
         }
 
         test_unique_features_in_ftable(type, *t.mesh, {t.serialize});
@@ -341,6 +348,15 @@ void test_more_types(test_data& t) {
             CHECK(fte.top_bid_back + 2 == fte.end);
 
             test_feature_implementers(type, *t.go_up_down, {{t.actor, 1, 1}, {t.procedural_geometry, -10, 1}});
+
+            {
+                auto next_bidders = type.find_next_bidder_set(*t.go_up_down, *t.actor);
+                CHECK(next_bidders.size() == 1);
+                CHECK(next_bidders[0].mixin_index == 1);
+                CHECK(next_bidders[0].data->info == t.go_up_down);
+            }
+
+            CHECK(type.find_next_bidder_set(*t.go_up_down, *t.procedural_geometry).empty());
         }
 
         CHECK(type.mixin_offsets[1] == 0);
@@ -415,6 +431,16 @@ void test_more_types(test_data& t) {
             }
 
             CHECK_FALSE(type.find_next_implementer(*t.render, *t.procedural_geometry));
+
+            {
+                auto next_bidders = type.find_next_bidder_set(*t.render, *t.over_under);
+                CHECK(next_bidders.size() == 2);
+                CHECK(next_bidders[0].mixin_index == 2);
+                CHECK(next_bidders[1].mixin_index == 1);
+                CHECK(next_bidders[0].data->info == t.render);
+            }
+
+            CHECK(type.find_next_bidder_set(*t.render, *t.invisible).empty());
         }
 
         {
