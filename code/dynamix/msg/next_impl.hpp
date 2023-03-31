@@ -13,7 +13,7 @@ namespace dynamix {
 template <typename Msg, typename Mixin>
 bool has_next_impl_msg(Mixin* mixin) {
     auto* obj = object_of(mixin);
-    return !!obj->get_type().find_next_implementer(Msg::info, g::get_mixin_info<Mixin>());
+    return !!obj->get_type().find_next_implementer(Msg::info, g::get_mixin_info<std::remove_cv_t<Mixin>>());
 }
 
 template <typename Msg, typename Mixin, typename... Args>
@@ -30,7 +30,7 @@ auto call_next_impl_msg(Mixin* mixin, Args&&... args) -> typename msg_traits<Msg
 template <typename Msg, typename Mixin>
 bool has_next_bidder_set(Mixin* mixin) {
     auto* obj = object_of(mixin);
-    return !obj->get_type().find_next_bidder_set(Msg::info, g::get_mixin_info<Mixin>()).empty();
+    return !obj->get_type().find_next_bidder_set(Msg::info, g::get_mixin_info<std::remove_cv_t<Mixin>>()).empty();
 }
 
 template <typename Msg, typename Mixin, typename... Args>

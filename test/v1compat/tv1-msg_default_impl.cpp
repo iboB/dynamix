@@ -33,10 +33,11 @@ DYNAMIX_V1_MESSAGE_1(int, basic_1_def, int, x);
 DYNAMIX_V1_CONST_MESSAGE_2(int, basic_2_def, int, x, int, y);
 
 // overloaded message with default impl
-DYNAMIX_V1_MESSAGE_1_OVERLOAD(basic_2_def_overload, int, basic_2_def, const string&, str);
+DYNAMIX_V1_MESSAGE_1_OVERLOAD(basic_2_def_overload, int, basic_2_def, const std::string&, str);
 
 // basic multicast test
 DYNAMIX_V1_CONST_MULTICAST_MESSAGE_1(int, def_multi, int, i);
+DYNAMIX_V1_CREATE_COMBINATOR_CALL_1(int, def_multi, int, i);
 
 ////////////////////////////////////////////////////////////////////////////////
 // tests
@@ -44,10 +45,10 @@ TEST_CASE("basic_msgs")
 {
     object o;
 
-    // empty objects implement no messages, even ones with a default implementation
-    CHECK(!o.implements(basic_def_msg));
-    CHECK(!o.type_info().implements_by_mixin(basic_def_msg));
-    CHECK(!o.type_info().implements_with_default(basic_def_no_impl_msg));
+    // v2!: empty objects implement messages with default impl
+    CHECK(o.implements(basic_def_msg));
+    CHECK(!o.get_type().implements_strong<basic_def_msg_t>());
+    // v2!: no implements with default
 
 #if DYNAMIX_V1_USE_EXCEPTIONS
     CHECK_THROWS_AS(basic_def(o), bad_message_call);
@@ -60,11 +61,9 @@ TEST_CASE("basic_msgs")
     setn(o, 50);
 
     CHECK(o.implements(basic_def_no_impl_msg));
-    CHECK(!o.type_info().implements_by_mixin(basic_def_no_impl_msg));
-    CHECK(o.type_info().implements_with_default(basic_def_no_impl_msg));
+    CHECK(!o.get_type().implements_strong<basic_def_no_impl_msg_t>());
     CHECK(o.implements(basic_def_msg));
-    CHECK(!o.type_info().implements_by_mixin(basic_def_msg));
-    CHECK(o.type_info().implements_with_default(basic_def_msg));
+    CHECK(!o.get_type().implements_strong<basic_def_msg_t>());
 
     CHECK(1110 == basic_def(o));
     CHECK(2111 == basic_def_no_impl(o));
@@ -74,8 +73,7 @@ TEST_CASE("basic_msgs")
         .add<mix_c>();
 
     CHECK(1000 == basic_def(o));
-    CHECK(o.type_info().implements_by_mixin(basic_def_msg));
-    CHECK(!o.type_info().implements_with_default(basic_def_msg));
+    CHECK(o.get_type().implements_strong<basic_def_msg_t>());
     CHECK(2001 == basic_def_no_impl(o));
     CHECK(55 == basic_1_def(o, 5));
 }
@@ -106,18 +104,15 @@ TEST_CASE("multi")
         .add<mix_c>();
 
     CHECK(o.implements(def_multi_msg));
-    CHECK(!o.type_info().implements_by_mixin(def_multi_msg));
-    CHECK(o.type_info().implements_with_default(def_multi_msg));
+    CHECK(!o.get_type().implements_strong<def_multi_msg_t>());
     CHECK(400 == def_multi<combinators::sum>(o, 2));
 
     mutate(o)
         .add<mix_a>()
         .add<mix_b>();
 
-    CHECK(o.type_info().implements_by_mixin(def_multi_msg));
-    CHECK(!o.type_info().implements_with_default(def_multi_msg));
-    // two since the default implementation should be overriden
-    CHECK(o.type_info().num_implementers(def_multi_msg) == 2);
+    CHECK(o.get_type().implements_strong<def_multi_msg_t>());
+    // v2!: no num_implementers
 
     setn(o, 3);
 
@@ -174,7 +169,7 @@ public:
     int basic_1_def(int x)
     {
         CHECK(!DYNAMIX_V1_HAS_NEXT_BIDDER(basic_def_no_impl_msg));
-        return basic_1(dm_this, x);
+        return basic_1(*dm_v1_this, x);
     }
 
     int basic_2_def(int x, int y) const
@@ -183,7 +178,7 @@ public:
         return x + y;
     }
 
-    int basic_2_def(const string& str)
+    int basic_2_def(const std::string& str)
     {
         CHECK(!DYNAMIX_V1_HAS_NEXT_BIDDER(basic_def_no_impl_msg));
         return int(str.length());
@@ -199,25 +194,30 @@ DYNAMIX_V1_DEFINE_MESSAGE(basic_1);
 DYNAMIX_V1_DEFINE_MESSAGE(setn);
 
 DYNAMIX_V1_DEFINE_MESSAGE_0_WITH_DEFAULT_IMPL(int, basic_def) {
-    return basic(dm_this) + 1010;
+    // v2!: dm_self arg
+    return basic(dm_self) + 1010;
 }
 
 DYNAMIX_V1_DEFINE_MESSAGE_0_WITH_DEFAULT_IMPL(int, basic_def_no_impl) {
-    return basic_def(dm_this) + 1001;
+    return basic_def(dm_self) + 1001;
 }
 
 DYNAMIX_V1_DEFINE_MESSAGE_1_WITH_DEFAULT_IMPL(int, basic_1_def, int, x) {
-    return 10 * x + basic_1(dm_this, x);
+    return 10 * x + basic_1(dm_self, x);
 }
 
 DYNAMIX_V1_DEFINE_MESSAGE_2_WITH_DEFAULT_IMPL(int, basic_2_def, int, x, int, y) {
+    // v2!: dm_self arg may lead to warnings if unused
+    (void)dm_self;
     return x * y;
 }
 
-DYNAMIX_V1_DEFINE_MESSAGE_1_WITH_DEFAULT_IMPL(int, basic_2_def_overload, const string&, str) {
+DYNAMIX_V1_DEFINE_MESSAGE_1_WITH_DEFAULT_IMPL(int, basic_2_def_overload, const std::string&, str) {
+    (void)dm_self;
     return atoi(str.c_str());
 }
 
 DYNAMIX_V1_DEFINE_MESSAGE_1_WITH_DEFAULT_IMPL(int, def_multi, int, i) {
+    (void)dm_self;
     return 200 * i;
 }

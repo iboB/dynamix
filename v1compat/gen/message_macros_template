@@ -4,7 +4,7 @@
         using traits = DYNAMIX_FUNC_TRAITS_NAME(method_name)<I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)>; \
         static const ::dynamix::common_feature_info& get_info_safe(); \
         static const ::dynamix::feature_info& info; \
-        static inline constexpr bool clash = is_multicast; \
+        static inline constexpr bool multicast = is_multicast; \
     }; \
     extern export I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name) * I_DYNAMIX_V1_MESSAGE_TAG(message_name)
 
