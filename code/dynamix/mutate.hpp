@@ -101,7 +101,7 @@ public:
         m_obj.reset_type(type);
     }
 };
-gradual_mutation mutate(object& obj) {
+inline gradual_mutation mutate(object& obj) {
     return gradual_mutation(obj);
 }
 }
