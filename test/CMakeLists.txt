@@ -3,11 +3,14 @@
 #
 CPMAddPackage(gh:iboB/doctest-util@0.1.0)
 CPMAddPackage(gh:ThrowTheSwitch/Unity@2.5.2)
+set_target_properties(doctest PROPERTIES FOLDER test)
+set_target_properties(doctest-main PROPERTIES FOLDER test)
+set_target_properties(unity PROPERTIES FOLDER test)
 
 add_library(doctest-unity STATIC
     doctest-unity-main.cpp
 )
-
+set_target_properties(doctest-unity PROPERTIES FOLDER test)
 target_link_libraries(doctest-unity PUBLIC
     unity::framework
     doctest::headers

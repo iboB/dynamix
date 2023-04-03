@@ -10,7 +10,10 @@ function(add_test_plugin name)
     if(NOT WIN32)
         target_compile_options(${tgt} PRIVATE -fvisibility=hidden)
     endif()
-    set_target_properties(${tgt} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${testPluginDir})
+    set_target_properties(${tgt} PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY ${testPluginDir}
+        FOLDER test
+    )
 endfunction()
 
 add_subdirectory(lib)

@@ -7,5 +7,6 @@ icm_add_shared_lib(dynamix-test-app-plugin-lib TAP
     tap-domain.cpp
     tap-object.cpp
 )
+set_target_properties(dynamix-test-app-plugin-lib PROPERTIES FOLDER test)
 target_link_libraries(dynamix-test-app-plugin-lib PUBLIC dynamix::dynamix)
 target_include_directories(dynamix-test-app-plugin-lib INTERFACE .)
