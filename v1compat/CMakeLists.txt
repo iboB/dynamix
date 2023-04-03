@@ -45,7 +45,18 @@ if(DYNAMIX_V1COMPAT_GENERATE_CODE)
 endif()
 
 target_sources(dynamix-v1compat PRIVATE
+    code/dynamix/v1compat/api.h
+    code/dynamix/v1compat/combinators.hpp
+    code/dynamix/v1compat/core.hpp
+    code/dynamix/v1compat/declare_message.hpp
+    code/dynamix/v1compat/declare_mixin.hpp
+    code/dynamix/v1compat/define_message.hpp
+    code/dynamix/v1compat/define_mixin.hpp
+    code/dynamix/v1compat/domain.hpp
     code/dynamix/v1compat/domain.cpp
+    code/dynamix/v1compat/mutate.hpp
+    code/dynamix/v1compat/next_bidder.hpp
+    code/dynamix/v1compat/object.hpp
     code/dynamix/v1compat/object.cpp
     ${generatedFiles}
 )
