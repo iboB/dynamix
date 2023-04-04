@@ -22,16 +22,16 @@ typedef struct dnmx_type_class_id {
 #endif
 } dnmx_type_class_id;
 
-typedef bool (*dnmx_type_class_check_func)(dnmx_type_handle) DNMX_NOEXCEPT;
+typedef bool (*dnmx_type_class_match_func)(dnmx_type_handle) DNMX_NOEXCEPT;
 
 typedef struct dnmx_type_class {
     dnmx_sv name;
-    dnmx_type_class_check_func check;
+    dnmx_type_class_match_func matches;
 
-    // if domain is not null, this means the type class is registered and checks can be
-    // made by id and name, instead of the check function
-    // if domain is null, this means the type class is not registered and checks can only
-    // be made by invoking the check function
+    // if domain is not null, this means the type class is registered and matches can be
+    // made by id and name, instead of the match function
+    // if domain is null, this means the type class is not registered and matches can only
+    // be made by invoking the match function
     dnmx_domain_handle domain;
     dnmx_type_class_id id;
 

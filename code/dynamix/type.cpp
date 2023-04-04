@@ -85,7 +85,7 @@ bool type::is_of(const type_class& tc) const noexcept {
         if (tc.id.i < type_classes.size()) return type_classes[tc.id.i];
     }
     // fall back to function if the fast route cannot be taken
-    return tc.check(this);
+    return tc.matches(this);
 }
 
 bool type::is_of(std::string_view name) const noexcept {

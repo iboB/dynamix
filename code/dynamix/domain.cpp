@@ -277,7 +277,7 @@ public:
         // the only way for this to lead to a concurrent access to the type_classes span would be
         // a bug: if a type class is registered while we're looking for it at the same time from another thread
         for (auto& t : reg->types) {
-            if (t->type_classes.size() < tc.id.i) {
+            if (t->type_classes.size() < tc.id.i && tc.matches(t.get())) {
                 const_cast<bool*>(t->type_classes.data())[tc.id.i] = true;
             }
         }
@@ -642,6 +642,7 @@ public:
         static_assert(alignof(typename type::ftable_payload) >= alignof(void*), "fix type buffer");
         static_assert(alignof(void*) >= alignof(uint32_t), "fix type buffer");
         static_assert(alignof(uint32_t) >= alignof(mixin_index_t), "fix type buffer");
+        static_assert(alignof(mixin_index_t) >= alignof(bool), "fix type buffer");
         static_assert(std::is_trivial_v<type::ftable_entry>, "fix type buffer");
 
         // prepare single buffer for type
@@ -663,6 +664,8 @@ public:
             return (*max_by_id)->iid() + 1;
         }();
         const byte_size_t sparse_mixin_indices_buf_size = num_sparse * sizeof(mixin_index_t);
+
+        //const byte_size_t type_classes_buf_size = byte_size_t(m_domain.m_type_classes.size() * sizeof(bool));
 
         // alloc and fill buf
         const byte_size_t total_obj_type_buf_size =
