@@ -60,8 +60,8 @@ public:
     void unregister_feature(feature_info& info);
 
     // type classes don't have to be registered, but if they are, they can be queried by name
-    void register_type_class(type_class& tc);
-    void unregister_type_class(type_class& tc);
+    void register_type_class(const type_class& tc);
+    void unregister_type_class(const type_class& tc);
 
     // get registered infos
     // return nullptr if nothing matches the arg

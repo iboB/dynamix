@@ -9,6 +9,8 @@
 #include <dynamix/common_mixin_info.hpp>
 #include <dynamix/common_feature_info.hpp>
 #include <dynamix/feature_for_mixin.hpp>
+#include <dynamix/type_class.hpp>
+#include <dynamix/type.hpp>
 
 #include <dnmx/bits/pp.h>
 
@@ -252,6 +254,10 @@ public:
         }
     }
 
+    dynamix::type_class
+        renderable,
+        serializable;
+
     test_mixin_allocator m_mixin_alloc;
 
     test_data() {
@@ -385,6 +391,17 @@ public:
             VMM(unused, {feature_of_unused});
             (void)desc;
         }
+
+        renderable.name = dnmx_make_sv_lit("renderable");
+        renderable.matches = [](dnmx_type_handle th) noexcept {
+            auto t = type::from_c_handle(th);
+            return t->implements_strong("render");
+        };
+        serializable.name = dnmx_make_sv_lit("serializable");
+        serializable.matches = [](dnmx_type_handle th) noexcept {
+            auto t = type::from_c_handle(th);
+            return t->implements_strong("serialize");
+        };
     }
 
     struct lifetimes {

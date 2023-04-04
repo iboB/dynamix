@@ -266,7 +266,10 @@ public:
         info.dom = nullptr;
     }
 
-    void register_type_class(type_class& new_tc) {
+    void register_type_class(const type_class& new_tc) {
+        if (new_tc.name.empty()) throw domain_error("empty type_class name");
+        if (!new_tc.matches) throw domain_error("type_class missing matches func");
+
         auto reg = m_registry.unique_lock();
 
         // search in reverse order while also checking for name clashes
@@ -288,7 +291,7 @@ public:
         *free_slot = &new_tc;
     }
 
-    void unregister_type_class(type_class& tc) {
+    void unregister_type_class(const type_class& tc) {
         auto reg = m_registry.unique_lock();
 
         for (auto& rtc : reg->sparse_type_classes) {
@@ -828,11 +831,11 @@ const feature_info* domain::get_feature_info(std::string_view name) noexcept {
     return m_impl->get_feature_info(name);
 }
 
-void domain::register_type_class(type_class& tc) {
+void domain::register_type_class(const type_class& tc) {
     m_impl->register_type_class(tc);
 }
 
-void domain::unregister_type_class(type_class& tc) {
+void domain::unregister_type_class(const type_class& tc) {
     m_impl->unregister_type_class(tc);
 }
 

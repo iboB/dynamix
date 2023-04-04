@@ -10,8 +10,8 @@
 namespace dynamix::impl {
 struct registered_type_class_instance {
     domain& dom;
-    type_class& tc;
-    registered_type_class_instance(domain& dom, type_class& tc) : dom(dom), tc(tc) {
+    const type_class& tc;
+    registered_type_class_instance(domain& dom, const type_class& tc) : dom(dom), tc(tc) {
         dom.register_type_class(tc);
     }
     ~registered_type_class_instance() {
