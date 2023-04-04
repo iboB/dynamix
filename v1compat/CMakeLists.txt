@@ -55,8 +55,12 @@ target_sources(dynamix-v1compat PRIVATE
     code/dynamix/v1compat/domain.hpp
     code/dynamix/v1compat/domain.cpp
     code/dynamix/v1compat/mutate.hpp
+    code/dynamix/v1compat/mutation_rule.hpp
+    code/dynamix/v1compat/common_mutation_rules.hpp
+    code/dynamix/v1compat/mutation_rules.cpp
     code/dynamix/v1compat/next_bidder.hpp
     code/dynamix/v1compat/object.hpp
     code/dynamix/v1compat/object.cpp
+    code/dynamix/v1compat/type_class.hpp
     ${generatedFiles}
 )

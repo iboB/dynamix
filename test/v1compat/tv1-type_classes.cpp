@@ -4,7 +4,7 @@
 #include <dynamix/v1compat/core.hpp>
 #include <dynamix/v1compat/type_class.hpp>
 
-#include "doctest/doctest.h"
+#include <doctest/doctest.h>
 
 TEST_SUITE_BEGIN("type classes");
 
@@ -20,8 +20,7 @@ DYNAMIX_V1_DECLARE_MIXIN(tank);
 DYNAMIX_V1_DECLARE_MIXIN(pacifist);
 DYNAMIX_V1_DECLARE_MIXIN(cannon);
 
-TEST_CASE("local")
-{
+TEST_CASE("local") {
     using namespace dynamix::v1compat;
 
     object gc; mutate(gc).add<ghost>().add<cannon>();
@@ -75,8 +74,7 @@ DYNAMIX_V1_DEFINE_TYPE_CLASS(move_and_ghost_and_tank) {
         && type.has<tank>();
 }
 
-TEST_CASE("global")
-{
+TEST_CASE("global") {
     using namespace dynamix::v1compat;
     object gt; mutate(gt).add<ghost>().add<tank>();
     // v2!: no matching_type_classes in type
@@ -97,38 +95,33 @@ DYNAMIX_V1_DEFINE_MESSAGE(shoot);
 class ghost {};
 DYNAMIX_V1_DEFINE_MIXIN(ghost, dynamix::v1compat::none);
 
-class visible
-{
+class visible {
 public:
     void draw() {}
 };
 DYNAMIX_V1_DEFINE_MIXIN(visible, draw_msg);
 
-class soldier
-{
+class soldier {
 public:
     void move() {}
     void shoot() {}
 };
 DYNAMIX_V1_DEFINE_MIXIN(soldier, move_msg & shoot_msg);
 
-class tank
-{
+class tank {
 public:
     void move() {}
     void shoot() {}
 };
 DYNAMIX_V1_DEFINE_MIXIN(tank, move_msg & shoot_msg);
 
-class pacifist
-{
+class pacifist {
 public:
     void move() {}
 };
 DYNAMIX_V1_DEFINE_MIXIN(pacifist, move_msg);
 
-class cannon
-{
+class cannon {
 public:
     void shoot() {}
 };

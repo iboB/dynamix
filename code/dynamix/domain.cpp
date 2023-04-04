@@ -425,7 +425,7 @@ public:
                 throw domain_error("rule interdependency too deep or cyclic");
             }
             if (i == 0) {
-                // first time running the loop and rules made changes, store original querty to return
+                // first time running the loop and rules made changes, store original query to return
                 original_query.swap(last_result);
             }
             last_result = nt_mixins;
