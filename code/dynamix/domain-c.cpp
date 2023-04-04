@@ -71,6 +71,24 @@ const dnmx_mixin_info* dnmx_get_mixin_info_by_name(dnmx_domain_handle hd, dnmx_s
     return self->get_mixin_info(name.to_std());
 }
 
+dnmx_error_return_t dnmx_register_type_class(dnmx_domain_handle hd, const dnmx_type_class* tc) {
+    try {
+        self->register_type_class(*tc);
+        return dnmx_result_success;
+    }
+    catch (std::exception&) {
+        return -1;
+    }
+}
+
+void dnmx_unregister_type_class(dnmx_domain_handle hd, const dnmx_type_class* tc) {
+    self->unregister_type_class(*tc);
+}
+
+const dnmx_type_class* dnmx_get_type_class_by_name(dnmx_domain_handle hd, dnmx_sv name) {
+    return self->get_type_class(name.to_std());
+}
+
 dnmx_error_return_t dnmx_add_mutation_rule(dnmx_domain_handle hd, const dnmx_mutation_rule_info* info) {
     try {
         self->add_mutation_rule(*info);

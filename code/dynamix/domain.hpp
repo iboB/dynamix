@@ -13,6 +13,7 @@
 #include "mixin_id.hpp"
 #include "mixin_info_fwd.hpp"
 #include "mutation_rule_info_fwd.hpp"
+#include "type_class.hpp"
 
 #include "allocator.hpp"
 
@@ -58,6 +59,10 @@ public:
     void unregister_mixin(mixin_info& info);
     void unregister_feature(feature_info& info);
 
+    // type classes don't have to be registered, but if they are, they can be queried by name
+    void register_type_class(const type_class& tc);
+    void unregister_type_class(const type_class& tc);
+
     // get registered infos
     // return nullptr if nothing matches the arg
     // these functions are not const, as they are not safe to use where a const domain
@@ -66,6 +71,7 @@ public:
     const mixin_info* get_mixin_info(std::string_view name) noexcept;
     const feature_info* get_feature_info(feature_id id) noexcept;
     const feature_info* get_feature_info(std::string_view name) noexcept;
+    const type_class* get_type_class(std::string_view name) noexcept;
 
     // mutation rules
     // adding and removing the same mutation rule is safe (it is managed by an internal ref count)

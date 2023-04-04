@@ -4,6 +4,7 @@
 #pragma once
 #include "object_mixin_data.h"
 #include "mixin_index.h"
+#include "type_handle.h"
 
 #include <splat/inline.h>
 
@@ -17,7 +18,7 @@ struct dnmx_basic_object {
     // object data visible to C so that queries can be inlined there too
 
     // type. never null
-    const struct dnmx_basic_type* m_type;
+    dnmx_type_handle m_type;
 
     // multi-purpose pointer
     // first, it points to the unified buffer for this object

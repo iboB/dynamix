@@ -75,6 +75,7 @@ dynamix_test(mixin_info_data t-mixin_info_data.cpp)
 dynamix_test(domain-features t-domain-features.cpp)
 dynamix_test(domain-mixins t-domain-mixins.cpp)
 dynamix_test(type t-type.cpp)
+dynamix_test(type_class t-type_class.cpp)
 dynamix_test(type_mutation t-type_mutation.cpp)
 dynamix_test(mutation_rule t-mutation_rule.cpp)
 

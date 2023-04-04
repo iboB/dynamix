@@ -5,6 +5,8 @@
 #include "type.hpp"
 #include "mixin_info.hpp"
 
+#include <exception>
+
 using namespace dynamix;
 
 extern "C" {
@@ -45,7 +47,18 @@ bool dnmx_type_implements(dnmx_type_handle ht, const dnmx_feature_info* info) {
     return self->implements(*info);
 }
 
-//dnmx_mixin_index_t dnmx_type_is_of() {}
+bool dnmx_type_is_of(dnmx_type_handle ht, const dnmx_type_class* tc) {
+    return self->is_of(*tc);
+}
+
+bool dnmx_type_is_of_name(dnmx_type_handle ht, dnmx_sv name) {
+    try {
+        return self->is_of(name.to_std());
+    }
+    catch (std::exception&) {
+        return false;
+    }
+}
 
 bool dnmx_type_is_default_constructible(dnmx_type_handle ht) {
     return self->default_constructible();

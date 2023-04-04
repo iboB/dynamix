@@ -106,6 +106,7 @@ public:
         // null elements have been unregistered and are free slots for future registers
         compat::pmr::vector<const feature_info*> sparse_features;
         compat::pmr::vector<const mixin_info*> sparse_mixins;
+        compat::pmr::vector<const type_class*> sparse_type_classes;
 
         // sorted rules with their refcounts
         mutation_rule_map mutation_rules;
@@ -265,6 +266,41 @@ public:
         info.dom = nullptr;
     }
 
+    void register_type_class(const type_class& new_tc) {
+        if (new_tc.name.empty()) throw domain_error("empty type_class name");
+        if (!new_tc.matches) throw domain_error("type_class missing matches func");
+
+        auto reg = m_registry.unique_lock();
+
+        // search in reverse order while also checking for name clashes
+        const type_class** free_slot = nullptr;
+        for (auto i = reg->sparse_type_classes.rbegin(); i != reg->sparse_type_classes.rend(); ++i) {
+            auto tc = *i;
+            if (tc) {
+                if (tc->name == new_tc.name) throw domain_error("duplicate type_class name");
+            }
+            else {
+                free_slot = &tc;
+            }
+        }
+
+        if (!free_slot) {
+            free_slot = &reg->sparse_type_classes.emplace_back();
+        }
+
+        *free_slot = &new_tc;
+    }
+
+    void unregister_type_class(const type_class& tc) {
+        auto reg = m_registry.unique_lock();
+
+        for (auto& rtc : reg->sparse_type_classes) {
+            if (rtc == &tc) {
+                rtc = nullptr;
+                return;
+            }
+        }
+    }
 
     template <typename Id, typename T>
     static const T* basic_get_by_id_l(Id id, const compat::pmr::vector<const T*>& sparse) noexcept {
@@ -292,6 +328,10 @@ public:
     }
     const feature_info* get_feature_info(std::string_view name) noexcept {
         return basic_get_by_name_l(name, m_registry.shared_lock()->sparse_features);
+    }
+
+    const type_class* get_type_class(std::string_view name) noexcept {
+        return basic_get_by_name_l(name, m_registry.shared_lock()->sparse_type_classes);
     }
 
     void add_mutation_rule(const mutation_rule_info& info) {
@@ -629,6 +669,8 @@ public:
         }();
         const byte_size_t sparse_mixin_indices_buf_size = num_sparse * sizeof(mixin_index_t);
 
+        //const byte_size_t type_classes_buf_size = byte_size_t(m_domain.m_type_classes.size() * sizeof(bool));
+
         // alloc and fill buf
         const byte_size_t total_obj_type_buf_size =
             type_size
@@ -787,6 +829,18 @@ const feature_info* domain::get_feature_info(feature_id id) noexcept {
 
 const feature_info* domain::get_feature_info(std::string_view name) noexcept {
     return m_impl->get_feature_info(name);
+}
+
+void domain::register_type_class(const type_class& tc) {
+    m_impl->register_type_class(tc);
+}
+
+void domain::unregister_type_class(const type_class& tc) {
+    m_impl->unregister_type_class(tc);
+}
+
+const type_class* domain::get_type_class(std::string_view name) noexcept {
+    return m_impl->get_type_class(name);
 }
 
 void domain::add_mutation_rule(const mutation_rule_info& info) {

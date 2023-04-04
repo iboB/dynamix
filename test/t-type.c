@@ -7,11 +7,16 @@
 #include <dnmx/type.h>
 #include <dnmx/type_mutation.h>
 #include <dnmx/mutation_rule_info.h>
+#include <dnmx/type_class.h>
 
 #include "s-unity.h"
 
 void setUp(void) {}
 void tearDown(void) {}
+
+bool can_jump(dnmx_type_handle ht) {
+    return dnmx_type_implements_strong_by_name(ht, dnmx_make_sv_lit("jump"));
+}
 
 void empty(void) {
     dnmx_domain_handle dom = dnmx_create_domain(dnmx_make_sv_lit("test"), (dnmx_domain_settings){0}, 0, NULL);
@@ -87,6 +92,13 @@ void simple(void) {
     dnmx_register_mixin(dom, &warrior);
     dnmx_register_mixin(dom, &shooter);
 
+    dnmx_type_class jumper = {0};
+    T_FAIL(dnmx_register_type_class(dom, &jumper));
+    jumper.name = dnmx_make_sv_lit("jumper");
+    T_FAIL(dnmx_register_type_class(dom, &jumper));
+    jumper.matches = can_jump;
+    T_SUCCESS(dnmx_register_type_class(dom, &jumper));
+
     const dnmx_mixin_info* ar_aw[] = {&athlete, &warrior};
     const dnmx_mixin_info* ar_as[] = {&athlete, &shooter};
     const dnmx_mixin_info* ar_ws[] = {&warrior, &shooter};
@@ -112,6 +124,10 @@ void simple(void) {
     CHECK(dnmx_type_implements_strong(type, &run));
     CHECK(dnmx_type_implements_strong_by_name(type, dnmx_make_sv_lit("shoot")));
     CHECK(dnmx_type_implements(type, &jump));
+
+    CHECK(dnmx_type_is_of(type, &jumper));
+    CHECK(dnmx_type_is_of_name(type, dnmx_make_sv_lit("jumper")));
+    CHECK_FALSE(dnmx_type_is_of_name(type, dnmx_make_sv_lit("xxx")));
 
     CHECK_FALSE(dnmx_type_is_default_constructible(type));
     CHECK_FALSE(dnmx_type_is_copy_constructible(type));

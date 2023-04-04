@@ -3,6 +3,7 @@
 //
 #include "object.hpp"
 #include "domain.hpp"
+#include "type_class.hpp"
 #include <dynamix/type.hpp>
 
 namespace dynamix::v1compat {
@@ -23,4 +24,9 @@ object object::copy() const {
     ret.copy_from(*this);
     return ret;
 }
+
+bool object::is_a(const type_class& tc) const noexcept {
+    return is_of(tc);
+}
+
 }

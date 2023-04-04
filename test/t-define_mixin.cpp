@@ -16,6 +16,7 @@
 #include <dynamix/any.hpp>
 #include <dynamix/common_mutation_rules.hpp>
 #include <dynamix/common_mixin_init.hpp>
+#include <dynamix/declare_type_class.hpp>
 
 #include <dynamix/compat/pmr/string.hpp>
 
@@ -29,6 +30,9 @@ DYNAMIX_DECLARE_DOMAIN(test);
 DYNAMIX_DECLARE_MIXIN(struct alice);
 DYNAMIX_DECLARE_MIXIN(class bob);
 DYNAMIX_DECLARE_MIXIN(class charlie);
+
+DYNAMIX_DECLARE_TYPE_CLASS(impl_bbb);
+DYNAMIX_DECLARE_TYPE_CLASS(impl_ccc);
 
 int domain_ctx;
 
@@ -113,6 +117,10 @@ TEST_CASE("declared mixins only") {
 
     using namespace dynamix::mutate_ops;
     mutate(obj, add<alice>(), add("bob"));
+    CHECK(obj.is_of<impl_ccc>());
+    CHECK(obj.is_of("impl_ccc"));
+    CHECK_FALSE(obj.is_of<impl_bbb>());
+    CHECK_FALSE(obj.is_of("impl_bbb"));
     auto& t_a_b = obj.get_type();
     {
         auto& t = t_a_b;
@@ -129,6 +137,11 @@ TEST_CASE("declared mixins only") {
         CHECK(t.implements_strong<feature_ccc>());
         CHECK(t.implements<feature_ccc>());
         CHECK(t.implements_strong<feature_ddd>());
+
+        CHECK(t.is_of<impl_ccc>());
+        CHECK(t.is_of("impl_ccc"));
+        CHECK_FALSE(t.is_of<impl_bbb>());
+        CHECK_FALSE(t.is_of("impl_bbb"));
     }
 
     CHECK(get_string<feature_aaa>(obj) == "alice-aaa");
@@ -211,9 +224,23 @@ TEST_CASE("common mixin init") {
     CHECK(obj.has<alice>());
     CHECK(obj.has<charlie>());
     test_charlie_common_mixin_init(obj);
+
+    CHECK(obj.is_of<impl_bbb>());
+    CHECK(obj.is_of("impl_bbb"));
 }
 
 // definitions
+
+#include <dynamix/define_type_class.hpp>
+
+bool implements_bbb(const dnmx_type_handle th) noexcept {
+    return dynamix::type::from_c_handle(th)->implements_strong<feature_bbb>();
+}
+DYNAMIX_DEFINE_TYPE_CLASS_WITH(test, impl_bbb, implements_bbb);
+bool implements_ccc(const dnmx_type_handle th) noexcept {
+    return dynamix::type::from_c_handle(th)->implements_strong<feature_ccc>();
+}
+DYNAMIX_DEFINE_TYPE_CLASS_WITH(test, impl_ccc, implements_ccc);
 
 struct alice {
     alice() = default;

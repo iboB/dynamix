@@ -23,6 +23,7 @@ extern "C" {
 typedef struct dnmx_feature_info dnmx_feature_info;
 typedef struct dnmx_mixin_info dnmx_mixin_info;
 typedef struct dnmx_mutation_rule_info dnmx_mutation_rule_info;
+typedef struct dnmx_type_class dnmx_type_class;
 
 DYNAMIX_API dnmx_domain_handle dnmx_create_domain(dnmx_sv name, dnmx_domain_settings settings, uintptr_t user_data, void* context);
 DYNAMIX_API void dnmx_destroy_domain(dnmx_domain_handle hd);
@@ -51,6 +52,10 @@ DYNAMIX_API const dnmx_feature_info* dnmx_get_feature_info_by_id(dnmx_domain_han
 DYNAMIX_API const dnmx_feature_info* dnmx_get_feature_info_by_name(dnmx_domain_handle hd, dnmx_sv name);
 DYNAMIX_API const dnmx_mixin_info* dnmx_get_mixin_info_by_id(dnmx_domain_handle hd, dnmx_mixin_id id);
 DYNAMIX_API const dnmx_mixin_info* dnmx_get_mixin_info_by_name(dnmx_domain_handle hd, dnmx_sv name);
+
+DYNAMIX_API dnmx_error_return_t dnmx_register_type_class(dnmx_domain_handle hd, const dnmx_type_class* tc);
+DYNAMIX_API void dnmx_unregister_type_class(dnmx_domain_handle hd, const dnmx_type_class* tc);
+DYNAMIX_API const dnmx_type_class* dnmx_get_type_class_by_name(dnmx_domain_handle hd, dnmx_sv name);
 
 DYNAMIX_API dnmx_error_return_t dnmx_add_mutation_rule(dnmx_domain_handle hd, const dnmx_mutation_rule_info* info);
 DYNAMIX_API void dnmx_remove_mutation_rule(dnmx_domain_handle hd, const dnmx_mutation_rule_info* info);

@@ -5,6 +5,9 @@
 #include "mixin_info.hpp"
 #include "feature_info.hpp"
 #include "feature_for_mixin.hpp"
+#include "domain.hpp"
+#include "type_class.hpp"
+#include "exception.hpp"
 
 #include <itlib/qalgorithm.hpp>
 
@@ -75,6 +78,12 @@ itlib::span<const type::ftable_payload> type::find_next_bidder_set(const feature
     auto end = begin + 1;
     while (end != fe.end && end->data->bid == f->data->bid) ++end; // find the end of the next bidder set
     return {begin, end};
+}
+
+bool type::is_of(std::string_view name) const {
+    auto tc = dom.get_type_class(name);
+    if (!tc) throw domain_error("unknown type class");
+    return is_of(*tc);
 }
 
 int type::compare(const type& other) const noexcept {

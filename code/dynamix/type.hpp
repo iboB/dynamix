@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 //
 #pragma once
+#include "../dnmx/api.h"
 #include "../dnmx/basic_type.h"
 #include "../dnmx/type_handle.h"
 
@@ -115,7 +116,14 @@ public:
 
     // type class
     [[nodiscard]] bool is_of(const type_class& tc) const noexcept {
-        return tc.matches(*this);
+        return tc.matches(this);
+    }
+    // check by registered type class from domain
+    // will throw domain_error if no such type class is registered
+    [[nodiscard]] bool is_of(std::string_view name) const;
+    template <typename TypeClass>
+    [[nodiscard]] bool is_of() const noexcept {
+        return is_of(TypeClass::m_dynamix_type_class);
     }
 
     // compare types
