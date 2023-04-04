@@ -100,8 +100,7 @@ TEST_CASE("apply rules") {
             auto& td = mrtd->t;
             if (td.mesh->user_data == 111) return -1;
             auto mut = type_mutation::from_c_handle(mutation);
-            auto& nt = mut->new_type();
-            if (nt.has(*td.actor) || nt.has(*td.mesh)) {
+            if (mut->has(*td.actor) || mut->has(*td.mesh)) {
                 mut->add_if_lacking("tam");
             }
             return result_success;
@@ -121,10 +120,10 @@ TEST_CASE("apply rules") {
             if (td.movable->user_data == 666) throw std::logic_error("too many wheels");
             mrtd->log.push_back(2);
             auto mut = type_mutation::from_c_handle(mutation);
-            if (mut->adding("wheeled") && mut->new_type().lacks(*td.movable)) {
+            if (mut->has("wheeled") && mut->lacks(*td.movable)) {
                 mut->add(*td.movable);
             }
-            else if (mut->removing("wheeled")) {
+            else if (mut->lacks("wheeled")) {
                 mut->remove(*td.movable);
             }
             return result_success;
@@ -141,9 +140,9 @@ TEST_CASE("apply rules") {
         auto mrtd = reinterpret_cast<mut_rule_test_data*>(ud);
         mrtd->log.push_back(0);
         auto mut = type_mutation::from_c_handle(mutation);
-        itlib::erase_all_if(mut->mod_new_type().mixins, [](const mixin_info* info) {
+        itlib::erase_all_if(mut->mixins, [](const mixin_info* info) {
             return itlib::starts_with(info->name.to_std(), "empty");
-            });
+        });
         return result_success;
     };
     mutation_rule_info mri;
@@ -276,10 +275,10 @@ TEST_CASE("rule interdependency") {
             mrtd->log.push_back(1);
             auto& td = mrtd->t;
             auto mut = type_mutation::from_c_handle(mutation);
-            if (mut->adding("wheeled")) {
+            if (mut->has("wheeled")) {
                 mut->add_if_lacking(*td.movable);
             }
-            else if (mut->removing("wheeled")) {
+            else {
                 mut->remove(*td.movable);
             }
             return result_success;
@@ -298,7 +297,7 @@ TEST_CASE("rule interdependency") {
             mrtd->log.push_back(2);
             auto& td = mrtd->t;
             auto mut = type_mutation::from_c_handle(mutation);
-            if (mut->new_type().has(*td.movable)) {
+            if (mut->has(*td.movable)) {
                 mut->add_if_lacking("tracker");
             }
             return result_success;

@@ -14,7 +14,7 @@ namespace impl {
 template <typename Primary, typename Dependent>
 error_return_t _apply_basic_mixin_dep(dnmx_type_mutation_handle mutation, uintptr_t) {
     auto mut = type_mutation::from_c_handle(mutation);
-    if (mut->new_type().has<Primary>()) {
+    if (mut->has<Primary>()) {
         mut->add_if_lacking<Dependent>();
     }
     return result_success;

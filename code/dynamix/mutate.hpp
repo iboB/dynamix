@@ -4,6 +4,7 @@
 #pragma once
 #include "mutate_ops.hpp"
 #include "mutate_to.hpp"
+#include "domain.hpp"
 
 namespace dynamix {
 // regular mutate with ops as arguments

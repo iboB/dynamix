@@ -29,7 +29,7 @@ namespace dynamix {
 
 namespace {
 error_return_t sort_by_canonical_order(dnmx_type_mutation_handle mutation, uintptr_t) {
-    auto& mixins = type_mutation::from_c_handle(mutation)->mod_new_type().mixins;
+    auto& mixins = type_mutation::from_c_handle(mutation)->mixins;
     std::sort(mixins.begin(), mixins.end(), canonical_mixin_order{});
     return result_success;
 }
@@ -401,7 +401,7 @@ public:
         type_query original_query(m_allocator); // store original query here to return
         type_query last_result(m_allocator); // store last rule application result here
 
-        auto& nt_mixins = mutation.mod_new_type().mixins;
+        auto& nt_mixins = mutation.mixins;
         last_result = nt_mixins;
 
         // first erase all deps from mixins
@@ -439,7 +439,7 @@ public:
         {
             // search for stored query for this combo
             auto reg = m_registry.shared_lock();
-            auto f = reg->type_queries.find(mutation.new_type().mixins);
+            auto f = reg->type_queries.find(mutation.mixins);
             if (f != reg->type_queries.end()) return *f->second;
 
             // query is not available, so we need to apply mutation rules
@@ -447,7 +447,7 @@ public:
             original_query = apply_mutation_rules_l(mutation, reg->mutation_rules);
 
             // now look for exact type
-            found = find_exact_type_l(mutation.new_type().mixins, reg->types);
+            found = find_exact_type_l(mutation.mixins, reg->types);
         }
 
         if (found) {
@@ -478,7 +478,7 @@ public:
         // creating a mutation will run more or less the exact same as above again
         // TODO: optimize
         type_mutation mut(m_empty_type, m_allocator);
-        mut.mod_new_type().mixins.assign(mixins.begin(), mixins.end());
+        mut.mixins.assign(mixins.begin(), mixins.end());
         return get_type(mut);
     }
 
@@ -623,7 +623,7 @@ public:
 
     // create type for a given mutation requested by a given query
     const type& create_type(type_mutation& mutation, type_query&& query) {
-        itlib::span mixins(mutation.new_type().mixins);
+        itlib::span mixins(mutation.mixins);
 
         // first check validity
         for (size_t i = 0; i < mixins.size(); ++i) {
