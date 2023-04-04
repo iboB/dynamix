@@ -7,6 +7,9 @@
 #include <dynamix/object_of.hpp>
 
 namespace dynamix::v1compat {
+
+class type_class;
+
 class DYNAMIX_V1COMPAT_API object : public dynamix::object {
 public:
     object() noexcept;
@@ -22,6 +25,10 @@ public:
     bool copyable() const noexcept;
 
     object copy() const;
+
+    bool is_a(const type_class& tc) const noexcept;
+    template <typename TypeClass>
+    bool is_a() const noexcept { return is_of<TypeClass>(); }
 
     static object* of(void* mixin) {
         return static_cast<object*>(dynamix::object_of(mixin));
