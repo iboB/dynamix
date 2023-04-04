@@ -11,7 +11,7 @@
 #include "allocator.hpp"
 #include "object_mixin_data.hpp"
 #include "mixin_info_fwd.hpp"
-#include "type_class_fwd.hpp"
+#include "type_class.hpp"
 #include "globals.hpp"
 
 #include <splat/inline.h>
@@ -113,11 +113,13 @@ public:
 
     const type& get_type() const noexcept;
 
-    bool is_of(const type_class& tc) const noexcept;
-    bool is_of(std::string_view name) const noexcept;
+    bool is_of(const type_class& tc) const noexcept {
+        return tc.matches(m_type);
+    }
+    bool is_of(std::string_view name) const; // will throw if type class is not registered
     template <typename TypeClass>
     bool is_of() const noexcept {
-        return is_of(TypeClass::m_dynamix_type_class);
+        return TypeClass::m_dynamix_type_class.matches(m_type);
     }
 
     //////////////////////////

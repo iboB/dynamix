@@ -13,7 +13,7 @@
 #include "mixin_id.hpp"
 #include "mixin_info_fwd.hpp"
 #include "mutation_rule_info_fwd.hpp"
-#include "type_class_fwd.hpp"
+#include "type_class.hpp"
 
 #include "allocator.hpp"
 
@@ -50,7 +50,6 @@ public:
     // with default settings get_type will register all unregistered mixins and features
     void register_feature(feature_info& info); // explicitly registering features is optional
     void register_mixin(mixin_info& info); // also register mixin's features
-    void register_type_class(type_class& tc);
 
     // unregistrators
     // optionally unregister infos (they must have been registered sucessfully before that)
@@ -59,6 +58,9 @@ public:
     // if objects do remain, using them in any way (even to destroy them) is ub (likely crash)
     void unregister_mixin(mixin_info& info);
     void unregister_feature(feature_info& info);
+
+    // type classes don't have to be registered, but if they are, they can be queried by name
+    void register_type_class(type_class& tc);
     void unregister_type_class(type_class& tc);
 
     // get registered infos

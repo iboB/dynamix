@@ -11,7 +11,6 @@
 #include "feature_info.hpp"
 #include "feature_for_mixin.hpp"
 #include "mutation_rule_info.hpp"
-#include "type_class.hpp"
 
 #include <itlib/qalgorithm.hpp>
 #include <itlib/data_mutex.hpp>
@@ -267,34 +266,37 @@ public:
         info.dom = nullptr;
     }
 
-    void register_type_class(type_class& tc) {
+    void register_type_class(type_class& new_tc) {
         auto reg = m_registry.unique_lock();
-        basic_register_l(tc, reg->sparse_type_classes, false);
 
-        // evil const_cast, but thus we can affort to attach type classes to existing types
-        // now, is this a race?
-        // it must not be
-        // the only way for this to lead to a concurrent access to the type_classes span would be
-        // a bug: if a type class is registered while we're looking for it at the same time from another thread
-        for (auto& t : reg->types) {
-            if (t->type_classes.size() < tc.id.i && tc.matches(t.get())) {
-                const_cast<bool*>(t->type_classes.data())[tc.id.i] = true;
+        // search in reverse order while also checking for name clashes
+        const type_class** free_slot = nullptr;
+        for (auto i = reg->sparse_type_classes.rbegin(); i != reg->sparse_type_classes.rend(); ++i) {
+            auto tc = *i;
+            if (tc) {
+                if (tc->name == new_tc.name) throw domain_error("duplicate type_class name");
+            }
+            else {
+                free_slot = &tc;
             }
         }
+
+        if (!free_slot) {
+            free_slot = &reg->sparse_type_classes.emplace_back();
+        }
+
+        *free_slot = &new_tc;
     }
 
     void unregister_type_class(type_class& tc) {
         auto reg = m_registry.unique_lock();
 
-        // again, an evil const_cast
-        // but as with registering, the only way for this to race would be a bug
-        for (auto& t : reg->types) {
-            if (t->type_classes.size() < tc.id.i && t->type_classes[tc.id.i]) {
-                const_cast<bool*>(t->type_classes.data())[tc.id.i] = false;
+        for (auto& rtc : reg->sparse_type_classes) {
+            if (rtc == &tc) {
+                rtc = nullptr;
+                return;
             }
         }
-
-        basic_unregister_l(tc, reg->sparse_type_classes);
     }
 
     template <typename Id, typename T>
@@ -642,7 +644,6 @@ public:
         static_assert(alignof(typename type::ftable_payload) >= alignof(void*), "fix type buffer");
         static_assert(alignof(void*) >= alignof(uint32_t), "fix type buffer");
         static_assert(alignof(uint32_t) >= alignof(mixin_index_t), "fix type buffer");
-        static_assert(alignof(mixin_index_t) >= alignof(bool), "fix type buffer");
         static_assert(std::is_trivial_v<type::ftable_entry>, "fix type buffer");
 
         // prepare single buffer for type

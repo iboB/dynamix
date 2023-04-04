@@ -61,10 +61,7 @@ const type& object::get_type() const noexcept {
     return *type::from_c_handle(m_type);
 }
 
-bool object::is_of(const type_class& tc) const noexcept {
-    return get_type().is_of(tc);
-}
-bool object::is_of(std::string_view name) const noexcept {
+bool object::is_of(std::string_view name) const {
     return get_type().is_of(name);
 }
 

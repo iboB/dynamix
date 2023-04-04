@@ -10,7 +10,6 @@
 
 #include "error_return.h"
 #include "domain_handle.h"
-#include "type_handle.h"
 
 #if defined(__cplusplus)
 extern "C" {
