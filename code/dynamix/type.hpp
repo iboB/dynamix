@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 //
 #pragma once
+#include "../dnmx/api.h"
 #include "../dnmx/basic_type.h"
 #include "../dnmx/type_handle.h"
 
@@ -11,7 +12,7 @@
 #include "feature_id.hpp"
 #include "feature_payload.hpp"
 #include "allocator.hpp"
-#include "type_class.hpp"
+#include "type_class_fwd.hpp"
 #include "feature_info_fwd.hpp"
 #include "mixin_info_fwd.hpp"
 #include "globals.hpp"
@@ -54,6 +55,12 @@ public:
     // indices of mixins in m_mixins per mixin_id
     // if an index is invalid_mixin_index, it is not a part of this type
     itlib::span<const mixin_index_t> sparse_mixin_indices;
+
+    // type classes to which this type belongs
+    // if a type class is registered, its id can be used as an index
+    // NOTE: if a type class is registered after the type is created, it will still not be in this span
+    // todo: turn this into a bitset
+    itlib::span<const bool> type_classes;
 
     // number of objects of this type
     // more precisely this is the number of active (living-allocated) object buffers
@@ -114,8 +121,11 @@ public:
     itlib::span<const ftable_payload> find_next_bidder_set(const feature_info& feature, const mixin_info& mixin) const noexcept;
 
     // type class
-    [[nodiscard]] bool is_of(const type_class& tc) const noexcept {
-        return tc.matches(*this);
+    [[nodiscard]] bool is_of(const type_class& tc) const noexcept;
+    [[nodiscard]] bool is_of(std::string_view name) const noexcept;
+    template <typename TypeClass>
+    [[nodiscard]] bool is_of() const noexcept {
+        return is_of(TypeClass::m_dynamix_type_class);
     }
 
     // compare types

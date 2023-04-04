@@ -13,6 +13,7 @@
 #include "mixin_id.hpp"
 #include "mixin_info_fwd.hpp"
 #include "mutation_rule_info_fwd.hpp"
+#include "type_class_fwd.hpp"
 
 #include "allocator.hpp"
 
@@ -49,6 +50,7 @@ public:
     // with default settings get_type will register all unregistered mixins and features
     void register_feature(feature_info& info); // explicitly registering features is optional
     void register_mixin(mixin_info& info); // also register mixin's features
+    void register_type_class(type_class& tc);
 
     // unregistrators
     // optionally unregister infos (they must have been registered sucessfully before that)
@@ -57,6 +59,7 @@ public:
     // if objects do remain, using them in any way (even to destroy them) is ub (likely crash)
     void unregister_mixin(mixin_info& info);
     void unregister_feature(feature_info& info);
+    void unregister_type_class(type_class& tc);
 
     // get registered infos
     // return nullptr if nothing matches the arg
@@ -66,6 +69,7 @@ public:
     const mixin_info* get_mixin_info(std::string_view name) noexcept;
     const feature_info* get_feature_info(feature_id id) noexcept;
     const feature_info* get_feature_info(std::string_view name) noexcept;
+    const type_class* get_type_class(std::string_view name) noexcept;
 
     // mutation rules
     // adding and removing the same mutation rule is safe (it is managed by an internal ref count)

@@ -115,8 +115,10 @@ target_sources(dynamix PRIVATE
     dynamix/exception.hpp
     dynamix/exception.cpp
 
+    dnmx/type_class.h
     dynamix/type_class.hpp
-    dynamix/type_class.cpp
+    dynamix/declare_type_class.hpp
+    dynamix/define_type_class.hpp
 
     dynamix/type_mutation.hpp
     dynamix/type_mutation.cpp

@@ -11,6 +11,7 @@
 #include "feature_info.hpp"
 #include "feature_for_mixin.hpp"
 #include "mutation_rule_info.hpp"
+#include "type_class.hpp"
 
 #include <itlib/qalgorithm.hpp>
 #include <itlib/data_mutex.hpp>
@@ -106,6 +107,7 @@ public:
         // null elements have been unregistered and are free slots for future registers
         compat::pmr::vector<const feature_info*> sparse_features;
         compat::pmr::vector<const mixin_info*> sparse_mixins;
+        compat::pmr::vector<const type_class*> sparse_type_classes;
 
         // sorted rules with their refcounts
         mutation_rule_map mutation_rules;
@@ -265,6 +267,35 @@ public:
         info.dom = nullptr;
     }
 
+    void register_type_class(type_class& tc) {
+        auto reg = m_registry.unique_lock();
+        basic_register_l(tc, reg->sparse_type_classes, false);
+
+        // evil const_cast, but thus we can affort to attach type classes to existing types
+        // now, is this a race?
+        // it must not be
+        // the only way for this to lead to a concurrent access to the type_classes span would be
+        // a bug: if a type class is registered while we're looking for it at the same time from another thread
+        for (auto& t : reg->types) {
+            if (t->type_classes.size() < tc.id.i) {
+                const_cast<bool*>(t->type_classes.data())[tc.id.i] = true;
+            }
+        }
+    }
+
+    void unregister_type_class(type_class& tc) {
+        auto reg = m_registry.unique_lock();
+
+        // again, an evil const_cast
+        // but as with registering, the only way for this to race would be a bug
+        for (auto& t : reg->types) {
+            if (t->type_classes.size() < tc.id.i && t->type_classes[tc.id.i]) {
+                const_cast<bool*>(t->type_classes.data())[tc.id.i] = false;
+            }
+        }
+
+        basic_unregister_l(tc, reg->sparse_type_classes);
+    }
 
     template <typename Id, typename T>
     static const T* basic_get_by_id_l(Id id, const compat::pmr::vector<const T*>& sparse) noexcept {
@@ -292,6 +323,10 @@ public:
     }
     const feature_info* get_feature_info(std::string_view name) noexcept {
         return basic_get_by_name_l(name, m_registry.shared_lock()->sparse_features);
+    }
+
+    const type_class* get_type_class(std::string_view name) noexcept {
+        return basic_get_by_name_l(name, m_registry.shared_lock()->sparse_type_classes);
     }
 
     void add_mutation_rule(const mutation_rule_info& info) {
@@ -787,6 +822,18 @@ const feature_info* domain::get_feature_info(feature_id id) noexcept {
 
 const feature_info* domain::get_feature_info(std::string_view name) noexcept {
     return m_impl->get_feature_info(name);
+}
+
+void domain::register_type_class(type_class& tc) {
+    m_impl->register_type_class(tc);
+}
+
+void domain::unregister_type_class(type_class& tc) {
+    m_impl->unregister_type_class(tc);
+}
+
+const type_class* domain::get_type_class(std::string_view name) noexcept {
+    return m_impl->get_type_class(name);
 }
 
 void domain::add_mutation_rule(const mutation_rule_info& info) {
