@@ -16,6 +16,7 @@ extern "C" {
 
 typedef struct dnmx_feature_info dnmx_feature_info;
 typedef struct dnmx_mixin_info dnmx_mixin_info;
+typedef struct dnmx_type_class dnmx_type_class;
 
 DYNAMIX_API size_t dnmx_type_num_objects(dnmx_type_handle ht);
 DYNAMIX_API dnmx_mixin_index_t dnmx_type_num_mixins(dnmx_type_handle ht);
@@ -31,7 +32,8 @@ DYNAMIX_API bool dnmx_type_implements_strong_by_name(dnmx_type_handle ht, dnmx_s
 
 DYNAMIX_API bool dnmx_type_implements(dnmx_type_handle ht, const dnmx_feature_info* info);
 
-//DYNAMIX_API dnmx_mixin_index_t dnmx_type_is_of();
+DYNAMIX_API bool dnmx_type_is_of(dnmx_type_handle ht, const dnmx_type_class* tc);
+DYNAMIX_API bool dnmx_type_is_of_name(dnmx_type_handle ht, dnmx_sv name);
 
 DYNAMIX_API bool dnmx_type_is_default_constructible(dnmx_type_handle ht);
 DYNAMIX_API bool dnmx_type_is_copy_constructible(dnmx_type_handle ht);
