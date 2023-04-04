@@ -623,7 +623,7 @@ public:
 
     // create type for a given mutation requested by a given query
     const type& create_type(type_mutation& mutation, type_query&& query) {
-        itlib::span mixins(mutation.mixins);
+        mixin_info_span mixins(mutation.mixins);
 
         // first check validity
         for (size_t i = 0; i < mixins.size(); ++i) {

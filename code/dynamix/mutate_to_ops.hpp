@@ -5,6 +5,7 @@
 #include "object_mutate_ops.hpp"
 #include "mixin_info.hpp"
 #include "object.hpp"
+#include "domain.hpp"
 
 #include <string_view>
 
