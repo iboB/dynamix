@@ -13,6 +13,7 @@
     * Creating Plugins
     * Mutation Rules
     * Custom Features
+    * [Dangerous Functionalities](advanced/danger.md)
 * Working with DynaMix
     * [Performance](working-with/perf.md)
     * Thread Safety
