@@ -204,37 +204,31 @@ void mutations(void) {
 
     {
         dnmx_type_mutation_handle mut = dnmx_create_type_mutation_empty(dom);
-        CHECK(dnmx_type_mutation_is_noop(mut));
-        CHECK(dnmx_type_mutation_get_base(mut) == dnmx_get_empty_type(dom));
+        dnmx_mixin_index_t num;
+        dnmx_type_mutation_get_mixins(mut, &num);
+        CHECK(num == 0);
         dnmx_destroy_unused_type_mutation(mut);
     }
 
     dnmx_type_handle t_aw;
     {
         dnmx_type_mutation_handle mut = dnmx_create_type_mutation_empty(dom);
-        dnmx_type_template_handle new_type = dnmx_type_mutation_get_new_type(mut);
 
-        CHECK(dnmx_type_template_add_if_lacking(new_type, &warrior));
-        CHECK(dnmx_type_template_add(new_type, &athlete));
-        CHECK_FALSE(dnmx_type_template_add_if_lacking(new_type, &warrior));
-        CHECK(&warrior == dnmx_type_template_to_back_by_name(new_type, dnmx_make_sv_lit("warrior")));
+        CHECK(dnmx_type_mutation_add_if_lacking(mut, &warrior));
+        CHECK(dnmx_type_mutation_add(mut, &athlete));
+        CHECK_FALSE(dnmx_type_mutation_add_if_lacking(mut, &warrior));
+        CHECK(&warrior == dnmx_type_mutation_to_back_by_name(mut, dnmx_make_sv_lit("warrior")));
 
-        CHECK(dnmx_type_template_has(new_type, &warrior));
-        CHECK(&athlete == dnmx_type_template_has_by_name(new_type, dnmx_make_sv_lit("athlete")));
-        CHECK(dnmx_type_template_implements_strong(new_type, &shoot));
-        CHECK(&run == dnmx_type_template_implements_strong_by_name(new_type, dnmx_make_sv_lit("run")));
+        CHECK(dnmx_type_mutation_has(mut, &warrior));
+        CHECK(&athlete == dnmx_type_mutation_has_by_name(mut, dnmx_make_sv_lit("athlete")));
+        CHECK(dnmx_type_mutation_implements_strong(mut, &shoot));
+        CHECK(&run == dnmx_type_mutation_implements_strong_by_name(mut, dnmx_make_sv_lit("run")));
 
         dnmx_mixin_index_t num;
-        const dnmx_mixin_info* const* infos = dnmx_type_template_get_mixins(new_type, &num);
+        const dnmx_mixin_info* const* infos = dnmx_type_mutation_get_mixins(mut, &num);
         CHECK(num == 2);
         CHECK(infos[0] == &athlete);
         CHECK(infos[1] == &warrior);
-
-        CHECK(dnmx_type_mutation_is_adding_mixins(mut));
-        CHECK_FALSE(dnmx_type_mutation_is_removing_mixins(mut));
-        CHECK(&athlete == dnmx_type_mutation_is_adding_by_name(mut, dnmx_make_sv_lit("athlete")));
-        CHECK(dnmx_type_mutation_is_adding(mut, &warrior));
-        CHECK_FALSE(dnmx_type_mutation_is_adding(mut, &shooter));
 
         t_aw = dnmx_get_type(dom, &mut);
         CHECK_FALSE(mut);
@@ -244,23 +238,17 @@ void mutations(void) {
     dnmx_type_handle t_as;
     {
         dnmx_type_mutation_handle mut = dnmx_create_type_mutation_from_type(t_aw);
-        dnmx_type_template_handle new_type = dnmx_type_mutation_get_new_type(mut);
-        CHECK_FALSE(dnmx_type_template_remove_by_name(new_type, dnmx_make_sv_lit("shooter")));
-        CHECK_FALSE(dnmx_type_template_remove(new_type, &shooter));
-        CHECK(&warrior == dnmx_type_template_remove_by_name(new_type, dnmx_make_sv_lit("warrior")));
-        CHECK(dnmx_type_template_add(new_type, &shooter));
-        CHECK(dnmx_type_mutation_is_removing_mixins(mut));
-        CHECK(dnmx_type_mutation_is_removing(mut, &warrior));
-        CHECK(&warrior == dnmx_type_mutation_is_removing_by_name(mut, dnmx_make_sv_lit("warrior")));
-        CHECK(dnmx_type_mutation_get_base(mut) == t_aw);
+        CHECK_FALSE(dnmx_type_mutation_remove_by_name(mut, dnmx_make_sv_lit("shooter")));
+        CHECK_FALSE(dnmx_type_mutation_remove(mut, &shooter));
+        CHECK(&warrior == dnmx_type_mutation_remove_by_name(mut, dnmx_make_sv_lit("warrior")));
+        CHECK(dnmx_type_mutation_add(mut, &shooter));
         t_as = dnmx_get_type(dom, &mut);
     }
 
     {
         dnmx_type_mutation_handle mut = dnmx_create_type_mutation_empty(dom);
         const dnmx_mixin_info* ar_aw[] = {&athlete, &warrior};
-        dnmx_type_template_handle new_type = dnmx_type_mutation_get_new_type(mut);
-        dnmx_type_template_set_mixins(new_type, ar_aw, 2);
+        dnmx_type_mutation_set_mixins(mut, ar_aw, 2);
         CHECK(t_aw == dnmx_get_type(dom, &mut));
     }
 
@@ -279,9 +267,8 @@ typedef struct mr_dep {
 } mr_dep;
 dnmx_error_return_t apply_dep(dnmx_type_mutation_handle mut, uintptr_t user_data) {
     mr_dep* dep = (mr_dep*)(user_data);
-    dnmx_type_template_handle new_type = dnmx_type_mutation_get_new_type(mut);
-    if (dnmx_type_template_has(new_type, dep->primary)) {
-        dnmx_type_template_add_if_lacking(new_type, dep->dependent);
+    if (dnmx_type_mutation_has(mut, dep->primary)) {
+        dnmx_type_mutation_add_if_lacking(mut, dep->dependent);
     }
     return dnmx_result_success;
 }

@@ -15,7 +15,7 @@ The compatibility library does not offer any solutions for the following differe
 * Unicast priority is inverted! This could've been fixed by the compatibily library, but it would have hidden potentially dangerous bugs. Instead `priority` for unicasts issues a warning, and `upriority` should be used when an instance is fixed and priority is inverted.
 * `objects::implements` will not work with `foo_msg` as an argument. Instead it must be called with a template argument `foo_msg_t`.
 * v1 allocators are not supported.
-* v1-style mutation rules are not supported
+* Custom v1-style mutation rules are not supported (though there is some support for the common ones)
 * When the declaring message overloads, either `DYNAMIX_MAKE_FUNC_TRAITS` must be used or the "original" message (i. e. at least one not declared as an overload for the same function name) must be visible.
 * v1 helpers like `object_type_template`, `same_type_mutator`, `single_object_mutator` are not available (and they don't make much sense in v2)
 * v1 multicast combinator calls are not immediately provided. Instead one must add the macro `DYNAMIX_V1_CREATE_COMBINATOR_CALL_<N>` for the messages that need them.

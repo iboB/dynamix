@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 //
 #pragma once
-#include "api.h"
 #include "domain.hpp"
 #include <dynamix/type.hpp>
 #include <dynamix/type_class.hpp>

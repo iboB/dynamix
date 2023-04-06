@@ -89,6 +89,8 @@ dynamix_test(define_mixin t-define_mixin.cpp)
 
 dynamix_test(msg t-msg.cpp)
 
+dynamix_test(danger t-danger.cpp)
+
 if(DYNAMIX_SHARED)
     add_subdirectory(app-plugin)
 endif()

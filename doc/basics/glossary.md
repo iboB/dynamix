@@ -1,12 +1,14 @@
 # Glossary
 
+## Mixin
+
+A mixin is a building block of objects.
+
 ## Domain
 
 ## Object
 
 ## Object Type
-
-## Mixin
 
 ## Mixin Feature
 

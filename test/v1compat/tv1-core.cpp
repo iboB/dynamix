@@ -196,9 +196,6 @@ TEST_CASE("type_template") {
     mut.add<counter>();
     mut.add<no_messages>();
 
-    CHECK(mut.adding<counter>());
-    CHECK(mut.adding<no_messages>());
-
     const dynamix::type& type = dom.get_type(std::move(mut));
 
     object o1(type);

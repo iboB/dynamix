@@ -18,15 +18,10 @@ TEST_CASE("type_mutation from empty") {
     domain dom;
 
     type_mutation mut(dom);
-    CHECK(&dom == &mut.get_domain());
-    CHECK(&dom.get_empty_type() == &mut.base());
-    CHECK(mut.noop());
-    CHECK_FALSE(mut.adding_mixins());
-    CHECK_FALSE(mut.removing_mixins());
-    auto& nt = mut.new_type();
-    CHECK(nt.mixins.empty());
-    CHECK(nt.implements(*t.serialize)); // default
-    CHECK_FALSE(nt.implements_strong(*t.serialize));
+    CHECK(&dom == &mut.dom);
+    CHECK(mut.mixins.empty());
+    CHECK(mut.implements(*t.serialize)); // default
+    CHECK_FALSE(mut.implements_strong(*t.serialize));
 
     CHECK_THROWS_WITH_AS(mut.add("actor"), "missing mixin name", mutation_error);
     CHECK_THROWS_WITH_AS(mut.to_back("actor"), "missing mixin", mutation_error);
@@ -37,31 +32,22 @@ TEST_CASE("type_mutation from empty") {
     mut.add(*t.ai);
     mut.add("actor");
 
-    CHECK_FALSE(mut.noop());
-    CHECK(mut.adding_mixins());
-    CHECK_FALSE(mut.removing_mixins());
-
-    CHECK(mut.adding("ai"));
-    CHECK(mut.adding(*t.actor));
-    CHECK(mut.adding(*t.mesh));
-
-    CHECK(nt.has(*t.ai));
-    CHECK_FALSE(nt.has(*t.empty));
-    CHECK(nt.lacks(*t.empty));
-    CHECK(nt.implements_strong(*t.serialize));
-    CHECK(nt.implements_strong("render"));
+    CHECK(mut.has(*t.ai));
+    CHECK_FALSE(mut.has(*t.empty));
+    CHECK(mut.lacks(*t.empty));
+    CHECK(mut.implements_strong(*t.serialize));
+    CHECK(mut.implements_strong("render"));
 
     // normalization
     mut.add("mesh");
-    mut.dedup_new_type();
-    CHECK(mut.new_type().mixins.size() == 3);
-    CHECK(mut.new_type().mixins.back() == t.mesh);
+    mut.dedup();
+    CHECK(mut.mixins.size() == 3);
+    CHECK(mut.mixins.back() == t.mesh);
 
-    mut.mod_new_type().add(*t.mesh);
-    CHECK(nt.mixins.size() == 4);
-    mut.dedup_new_type();
-    CHECK(mut.new_type().mixins.size() == 3);
-    CHECK(nt.mixins.size() == 3);
+    mut.add(*t.mesh);
+    CHECK(mut.mixins.size() == 4);
+    mut.dedup();
+    CHECK(mut.mixins.size() == 3);
 }
 
 TEST_CASE("type_mutation from type") {
@@ -72,45 +58,20 @@ TEST_CASE("type_mutation from type") {
 
     {
         type_mutation mut(*t.t_asim);
-        CHECK(mut.noop());
-        CHECK_FALSE(mut.adding_mixins());
-        CHECK_FALSE(mut.removing_mixins());
-        CHECK(mut.new_type().implements_strong(*t.render));
-        CHECK_FALSE(mut.new_type().implements_strong(*t.get_name));
+        CHECK(mut.implements_strong(*t.render));
+        CHECK_FALSE(mut.implements_strong(*t.get_name));
         CHECK_FALSE(mut.add_if_lacking(*t.mesh));
-        CHECK(mut.noop());
         mut.remove("mesh");
-        CHECK(mut.removing(*t.mesh));
-        CHECK_FALSE(mut.removing(*t.stats));
+        CHECK(mut.lacks(*t.mesh));
+        CHECK_FALSE(mut.lacks(*t.stats));
         mut.remove(*t.stats);
-        CHECK(mut.removing(*t.stats));
-        CHECK_FALSE(mut.noop());
-        CHECK_FALSE(mut.adding_mixins());
-        CHECK(mut.removing_mixins());
+        CHECK(mut.lacks(*t.stats));
         CHECK_THROWS_WITH_AS(mut.to_back(*t.stats), "missing mixin", mutation_error);
-        CHECK_FALSE(mut.adding("actor"));
+        CHECK_FALSE(mut.has("actor"));
         CHECK(mut.add_if_lacking(*t.actor));
-        CHECK(mut.adding("actor"));
-        CHECK_FALSE(mut.noop());
-        CHECK(mut.adding_mixins());
-        CHECK(mut.removing_mixins());
-        CHECK(mut.new_type().implements_strong(*t.get_name));
-        CHECK_FALSE(mut.new_type().implements_strong(*t.render));
-
-        mut.reset();
-        CHECK(mut.noop());
-    }
-
-    {
-        // reorder
-        type_mutation mut(*t.t_asim);
-        mut.add(*t.ai);
-        CHECK_FALSE(mut.noop());
-        CHECK_FALSE(mut.adding_mixins());
-        CHECK_FALSE(mut.removing_mixins());
-
-        mut.reset();
-        CHECK(mut.noop());
+        CHECK(mut.has("actor"));
+        CHECK(mut.implements_strong(*t.get_name));
+        CHECK_FALSE(mut.implements_strong(*t.render));
     }
 }
 
@@ -125,11 +86,6 @@ TEST_CASE("type_mutation misc") {
         mut.add(*t.actor);
         mut.add(*t.mesh);
         mut.to_back(*t.actor);
-
-        CHECK_FALSE(mut.noop());
-        CHECK(mut.adding_mixins());
-        CHECK_FALSE(mut.removing_mixins());
-
         auto& ma = dom.get_type(std::move(mut));
 
         CHECK(ma.has(*t.mesh));
@@ -151,10 +107,9 @@ TEST_CASE("type_mutation misc") {
         type_mutation mut(*t.t_afmi);
         mut.add(*t.actor);
         mut.add(*t.stats);
-        CHECK_FALSE(mut.removing_mixins());
 
         mut.remove(*t.ai);
-        CHECK(mut.new_type().has("mesh"));
+        CHECK(mut.has("mesh"));
         mut.to_back(*t.mesh);
 
         mut.remove("flyer");
@@ -171,10 +126,7 @@ TEST_CASE("type_mutation misc") {
     {
         type_mutation mut(*t.t_asmpi);
 
-        mut.mod_new_type().mixins = {t.invisible, t.mesh, t.procedural_geometry, t.stats, t.actor};
-        CHECK_FALSE(mut.adding_mixins());
-        CHECK_FALSE(mut.removing_mixins());
-        CHECK_FALSE(mut.noop());
+        mut.mixins = {t.invisible, t.mesh, t.procedural_geometry, t.stats, t.actor};
 
         auto& timpsa = dom.get_type(std::move(mut));
         t.create_reordered_types(dom);
@@ -194,18 +146,17 @@ TEST_CASE("type_mutation canon") {
     {
         type_mutation mut(*t.t_asim);
         mut.add(*t.ai);
-        mut.dedup_new_type();
-        CHECK_FALSE(mut.noop());
-        CHECK(&dom.get_type(mut.new_type().mixins) == t.t_asim);
+        mut.dedup();
+        CHECK(&dom.get_type(mut.mixins) == t.t_asim);
 
         mut.remove(*t.stats);
         mut.remove(*t.ai);
         mut.add(*t.actor);
         mut.remove(*t.actor);
         mut.remove(*t.immaterial);
-        CHECK_FALSE(mut.adding(*t.actor));
-        CHECK(mut.removing(*t.stats));
-        CHECK_FALSE(mut.removing(*t.mesh));
+        CHECK_FALSE(mut.has(*t.actor));
+        CHECK(mut.lacks(*t.stats));
+        CHECK_FALSE(mut.lacks(*t.mesh));
 
         CHECK(&dom.get_type(std::move(mut)) == t.t_m);
     }
@@ -216,24 +167,24 @@ TEST_CASE("type_mutation canon") {
         mut.add(*t.stats);
         mut.add(*t.immaterial);
         mut.add(*t.ai);
-        CHECK(&dom.get_type(mut.new_type().mixins) == t.t_asim);
+        CHECK(&dom.get_type(mut.mixins) == t.t_asim);
 
         mut.remove(*t.stats);
         mut.remove(*t.ai);
         mut.add(*t.actor);
         mut.remove(*t.actor);
         mut.remove(*t.immaterial);
-        CHECK_FALSE(mut.removing(*t.actor));
-        CHECK_FALSE(mut.removing(*t.immaterial));
-        CHECK(mut.adding("mesh"));
-        CHECK(&dom.get_type(mut.new_type().mixins) == t.t_m);
+        CHECK(mut.lacks(*t.actor));
+        CHECK(mut.lacks(*t.immaterial));
+        CHECK(mut.has("mesh"));
+        CHECK(&dom.get_type(mut.mixins) == t.t_m);
 
         mut.add(*t.ai);
         mut.add(*t.invisible);
         mut.add(*t.flyer);
 
-        CHECK(mut.adding("mesh"));
-        CHECK(mut.adding("flyer"));
+        CHECK(mut.has("mesh"));
+        CHECK(mut.has("flyer"));
         CHECK(&dom.get_type(std::move(mut)) == t.t_afmi);
     }
 
@@ -241,8 +192,7 @@ TEST_CASE("type_mutation canon") {
         t.create_more_types(dom);
         type_mutation mut(*t.t_asmpi);
 
-        mut.mod_new_type().mixins = {t.invisible, t.mesh, t.procedural_geometry, t.stats, t.actor};
-        CHECK_FALSE(mut.noop());
+        mut.mixins = {t.invisible, t.mesh, t.procedural_geometry, t.stats, t.actor};
 
         auto& tasmpi = dom.get_type(std::move(mut));
         CHECK(t.t_asmpi == &tasmpi);
