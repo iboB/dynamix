@@ -4,9 +4,13 @@
 #include "mutation_rule.hpp"
 #include "common_mutation_rules.hpp"
 #include "domain.hpp"
+
 #include <dynamix/domain.hpp>
+
 #include <itlib/data_mutex.hpp>
 #include <itlib/qalgorithm.hpp>
+
+#include <mutex>
 
 namespace dynamix::v1compat {
 
