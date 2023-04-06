@@ -2,7 +2,7 @@
 
 *The documentation is still in progress*
 
-* [Introduction](intro.md)
+* [Overview](overview.md)
 * Basics
     * Adding DynaMix to a Project
     * [Elements and Glossary](basics/glossary.md)
