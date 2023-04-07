@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) Borislav Stanimirov
+SPDX-License-Identifier: MIT
+-->
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+    <Type Name="dnmx_sv">
+        <Intrinsic Name="size" Expression="end - begin" />
+        <DisplayString>{begin,na}</DisplayString>
+        <StringView>begin,[size()]</StringView>
+        <Expand>
+            <Item Name="length">size()</Item>
+            <Item Name="string">begin,[size()]</Item>
+        </Expand>
+    </Type>
+</AutoVisualizer>
