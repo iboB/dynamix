@@ -13,4 +13,22 @@ SPDX-License-Identifier: MIT
             <Item Name="string">begin,[size()]</Item>
         </Expand>
     </Type>
+    <Type Name="dnmx_basic_domain">
+        <Intrinsic Name="named" Expression="!!m_name.begin" />
+        <DisplayString Condition="named()">{m_name}</DisplayString>
+        <DisplayString Condition="!named()">&lt;unnamed&gt;</DisplayString>
+    </Type>
+    <Type Name="dnmx_mixin_info">
+        <Intrinsic Name="registered" Expression="id.i != ~((unsigned)0)" />
+        <Intrinsic Name="external" Expression="!move_init || allocator || force_external" />
+        <DisplayString Condition="registered() &amp;&amp; !external()">
+            {{{name}, {id.i}, dom = {*dom}}}
+        </DisplayString>
+        <DisplayString Condition="registered() &amp;&amp; external()">
+            {{{name}, {id.i}, x, {*dom}}}
+        </DisplayString>
+        <DisplayString Condition="!registered()">
+            {{{name}, &lt;unreg&gt;}}
+        </DisplayString>
+    </Type>
 </AutoVisualizer>
