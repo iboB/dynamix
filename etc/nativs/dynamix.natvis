@@ -18,17 +18,26 @@ SPDX-License-Identifier: MIT
         <DisplayString Condition="named()">{m_name}</DisplayString>
         <DisplayString Condition="!named()">&lt;unnamed&gt;</DisplayString>
     </Type>
+    <Type Name="dnmx_feature_info">
+        <Intrinsic Name="registered" Expression="id.i != ~((unsigned)0)" />
+        <DisplayString Condition="registered()">
+            {{f: {name}, id = {id.i}}}
+        </DisplayString>
+        <DisplayString Condition="!registered()">
+            {{f: {name}, &lt;unreg&gt;}}
+        </DisplayString>
+    </Type>
     <Type Name="dnmx_mixin_info">
         <Intrinsic Name="registered" Expression="id.i != ~((unsigned)0)" />
         <Intrinsic Name="external" Expression="!move_init || allocator || force_external" />
         <DisplayString Condition="registered() &amp;&amp; !external()">
-            {{{name}, {id.i}, dom = {*dom}}}
+            {{m: {name}, id = {id.i}, dom = {*dom}}}
         </DisplayString>
         <DisplayString Condition="registered() &amp;&amp; external()">
-            {{{name}, {id.i}, x, {*dom}}}
+            {{m: {name}, id = {id.i}, x, {*dom}}}
         </DisplayString>
         <DisplayString Condition="!registered()">
-            {{{name}, &lt;unreg&gt;}}
+            {{m: {name}, &lt;unreg&gt;}}
         </DisplayString>
     </Type>
 </AutoVisualizer>
