@@ -40,4 +40,22 @@ SPDX-License-Identifier: MIT
             {{m: {name}, &lt;unreg&gt;}}
         </DisplayString>
     </Type>
+    <Type Name="dynamix::object">
+        <Intrinsic Name="type" Expression="(const dynamix::type*)m_type" />
+        <DisplayString Condition="m_sealed">sealed object</DisplayString>
+        <DisplayString Condition="!m_sealed">object</DisplayString>
+        <Expand>
+            <Item Name="type">type()</Item>
+            <CustomListItems MaxItemsPerView="64" >
+                <Variable Name="imix" InitialValue="0" />
+                <Size>type()->mixins.m_end - type()->mixins.m_begin</Size>
+                <Loop>
+                    <Item Name="{type()->mixins.m_begin[imix]->name}">(void*)m_mixin_data[imix].mixin</Item>
+                    <Exec>++imix</Exec>
+                </Loop>
+            </CustomListItems>
+            <Item Name="allocator">m_allocator</Item>
+            <Item Name="sealed">m_sealed</Item>
+        </Expand>
+    </Type>
 </AutoVisualizer>
