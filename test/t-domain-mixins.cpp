@@ -60,13 +60,13 @@ TEST_CASE("reg/unreg mixin") {
         // duplicate names are not allowed
         mixin_info m2 = dnmx_make_mixin_info();
         m2.name = dnmx_sv::from_std("movable");
-        CHECK_THROWS_WITH_AS(dom.register_mixin(m2), "duplicate name", domain_error);
+        CHECK_THROWS_WITH_AS(dom.register_mixin(m2), "test: register mixin with duplicate name 'movable'", domain_error);
     }
 
     {
         // empty names are not allowed
         mixin_info e = dnmx_make_mixin_info();
-        CHECK_THROWS_WITH_AS(dom.register_mixin(e), "empty info name", domain_error);
+        CHECK_THROWS_WITH_AS(dom.register_mixin(e), "test: register mixin with empty name", domain_error);
     }
 }
 

@@ -12,6 +12,8 @@
 #include "feature_for_mixin.hpp"
 #include "mutation_rule_info.hpp"
 
+#include "_throw_exception.hpp"
+
 #include <itlib/qalgorithm.hpp>
 #include <itlib/data_mutex.hpp>
 #include <itlib/flat_map.hpp>
@@ -24,8 +26,6 @@
 #include <shared_mutex>
 
 namespace dynamix {
-
-#define BAD_ARG_UNLESS(cond, err) if (!(cond)) do { assert(false); throw domain_error(err); } while(false)
 
 namespace {
 error_return_t sort_by_canonical_order(dnmx_type_mutation_handle mutation, uintptr_t) {
@@ -136,13 +136,11 @@ public:
     }
 
     template <typename T>
-    static void basic_register_l(T& info, compat::pmr::vector<const T*>& sparse, bool enforce_unique_names) {
+    void basic_register_l(T& info, compat::pmr::vector<const T*>& sparse, bool enforce_unique_names) {
         using id_t = decltype(info.id);
         constexpr id_t invalid = id_t{dnmx_invalid_id};
-        BAD_ARG_UNLESS(info.id == invalid, "id registered");
-        if (enforce_unique_names && info.name.empty()) {
-            throw domain_error("empty info name");
-        }
+        if (info.id != invalid) priv::throw_id_registered(m_domain, info);
+        if (enforce_unique_names && info.name.empty()) priv::throw_empty_name(m_domain, info);
 
         id_t free_id = invalid;
 
@@ -153,7 +151,7 @@ public:
                 auto reg = sparse[i];
                 if (reg) {
                     assert(reg->iid() == i); // sanity check
-                    if (reg->name == info.name) throw domain_error("duplicate name");
+                    if (reg->name == info.name) priv::throw_duplicate_name(m_domain, info);
                 }
                 else {
                     free_id = id_t{i};
@@ -180,9 +178,9 @@ public:
     }
 
     template <typename T>
-    static void basic_unregister_l(T& info, compat::pmr::vector<const T*>& sparse) {
+    void basic_unregister_l(T& info, compat::pmr::vector<const T*>& sparse) {
         // info is not our own?
-        BAD_ARG_UNLESS(info.iid() < sparse.size() && sparse[info.iid()] == &info, "unregister bad info");
+        if (info.iid() >= sparse.size() || sparse[info.iid()] != &info) priv::throw_unreg_foreign(m_domain, info);
 
         sparse[info.iid()] = nullptr; // free slot
         info.id = decltype(info.id){dnmx_invalid_id}; // invalidate info
@@ -208,7 +206,7 @@ public:
     }
 
     void register_mixin(mixin_info& info) {
-        BAD_ARG_UNLESS(info.dom == nullptr || info.dom == &m_domain, "info has domain");
+        if (info.dom != nullptr && info.dom != &m_domain) priv::throw_info_has_domain(m_domain, info);
         auto reg = m_registry.unique_lock();
 
         // register mixin's features
@@ -258,7 +256,7 @@ public:
         auto& sparse_mixins = reg->sparse_mixins;
 
         // mixin is not our own?
-        BAD_ARG_UNLESS(info.iid() < sparse_mixins.size() && sparse_mixins[info.iid()] == &info, "unregister bad info");
+        if (info.iid() >= sparse_mixins.size() || sparse_mixins[info.iid()] != &info) priv::throw_unreg_foreign(m_domain, info);
         sparse_mixins[info.iid()] = nullptr; // free slot
 
         // invalidate info
@@ -267,8 +265,8 @@ public:
     }
 
     void register_type_class(const type_class& new_tc) {
-        if (new_tc.name.empty()) throw domain_error("empty type_class name");
-        if (!new_tc.matches) throw domain_error("type_class missing matches func");
+        if (new_tc.name.empty()) priv::throw_empty_name(m_domain, new_tc);
+        if (!new_tc.matches) priv::throw_no_func(m_domain, new_tc);
 
         auto reg = m_registry.unique_lock();
 
@@ -277,7 +275,7 @@ public:
         for (auto i = reg->sparse_type_classes.rbegin(); i != reg->sparse_type_classes.rend(); ++i) {
             auto tc = *i;
             if (tc) {
-                if (tc->name == new_tc.name) throw domain_error("duplicate type_class name");
+                if (tc->name == new_tc.name) priv::throw_duplicate_name(m_domain, new_tc);
             }
             else {
                 free_slot = &tc;
@@ -335,7 +333,7 @@ public:
     }
 
     void add_mutation_rule(const mutation_rule_info& info) {
-        if (!info.apply) throw domain_error("bad mutation rule");
+        if (!info.apply) priv::throw_no_func(m_domain, info);
 
         auto reg = m_registry.unique_lock();
 
@@ -412,7 +410,7 @@ public:
             for (auto& r : rules) {
                 auto& info = *r.first;
                 if (auto err = info.apply(mutation.to_c_hanlde(), info.user_data)) {
-                    throw mutation_user_error("mutation rule", err);
+                    priv::throw_mutation_rule_user_error(m_domain, mutation, info, err);
                 }
             }
             if (last_result == nt_mixins) {

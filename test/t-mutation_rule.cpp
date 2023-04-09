@@ -23,10 +23,11 @@ TEST_CASE("domain add/remove rules") {
     auto noop = [](dnmx_type_mutation_handle, uintptr_t) { return dnmx_result_success; };
 
     {
-        domain dom;
+        domain dom("mr");
         mutation_rule_info mr = {};
+        mr.name = dnmx_make_sv_lit("noop");
         dom.remove_mutation_rule(mr); // should be safe
-        CHECK_THROWS_WITH_AS(dom.add_mutation_rule(mr), "bad mutation rule", domain_error);
+        CHECK_THROWS_WITH_AS(dom.add_mutation_rule(mr), "mr: register mutation rule 'noop' with apply function = null", domain_error);
         mr.apply = noop;
         CHECK_NOTHROW(dom.add_mutation_rule(mr));
 
@@ -43,8 +44,8 @@ TEST_CASE("domain add/remove rules") {
         mutation_rule_info mr2 = {};
         mutation_rule_info mr3 = {};
 
-        domain dom;
-        CHECK_THROWS_WITH_AS(dom.add_mutation_rule(mr1), "bad mutation rule", domain_error);
+        domain dom("mr2");
+        CHECK_THROWS_WITH_AS(dom.add_mutation_rule(mr1), "mr2: register mutation rule '' with apply function = null", domain_error);
         mr1.apply = noop;
         mr2.apply = noop;
         mr3.apply = noop;
@@ -86,7 +87,7 @@ struct mut_rule_test_data {
 
 TEST_CASE("apply rules") {
     mut_rule_test_data mrtd;
-    domain dom;
+    domain dom("amr");
 
     mrtd.t.register_all_mixins(dom);
     CHECK(dom.num_mutation_rules() == 0);
@@ -197,7 +198,7 @@ TEST_CASE("apply rules") {
     {
         t.mesh->user_data = 111;
         const mixin_info* mixins[] = {t.mesh};
-        CHECK_THROWS_WITH_AS(dom.get_type(mixins), "mutation rule", mutation_user_error);
+        CHECK_THROWS_WITH_AS(dom.get_type(mixins), "amr: applying mutation rule '' to {'mesh'} failed with error -1", mutation_error);
         mrtd.check_log({0, 1});
         t.mesh->user_data = 0;
         CHECK(dom.num_types() == 2);
