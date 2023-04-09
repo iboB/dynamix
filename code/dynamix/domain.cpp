@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 //
 #include "domain.hpp"
-#include "exception.hpp"
 #include "mixin_info.hpp"
 #include "type.hpp"
 #include "type_mutation.hpp"
@@ -410,7 +409,7 @@ public:
             for (auto& r : rules) {
                 auto& info = *r.first;
                 if (auto err = info.apply(mutation.to_c_hanlde(), info.user_data)) {
-                    priv::throw_mutation_rule_user_error(m_domain, mutation, info, err);
+                    priv::throw_mutation_rule_user_error(mutation, info, err);
                 }
             }
             if (last_result == nt_mixins) {
@@ -420,7 +419,7 @@ public:
             }
             if (i == max_depenency_depth || i == int(rules.size())) {
                 // again: this is not necessarily a real cycle but we treat it as such
-                throw domain_error("rule interdependency too deep or cyclic");
+                priv::throw_cyclic_rule_deps(mutation);
             }
             if (i == 0) {
                 // first time running the loop and rules made changes, store original query to return
@@ -431,6 +430,8 @@ public:
     }
 
     const type& get_type(type_mutation& mutation) {
+        if (&mutation.dom != &m_domain) priv::throw_foreign_domain(m_domain, mutation);
+
         type_query original_query(m_allocator); // prepare original query with our allocator
         const type* found = nullptr;
 
@@ -475,13 +476,13 @@ public:
         // no stored query, so create a mutation and apply rules
         // creating a mutation will run more or less the exact same as above again
         // TODO: optimize
-        type_mutation mut(m_empty_type, m_allocator);
+        type_mutation mut(m_domain, m_allocator);
         mut.mixins.assign(mixins.begin(), mixins.end());
         return get_type(mut);
     }
 
     struct ftable_build_helper {
-        mixin_info_span& m_mixins;
+        const type_mutation& m_mut;
 
         // number of reachable payloads per feature id
         compat::pmr::vector<uint32_t> m_num_reachable_pls;
@@ -489,13 +490,13 @@ public:
         // total number of ftable_payload-s to allocate
         uint32_t m_num_total_pls = 0;
 
-        ftable_build_helper(domain::impl& di, mixin_info_span& mixins)
-            : m_mixins(mixins)
-            , m_num_reachable_pls(di.m_allocator)
+        ftable_build_helper(type_mutation& mutation)
+            : m_mut(mutation)
+            , m_num_reachable_pls(m_mut.dom.get_allocator())
         {
             // first pass: find greatest feature_id in mixins to determine ftable size
             feature_id::int_t ftable_size = 0;
-            for (const auto* mixin : mixins) {
+            for (const auto* mixin : m_mut.mixins) {
                 for (auto& feature : mixin->features_span()) {
                     const auto size_with = feature.info->iid() + 1;
                     if (size_with > ftable_size) {
@@ -508,7 +509,7 @@ public:
             // * count reachable payloads per feature
             // * count total payloads
             m_num_reachable_pls.resize(ftable_size);
-            for (const auto* mixin : mixins) {
+            for (const auto* mixin : m_mut.mixins) {
                 for (auto& feature : mixin->features_span()) {
                     ++m_num_reachable_pls[feature.info->iid()];
                     ++m_num_total_pls;
@@ -547,8 +548,8 @@ public:
 
             // third pass
             // attach begin and end pointers of ftable entries and give them values
-            for (mixin_index_t i = 0; i < m_mixins.size(); ++i) {
-                const auto* mixin = m_mixins[i];
+            for (mixin_index_t i = 0; i < m_mut.mixins.size(); ++i) {
+                const auto* mixin = m_mut.mixins[i];
                 for (auto& feature : mixin->features_span()) {
                     auto& finfo = *feature.info;
                     auto& entry = ftable[finfo.iid()];
@@ -596,12 +597,12 @@ public:
                 // check for clashes
                 if (!entry.begin->data->info->allow_clashes) {
                     for (auto ie = entry.begin; ie != entry.end - 1; ++ie) {
-                        const auto& cur = *ie->data;
-                        const auto& next = *(ie + 1)->data;
-
-                        // same bid and prio = clash
-                        if (cur.bid == next.bid && cur.priority == next.priority)
-                            if (ie->data->bid == (ie + 1)->data->bid) throw mutation_error("feature clash");
+                        const auto& cur = *ie;
+                        const auto& next = *(ie + 1);
+                        if (cur.data->bid == next.data->bid && cur.data->priority == next.data->priority) {
+                            // same bid and prio = clash
+                            priv::throw_feature_clash(m_mut, cur, next);
+                        }
                     }
                 }
 
@@ -626,10 +627,10 @@ public:
         // first check validity
         for (size_t i = 0; i < mixins.size(); ++i) {
             auto m = mixins[i];
-            if (m->id == invalid_mixin_id) throw domain_error("unregistered mixin");
-            if (m->dom != &m_domain) throw domain_error("foreign mixin");
+            if (m->id == invalid_mixin_id) priv::throw_mut_unreg_mixin(mutation, *m);
+            if (m->dom != &m_domain) priv::throw_mut_foreign_mixin(mutation, *m);;
             for (size_t j = i + 1; j < mixins.size(); ++j) {
-                if (mixins[i] == mixins[j]) throw domain_error("duplicate mixins");
+                if (mixins[i] == mixins[j]) priv::throw_mut_dup_mixin(mutation, *m);;
             }
         }
 
@@ -652,7 +653,7 @@ public:
         // calc buf components
         const byte_size_t type_size = sizeof(type);
 
-        const ftable_build_helper ftable_helper(*this, mixins);
+        const ftable_build_helper ftable_helper(mutation);
         const byte_size_t ftable_size = ftable_helper.calc_ftable_byte_size();
 
         const byte_size_t mixins_buf_size = byte_size_t(mixins.byte_size());

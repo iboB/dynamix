@@ -266,7 +266,7 @@ TEST_CASE("apply rules") {
 
 TEST_CASE("rule interdependency") {
     mut_rule_test_data mrtd;
-    domain dom;
+    domain dom("rid");
     mrtd.t.register_all_mixins(dom);
 
     util::mixin_info_data wheeled;
@@ -334,7 +334,9 @@ TEST_CASE("rule interdependency") {
 
     {
         const mixin_info* mixins[] = {&wheeled.info};
-        CHECK_THROWS_WITH_AS(dom.get_type(mixins), "rule interdependency too deep or cyclic", domain_error);
+        CHECK_THROWS_WITH_AS(dom.get_type(mixins),
+            "rid: rule interdependency too deep or cyclic at "
+            "{'wheeled', 'actor', 'movable', 'tracker', 'actor', 'actor', 'actor'}", domain_error);
         CHECK(dom.num_types() == 1);
         CHECK(dom.num_type_queries() == 0);
     }

@@ -79,7 +79,9 @@ TEST_CASE("empty obj") {
 
 TEST_CASE("clash") {
     test_obj obj;
-    CHECK_THROWS_WITH_AS(mutate(obj, dynamix::add<common>(), dynamix::add<get_ptr_clash>()), "feature clash", dynamix::mutation_error);
+    CHECK_THROWS_WITH_AS(mutate(obj, dynamix::add<common>(), dynamix::add<get_ptr_clash>()),
+        "msgt: feature clash in {'common', 'get_ptr_clash'} on 'get_ptr' between 'get_ptr_clash' and 'common'",
+        dynamix::mutation_error);
 }
 
 TEST_CASE("uni") {
@@ -361,4 +363,4 @@ DYNAMIX_DEFINE_MSG(fill_vec_msg, multicast, fill_vec, void, (const test_obj&, st
 
 #include <dynamix/define_domain.hpp>
 
-DYNAMIX_DEFINE_DOMAIN(test);
+DYNAMIX_DEFINE_DOMAIN(test, "msgt");

@@ -8,6 +8,7 @@
 #include "type_mutation.hpp"
 #include "exception.hpp"
 #include "error_return.hpp"
+#include "type.hpp"
 
 #include <sstream>
 
@@ -132,8 +133,41 @@ void throw_no_func(const domain& dom, const type_class& tc) {
     e<domain_error>(dom) << "register type class '" << tc.name.to_std() << "' with match function = null";
 }
 
-void throw_mutation_rule_user_error(const domain& dom, const type_mutation& mut, const mutation_rule_info& info, error_return_t error) {
-    e<mutation_error>(dom) << "applying mutation rule " << info << " to " << mut << " failed with error " << error;
+void throw_mutation_rule_user_error(const type_mutation& mut, const mutation_rule_info& info, error_return_t error) {
+    e<mutation_error>(mut.dom) << "applying mutation rule " << info << " to " << mut << " failed with error " << error;
+}
+
+void throw_foreign_domain(const domain& dom, const type_mutation& mut) {
+    e<mutation_error>(dom) << "requested type with foreign mutation " << mut << " of domain '" << mut.dom << '\'';
+}
+
+void throw_cyclic_rule_deps(const type_mutation& mut) {
+    e<domain_error>(mut.dom) << "rule interdependency too deep or cyclic at " << mut;
+}
+
+void throw_mut_unreg_mixin(const type_mutation& mut, const mixin_info& m) {
+    e<mutation_error>(mut.dom) << "unregistered mixin " << m << " while trying to create type " << mut;
+}
+
+void throw_mut_foreign_mixin(const type_mutation& mut, const mixin_info& m) {
+    e<mutation_error> out(mut.dom);
+    out << "foreign mixin " << m << " from ";
+    if (m.dom) {
+        out << '\'' << *domain::from_c_handle(m.dom) << '\'';
+    }
+    else {
+        out << "<null>";
+    }
+    out << " while trying to create type " << mut;
+}
+
+void throw_mut_dup_mixin(const type_mutation& mut, const mixin_info& m) {
+    e<mutation_error>(mut.dom) << "duplicate mixin " << m << " while trying to create type " << mut;
+}
+
+void throw_feature_clash(const type_mutation& mut, const dnmx_ftable_payload& a, const dnmx_ftable_payload& b) {
+    e<mutation_error>(mut.dom) << "feature clash in " << mut << " on " << *a.data->info << " between " <<
+        *mut.mixins[a.mixin_index] << " and " << *mut.mixins[b.mixin_index];
 }
 
 }

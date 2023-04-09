@@ -305,7 +305,9 @@ void test_simple_types(test_data& t, domain& dom) {
 
     {
         const dynamix::mixin_info* dup[] = {t.movable, t.movable};
-        CHECK_THROWS_WITH_AS(dom.get_type(dup), "duplicate mixins", domain_error);
+        CHECK_THROWS_WITH_AS(dom.get_type(dup),
+            "tt: duplicate mixin 'movable' while trying to create type {'movable', 'movable'}",
+            mutation_error);
     }
 }
 
@@ -602,7 +604,7 @@ void test_reordered_types(test_data& t) {
 
 TEST_CASE("types") {
     test_data t;
-    domain dom;
+    domain dom("tt");
     t.register_all_mixins(dom);
 
     CHECK(dom.num_types() == 0);
@@ -636,7 +638,7 @@ TEST_CASE("types") {
 
     {
         const dynamix::mixin_info* clash[] = {t.flyer, t.walker};
-        CHECK_THROWS_WITH_AS(dom.get_type(clash), "feature clash", mutation_error);
+        CHECK_THROWS_WITH_AS(dom.get_type(clash), "tt: feature clash in {'flyer', 'walker'} on 'can_move_to' between 'walker' and 'flyer'", mutation_error);
     }
 
     CHECK(dom.num_types() == 5);
@@ -663,9 +665,11 @@ TEST_CASE("types") {
 
 TEST_CASE("unregistered mixins") {
     test_data t;
-    domain dom;
+    domain dom("tt");
 
-    CHECK_THROWS_WITH_AS(t.create_types(dom), "unregistered mixin", domain_error);
+    CHECK_THROWS_WITH_AS(t.create_types(dom),
+        "tt: unregistered mixin 'movable' while trying to create type {'movable'}",
+        mutation_error);
     CHECK_FALSE(t.t_mov);
     CHECK_FALSE(t.t_asim);
     t.register_all_mixins(dom);
@@ -689,7 +693,7 @@ TEST_CASE("types canon") {
     test_data t;
     domain_settings s = {};
     s.canonicalize_types = true;
-    domain dom({}, s);
+    domain dom("tt", s);
     t.register_all_mixins(dom);
     t.create_types(dom);
     CHECK(dom.num_types() == 4);
