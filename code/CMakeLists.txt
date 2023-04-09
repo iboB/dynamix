@@ -114,8 +114,8 @@ target_sources(dynamix PRIVATE
 
     dynamix/exception.hpp
     dynamix/exception.cpp
-    dynamix/_throw_exception.hpp
-    dynamix/_throw_exception.cpp
+    dynamix/throw_exception.hpp
+    dynamix/throw_exception.cpp
 
     dnmx/type_class.h
     dynamix/type_class.hpp

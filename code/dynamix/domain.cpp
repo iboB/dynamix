@@ -10,8 +10,7 @@
 #include "feature_info.hpp"
 #include "feature_for_mixin.hpp"
 #include "mutation_rule_info.hpp"
-
-#include "_throw_exception.hpp"
+#include "throw_exception.hpp"
 
 #include <itlib/qalgorithm.hpp>
 #include <itlib/data_mutex.hpp>
@@ -138,8 +137,8 @@ public:
     void basic_register_l(T& info, compat::pmr::vector<const T*>& sparse, bool enforce_unique_names) {
         using id_t = decltype(info.id);
         constexpr id_t invalid = id_t{dnmx_invalid_id};
-        if (info.id != invalid) priv::throw_id_registered(m_domain, info);
-        if (enforce_unique_names && info.name.empty()) priv::throw_empty_name(m_domain, info);
+        if (info.id != invalid) throw_exception::id_registered(m_domain, info);
+        if (enforce_unique_names && info.name.empty()) throw_exception::empty_name(m_domain, info);
 
         id_t free_id = invalid;
 
@@ -150,7 +149,7 @@ public:
                 auto reg = sparse[i];
                 if (reg) {
                     assert(reg->iid() == i); // sanity check
-                    if (reg->name == info.name) priv::throw_duplicate_name(m_domain, info);
+                    if (reg->name == info.name) throw_exception::duplicate_name(m_domain, info);
                 }
                 else {
                     free_id = id_t{i};
@@ -179,7 +178,7 @@ public:
     template <typename T>
     void basic_unregister_l(T& info, compat::pmr::vector<const T*>& sparse) {
         // info is not our own?
-        if (info.iid() >= sparse.size() || sparse[info.iid()] != &info) priv::throw_unreg_foreign(m_domain, info);
+        if (info.iid() >= sparse.size() || sparse[info.iid()] != &info) throw_exception::unreg_foreign(m_domain, info);
 
         sparse[info.iid()] = nullptr; // free slot
         info.id = decltype(info.id){dnmx_invalid_id}; // invalidate info
@@ -205,7 +204,7 @@ public:
     }
 
     void register_mixin(mixin_info& info) {
-        if (info.dom != nullptr && info.dom != &m_domain) priv::throw_info_has_domain(m_domain, info);
+        if (info.dom != nullptr && info.dom != &m_domain) throw_exception::info_has_domain(m_domain, info);
         auto reg = m_registry.unique_lock();
 
         // register mixin's features
@@ -255,7 +254,7 @@ public:
         auto& sparse_mixins = reg->sparse_mixins;
 
         // mixin is not our own?
-        if (info.iid() >= sparse_mixins.size() || sparse_mixins[info.iid()] != &info) priv::throw_unreg_foreign(m_domain, info);
+        if (info.iid() >= sparse_mixins.size() || sparse_mixins[info.iid()] != &info) throw_exception::unreg_foreign(m_domain, info);
         sparse_mixins[info.iid()] = nullptr; // free slot
 
         // invalidate info
@@ -264,8 +263,8 @@ public:
     }
 
     void register_type_class(const type_class& new_tc) {
-        if (new_tc.name.empty()) priv::throw_empty_name(m_domain, new_tc);
-        if (!new_tc.matches) priv::throw_no_func(m_domain, new_tc);
+        if (new_tc.name.empty()) throw_exception::empty_name(m_domain, new_tc);
+        if (!new_tc.matches) throw_exception::no_func(m_domain, new_tc);
 
         auto reg = m_registry.unique_lock();
 
@@ -274,7 +273,7 @@ public:
         for (auto i = reg->sparse_type_classes.rbegin(); i != reg->sparse_type_classes.rend(); ++i) {
             auto tc = *i;
             if (tc) {
-                if (tc->name == new_tc.name) priv::throw_duplicate_name(m_domain, new_tc);
+                if (tc->name == new_tc.name) throw_exception::duplicate_name(m_domain, new_tc);
             }
             else {
                 free_slot = &tc;
@@ -332,7 +331,7 @@ public:
     }
 
     void add_mutation_rule(const mutation_rule_info& info) {
-        if (!info.apply) priv::throw_no_func(m_domain, info);
+        if (!info.apply) throw_exception::no_func(m_domain, info);
 
         auto reg = m_registry.unique_lock();
 
@@ -409,7 +408,7 @@ public:
             for (auto& r : rules) {
                 auto& info = *r.first;
                 if (auto err = info.apply(mutation.to_c_hanlde(), info.user_data)) {
-                    priv::throw_mutation_rule_user_error(mutation, info, err);
+                    throw_exception::mutation_rule_user_error(mutation, info, err);
                 }
             }
             if (last_result == nt_mixins) {
@@ -419,7 +418,7 @@ public:
             }
             if (i == max_depenency_depth || i == int(rules.size())) {
                 // again: this is not necessarily a real cycle but we treat it as such
-                priv::throw_cyclic_rule_deps(mutation);
+                throw_exception::cyclic_rule_deps(mutation);
             }
             if (i == 0) {
                 // first time running the loop and rules made changes, store original query to return
@@ -430,7 +429,7 @@ public:
     }
 
     const type& get_type(type_mutation& mutation) {
-        if (&mutation.dom != &m_domain) priv::throw_foreign_domain(m_domain, mutation);
+        if (&mutation.dom != &m_domain) throw_exception::foreign_domain(m_domain, mutation);
 
         type_query original_query(m_allocator); // prepare original query with our allocator
         const type* found = nullptr;
@@ -601,7 +600,7 @@ public:
                         const auto& next = *(ie + 1);
                         if (cur.data->bid == next.data->bid && cur.data->priority == next.data->priority) {
                             // same bid and prio = clash
-                            priv::throw_feature_clash(m_mut, cur, next);
+                            throw_exception::feature_clash(m_mut, cur, next);
                         }
                     }
                 }
@@ -627,10 +626,10 @@ public:
         // first check validity
         for (size_t i = 0; i < mixins.size(); ++i) {
             auto m = mixins[i];
-            if (m->id == invalid_mixin_id) priv::throw_mut_unreg_mixin(mutation, *m);
-            if (m->dom != &m_domain) priv::throw_mut_foreign_mixin(mutation, *m);;
+            if (m->id == invalid_mixin_id) throw_exception::mut_unreg_mixin(mutation, *m);
+            if (m->dom != &m_domain) throw_exception::mut_foreign_mixin(mutation, *m);;
             for (size_t j = i + 1; j < mixins.size(); ++j) {
-                if (mixins[i] == mixins[j]) priv::throw_mut_dup_mixin(mutation, *m);;
+                if (mixins[i] == mixins[j]) throw_exception::mut_dup_mixin(mutation, *m);;
             }
         }
 
