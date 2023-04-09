@@ -77,10 +77,13 @@ void funcs(void) {
     CHECK(is_filled(buf_a));
 
     CHECK(dnmx_mixin_common_cmp_func(&info, buf_a, buf_b) == 0);
+    CHECK(dnmx_mixin_common_eq_func(&info, buf_a, buf_b));
     buf_a[3] = 5;
     CHECK(dnmx_mixin_common_cmp_func(&info, buf_a, buf_b) > 0);
+    CHECK_FALSE(dnmx_mixin_common_eq_func(&info, buf_a, buf_b));
     buf_b[3] = 15;
     CHECK(dnmx_mixin_common_cmp_func(&info, buf_a, buf_b) < 0);
+    CHECK_FALSE(dnmx_mixin_common_eq_func(&info, buf_a, buf_b));
 
     buf_a[3] = buf_b[3] = 4;
     T_SUCCESS(dnmx_mixin_noop_init_func(&info, buf_a));
