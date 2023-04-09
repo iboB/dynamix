@@ -131,7 +131,7 @@ TEST_CASE("apply rules") {
         };
         util::mixin_info_data_builder builder(wheeled, "wheeled");
         using namespace util::builder_literals;
-        builder.adds_mutation_rule(add_movable_to_wheeled, reinterpret_cast<uintptr_t>(&mrtd), 100_prio);
+        builder.adds_mutation_rule("m2w", add_movable_to_wheeled, reinterpret_cast<uintptr_t>(&mrtd), 100_prio);
         builder.dependency(false);
         wheeled.register_in(dom);
     }
@@ -198,7 +198,7 @@ TEST_CASE("apply rules") {
     {
         t.mesh->user_data = 111;
         const mixin_info* mixins[] = {t.mesh};
-        CHECK_THROWS_WITH_AS(dom.get_type(mixins), "amr: applying mutation rule '' to {'mesh'} failed with error -1", mutation_error);
+        CHECK_THROWS_WITH_AS(dom.get_type(mixins), "amr: applying mutation rule 'tam rule 0' to {'mesh'} failed with error -1", mutation_error);
         mrtd.check_log({0, 1});
         t.mesh->user_data = 0;
         CHECK(dom.num_types() == 2);

@@ -77,13 +77,13 @@ TEST_CASE("mixin_info_data build mutation rules") {
 
     {
         auto& crule = data.mutation_rule_info_storage[0];
-        CHECK(crule.name.empty());
+        CHECK(crule.name == "test rule 1");
         CHECK(crule.apply(nullptr, 0) == 125);
         CHECK(crule.order_priority == 0);
         CHECK(crule.user_data == 0);
     }
 
-    b.adds_mutation_rule([](dnmx_type_mutation_handle, uintptr_t) { return 42; }, 45, -6_prio);
+    b.adds_mutation_rule("ret42", [](dnmx_type_mutation_handle, uintptr_t) { return 42; }, 45, -6_prio);
 
     CHECK(data.mutation_rule_infos.size() == 3);
     CHECK(data.mutation_rule_infos.front() == &rule);
@@ -93,7 +93,7 @@ TEST_CASE("mixin_info_data build mutation rules") {
 
     {
         auto& crule = data.mutation_rule_info_storage[0];
-        CHECK(crule.name.empty());
+        CHECK(crule.name == "test rule 1");
         CHECK(crule.apply(nullptr, 0) == 125);
         CHECK(crule.order_priority == 0);
         CHECK(crule.user_data == 0);
@@ -101,7 +101,7 @@ TEST_CASE("mixin_info_data build mutation rules") {
 
     {
         auto& crule = data.mutation_rule_info_storage[1];
-        CHECK(crule.name.empty());
+        CHECK(crule.name == "ret42");
         CHECK(crule.apply(nullptr, 0) == 42);
         CHECK(crule.order_priority == -6);
         CHECK(crule.user_data == 45);

@@ -29,6 +29,7 @@ struct DYNAMIX_API mixin_info_data {
         , feature_payload_storage(alloc)
         , mutation_rule_infos(alloc)
         , mutation_rule_info_storage(alloc)
+        , mutation_rule_info_names_storage(alloc)
     {}
 
     allocator get_allocator() const noexcept { return stored_name.get_allocator(); }
@@ -44,6 +45,7 @@ struct DYNAMIX_API mixin_info_data {
 
     compat::pmr::deque<const mutation_rule_info*> mutation_rule_infos;
     compat::pmr::deque<mutation_rule_info> mutation_rule_info_storage;
+    compat::pmr::deque<compat::pmr::string> mutation_rule_info_names_storage;
 
     // use these to register infos build from this data
     // these function will automatically manage the associated mutation rules
@@ -179,10 +181,19 @@ public:
         return *this;
     }
 
-    self& adds_mutation_rule(error_return_t(apply)(dnmx_type_mutation_handle, uintptr_t), uintptr_t user_data = 0, builder_perks perks = {}) {
+    self& adds_mutation_rule(compat::pmr::string name, mutation_rule_info::apply_func apply, uintptr_t user_data = 0, builder_perks perks = {}) {
         int32_t priority = perks.priority.value_or(0);
-        m_data.mutation_rule_info_storage.push_back({{}, apply, user_data, priority});
+        auto& stored_name = m_data.mutation_rule_info_names_storage.emplace_back(std::move(name));
+        m_data.mutation_rule_info_storage.push_back({dnmx_sv::from_std(stored_name), apply, user_data, priority});
         return adds_mutation_rule(m_data.mutation_rule_info_storage.back());
+    }
+
+    self& adds_mutation_rule(mutation_rule_info::apply_func apply, uintptr_t user_data = 0, builder_perks perks = {}) {
+        // generate name
+        compat::pmr::string name{m_data.info.name.to_std()};
+        name += " rule ";
+        name += std::to_string(m_data.mutation_rule_infos.size());
+        return adds_mutation_rule(std::move(name), apply, user_data, perks);
     }
 
     // on mutation uses the common rule syntax to add template rules for this mixin
@@ -193,10 +204,26 @@ public:
         if (r.makes_dependency) {
             m_data.info.dependency = true;
         }
-        r.info.user_data = user_data;
-        r.info.order_priority = perks.priority.value_or(0);
-        m_data.mutation_rule_info_storage.push_back(r.info);
-        m_data.mutation_rule_infos.push_back(&m_data.mutation_rule_info_storage.back());
+
+        auto& stored_name = m_data.mutation_rule_info_names_storage.emplace_back();
+        stored_name += m_data.info.name.to_std();
+        stored_name += " ";
+        stored_name += CommonRule::name;
+        // sadly we cannot attach the other mixin's name here as it's initialized globally and
+        // thus may not be initialized at this (also global) point
+        // so, we will just use the index:
+        stored_name += '<';
+        stored_name += std::to_string(m_data.mutation_rule_infos.size());
+        stored_name += '>';
+
+        mutation_rule_info& info = m_data.mutation_rule_info_storage.emplace_back();
+
+        info.name = dnmx_sv::from_std(stored_name);
+        info.apply = r.apply;
+        info.user_data = user_data;
+        info.order_priority = perks.priority.value_or(0);
+
+        m_data.mutation_rule_infos.push_back(&info);
         return *this;
     }
 
