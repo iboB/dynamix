@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include <dnmx/mixin_info_util.h>
+#include <splat/warnings.h>
 
 #include "s-unity.h"
 
@@ -38,6 +39,15 @@ void clear(char* buf) {
 bool is_cleared(const char* buf) {
     for (int i = 0; i < SIZE; ++i) {
         if (buf[i] != 0) return false;
+    }
+    return true;
+}
+bool is_fe(const char* buf) {
+    for (int i = 0; i < SIZE; ++i) {
+        PRAGMA_WARNING_PUSH
+        DISABLE_MSVC_WARNING(4310) // cast truncates constant value
+        if (buf[i] != (char)0xfe) return false;
+        PRAGMA_WARNING_POP
     }
     return true;
 }
@@ -94,6 +104,9 @@ void funcs(void) {
     dnmx_mixin_noop_copy_func(&info, buf_a, buf_b);
     CHECK(is_cleared(buf_a));
     CHECK(is_filled(buf_b));
+
+    dnmx_mixin_common_destroy_func(&info, buf_a);
+    CHECK(is_fe(buf_a));
 }
 
 typedef struct byte { uint8_t val; } byte;
