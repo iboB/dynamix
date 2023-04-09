@@ -19,7 +19,6 @@
     (mi).name = dnmx_make_sv_lit(I_DNMX_PP_STRINGIZE(mixin_type)); \
     dnmx_set_mixin_info_size_and_alignment(&(mi), sizeof(mixin_type), alignof(mixin_type)); \
     (mi).init = dnmx_mixin_common_init_func; \
-    (mi).copy_init = dnmx_mixin_common_copy_func; \
     (mi).move_init = dnmx_mixin_common_move_func; \
     (mi).move_asgn = dnmx_mixin_common_move_func; \
     (mi).copy_init = dnmx_mixin_common_copy_func; \
