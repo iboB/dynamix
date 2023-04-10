@@ -7,11 +7,14 @@
 #include "mutation_rule_info.hpp"
 #include "type_class.hpp"
 
+#include <string_view>
+
 struct dnmx_ftable_payload;
 
 namespace dynamix {
 class domain;
 class type_mutation;
+class type;
 namespace throw_exception {
 [[noreturn]] void id_registered(const domain& dom, const feature_info& info);
 [[noreturn]] void id_registered(const domain& dom, const mixin_info& info);
@@ -33,5 +36,9 @@ namespace throw_exception {
 [[noreturn]] void mut_foreign_mixin(const type_mutation& mut, const mixin_info& m);
 [[noreturn]] void mut_dup_mixin(const type_mutation& mut, const mixin_info& m);
 [[noreturn]] void feature_clash(const type_mutation& mut, const dnmx_ftable_payload& a, const dnmx_ftable_payload& b);
+[[noreturn]] void obj_mut_error(const type& t, std::string_view op, std::string_view err, const mixin_info& m);
+[[noreturn]] void obj_mut_user_error(const type& t, std::string_view op, std::string_view ovr, const mixin_info& m, error_return_t error);
+[[noreturn]] void obj_mut_sealed_object(const type& t, std::string_view op);
+[[noreturn]] void obj_error(const type& t, std::string_view op);
 }
 }

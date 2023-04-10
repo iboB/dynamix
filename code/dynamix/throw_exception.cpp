@@ -47,10 +47,10 @@ public:
         return *this;
     }
 
-    e& operator<<(const type_mutation& mut) {
+    void output_mixins(const itlib::span<const mixin_info* const>& mixins) {
         out << '{';
         bool first = true;
-        for (const auto& m : mut.mixins) {
+        for (const auto& m : mixins) {
             if (first) {
                 first = false;
             }
@@ -60,6 +60,15 @@ public:
             *this << *m;
         }
         out << '}';
+    }
+
+    e& operator<<(const type_mutation& mut) {
+        output_mixins(mut.mixins);
+        return *this;
+    }
+
+    e& operator<<(const type& t) {
+        output_mixins(t.mixins);
         return *this;
     }
 
@@ -168,6 +177,22 @@ void mut_dup_mixin(const type_mutation& mut, const mixin_info& m) {
 void feature_clash(const type_mutation& mut, const dnmx_ftable_payload& a, const dnmx_ftable_payload& b) {
     e<mutation_error>(mut.dom) << "feature clash in " << mut << " on " << *a.data->info << " between " <<
         *mut.mixins[a.mixin_index] << " and " << *mut.mixins[b.mixin_index];
+}
+
+void obj_mut_error(const type& t, std::string_view op, std::string_view err, const mixin_info& m) {
+    e<mutation_error>(t.dom) << op << " on object of type " << t << ": " << m << ' ' << err;
+}
+
+void obj_mut_user_error(const type& t, std::string_view op, std::string_view ovr, const mixin_info& m, error_return_t error) {
+    e<mutation_error>(t.dom) << op << " on object of type " << t << ": " << ovr << ' ' << m << " failed with error " << error;
+}
+
+void obj_mut_sealed_object(const type& t, std::string_view op) {
+    e<mutation_error>(t.dom) << op << " on sealed object of type " << t;
+}
+
+void obj_error(const type& t, std::string_view op) {
+    e<mutation_error>(t.dom) << op << " on object of type " << t;
 }
 
 }

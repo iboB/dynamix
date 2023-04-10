@@ -8,8 +8,8 @@
 #include "domain.hpp"
 #include "object_mutation.hpp"
 #include "error_return.hpp"
-#include "exception.hpp"
 #include "type_mutation.hpp"
+#include "throw_exception.hpp"
 
 #include <itlib/qalgorithm.hpp>
 
@@ -37,7 +37,7 @@ dnmx_error_return_t dnmx_mutate_to(dnmx_object_handle obj, dnmx_type_handle ht, 
                 if (o->init_new) {
                     auto err = o->init_new(&info, o->user_data, index, mixin);
                     if (err) {
-                        throw mutation_user_error("mutate_to", err);
+                        throw_exception::obj_mut_user_error(t, "mutate_to", "init", info, err);
                     }
                 }
                 else {
@@ -49,7 +49,7 @@ dnmx_error_return_t dnmx_mutate_to(dnmx_object_handle obj, dnmx_type_handle ht, 
                 if (o->update_common) {
                     auto err = o->update_common(&info, o->user_data, index, mixin);
                     if (err) {
-                        throw mutation_user_error("mutate_to", err);
+                        throw_exception::obj_mut_user_error(t, "mutate_to", "update", info, err);
                     }
                 }
                 else {
@@ -111,7 +111,7 @@ DYNAMIX_API dnmx_error_return_t dnmx_mutate(dnmx_object_handle ho, const dnmx_mu
             auto wrap_init = [&](const mixin_info& info, mixin_index_t index, byte_t* mixin) {
                 auto err = o->init_override(&info, o->user_data, index, mixin);
                 if (err) {
-                    throw mutation_user_error("mutate", err);
+                    throw_exception::obj_mut_user_error(t, "mutate", "init", info, err);
                 }
             };
 

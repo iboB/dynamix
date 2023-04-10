@@ -7,6 +7,7 @@
 #include "domain.hpp"
 #include "exception.hpp"
 #include "object_mutation.hpp"
+#include "throw_exception.hpp"
 
 namespace dynamix {
 
@@ -46,12 +47,12 @@ object::~object() {
 object& object::operator=(object&& o) {
     if (&o == this) return *this; // prevent self-usurp
     if (m_allocator == o.m_allocator) {
-        if (m_sealed) throw mutation_error("sealed object");
+        if (m_sealed) throw_exception::obj_mut_sealed_object(get_type(), "operator=");
         clear_mixin_data();
         usurp(o);
     }
     else {
-        throw mutation_error("move operator=");
+        throw_exception::obj_error(get_type(), "move operator= with mismatched allocators");
     }
     return *this;
 }
@@ -89,7 +90,7 @@ object object::copy(const allocator& alloc) const {
 
 void object::copy_from(const object& o) {
     if (o.empty()) {
-        if (m_sealed) throw mutation_error("sealed object");
+        if (m_sealed) throw_exception::obj_mut_sealed_object(get_type(), "copy_from");
         clear_mixin_data();
         m_type = o.m_type;
         return;
@@ -233,14 +234,14 @@ const void* object::get(const mixin_info& info) const noexcept {
 }
 
 void object::clear() {
-    if (m_sealed) throw mutation_error("sealed object");
+    if (m_sealed) throw_exception::obj_mut_sealed_object(get_type(), "clear");
     clear_mixin_data();
     m_type = &get_domain().get_empty_type();
 }
 
 void object::reset_type(const type& type) {
     if (type.num_mixins() == 0) {
-        if (m_sealed) throw mutation_error("sealed object");
+        if (m_sealed) throw_exception::obj_mut_sealed_object(get_type(), "reset_type");;
         clear_mixin_data();
         m_type = &type;
         return;
@@ -278,7 +279,7 @@ int object::compare(const object& other) const {
 
     for (size_t index = 0; index < mtype.mixins.size(); ++index) {
         auto& info = *mtype.mixins[index];
-        if (!info.compare) throw compare_error("compare");
+        if (!info.compare) throw_exception::obj_mut_error(get_type(), "compare", "missing compare", info);
         auto own_mixin = m_mixin_data[index].mixin;
         auto other_mixin = other.m_mixin_data[index].mixin;
         if (auto cmp = info.compare(&info, own_mixin, other_mixin)) return cmp;

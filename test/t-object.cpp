@@ -60,7 +60,7 @@ TEST_CASE("empty object") {
 
 TEST_CASE("simple object") {
     test_data t;
-    domain dom;
+    domain dom("s");
     t.register_all_mixins(dom);
     t.create_types(dom);
 
@@ -401,7 +401,9 @@ TEST_CASE("simple object") {
     CHECK(qget(asim2, ai)->strategy == "something entirely different but also long");
 
     CHECK_FALSE(asim2.equals(asim));
-    CHECK_THROWS_WITH_AS(asim2.compare(asim), "compare", compare_error);
+    CHECK_THROWS_WITH_AS(asim2.compare(asim),
+        "s: compare on object of type {'ai', 'stats', 'immaterial', 'mesh'}: 'ai' missing compare",
+        mutation_error);
 
     CHECK(dom.num_types() == 4);
     dom.garbage_collect_types();
@@ -801,7 +803,7 @@ TEST_CASE("more mutation errors") {
 
 TEST_CASE("seal") {
     test_data t;
-    domain dom;
+    domain dom("sl");
     t.register_all_mixins(dom);
     t.create_types(dom);
 
@@ -813,7 +815,7 @@ TEST_CASE("seal") {
     auto scopy = sobj.copy();
     CHECK_FALSE(scopy.sealed());
 
-    CHECK_THROWS_WITH_AS(sobj.clear(), "sealed object", mutation_error);
+    CHECK_THROWS_WITH_AS(sobj.clear(), "sl: clear on sealed object of type {'movable'}", mutation_error);
     CHECK(sobj.equals(scopy));
 
     {
@@ -836,14 +838,14 @@ TEST_CASE("seal") {
 
     {
         object oobj(*t.t_mov);
-        CHECK_THROWS_WITH_AS(sobj = std::move(oobj), "sealed object", mutation_error);
+        CHECK_THROWS_WITH_AS(sobj = std::move(oobj), "sl: operator= on sealed object of type {'movable'}", mutation_error);
         CHECK(sobj.equals(scopy));
     }
 
     CHECK_THROWS_WITH_AS(mutate(sobj, add(*t.mesh)), "sealed object", mutation_error);
     CHECK(sobj.equals(scopy));
 
-    CHECK_THROWS_WITH_AS((void)sobj.reset_type(*t.t_mov), "sealed object", mutation_error);
+    CHECK_THROWS_WITH_AS(sobj.reset_type(*t.t_mov), "sealed object", mutation_error);
     CHECK(sobj.equals(scopy));
 
     {
