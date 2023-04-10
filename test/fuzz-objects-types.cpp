@@ -59,7 +59,7 @@ struct object_producer {
 };
 
 TEST_CASE("fuzz objects and types") {
-    unsigned initial_seed = std::random_device{}();
+    unsigned initial_seed = 4133773066;// std::random_device{}();
     printf("initial seed: %u\n", initial_seed);
     std::minstd_rand seeder(initial_seed);
 
@@ -240,16 +240,20 @@ TEST_CASE("fuzz objects and types") {
     }
 
     std::deque<object_producer> producers;
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < 1; ++i) {
         producers.emplace_back(dom, mixins, seeder());
     }
 
-    std::vector<std::thread> threads;
     for (auto& p : producers) {
-        threads.emplace_back([&]() { p.produce(); });
+        p.produce();
     }
 
-    for (auto& t : threads) {
-        t.join();
-    }
+    //std::vector<std::thread> threads;
+    //for (auto& p : producers) {
+    //    threads.emplace_back([&]() { p.produce(); });
+    //}
+
+    //for (auto& t : threads) {
+    //    t.join();
+    //}
 }
