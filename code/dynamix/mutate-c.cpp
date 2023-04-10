@@ -74,7 +74,7 @@ DYNAMIX_API dnmx_error_return_t dnmx_mutate(dnmx_object_handle ho, const dnmx_mu
         type_mutation type_mut(obj->get_type());
 
         for (auto& op : ops) {
-            switch (op.type) {
+            switch (op.op_type) {
             case dnmx_mutate_op_add:
                 if (op.mixin) type_mut.add(*op.mixin);
                 else type_mut.add(op.mixin_name.to_std());
@@ -100,7 +100,7 @@ DYNAMIX_API dnmx_error_return_t dnmx_mutate(dnmx_object_handle ho, const dnmx_mu
         for (mixin_index_t i = 0; i < t.num_mixins(); ++i) {
             auto* m = t.mixins[i];
             auto o = itlib::pfind_if(ops, [&](const dnmx_mutate_op& op) {
-                if (op.type != dnmx_mutate_op_add) return false; // only collect add ops
+                if (op.op_type != dnmx_mutate_op_add) return false; // only collect add ops
                 if (!op.init_override) return false; // ... which have an init override
                 // ... for the mixin in question
                 if (op.mixin) return op.mixin == m;

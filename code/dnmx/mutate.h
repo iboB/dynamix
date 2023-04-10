@@ -31,7 +31,7 @@ enum dnmx_mutate_op_type {
     dnmx_mutate_op_to_back, // move mixin to back
 };
 typedef struct dnmx_mutate_op {
-    int type; // dnmx_mutate_op_type
+    int op_type; // dnmx_mutate_op_type
     const dnmx_mixin_info* mixin; // can be null, in which case mixin_name is checked
     dnmx_sv mixin_name; // will only be checked in mixin is null
     dnmx_mutate_func init_override; // can be null, in which case the default init is used
