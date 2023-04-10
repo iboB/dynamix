@@ -189,7 +189,7 @@ TEST_CASE("declared mixins only") {
 
     CHECK_THROWS_WITH_AS(dynamix::mutate(obj, dynamix::add<charlie>()),
         "test: mutate to object of type {'alice', 'bob', 'charlie', 'to Bob'}: 'charlie' missing default init",
-        dynamix::mutation_error);
+        dynamix::object_error);
 
     CHECK(as.living == 1);
     CHECK(as.total == 1);

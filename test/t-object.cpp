@@ -403,7 +403,7 @@ TEST_CASE("simple object") {
     CHECK_FALSE(asim2.equals(asim));
     CHECK_THROWS_WITH_AS(asim2.compare(asim),
         "s: compare object of type {'ai', 'stats', 'immaterial', 'mesh'}: 'ai' missing compare",
-        mutation_error);
+        object_error);
 
     CHECK(dom.num_types() == 4);
     dom.garbage_collect_types();
@@ -427,7 +427,7 @@ TEST_CASE("mutate_to") {
     {
         CHECK_THROWS_WITH_AS(object obj(*t.t_ap),
             "mt: mutate to object of type {'actor', 'procedural_geometry'}: 'actor' missing default init",
-            mutation_error);
+            object_error);
 
         auto custom_actor_init = [&](init_new_args args) {
             CHECK(args.mixin_buf);
@@ -461,10 +461,10 @@ TEST_CASE("mutate_to") {
 
         CHECK_THROWS_WITH_AS(auto x = obj.copy(),
             "mt: copy object of type {'actor', 'procedural_geometry'}: 'procedural_geometry' missing copy init",
-            mutation_error);
+            object_error);
         CHECK_THROWS_WITH_AS(obj2.copy_from(obj),
             "mt: copy_from object of type {'actor', 'procedural_geometry'}: 'procedural_geometry' missing copy assign",
-            mutation_error);
+            object_error);
 
         object obj3(dom);
         mutate_to(obj3, *t.t_ap
@@ -484,7 +484,7 @@ TEST_CASE("mutate_to") {
             mutate_to(acp, *t.t_acp,
                 construct(*t.actor, custom_actor_init))
             , "mt: mutate to object of type {'actor', 'controlled', 'physical'}: 'physical' missing default init"
-            , mutation_error);
+            , object_error);
         CHECK(acp.empty());
 
         auto custom_physical_init = [&](init_new_args args) {
@@ -553,7 +553,7 @@ TEST_CASE("mutate") {
         mutate(obj, add(*t.movable));
         CHECK_THROWS_WITH_AS(mutate(obj, add(*t.actor)),
             "m: mutate to object of type {'movable', 'actor'}: 'actor' missing default init",
-            mutation_error);
+            object_error);
 
         CHECK(obj.num_mixins() == 1);
         CHECK(obj.has(*t.movable));
@@ -593,7 +593,7 @@ TEST_CASE("mutate") {
 
         CHECK_THROWS_WITH_AS(mutate(obj).add("actor"),
             "m: mutate to object of type {'movable', 'procedural_geometry', 'actor'}: 'actor' missing default init",
-            mutation_error);
+            object_error);
         CHECK(obj.get_type() == t_mp);
     }
 }
@@ -624,7 +624,7 @@ TEST_CASE("more mutation errors") {
 
         CHECK_THROWS_WITH_AS(object afmi(*t.t_afmi),
             "me: mutate to object of type {'ai', 'flyer', 'mesh', 'invisible'}: deafult init 'mesh' failed with error 1000",
-            mutation_error);
+            object_error);
 
         CHECK(lstats.ai.living == 0);
         CHECK(lstats.ai.total == 2);
@@ -648,7 +648,7 @@ TEST_CASE("more mutation errors") {
 
         CHECK_THROWS_WITH_AS(auto x = afmi.copy(),
             "me: copy object of type {'ai', 'flyer', 'mesh', 'invisible'}: copy init 'mesh' failed with error 10",
-            mutation_error);
+            object_error);
 
         CHECK(lstats.ai.living == 1);
         CHECK(lstats.ai.total == 4);
@@ -668,7 +668,7 @@ TEST_CASE("more mutation errors") {
 
         CHECK_THROWS_WITH_AS(asim.copy_matching_from(afmi),
             "me: copy_matching_from object of type {'ai', 'stats', 'immaterial', 'mesh'}: copy assign 'mesh' failed with error 100",
-            mutation_error);
+            object_error);
 
         CHECK(qget(asim, ai)->strategy == "some strat");
         CHECK(qget(asim, mesh)->vertices.size() == 5);
@@ -688,7 +688,7 @@ TEST_CASE("more mutation errors") {
         qget(afmi, ai)->strategy = "another";
         CHECK_THROWS_WITH_AS(asim.copy_from(afmi),
             "me: copy_from object of type {'ai', 'flyer', 'mesh', 'invisible'}: copy assign 'mesh' failed with error 100",
-            mutation_error);
+            object_error);
 
         CHECK(&asim.get_type() == t.t_asim);
 
@@ -727,10 +727,10 @@ TEST_CASE("more mutation errors") {
 
         CHECK_THROWS_WITH_AS(object obj(*t.t_pp),
             "me: mutate to object of type {'physical', 'procedural_geometry'}: 'physical' missing default init",
-            mutation_error);
+            object_error);
         CHECK_THROWS_WITH_AS(object obj(*t.t_ap),
             "me: mutate to object of type {'actor', 'procedural_geometry'}: 'actor' missing default init",
-            mutation_error);
+            object_error);
     }
 
     {
@@ -833,13 +833,13 @@ TEST_CASE("seal") {
     auto scopy = sobj.copy();
     CHECK_FALSE(scopy.sealed());
 
-    CHECK_THROWS_WITH_AS(sobj.clear(), "sl: clear sealed object of type {'movable'}", mutation_error);
+    CHECK_THROWS_WITH_AS(sobj.clear(), "sl: clear sealed object of type {'movable'}", object_error);
     CHECK(sobj.equals(scopy));
 
     {
         CHECK(t.t_afmi->copyable());
         object oobj(*t.t_afmi);
-        CHECK_THROWS_WITH_AS(sobj.copy_from(oobj), "sl: mutate sealed object of type {'movable'}", mutation_error);
+        CHECK_THROWS_WITH_AS(sobj.copy_from(oobj), "sl: mutate sealed object of type {'movable'}", object_error);
         CHECK(sobj.equals(scopy));
 
         oobj.copy_from(sobj);
@@ -850,20 +850,20 @@ TEST_CASE("seal") {
     {
         object oobj(*t.t_mov);
         CHECK_FALSE(sobj.equals(oobj));
-        CHECK_THROWS_WITH_AS(sobj.copy_from(oobj), "sl: mutate sealed object of type {'movable'}", mutation_error);
+        CHECK_THROWS_WITH_AS(sobj.copy_from(oobj), "sl: mutate sealed object of type {'movable'}", object_error);
         CHECK(sobj.equals(scopy));
     }
 
     {
         object oobj(*t.t_mov);
-        CHECK_THROWS_WITH_AS(sobj = std::move(oobj), "sl: move assign sealed object of type {'movable'}", mutation_error);
+        CHECK_THROWS_WITH_AS(sobj = std::move(oobj), "sl: move assign sealed object of type {'movable'}", object_error);
         CHECK(sobj.equals(scopy));
     }
 
-    CHECK_THROWS_WITH_AS(mutate(sobj, add(*t.mesh)), "sl: mutate sealed object of type {'movable'}", mutation_error);
+    CHECK_THROWS_WITH_AS(mutate(sobj, add(*t.mesh)), "sl: mutate sealed object of type {'movable'}", object_error);
     CHECK(sobj.equals(scopy));
 
-    CHECK_THROWS_WITH_AS(sobj.reset_type(*t.t_mov), "sl: mutate sealed object of type {'movable'}", mutation_error);
+    CHECK_THROWS_WITH_AS(sobj.reset_type(*t.t_mov), "sl: mutate sealed object of type {'movable'}", object_error);
     CHECK(sobj.equals(scopy));
 
     {

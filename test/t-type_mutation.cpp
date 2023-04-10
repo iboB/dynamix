@@ -25,10 +25,10 @@ TEST_CASE("type_mutation from empty") {
 
     CHECK_THROWS_WITH_AS(mut.add("actor"),
         "e: creating type {}: unknown mixin 'actor' in add",
-        mutation_error);
+        type_error);
     CHECK_THROWS_WITH_AS(mut.to_back("actor"),
         "e: creating type {}: unknown mixin 'actor' in to_back",
-        mutation_error);
+        type_error);
 
     t.register_all_mixins(dom);
 
@@ -72,7 +72,7 @@ TEST_CASE("type_mutation from type") {
         CHECK(mut.lacks(*t.stats));
         CHECK_THROWS_WITH_AS(mut.to_back(*t.stats),
             "t: creating type {'ai', 'immaterial'}: 'stats' to_back on missing mixin",
-            mutation_error);
+            type_error);
         CHECK_FALSE(mut.has("actor"));
         CHECK(mut.add_if_lacking(*t.actor));
         CHECK(mut.has("actor"));

@@ -198,7 +198,7 @@ TEST_CASE("apply rules") {
     {
         t.mesh->user_data = 111;
         const mixin_info* mixins[] = {t.mesh};
-        CHECK_THROWS_WITH_AS(dom.get_type(mixins), "amr: applying mutation rule 'tam rule 0' to {'mesh'} failed with error -1", mutation_error);
+        CHECK_THROWS_WITH_AS(dom.get_type(mixins), "amr: applying mutation rule 'tam rule 0' to {'mesh'} failed with error -1", type_error);
         mrtd.check_log({0, 1});
         t.mesh->user_data = 0;
         CHECK(dom.num_types() == 2);
@@ -336,7 +336,7 @@ TEST_CASE("rule interdependency") {
         const mixin_info* mixins[] = {&wheeled.info};
         CHECK_THROWS_WITH_AS(dom.get_type(mixins),
             "rid: rule interdependency too deep or cyclic at "
-            "{'wheeled', 'actor', 'movable', 'tracker', 'actor', 'actor', 'actor'}", domain_error);
+            "{'wheeled', 'actor', 'movable', 'tracker', 'actor', 'actor', 'actor'}", type_error);
         CHECK(dom.num_types() == 1);
         CHECK(dom.num_type_queries() == 0);
     }

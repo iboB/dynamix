@@ -307,7 +307,7 @@ void test_simple_types(test_data& t, domain& dom) {
         const dynamix::mixin_info* dup[] = {t.movable, t.movable};
         CHECK_THROWS_WITH_AS(dom.get_type(dup),
             "tt: creating type {'movable', 'movable'}: 'movable' duplicate",
-            mutation_error);
+            type_error);
     }
 }
 
@@ -638,7 +638,7 @@ TEST_CASE("types") {
 
     {
         const dynamix::mixin_info* clash[] = {t.flyer, t.walker};
-        CHECK_THROWS_WITH_AS(dom.get_type(clash), "tt: feature clash in {'flyer', 'walker'} on 'can_move_to' between 'walker' and 'flyer'", mutation_error);
+        CHECK_THROWS_WITH_AS(dom.get_type(clash), "tt: feature clash in {'flyer', 'walker'} on 'can_move_to' between 'walker' and 'flyer'", type_error);
     }
 
     CHECK(dom.num_types() == 5);
@@ -669,7 +669,7 @@ TEST_CASE("unregistered mixins") {
 
     CHECK_THROWS_WITH_AS(t.create_types(dom),
         "tt: creating type {'movable'}: 'movable' unregistered",
-        mutation_error);
+        type_error);
     CHECK_FALSE(t.t_mov);
     CHECK_FALSE(t.t_asim);
     t.register_all_mixins(dom);

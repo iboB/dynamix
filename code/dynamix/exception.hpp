@@ -18,19 +18,14 @@ struct DYNAMIX_API domain_error : public exception {
     ~domain_error();
 };
 
-struct DYNAMIX_API mutation_error : public exception {
+struct DYNAMIX_API type_error : public exception {
     using exception::exception;
-    ~mutation_error();
+    ~type_error();
 };
 
-struct DYNAMIX_API mutation_user_error : public mutation_error {
-    mutation_user_error(const char* text, error_return_t e);
-    error_return_t error;
-};
-
-struct DYNAMIX_API compare_error : public exception {
+struct DYNAMIX_API object_error : public exception {
     using exception::exception;
-    ~compare_error();
+    ~object_error();
 };
 
 struct DYNAMIX_API bad_feature_access : public exception {

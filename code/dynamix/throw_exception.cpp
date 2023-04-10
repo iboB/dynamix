@@ -165,40 +165,44 @@ void foreign_mixin(const type_mutation& mut, const mixin_info& m) {
 
 
 void mutation_rule_user_error(const type_mutation& mut, const mutation_rule_info& info, error_return_t error) {
-    e<mutation_error>(mut.dom) << "applying mutation rule " << info << " to " << mut << " failed with error " << error;
+    e<type_error>(mut.dom) << "applying mutation rule " << info << " to " << mut << " failed with error " << error;
 }
 
 void cyclic_rule_deps(const type_mutation& mut) {
-    e<domain_error>(mut.dom) << "rule interdependency too deep or cyclic at " << mut;
+    e<type_error>(mut.dom) << "rule interdependency too deep or cyclic at " << mut;
 }
 
 void type_mut_error(const type_mutation& mut, std::string_view err, const mixin_info& m) {
-    e<mutation_error>(mut.dom) << "creating type " << mut << ": " << m << ' ' << err;
+    e<type_error>(mut.dom) << "creating type " << mut << ": " << m << ' ' << err;
 }
 
 void type_mut_error(const type_mutation& mut, std::string_view err, std::string_view name) {
-    e<mutation_error>(mut.dom) << "creating type " << mut << ": unknown mixin '" << name << "' in " << err;
+    e<type_error>(mut.dom) << "creating type " << mut << ": unknown mixin '" << name << "' in " << err;
 }
 
 void feature_clash(const type_mutation& mut, const dnmx_ftable_payload& a, const dnmx_ftable_payload& b) {
-    e<mutation_error>(mut.dom) << "feature clash in " << mut << " on " << *a.data->info << " between " <<
+    e<type_error>(mut.dom) << "feature clash in " << mut << " on " << *a.data->info << " between " <<
         *mut.mixins[a.mixin_index] << " and " << *mut.mixins[b.mixin_index];
 }
 
+void unknown_type_class(const type& t, const std::string_view name) {
+    e<type_error>(t.dom) << "type " << t << ": unknown type class '" << name << '\'';
+}
+
 void obj_mut_error(const type& t, std::string_view op, std::string_view err, const mixin_info& m) {
-    e<mutation_error>(t.dom) << op << " object of type " << t << ": " << m << ' ' << err;
+    e<object_error>(t.dom) << op << " object of type " << t << ": " << m << ' ' << err;
 }
 
 void obj_mut_user_error(const type& t, std::string_view op, std::string_view ovr, const mixin_info& m, error_return_t error) {
-    e<mutation_error>(t.dom) << op << " object of type " << t << ": " << ovr << ' ' << m << " failed with error " << error;
+    e<object_error>(t.dom) << op << " object of type " << t << ": " << ovr << ' ' << m << " failed with error " << error;
 }
 
 void obj_mut_sealed_object(const type& t, std::string_view op) {
-    e<mutation_error>(t.dom) << op << " sealed object of type " << t;
+    e<object_error>(t.dom) << op << " sealed object of type " << t;
 }
 
 void obj_error(const type& t, std::string_view op) {
-    e<mutation_error>(t.dom) << op << " object of type " << t;
+    e<object_error>(t.dom) << op << " object of type " << t;
 }
 
 }

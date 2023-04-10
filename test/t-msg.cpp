@@ -81,7 +81,7 @@ TEST_CASE("clash") {
     test_obj obj;
     CHECK_THROWS_WITH_AS(mutate(obj, dynamix::add<common>(), dynamix::add<get_ptr_clash>()),
         "msgt: feature clash in {'common', 'get_ptr_clash'} on 'get_ptr' between 'get_ptr_clash' and 'common'",
-        dynamix::mutation_error);
+        dynamix::type_error);
 }
 
 TEST_CASE("uni") {

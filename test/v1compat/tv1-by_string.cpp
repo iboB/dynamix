@@ -52,7 +52,7 @@ TEST_CASE("v1 mixin_types") {
     CHECK_NOTHROW(mut.add(*ominfo));
     CHECK_NOTHROW(mut.add(*tinfo));
 
-    CHECK_THROWS_AS(mut.add("third"), dynamix::mutation_error);
+    CHECK_THROWS_AS(mut.add("third"), dynamix::type_error);
 
     mut.apply();
 
