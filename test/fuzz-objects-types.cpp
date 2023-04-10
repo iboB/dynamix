@@ -51,7 +51,7 @@ struct object_producer {
                 auto& o = objects.emplace_back(dom);
                 o.reset_type(t);
             }
-            catch (const dynamix::exception&) {
+            catch (const dynamix::exception& e) {
                 continue;
             }
         }
@@ -59,8 +59,11 @@ struct object_producer {
 };
 
 TEST_CASE("fuzz objects and types") {
-    std::random_device rd;
-    std::minstd_rand rnd(rd());
+    unsigned initial_seed = std::random_device{}();
+    printf("initial seed: %u\n", initial_seed);
+    std::minstd_rand seeder(initial_seed);
+
+    std::minstd_rand rnd(seeder());
 
     std::deque<dynamix::util::feature_info_data> features;
     // generate features
@@ -227,25 +230,25 @@ TEST_CASE("fuzz objects and types") {
         }
     }
 
-    //dynamix::domain dom;
-    //for (auto& m : mixins) {
-    //    m.register_in(dom);
-    //}
-    //for (auto& d : deps) {
-    //    d.register_in(dom);
-    //}
+    dynamix::domain dom;
+    for (auto& m : mixins) {
+        m.register_in(dom);
+    }
+    for (auto& d : deps) {
+        d.register_in(dom);
+    }
 
-    //std::deque<object_producer> producers;
-    //for (int i = 0; i < 1; ++i) {
-    //    producers.emplace_back(dom, mixins, rd());
-    //}
+    std::deque<object_producer> producers;
+    for (int i = 0; i < 2; ++i) {
+        producers.emplace_back(dom, mixins, seeder());
+    }
 
-    //std::vector<std::thread> threads;
-    //for (auto& p : producers) {
-    //    threads.emplace_back([&]() { p.produce(); });
-    //}
+    std::vector<std::thread> threads;
+    for (auto& p : producers) {
+        threads.emplace_back([&]() { p.produce(); });
+    }
 
-    //for (auto& t : threads) {
-    //    t.join();
-    //}
+    for (auto& t : threads) {
+        t.join();
+    }
 }

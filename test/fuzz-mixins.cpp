@@ -134,15 +134,17 @@ TEST_CASE("fuzz mixins") {
     std::deque<mixin_generator> generators;
     std::deque<mixin_getter> getters;
 
-    std::random_device rd;
+    unsigned initial_seed = std::random_device{}();
+    printf("initial seed: %u\n", initial_seed);
+    std::minstd_rand seeder(initial_seed);
 
     dynamix::domain dom;
     for (auto& b : bases) {
-        generators.emplace_back(dom, b, features, rd());
+        generators.emplace_back(dom, b, features, seeder());
     }
 
     for (int i = 0; i < 2; ++i) {
-        getters.emplace_back(dom, bases, rd());
+        getters.emplace_back(dom, bases, seeder());
     }
 
     std::vector<std::thread> threads;
