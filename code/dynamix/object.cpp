@@ -5,7 +5,6 @@
 #include "type.hpp"
 #include "mixin_info.hpp"
 #include "domain.hpp"
-#include "exception.hpp"
 #include "object_mutation.hpp"
 #include "throw_exception.hpp"
 
@@ -47,12 +46,12 @@ object::~object() {
 object& object::operator=(object&& o) {
     if (&o == this) return *this; // prevent self-usurp
     if (m_allocator == o.m_allocator) {
-        if (m_sealed) throw_exception::obj_mut_sealed_object(get_type(), "operator=");
+        if (m_sealed) throw_exception::obj_mut_sealed_object(get_type(), "move assign");
         clear_mixin_data();
         usurp(o);
     }
     else {
-        throw_exception::obj_error(get_type(), "move operator= with mismatched allocators");
+        throw_exception::obj_error(get_type(), "move assign with mismatched allocators");
     }
     return *this;
 }
@@ -76,13 +75,11 @@ object object::copy(const allocator& alloc) const {
     }
 
     auto& mtype = get_type();
-    // check if all our mixin can be copy constructed
-    if (!mtype.copy_constructible()) throw mutation_error("missing copy init");
-
     perform_object_mutation(ret, mtype, [&](const mixin_info& info, mixin_index_t index, byte_t* new_mixin) {
         auto source = m_mixin_data[index].mixin;
+        if (!info.copy_init) throw_exception::obj_mut_error(mtype, "copy", "missing copy init", info);
         auto err = info.copy_init(&info, new_mixin, source);
-        if (err) throw mutation_user_error("copy_init user", err);
+        if (err) throw_exception::obj_mut_user_error(mtype, "copy", "copy init", info, err);
     });
 
     return ret;
@@ -96,28 +93,30 @@ void object::copy_from(const object& o) {
         return;
     }
 
+    auto& tt = o.get_type();
+
     // check copy availability
     for (const auto* info : o.get_type().mixins) {
         if (get_type().has(info->id)) {
             // matching type - must be copy-assignable
-            if (!info->copy_asgn) throw mutation_error("copy_from");
+            if (!info->copy_asgn) throw_exception::obj_mut_error(tt, "copy_from", "missing copy assign", *info);
         }
         else {
             // o-only type - must be copy-constructible
-            if (!info->copy_init) throw mutation_error("copy_from");
+            if (!info->copy_init) throw_exception::obj_mut_error(tt, "copy_from", "missing copy init", *info);
         }
     }
 
-    perform_object_mutation(*this, o.get_type(),
+    perform_object_mutation(*this, tt,
         [&](const mixin_info& info, mixin_index_t index, byte_t* new_mixin) {
             auto source = o.m_mixin_data[index].mixin;
             auto err = info.copy_init(&info, new_mixin, source);
-            if (err) throw mutation_user_error("copy_init user", err);
+            if (err) throw_exception::obj_mut_user_error(tt, "copy_from", "copy init", info, err);
         },
         [&](const mixin_info& info, mixin_index_t index, byte_t* mixin) {
             auto source = o.m_mixin_data[index].mixin;
             auto err = info.copy_asgn(&info, mixin, source);
-            if (err) throw mutation_user_error("copy_asgn user", err);
+            if (err) throw_exception::obj_mut_user_error(tt, "copy_from", "copy assign", info, err);
         }
     );
 }
@@ -130,7 +129,7 @@ void object::copy_matching_from(const object& o) {
     for (const auto* info : otype.mixins) {
         if (mtype.has(info->id)) {
             // matching type - must be copy-assignable
-            if (!info->copy_asgn) throw mutation_error("copy_matching_from");
+            if (!info->copy_asgn) throw_exception::obj_mut_error(mtype, "copy_matching_from", "missing copy assign", *info);
         }
     }
 
@@ -145,7 +144,7 @@ void object::copy_matching_from(const object& o) {
             m_mixin_data[own_index].mixin,
             o.m_mixin_data[src_index].mixin
         );
-        if (err) throw mutation_user_error("copy_asgn user", err);
+        if (err) throw_exception::obj_mut_user_error(mtype, "copy_matching_from", "copy assign", info, err);
     }
 }
 
@@ -158,9 +157,9 @@ void object::move_matching_from(object& o, bool fallback_to_init) {
         if (mtype.has(info->id)) {
             // matching type - must be move-assignable
             if (info->move_asgn) continue;
-            // .. or if fallback is allowed move-constructible
+            // .. or if fallback is allowed, move-constructible
             if (fallback_to_init && info->move_init) continue;
-            throw mutation_error("move_matching_from");
+            throw_exception::obj_mut_error(mtype, "move_matching_from", "cannot be moved", *info);
         }
     }
 

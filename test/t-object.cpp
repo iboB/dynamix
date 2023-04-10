@@ -402,7 +402,7 @@ TEST_CASE("simple object") {
 
     CHECK_FALSE(asim2.equals(asim));
     CHECK_THROWS_WITH_AS(asim2.compare(asim),
-        "s: compare on object of type {'ai', 'stats', 'immaterial', 'mesh'}: 'ai' missing compare",
+        "s: compare object of type {'ai', 'stats', 'immaterial', 'mesh'}: 'ai' missing compare",
         mutation_error);
 
     CHECK(dom.num_types() == 4);
@@ -413,7 +413,7 @@ TEST_CASE("simple object") {
 TEST_CASE("mutate_to") {
     test_data::lifetimes lstats;
     test_data t;
-    domain dom;
+    domain dom("mt");
     t.register_all_mixins(dom);
     t.create_types(dom);
     t.create_more_types(dom);
@@ -461,9 +461,12 @@ TEST_CASE("mutate_to") {
         CHECK_FALSE(obj.equals(obj2));
         CHECK(obj.compare(obj2) > 0);
 
-        qget(obj, actor)->name = "error";
-        CHECK_THROWS_WITH_AS(auto x = obj.copy(), "missing copy init", mutation_error);
-        CHECK_THROWS_WITH_AS(obj2.copy_from(obj), "copy_from", mutation_error);
+        CHECK_THROWS_WITH_AS(auto x = obj.copy(),
+            "mt: copy object of type {'actor', 'procedural_geometry'}: 'procedural_geometry' missing copy init",
+            mutation_error);
+        CHECK_THROWS_WITH_AS(obj2.copy_from(obj),
+            "mt: copy_from object of type {'actor', 'procedural_geometry'}: 'procedural_geometry' missing copy assign",
+            mutation_error);
 
         object obj3(dom);
         mutate_to(obj3, *t.t_ap
@@ -497,6 +500,7 @@ TEST_CASE("mutate_to") {
         CHECK(qget(acp, actor)->name == "foo");
         CHECK(qget(acp, physical)->data == std::vector<double>{1, 2, 3});
 
+        qget(obj, actor)->name = "error";
         mutate_to(obj, *t.t_acp,
             construct(*t.physical, custom_physical_init));
         CHECK(qget(obj, actor)->name == "error");
@@ -599,7 +603,7 @@ TEST_CASE("more mutation errors") {
     {
         test_data::lifetimes lstats;
         test_data t;
-        domain dom;
+        domain dom("me");
         t.register_all_mixins(dom);
         t.create_types(dom);
 
@@ -638,7 +642,9 @@ TEST_CASE("more mutation errors") {
         CHECK(lstats.invisible.living == 1);
         CHECK(lstats.invisible.total == 1);
 
-        CHECK_THROWS_WITH_AS(auto x = afmi.copy(), "copy_init user", mutation_user_error);
+        CHECK_THROWS_WITH_AS(auto x = afmi.copy(),
+            "me: copy object of type {'ai', 'flyer', 'mesh', 'invisible'}: copy init 'mesh' failed with error 10",
+            mutation_error);
 
         CHECK(lstats.ai.living == 1);
         CHECK(lstats.ai.total == 4);
@@ -656,7 +662,9 @@ TEST_CASE("more mutation errors") {
         CHECK(qget(asim, ai)->strategy == "attack");
         CHECK(qget(asim, mesh)->vertices.size() == 5);
 
-        CHECK_THROWS_WITH_AS(asim.copy_matching_from(afmi), "copy_asgn user", mutation_user_error);
+        CHECK_THROWS_WITH_AS(asim.copy_matching_from(afmi),
+            "me: copy_matching_from object of type {'ai', 'stats', 'immaterial', 'mesh'}: copy assign 'mesh' failed with error 100",
+            mutation_error);
 
         CHECK(qget(asim, ai)->strategy == "some strat");
         CHECK(qget(asim, mesh)->vertices.size() == 5);
@@ -674,7 +682,9 @@ TEST_CASE("more mutation errors") {
         CHECK(lstats.invisible.total == 1);
 
         qget(afmi, ai)->strategy = "another";
-        CHECK_THROWS_WITH_AS(asim.copy_from(afmi), "copy_asgn user", mutation_user_error);
+        CHECK_THROWS_WITH_AS(asim.copy_from(afmi),
+            "me: copy_from object of type {'ai', 'flyer', 'mesh', 'invisible'}: copy assign 'mesh' failed with error 100",
+            mutation_error);
 
         CHECK(&asim.get_type() == t.t_asim);
 
@@ -815,7 +825,7 @@ TEST_CASE("seal") {
     auto scopy = sobj.copy();
     CHECK_FALSE(scopy.sealed());
 
-    CHECK_THROWS_WITH_AS(sobj.clear(), "sl: clear on sealed object of type {'movable'}", mutation_error);
+    CHECK_THROWS_WITH_AS(sobj.clear(), "sl: clear sealed object of type {'movable'}", mutation_error);
     CHECK(sobj.equals(scopy));
 
     {
@@ -838,7 +848,7 @@ TEST_CASE("seal") {
 
     {
         object oobj(*t.t_mov);
-        CHECK_THROWS_WITH_AS(sobj = std::move(oobj), "sl: operator= on sealed object of type {'movable'}", mutation_error);
+        CHECK_THROWS_WITH_AS(sobj = std::move(oobj), "sl: move assign sealed object of type {'movable'}", mutation_error);
         CHECK(sobj.equals(scopy));
     }
 

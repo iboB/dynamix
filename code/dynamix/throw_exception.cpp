@@ -182,19 +182,19 @@ void feature_clash(const type_mutation& mut, const dnmx_ftable_payload& a, const
 }
 
 void obj_mut_error(const type& t, std::string_view op, std::string_view err, const mixin_info& m) {
-    e<mutation_error>(t.dom) << op << " on object of type " << t << ": " << m << ' ' << err;
+    e<mutation_error>(t.dom) << op << " object of type " << t << ": " << m << ' ' << err;
 }
 
 void obj_mut_user_error(const type& t, std::string_view op, std::string_view ovr, const mixin_info& m, error_return_t error) {
-    e<mutation_error>(t.dom) << op << " on object of type " << t << ": " << ovr << ' ' << m << " failed with error " << error;
+    e<mutation_error>(t.dom) << op << " object of type " << t << ": " << ovr << ' ' << m << " failed with error " << error;
 }
 
 void obj_mut_sealed_object(const type& t, std::string_view op) {
-    e<mutation_error>(t.dom) << op << " on sealed object of type " << t;
+    e<mutation_error>(t.dom) << op << " sealed object of type " << t;
 }
 
 void obj_error(const type& t, std::string_view op) {
-    e<mutation_error>(t.dom) << op << " on object of type " << t;
+    e<mutation_error>(t.dom) << op << " object of type " << t;
 }
 
 }
