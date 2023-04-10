@@ -216,7 +216,7 @@ TEST_CASE("fuzz objects and types") {
         auto num = rnd() % 2 + 1;
         for (uint32_t i = 0; i < num; ++i) {
             auto to = rnd() % NUM_MIXINS;
-            auto r = d.mutation_rule_info_storage.emplace_back();
+            auto& r = d.mutation_rule_info_storage.emplace_back();
             auto& m = mixins[to];
             r.apply = [](dnmx_type_mutation_handle mutation, uintptr_t user_data) {
                 auto mut = dynamix::type_mutation::from_c_handle(mutation);
