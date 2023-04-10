@@ -146,7 +146,9 @@ TEST_CASE("declared mixins only") {
     }
 
     CHECK(get_string<feature_aaa>(obj) == "alice-aaa");
-    CHECK_THROWS_WITH_AS(get_string<feature_bbb>(obj), "no string 'bbb'", dynamix::feature_error);
+    CHECK_THROWS_WITH_AS(get_string<feature_bbb>(obj),
+        "test: {'alice', 'bob', 'to Bob'} no string 'bbb'",
+        dynamix::feature_error);
     CHECK(get_string<feature_ccc>(obj) == "bob-ccc");
     CHECK(get_string<feature_ddd>(obj) == "to Bob-ddd");
 
