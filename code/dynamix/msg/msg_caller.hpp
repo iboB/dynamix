@@ -4,7 +4,7 @@
 #pragma once
 #include "../feature_info.hpp"
 #include "../feature_payload.hpp"
-#include "../exception.hpp"
+#include "../throw_exception.hpp"
 #include "../type.hpp"
 #include "../../dnmx/bits/no_sanitize.h"
 
@@ -14,7 +14,9 @@ namespace dynamix {
 template <typename Object, typename Ret, typename... Args>
 struct msg_caller {
     static Ret try_default_payload(const feature_info& info, Object& obj, Args&&... args) {
-        if (!info.default_payload) throw bad_feature_access("dynamix message");
+        if (!info.default_payload) {
+            throw_exception::generic_feature_error(obj.get_type(), "does not implement", "dynamix msg", info);
+        }
 
         // we have a default payload
         // note that it has a different signature (obj first instead of mixin)

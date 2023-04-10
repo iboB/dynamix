@@ -28,9 +28,9 @@ struct DYNAMIX_API object_error : public exception {
     ~object_error();
 };
 
-struct DYNAMIX_API bad_feature_access : public exception {
+struct DYNAMIX_API feature_error : public exception {
     using exception::exception;
-    ~bad_feature_access();
+    ~feature_error();
 };
 
 }

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 //
 #pragma once
+#include "../dnmx/api.h"
 #include "feature_info_fwd.hpp"
 #include "mixin_info_fwd.hpp"
 #include "mutation_rule_info.hpp"
@@ -46,5 +47,9 @@ namespace throw_exception {
 [[noreturn]] void obj_mut_user_error(const type& t, std::string_view op, std::string_view ovr, const mixin_info& m, error_return_t error);
 [[noreturn]] void obj_mut_sealed_object(const type& t, std::string_view op);
 [[noreturn]] void obj_error(const type& t, std::string_view op);
+
+// feature_error
+[[noreturn]] DYNAMIX_API void generic_feature_error(const type& t, std::string_view err, std::string_view feature_type, const feature_info& f);
+[[noreturn]] DYNAMIX_API void generic_feature_error(const type& t, std::string_view err, std::string_view feature_type, const feature_info& f, const mixin_info& m);
 }
 }

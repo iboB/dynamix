@@ -12,6 +12,7 @@
 #include <dynamix/type.hpp>
 #include <dynamix/mutate.hpp>
 #include <dynamix/exception.hpp>
+#include <dynamix/throw_exception.hpp>
 #include <dynamix/common_feature_info.hpp>
 #include <dynamix/any.hpp>
 #include <dynamix/common_mutation_rules.hpp>
@@ -95,7 +96,7 @@ dynamix::compat::pmr::string& get_string(test_obj& object) {
         data = info.default_payload;
     }
 
-    if (!data) throw dynamix::bad_feature_access("test string");
+    if (!data) dynamix::throw_exception::generic_feature_error(object.get_type(), "no", "string", info);
 
     return *reinterpret_cast<dynamix::compat::pmr::string*>(data);
 }
@@ -145,7 +146,7 @@ TEST_CASE("declared mixins only") {
     }
 
     CHECK(get_string<feature_aaa>(obj) == "alice-aaa");
-    CHECK_THROWS_WITH_AS(get_string<feature_bbb>(obj), "test string", dynamix::bad_feature_access);
+    CHECK_THROWS_WITH_AS(get_string<feature_bbb>(obj), "no string 'bbb'", dynamix::feature_error);
     CHECK(get_string<feature_ccc>(obj) == "bob-ccc");
     CHECK(get_string<feature_ddd>(obj) == "to Bob-ddd");
 

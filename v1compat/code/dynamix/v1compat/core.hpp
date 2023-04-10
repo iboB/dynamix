@@ -9,3 +9,5 @@
 #include "declare_message.hpp"
 #include "define_message.hpp"
 #include "mutate.hpp"
+
+#include <dynamix/exception.hpp>

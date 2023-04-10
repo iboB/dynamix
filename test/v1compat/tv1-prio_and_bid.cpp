@@ -72,7 +72,7 @@ TEST_CASE("bids") {
     bids_uni(o, sout);
     CHECK(sout.str() == "abc");
 
-    CHECK_THROWS_AS(bids_bad_uni(o, sout), dynamix::bad_feature_access);
+    CHECK_THROWS_AS(bids_bad_uni(o, sout), dynamix::feature_error);
 
     sout.str(std::string());
     bids_multi_override(o, sout);
@@ -86,7 +86,7 @@ TEST_CASE("bids") {
         .remove<c>()
         .remove<d>();
 
-    CHECK_THROWS_AS(bids_uni(o, sout), dynamix::bad_feature_access);
+    CHECK_THROWS_AS(bids_uni(o, sout), dynamix::feature_error);
 
     sout.str(std::string());
     bids_multi_override(o, sout);

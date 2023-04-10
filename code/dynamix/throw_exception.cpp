@@ -205,4 +205,12 @@ void obj_error(const type& t, std::string_view op) {
     e<object_error>(t.dom) << op << " object of type " << t;
 }
 
+void generic_feature_error(const type& t, std::string_view err, std::string_view feature_type, const feature_info& f) {
+    e<feature_error>(t.dom) << t << ' ' << err << ' ' << feature_type << ' ' << f;
+}
+
+void generic_feature_error(const type& t, std::string_view err, std::string_view feature_type, const feature_info& f, const mixin_info& m) {
+    e<feature_error>(t.dom) << t << ' ' << err << ' ' << feature_type << ' ' << f << " with " << m;
+}
+
 }
