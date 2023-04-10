@@ -51,7 +51,7 @@ struct object_producer {
                 auto& o = objects.emplace_back(dom);
                 o.reset_type(t);
             }
-            catch (const dynamix::exception& e) {
+            catch (const dynamix::exception&) {
                 continue;
             }
         }
@@ -108,9 +108,10 @@ TEST_CASE("fuzz objects and types") {
             info.compare = dnmx_mixin_common_cmp_func;
             info.destroy = dnmx_mixin_common_destroy_func;
 
-            if (!dep && (rnd() % 5 == 0)) {
-                // no default ctor 20% of the time
-                // but only if not a dependency
+            if (!dep && i % 2 == 1 && (rnd() % 3 == 0)) {
+                // no default ctor 16% of the time
+                // but leave at least half of the mixins with a default ctor
+                // and only if not a dependency
                 info.init = nullptr;
             }
 
