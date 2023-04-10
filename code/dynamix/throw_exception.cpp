@@ -42,8 +42,13 @@ public:
         return *this;
     }
 
-    e& operator<< (const mutation_rule_info& info) {
+    e& operator<<(const mutation_rule_info& info) {
         out << '\'' << info.name.to_std() << '\'';
+        return *this;
+    }
+
+    e& operator<<(const type_class& tc) {
+        out << '\'' << tc.name.to_std() << '\'';
         return *this;
     }
 
@@ -105,15 +110,15 @@ void empty_name(const domain& dom, const type_class&) {
 }
 
 void duplicate_name(const domain& dom, const feature_info& info) {
-    e<domain_error>(dom) << "register feature with duplicate name '" << info.name.to_std() << '\'';
+    e<domain_error>(dom) << "register feature with duplicate name " << info;
 }
 
 void duplicate_name(const domain& dom, const mixin_info& info) {
-    e<domain_error>(dom) << "register mixin with duplicate name '" << info.name.to_std() << '\'';
+    e<domain_error>(dom) << "register mixin with duplicate name " << info;
 }
 
 void duplicate_name(const domain& dom, const type_class& tc) {
-    e<domain_error>(dom) << "register type class with duplicate name '" << tc.name.to_std() << '\'';
+    e<domain_error>(dom) << "register type class with duplicate name " << tc;
 }
 
 void info_has_domain(const domain& dom, const mixin_info& info) {
@@ -139,27 +144,15 @@ void no_func(const domain& dom, const mutation_rule_info& info) {
 }
 
 void no_func(const domain& dom, const type_class& tc) {
-    e<domain_error>(dom) << "register type class '" << tc.name.to_std() << "' with match function = null";
+    e<domain_error>(dom) << "register type class " << tc << " with match function = null";
 }
 
-void mutation_rule_user_error(const type_mutation& mut, const mutation_rule_info& info, error_return_t error) {
-    e<mutation_error>(mut.dom) << "applying mutation rule " << info << " to " << mut << " failed with error " << error;
+void foreign_mutation(const domain& dom, const type_mutation& mut) {
+    e<domain_error>(dom) << "requested type with foreign mutation " << mut << " of domain '" << mut.dom << '\'';
 }
 
-void foreign_domain(const domain& dom, const type_mutation& mut) {
-    e<mutation_error>(dom) << "requested type with foreign mutation " << mut << " of domain '" << mut.dom << '\'';
-}
-
-void cyclic_rule_deps(const type_mutation& mut) {
-    e<domain_error>(mut.dom) << "rule interdependency too deep or cyclic at " << mut;
-}
-
-void mut_unreg_mixin(const type_mutation& mut, const mixin_info& m) {
-    e<mutation_error>(mut.dom) << "unregistered mixin " << m << " while trying to create type " << mut;
-}
-
-void mut_foreign_mixin(const type_mutation& mut, const mixin_info& m) {
-    e<mutation_error> out(mut.dom);
+void foreign_mixin(const type_mutation& mut, const mixin_info& m) {
+    e<domain_error> out(mut.dom);
     out << "foreign mixin " << m << " from ";
     if (m.dom) {
         out << '\'' << *domain::from_c_handle(m.dom) << '\'';
@@ -170,8 +163,17 @@ void mut_foreign_mixin(const type_mutation& mut, const mixin_info& m) {
     out << " while trying to create type " << mut;
 }
 
-void mut_dup_mixin(const type_mutation& mut, const mixin_info& m) {
-    e<mutation_error>(mut.dom) << "duplicate mixin " << m << " while trying to create type " << mut;
+
+void mutation_rule_user_error(const type_mutation& mut, const mutation_rule_info& info, error_return_t error) {
+    e<mutation_error>(mut.dom) << "applying mutation rule " << info << " to " << mut << " failed with error " << error;
+}
+
+void cyclic_rule_deps(const type_mutation& mut) {
+    e<domain_error>(mut.dom) << "rule interdependency too deep or cyclic at " << mut;
+}
+
+void type_mut_error(const type_mutation& mut, std::string_view err, const mixin_info& m) {
+    e<mutation_error>(mut.dom) << "creating type " << mut << ": " << m << ' ' << err;
 }
 
 void feature_clash(const type_mutation& mut, const dnmx_ftable_payload& a, const dnmx_ftable_payload& b) {

@@ -429,7 +429,7 @@ public:
     }
 
     const type& get_type(type_mutation& mutation) {
-        if (&mutation.dom != &m_domain) throw_exception::foreign_domain(m_domain, mutation);
+        if (&mutation.dom != &m_domain) throw_exception::foreign_mutation(m_domain, mutation);
 
         type_query original_query(m_allocator); // prepare original query with our allocator
         const type* found = nullptr;
@@ -626,10 +626,10 @@ public:
         // first check validity
         for (size_t i = 0; i < mixins.size(); ++i) {
             auto m = mixins[i];
-            if (m->id == invalid_mixin_id) throw_exception::mut_unreg_mixin(mutation, *m);
-            if (m->dom != &m_domain) throw_exception::mut_foreign_mixin(mutation, *m);;
+            if (m->id == invalid_mixin_id) throw_exception::type_mut_error(mutation, "unregistered", *m);
+            if (m->dom != &m_domain) throw_exception::foreign_mixin(mutation, *m);;
             for (size_t j = i + 1; j < mixins.size(); ++j) {
-                if (mixins[i] == mixins[j]) throw_exception::mut_dup_mixin(mutation, *m);;
+                if (mixins[i] == mixins[j]) throw_exception::type_mut_error(mutation, "duplicate", *m);;
             }
         }
 

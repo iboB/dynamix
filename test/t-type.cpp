@@ -306,7 +306,7 @@ void test_simple_types(test_data& t, domain& dom) {
     {
         const dynamix::mixin_info* dup[] = {t.movable, t.movable};
         CHECK_THROWS_WITH_AS(dom.get_type(dup),
-            "tt: duplicate mixin 'movable' while trying to create type {'movable', 'movable'}",
+            "tt: creating type {'movable', 'movable'}: 'movable' duplicate",
             mutation_error);
     }
 }
@@ -668,7 +668,7 @@ TEST_CASE("unregistered mixins") {
     domain dom("tt");
 
     CHECK_THROWS_WITH_AS(t.create_types(dom),
-        "tt: unregistered mixin 'movable' while trying to create type {'movable'}",
+        "tt: creating type {'movable'}: 'movable' unregistered",
         mutation_error);
     CHECK_FALSE(t.t_mov);
     CHECK_FALSE(t.t_asim);

@@ -9,11 +9,6 @@ exception::~exception() = default;
 
 domain_error::~domain_error() = default;
 
-domain_user_error::domain_user_error(const char* text, error_return_t e)
-    : domain_error(text)
-    , error(e)
-{}
-
 mutation_error::~mutation_error() = default;
 
 mutation_user_error::mutation_user_error(const char* text, error_return_t e)

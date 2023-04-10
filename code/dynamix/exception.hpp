@@ -18,11 +18,6 @@ struct DYNAMIX_API domain_error : public exception {
     ~domain_error();
 };
 
-struct DYNAMIX_API domain_user_error : public domain_error {
-    domain_user_error(const char* text, error_return_t e);
-    error_return_t error;
-};
-
 struct DYNAMIX_API mutation_error : public exception {
     using exception::exception;
     ~mutation_error();
