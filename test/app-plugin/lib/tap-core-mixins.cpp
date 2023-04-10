@@ -29,8 +29,8 @@ struct person {
     }
 };
 
-void mixin_person::do_init(const dynamix::mixin_info&, dynamix::mixin_index_t, dynamix::byte_t* new_mixin) {
-    new (new_mixin) person(name, age);
+void mixin_person::do_init(dynamix::init_new_args args) {
+    new (args.mixin_buf) person(name, age);
 }
 
 DYNAMIX_DEFINE_MIXIN(dynamix_domain, person)

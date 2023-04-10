@@ -75,10 +75,11 @@ object object::copy(const allocator& alloc) const {
     }
 
     auto& mtype = get_type();
-    perform_object_mutation(ret, mtype, [&](const mixin_info& info, mixin_index_t index, byte_t* new_mixin) {
-        auto source = m_mixin_data[index].mixin;
+    perform_object_mutation(ret, mtype, [&](init_new_args args) {
+        auto source = m_mixin_data[args.target_index].mixin;
+        auto& info = args.info;
         if (!info.copy_init) throw_exception::obj_mut_error(mtype, "copy", "missing copy init", info);
-        auto err = info.copy_init(&info, new_mixin, source);
+        auto err = info.copy_init(&info, args.mixin_buf, source);
         if (err) throw_exception::obj_mut_user_error(mtype, "copy", "copy init", info, err);
     });
 
@@ -108,15 +109,15 @@ void object::copy_from(const object& o) {
     }
 
     perform_object_mutation(*this, tt,
-        [&](const mixin_info& info, mixin_index_t index, byte_t* new_mixin) {
-            auto source = o.m_mixin_data[index].mixin;
-            auto err = info.copy_init(&info, new_mixin, source);
-            if (err) throw_exception::obj_mut_user_error(tt, "copy_from", "copy init", info, err);
+        [&](init_new_args args) {
+            auto source = o.m_mixin_data[args.target_index].mixin;
+            auto err = args.info.copy_init(&args.info, args.mixin_buf, source);
+            if (err) throw_exception::obj_mut_user_error(tt, "copy_from", "copy init", args.info, err);
         },
-        [&](const mixin_info& info, mixin_index_t index, byte_t* mixin) {
-            auto source = o.m_mixin_data[index].mixin;
-            auto err = info.copy_asgn(&info, mixin, source);
-            if (err) throw_exception::obj_mut_user_error(tt, "copy_from", "copy assign", info, err);
+        [&](update_common_args args) {
+            auto source = o.m_mixin_data[args.target_index].mixin;
+            auto err = args.info.copy_asgn(&args.info, args.mixin_buf, source);
+            if (err) throw_exception::obj_mut_user_error(tt, "copy_from", "copy assign", args.info, err);
         }
     );
 }

@@ -47,9 +47,9 @@ void mutate_to(object& obj, const type& type, Ops&&... ops) {
     for (auto i = obj_mutates; i != obj_mutates_end; ++i) {
         auto& op = **i;
         obj_mut.default_construct_each_new_mixin(op.mixin_index);
-        obj_mut.update_next_mixin([&op](const mixin_info& info, mixin_index_t new_index, byte_t* new_mixin) {
-            op.do_init(info, new_index, new_mixin);
-        }, object_mutation::empty_udpate_func);
+        obj_mut.update_next_mixin([&op](init_new_args args) {
+            op.do_init(args);
+        }, util::noop_udpate_common_func);
     }
 }
 }

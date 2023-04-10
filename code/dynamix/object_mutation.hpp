@@ -7,6 +7,7 @@
 #include "object_mixin_data.hpp"
 #include "mixin_info.hpp"
 #include "globals.hpp"
+#include "object_mutation_funcs.hpp"
 
 namespace dynamix {
 class object;
@@ -25,9 +26,6 @@ public:
     object_mutation(object_mutation&&) noexcept = delete; // allow factory constructors
     object_mutation& operator=(object_mutation&&) = delete;
 
-    static void empty_udpate_func(const mixin_info&, mixin_index_t, byte_t*) {}
-    static void default_init_mixin(const mixin_info&, mixin_index_t, byte_t*);
-
     // update next mixin (in order of construction) after the one reached by the last piecewise call
     //
     // * call construct_new if the mixin is new and assume it's constructed after the call
@@ -44,12 +42,13 @@ public:
         if (m_old_mixin_data && m_old_type->has(info.id)) {
             // matching
             auto oi = m_old_type->sparse_mixin_indices[info.iid()];
-            auto old_mixin = m_old_mixin_data[oi].mixin;
-            update_common(info, ti, old_mixin);
+            auto mixin = m_old_mixin_data[oi].mixin;
+            update_common(update_common_args{info, mixin, m_target_type, ti, *m_old_type, oi});
         }
         else {
             // new
-            construct_new(info, ti, m_target_mixin_data[ti].mixin);
+            auto mixin = m_target_mixin_data[ti].mixin;
+            construct_new(init_new_args{info, mixin, m_target_type, ti});
         }
         ++m_updated_upto;
         m_complete = (m_updated_upto == m_target_type.num_mixins());
@@ -72,7 +71,7 @@ public:
     template <typename ConstructNew_Func>
     void construct_each_new_mixin(ConstructNew_Func&& construct_new, mixin_index_t upto_index = invalid_mixin_index) {
         update_each_mixin(std::forward<ConstructNew_Func>(construct_new),
-            empty_udpate_func,
+            util::noop_udpate_common_func,
             upto_index);
     }
 

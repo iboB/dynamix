@@ -103,7 +103,7 @@ dynamix::compat::pmr::string& get_string(test_obj& object) {
 struct mixin_charlie : public dynamix::common_mixin_init<charlie> {
     const char* lit;
     mixin_charlie(const char* lit) : lit(lit) {}
-    virtual void do_init(const dynamix::mixin_info&, dynamix::mixin_index_t, dynamix::byte_t* new_mixin) final override;
+    virtual void do_init(dynamix::init_new_args args) final override;
 };
 
 TEST_CASE("declared mixins only") {
@@ -376,8 +376,8 @@ DYNAMIX_DEFINE_MIXIN(test, charlie)
     .implements<feature_bbb>()
     ;
 
-void mixin_charlie::do_init(const dynamix::mixin_info&, dynamix::mixin_index_t, dynamix::byte_t* new_mixin) {
-    new (new_mixin) charlie(lit);
+void mixin_charlie::do_init(dynamix::init_new_args args) {
+    new (args.mixin_buf) charlie(lit);
 }
 
 DYNAMIX_DEFINE_MIXIN(test, to_bob)

@@ -127,6 +127,7 @@ target_sources(dynamix PRIVATE
     dnmx/type_mutation.h
     dnmx/type_mutation_handle.h
     dynamix/type_mutation-c.cpp
+    dynamix/object_mutation_funcs.hpp
     dynamix/object_mutation.hpp
     dynamix/object_mutation.cpp
     dynamix/object_mutate_ops.hpp

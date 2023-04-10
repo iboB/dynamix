@@ -431,11 +431,11 @@ TEST_CASE("mutate_to") {
     {
         CHECK_THROWS_WITH_AS(object obj(*t.t_ap), "missing default init", mutation_error);
 
-        auto custom_actor_init = [&](const mixin_info& info, mixin_index_t i, void* mixin) {
-            CHECK(mixin);
-            CHECK(&info == t.actor);
-            CHECK(i == 0);
-            new (mixin) test_data::m_actor("foo", 10);
+        auto custom_actor_init = [&](init_new_args args) {
+            CHECK(args.mixin_buf);
+            CHECK(&args.info == t.actor);
+            CHECK(args.target_index == 0);
+            new (args.mixin_buf) test_data::m_actor("foo", 10);
         };
 
         object obj(dom);
@@ -471,10 +471,10 @@ TEST_CASE("mutate_to") {
         object obj3(dom);
         mutate_to(obj3, *t.t_ap
             , construct(*t.actor, custom_actor_init)
-            , construct("procedural_geometry", [&](const mixin_info& info, mixin_index_t, void* mixin) {
-                CHECK(mixin);
-                CHECK(&info == t.procedural_geometry);
-                auto pg = new (mixin) test_data::m_procedural_geometry;
+            , construct("procedural_geometry", [&](init_new_args args) {
+                CHECK(args.mixin_buf);
+                CHECK(&args.info == t.procedural_geometry);
+                auto pg = new (args.mixin_buf) test_data::m_procedural_geometry;
                 pg->algo = "xxx";
             })
         );
@@ -488,10 +488,10 @@ TEST_CASE("mutate_to") {
             , "missing default init", mutation_error);
         CHECK(acp.empty());
 
-        auto custom_physical_init = [&](const mixin_info& info, mixin_index_t, void* mixin) {
-            CHECK(mixin);
-            CHECK(&info == t.physical);
-            new (mixin) test_data::m_physical({1, 2, 3});
+        auto custom_physical_init = [&](init_new_args args) {
+            CHECK(args.mixin_buf);
+            CHECK(&args.info == t.physical);
+            new (args.mixin_buf) test_data::m_physical({1, 2, 3});
         };
         mutate_to(acp, *t.t_acp
             , construct("actor", custom_actor_init)
@@ -518,11 +518,10 @@ TEST_CASE("mutate") {
     domain dom;
     t.register_all_mixins(dom);
 
-    auto custom_actor_init = [&](const mixin_info& info, mixin_index_t, void* mixin) {
-        CHECK(mixin);
-        CHECK(&info == t.actor);
-        new (mixin) test_data::m_actor("foo", 10);
-        return result_success;
+    auto custom_actor_init = [&](init_new_args args) {
+        CHECK(args.mixin_buf);
+        CHECK(&args.info == t.actor);
+        new (args.mixin_buf) test_data::m_actor("foo", 10);
     };
 
     {
@@ -736,10 +735,10 @@ TEST_CASE("more mutation errors") {
 
         auto create_asp_obj = [&]() {
             object obj(dom);
-            mutate_to(obj, tasp, construct(*t.physical, [&](const mixin_info& info, mixin_index_t, void* mixin) {
-                CHECK(mixin);
-                CHECK(&info == t.physical);
-                new (mixin) test_data::m_physical({1, 2, 3});
+            mutate_to(obj, tasp, construct(*t.physical, [&](init_new_args args) {
+                CHECK(args.mixin_buf);
+                CHECK(&args.info == t.physical);
+                new (args.mixin_buf) test_data::m_physical({1, 2, 3});
             }));
             return obj;
         };

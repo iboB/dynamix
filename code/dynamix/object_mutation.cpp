@@ -229,14 +229,16 @@ void object_mutation::finalize() noexcept {
     m_object.m_mixin_data = m_target_mixin_data;
 }
 
-void object_mutation::default_init_mixin(const mixin_info& info, mixin_index_t, byte_t* mixin) {
-    if (!info.init) throw mutation_error("missing default init");
-    auto err = info.init(&info, mixin);
+namespace util {
+void default_init_new_func(init_new_args args) {
+    if (!args.info.init) throw mutation_error("missing default init");
+    auto err = args.info.init(&args.info, args.mixin_buf);
     if (err) throw mutation_user_error("default init user", err);
+}
 }
 
 void object_mutation::default_construct_each_new_mixin(mixin_index_t upto_index) {
-    construct_each_new_mixin(default_init_mixin, upto_index);
+    construct_each_new_mixin(util::default_init_new_func, upto_index);
 }
 
 void object_mutation::throw_bad_piecewise_mutation() {
