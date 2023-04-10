@@ -187,7 +187,9 @@ TEST_CASE("declared mixins only") {
     CHECK(dynamix::g::get_domain<test>().num_types() == ntypes);
     CHECK(dynamix::g::get_domain<test>().num_type_queries() == nqueries + 1);
 
-    CHECK_THROWS_WITH_AS(dynamix::mutate(obj, dynamix::add<charlie>()), "missing default init", dynamix::mutation_error);
+    CHECK_THROWS_WITH_AS(dynamix::mutate(obj, dynamix::add<charlie>()),
+        "test: mutate to object of type {'alice', 'bob', 'charlie', 'to Bob'}: 'charlie' missing default init",
+        dynamix::mutation_error);
 
     CHECK(as.living == 1);
     CHECK(as.total == 1);

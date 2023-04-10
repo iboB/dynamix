@@ -176,6 +176,10 @@ void type_mut_error(const type_mutation& mut, std::string_view err, const mixin_
     e<mutation_error>(mut.dom) << "creating type " << mut << ": " << m << ' ' << err;
 }
 
+void type_mut_error(const type_mutation& mut, std::string_view err, std::string_view name) {
+    e<mutation_error>(mut.dom) << "creating type " << mut << ": unknown mixin '" << name << "' in " << err;
+}
+
 void feature_clash(const type_mutation& mut, const dnmx_ftable_payload& a, const dnmx_ftable_payload& b) {
     e<mutation_error>(mut.dom) << "feature clash in " << mut << " on " << *a.data->info << " between " <<
         *mut.mixins[a.mixin_index] << " and " << *mut.mixins[b.mixin_index];

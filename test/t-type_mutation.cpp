@@ -15,7 +15,7 @@ TEST_SUITE_BEGIN("dynamix");
 
 TEST_CASE("type_mutation from empty") {
     test_data t;
-    domain dom;
+    domain dom("e");
 
     type_mutation mut(dom);
     CHECK(&dom == &mut.dom);
@@ -23,8 +23,12 @@ TEST_CASE("type_mutation from empty") {
     CHECK(mut.implements(*t.serialize)); // default
     CHECK_FALSE(mut.implements_strong(*t.serialize));
 
-    CHECK_THROWS_WITH_AS(mut.add("actor"), "missing mixin name", mutation_error);
-    CHECK_THROWS_WITH_AS(mut.to_back("actor"), "missing mixin", mutation_error);
+    CHECK_THROWS_WITH_AS(mut.add("actor"),
+        "e: creating type {}: unknown mixin 'actor' in add",
+        mutation_error);
+    CHECK_THROWS_WITH_AS(mut.to_back("actor"),
+        "e: creating type {}: unknown mixin 'actor' in to_back",
+        mutation_error);
 
     t.register_all_mixins(dom);
 
@@ -52,7 +56,7 @@ TEST_CASE("type_mutation from empty") {
 
 TEST_CASE("type_mutation from type") {
     test_data t;
-    domain dom;
+    domain dom("t");
     t.register_all_mixins(dom);
     t.create_types(dom);
 
@@ -66,7 +70,9 @@ TEST_CASE("type_mutation from type") {
         CHECK_FALSE(mut.lacks(*t.stats));
         mut.remove(*t.stats);
         CHECK(mut.lacks(*t.stats));
-        CHECK_THROWS_WITH_AS(mut.to_back(*t.stats), "missing mixin", mutation_error);
+        CHECK_THROWS_WITH_AS(mut.to_back(*t.stats),
+            "t: creating type {'ai', 'immaterial'}: 'stats' to_back on missing mixin",
+            mutation_error);
         CHECK_FALSE(mut.has("actor"));
         CHECK(mut.add_if_lacking(*t.actor));
         CHECK(mut.has("actor"));
