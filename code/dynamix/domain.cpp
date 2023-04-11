@@ -106,6 +106,8 @@ public:
     struct rule_compare {
         bool operator()(const mutation_rule_info* a, const mutation_rule_info* b) const {
             if (a->order_priority != b->order_priority) return a->order_priority < b->order_priority;
+            auto name_cmp = dnmx_sv_cmp(a->name, b->name);
+            if (name_cmp != 0) return name_cmp < 0;
             return a < b;
         }
     };

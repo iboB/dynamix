@@ -28,7 +28,8 @@ typedef struct dnmx_mutation_rule_info {
 
     // sort order of rule
     // higher values will be applied after lower ones
-    // mutation rules with the same order priority will be executed in an indeterminate order
+    // mutation rules with the same order priority will be executed by name (lexicographically smaller first)
+    // if the names are also the same, executed in an indeterminate order
     int32_t order_priority;
 
 #if defined(__cplusplus)
