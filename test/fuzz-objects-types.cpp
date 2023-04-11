@@ -198,7 +198,7 @@ TEST_CASE("fuzz objects and types") {
             b.default_payload_by(name);
         }
         else if (op == 1) {
-            b.default_payload_with(std::pmr::string("fff"));
+            b.default_payload_with(dynamix::compat::pmr::string("fff"));
         }
 
         f.info.feature_class = rnd() % 5;
@@ -289,7 +289,7 @@ TEST_CASE("fuzz objects and types") {
 
                 auto op = rnd() % 2;
                 if (op == 0) {
-                    std::pmr::string ffm = name + '-' + f.stored_name;
+                    dynamix::compat::pmr::string ffm = name + '-' + f.stored_name;
                     ffm += f.info.name.to_std();
                     b.implements_with(f.info, ffm, perks);
                 }
