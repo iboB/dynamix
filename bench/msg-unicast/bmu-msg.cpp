@@ -51,20 +51,20 @@ inline int triangle_mixin::area(int mod) const {
     return mod * m_a * m_ha / 2;
 }
 
-void mixin_square::do_init(const dynamix::mixin_info&, dynamix::mixin_index_t, dynamix::byte_t* new_mixin) {
-    new (new_mixin) square_mixin(side);
+void mixin_square::do_init(dynamix::init_new_args args) {
+    new (args.mixin_buf) square_mixin(side);
 }
 
-void mixin_rect::do_init(const dynamix::mixin_info&, dynamix::mixin_index_t, dynamix::byte_t* new_mixin) {
-    new (new_mixin) rect_mixin(a, b);
+void mixin_rect::do_init(dynamix::init_new_args args) {
+    new (args.mixin_buf) rect_mixin(a, b);
 }
 
-void mixin_circle::do_init(const dynamix::mixin_info&, dynamix::mixin_index_t, dynamix::byte_t* new_mixin) {
-    new (new_mixin) circle_mixin(radius);
+void mixin_circle::do_init(dynamix::init_new_args args) {
+    new (args.mixin_buf) circle_mixin(radius);
 }
 
-void mixin_triangle::do_init(const dynamix::mixin_info&, dynamix::mixin_index_t, dynamix::byte_t* new_mixin) {
-    new (new_mixin) triangle_mixin(a, ha);
+void mixin_triangle::do_init(dynamix::init_new_args args) {
+    new (args.mixin_buf) triangle_mixin(a, ha);
 }
 
 DYNAMIX_DEFINE_DOMAIN(bench);

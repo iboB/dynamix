@@ -62,9 +62,9 @@ TEST_CASE("register features") {
     {
         // duplicate names are not allowed
         feature_info ua2 = dnmx_make_feature_info();
-        CHECK_THROWS_WITH_AS(d.register_feature(ua2), "empty info name", domain_error);
+        CHECK_THROWS_WITH_AS(d.register_feature(ua2), "unnamed domain: register feature with empty name", domain_error);
         ua2.name = dnmx_make_sv_lit("update_actor");
-        CHECK_THROWS_WITH_AS(d.register_feature(ua2), "duplicate name", domain_error);
+        CHECK_THROWS_WITH_AS(d.register_feature(ua2), "unnamed domain: register feature with duplicate name 'update_actor'", domain_error);
         CHECK(invalid_feature_id == ua2.id);
     }
 }

@@ -12,6 +12,7 @@
 #include <dynamix/type.hpp>
 #include <dynamix/mutate.hpp>
 #include <dynamix/exception.hpp>
+#include <dynamix/throw_exception.hpp>
 #include <dynamix/common_feature_info.hpp>
 #include <dynamix/any.hpp>
 #include <dynamix/common_mutation_rules.hpp>
@@ -95,7 +96,7 @@ dynamix::compat::pmr::string& get_string(test_obj& object) {
         data = info.default_payload;
     }
 
-    if (!data) throw dynamix::bad_feature_access("test string");
+    if (!data) dynamix::throw_exception::generic_feature_error(object.get_type(), "no", "string", info);
 
     return *reinterpret_cast<dynamix::compat::pmr::string*>(data);
 }
@@ -103,7 +104,7 @@ dynamix::compat::pmr::string& get_string(test_obj& object) {
 struct mixin_charlie : public dynamix::common_mixin_init<charlie> {
     const char* lit;
     mixin_charlie(const char* lit) : lit(lit) {}
-    virtual void do_init(const dynamix::mixin_info&, dynamix::mixin_index_t, dynamix::byte_t* new_mixin) final override;
+    virtual void do_init(dynamix::init_new_args args) final override;
 };
 
 TEST_CASE("declared mixins only") {
@@ -145,7 +146,9 @@ TEST_CASE("declared mixins only") {
     }
 
     CHECK(get_string<feature_aaa>(obj) == "alice-aaa");
-    CHECK_THROWS_WITH_AS(get_string<feature_bbb>(obj), "test string", dynamix::bad_feature_access);
+    CHECK_THROWS_WITH_AS(get_string<feature_bbb>(obj),
+        "test: {'alice', 'bob', 'to Bob'} no string 'bbb'",
+        dynamix::feature_error);
     CHECK(get_string<feature_ccc>(obj) == "bob-ccc");
     CHECK(get_string<feature_ddd>(obj) == "to Bob-ddd");
 
@@ -187,7 +190,9 @@ TEST_CASE("declared mixins only") {
     CHECK(dynamix::g::get_domain<test>().num_types() == ntypes);
     CHECK(dynamix::g::get_domain<test>().num_type_queries() == nqueries + 1);
 
-    CHECK_THROWS_WITH_AS(dynamix::mutate(obj, dynamix::add<charlie>()), "missing default init", dynamix::mutation_error);
+    CHECK_THROWS_WITH_AS(dynamix::mutate(obj, dynamix::add<charlie>()),
+        "test: mutate to object of type {'alice', 'bob', 'charlie', 'to Bob'}: 'charlie' missing default init",
+        dynamix::object_error);
 
     CHECK(as.living == 1);
     CHECK(as.total == 1);
@@ -376,8 +381,8 @@ DYNAMIX_DEFINE_MIXIN(test, charlie)
     .implements<feature_bbb>()
     ;
 
-void mixin_charlie::do_init(const dynamix::mixin_info&, dynamix::mixin_index_t, dynamix::byte_t* new_mixin) {
-    new (new_mixin) charlie(lit);
+void mixin_charlie::do_init(dynamix::init_new_args args) {
+    new (args.mixin_buf) charlie(lit);
 }
 
 DYNAMIX_DEFINE_MIXIN(test, to_bob)

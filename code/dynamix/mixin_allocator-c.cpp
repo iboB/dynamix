@@ -35,7 +35,7 @@ using namespace dynamix;
 extern "C" {
 dnmx_mixin_allocator_handle dnmx_create_mixin_allocator(dnmx_alloc_mixin_func alloc, dnmx_dealloc_mixin_func dealloc) {
     auto ret = new c_mixin_allocator(alloc, dealloc);
-    return ret->to_c_hanlde();;
+    return ret->to_c_hanlde();
 }
 void dnmx_destroy_mixin_allocator(dnmx_mixin_allocator_handle ha) {
     delete mixin_allocator::from_c_handle(ha);

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 //
 #include "domain.hpp"
-#include "exception.hpp"
 #include "mixin_info.hpp"
 #include "type.hpp"
 #include "type_mutation.hpp"
@@ -11,6 +10,8 @@
 #include "feature_info.hpp"
 #include "feature_for_mixin.hpp"
 #include "mutation_rule_info.hpp"
+#include "throw_exception.hpp"
+#include "domain_traverse.hpp"
 
 #include <itlib/qalgorithm.hpp>
 #include <itlib/data_mutex.hpp>
@@ -21,11 +22,31 @@
 #include <memory>
 #include <limits>
 #include <cassert>
+
+#if 0
+#include <mutex>
+namespace dynamix {
+// fake mutex which can be used in tsan scenarios
+// for some reason recursive locks on std::shared_mutex don't trigger tsan errors
+class shared_mutex {
+    std::mutex m_mutex;
+public:
+    void lock_shared() { m_mutex.lock(); }
+    void unlock_shared() { m_mutex.unlock(); }
+    bool try_lock_shared() { return m_mutex.try_lock(); }
+    void lock() { m_mutex.lock(); }
+    void unlock() { m_mutex.unlock(); }
+    bool try_lock() { return m_mutex.try_lock(); }
+};
+}
+#else
 #include <shared_mutex>
+namespace dynamix {
+using shared_mutex = std::shared_mutex;
+}
+#endif
 
 namespace dynamix {
-
-#define BAD_ARG_UNLESS(cond, err) if (!(cond)) do { assert(false); throw domain_error(err); } while(false)
 
 namespace {
 error_return_t sort_by_canonical_order(dnmx_type_mutation_handle mutation, uintptr_t) {
@@ -42,6 +63,9 @@ const mutation_rule_info canonicalize_rule = {
 };
 
 using mixin_info_span = const itlib::span<const mixin_info* const>;
+
+template <typename T>
+using data_mutex = itlib::data_mutex<T, shared_mutex>;
 }
 
 class domain::impl {
@@ -49,6 +73,24 @@ public:
     domain& m_domain;
 
     allocator m_allocator;
+
+    // registry of type elements
+    // this is separate from the type registry because it can be locked independently
+    // (and does get locked recursively when applying mutation rules)
+    struct element_registry {
+        element_registry(allocator alloc)
+            : sparse_features(alloc)
+            , sparse_mixins(alloc)
+            , sparse_type_classes(alloc)
+        {}
+
+        // sparse arrays of info per id
+        // null elements have been unregistered and are free slots for future registers
+        compat::pmr::vector<const feature_info*> sparse_features;
+        compat::pmr::vector<const mixin_info*> sparse_mixins;
+        compat::pmr::vector<const type_class*> sparse_type_classes;
+    };
+    data_mutex<element_registry> m_element_registry;
 
     struct deleter {
         void operator()(const type* ptr) {
@@ -64,6 +106,8 @@ public:
     struct rule_compare {
         bool operator()(const mutation_rule_info* a, const mutation_rule_info* b) const {
             if (a->order_priority != b->order_priority) return a->order_priority < b->order_priority;
+            auto name_cmp = dnmx_sv_cmp(a->name, b->name);
+            if (name_cmp != 0) return name_cmp < 0;
             return a < b;
         }
     };
@@ -93,20 +137,14 @@ public:
     };
     using type_query_map = itlib::flat_map<type_query, const type*, type_query_compare, compat::pmr::vector<std::pair<type_query, const type*>>>;
 
-    struct registry {
-        registry(allocator alloc)
-            : sparse_features(alloc)
-            , sparse_mixins(alloc)
-            , mutation_rules({}, alloc)
+    // registry of types and helpers
+    // it independently locked from the element registry
+    struct type_registry {
+        type_registry(allocator alloc)
+            : mutation_rules({}, alloc)
             , types(alloc)
             , type_queries({}, alloc)
         {}
-
-        // sparse arrays of info per id
-        // null elements have been unregistered and are free slots for future registers
-        compat::pmr::vector<const feature_info*> sparse_features;
-        compat::pmr::vector<const mixin_info*> sparse_mixins;
-        compat::pmr::vector<const type_class*> sparse_type_classes;
 
         // sorted rules with their refcounts
         mutation_rule_map mutation_rules;
@@ -118,15 +156,15 @@ public:
         // with them we avoid applying mutation rules for the same type query
         type_query_map type_queries;
     };
-
-    itlib::data_mutex<registry, std::shared_mutex> m_registry;
+    data_mutex<type_registry> m_type_registry;
 
     type m_empty_type;
 
     impl(domain& domain, allocator alloc)
         : m_domain(domain)
         , m_allocator(std::move(alloc))
-        , m_registry(m_allocator)
+        , m_element_registry(m_allocator)
+        , m_type_registry(m_allocator)
         , m_empty_type(domain)
     {
         if (m_domain.m_settings.canonicalize_types) {
@@ -136,13 +174,11 @@ public:
     }
 
     template <typename T>
-    static void basic_register_l(T& info, compat::pmr::vector<const T*>& sparse, bool enforce_unique_names) {
+    void basic_register_l(T& info, compat::pmr::vector<const T*>& sparse, bool enforce_unique_names) {
         using id_t = decltype(info.id);
         constexpr id_t invalid = id_t{dnmx_invalid_id};
-        BAD_ARG_UNLESS(info.id == invalid, "id registered");
-        if (enforce_unique_names && info.name.empty()) {
-            throw domain_error("empty info name");
-        }
+        if (info.id != invalid) throw_exception::id_registered(m_domain, info);
+        if (enforce_unique_names && info.name.empty()) throw_exception::empty_name(m_domain, info);
 
         id_t free_id = invalid;
 
@@ -153,7 +189,7 @@ public:
                 auto reg = sparse[i];
                 if (reg) {
                     assert(reg->iid() == i); // sanity check
-                    if (reg->name == info.name) throw domain_error("duplicate name");
+                    if (reg->name == info.name) throw_exception::duplicate_name(m_domain, info);
                 }
                 else {
                     free_id = id_t{i};
@@ -180,16 +216,16 @@ public:
     }
 
     template <typename T>
-    static void basic_unregister_l(T& info, compat::pmr::vector<const T*>& sparse) {
+    void basic_unregister_l(T& info, compat::pmr::vector<const T*>& sparse) {
         // info is not our own?
-        BAD_ARG_UNLESS(info.iid() < sparse.size() && sparse[info.iid()] == &info, "unregister bad info");
+        if (info.iid() >= sparse.size() || sparse[info.iid()] != &info) throw_exception::unreg_foreign(m_domain, info);
 
         sparse[info.iid()] = nullptr; // free slot
         info.id = decltype(info.id){dnmx_invalid_id}; // invalidate info
     }
 
     void register_feature(feature_info& info) {
-        basic_register_l(info, m_registry.unique_lock()->sparse_features, !m_domain.m_settings.allow_duplicate_feature_names);
+        basic_register_l(info, m_element_registry.unique_lock()->sparse_features, !m_domain.m_settings.allow_duplicate_feature_names);
     }
 
     // to be pedantic when we clear features we should clear all object types which
@@ -204,12 +240,12 @@ public:
     // if something breaks because of this inconsitency, then this would have been a
     // break anyway - the mixins referencing this feature would keep on living??
     void unregister_feature(feature_info& info) {
-        basic_unregister_l(info, m_registry.unique_lock()->sparse_features);
+        basic_unregister_l(info, m_element_registry.unique_lock()->sparse_features);
     }
 
     void register_mixin(mixin_info& info) {
-        BAD_ARG_UNLESS(info.dom == nullptr || info.dom == &m_domain, "info has domain");
-        auto reg = m_registry.unique_lock();
+        if (info.dom != nullptr && info.dom != &m_domain) throw_exception::info_has_domain(m_domain, info);
+        auto reg = m_element_registry.unique_lock();
 
         // register mixin's features
         for (auto& f : info.features_span()) {
@@ -239,26 +275,28 @@ public:
     }
 
     void unregister_mixin(mixin_info& info) {
-        auto reg = m_registry.unique_lock();
+        {
+            auto treg = m_type_registry.unique_lock();
+            // since this mixin is no longer valid
+            // remove all types which reference it
+            itlib::erase_all_if(treg->types, [&](const uptr<const type>& t) {
+                if (!t->has(info.id)) return false; // type does't have mixin
 
-        // since this mixin is no longer valid
-        // remove all object type infos which reference it
-        itlib::erase_all_if(reg->types, [&](const uptr<const type>& t) {
-            if (!t->has(info.id)) return false; // type does't have mixin
+                // removing a type with active objects?
+                // UB and crashes await
+                assert(t->num_objects() == 0);
 
-            // removing a type with active objects?
-            // UB and crashes await
-            assert(t->num_objects() == 0);
+                erase_queries_leading_to_l(treg->type_queries, *t);
 
-            erase_queries_leading_to_l(reg->type_queries, *t);
+                return true;
+            });
+        }
 
-            return true;
-        });
-
+        auto reg = m_element_registry.unique_lock();
         auto& sparse_mixins = reg->sparse_mixins;
 
         // mixin is not our own?
-        BAD_ARG_UNLESS(info.iid() < sparse_mixins.size() && sparse_mixins[info.iid()] == &info, "unregister bad info");
+        if (info.iid() >= sparse_mixins.size() || sparse_mixins[info.iid()] != &info) throw_exception::unreg_foreign(m_domain, info);
         sparse_mixins[info.iid()] = nullptr; // free slot
 
         // invalidate info
@@ -267,17 +305,17 @@ public:
     }
 
     void register_type_class(const type_class& new_tc) {
-        if (new_tc.name.empty()) throw domain_error("empty type_class name");
-        if (!new_tc.matches) throw domain_error("type_class missing matches func");
+        if (new_tc.name.empty()) throw_exception::empty_name(m_domain, new_tc);
+        if (!new_tc.matches) throw_exception::no_func(m_domain, new_tc);
 
-        auto reg = m_registry.unique_lock();
+        auto reg = m_element_registry.unique_lock();
 
         // search in reverse order while also checking for name clashes
         const type_class** free_slot = nullptr;
         for (auto i = reg->sparse_type_classes.rbegin(); i != reg->sparse_type_classes.rend(); ++i) {
             auto tc = *i;
             if (tc) {
-                if (tc->name == new_tc.name) throw domain_error("duplicate type_class name");
+                if (tc->name == new_tc.name) throw_exception::duplicate_name(m_domain, new_tc);
             }
             else {
                 free_slot = &tc;
@@ -292,7 +330,7 @@ public:
     }
 
     void unregister_type_class(const type_class& tc) {
-        auto reg = m_registry.unique_lock();
+        auto reg = m_element_registry.unique_lock();
 
         for (auto& rtc : reg->sparse_type_classes) {
             if (rtc == &tc) {
@@ -317,27 +355,27 @@ public:
     }
 
     const mixin_info* get_mixin_info(mixin_id id) noexcept {
-        return basic_get_by_id_l(id, m_registry.shared_lock()->sparse_mixins);
+        return basic_get_by_id_l(id, m_element_registry.shared_lock()->sparse_mixins);
     }
     const mixin_info* get_mixin_info(std::string_view name) noexcept {
-        return basic_get_by_name_l(name, m_registry.shared_lock()->sparse_mixins);
+        return basic_get_by_name_l(name, m_element_registry.shared_lock()->sparse_mixins);
     }
 
     const feature_info* get_feature_info(feature_id id) noexcept {
-        return basic_get_by_id_l(id, m_registry.shared_lock()->sparse_features);
+        return basic_get_by_id_l(id, m_element_registry.shared_lock()->sparse_features);
     }
     const feature_info* get_feature_info(std::string_view name) noexcept {
-        return basic_get_by_name_l(name, m_registry.shared_lock()->sparse_features);
+        return basic_get_by_name_l(name, m_element_registry.shared_lock()->sparse_features);
     }
 
     const type_class* get_type_class(std::string_view name) noexcept {
-        return basic_get_by_name_l(name, m_registry.shared_lock()->sparse_type_classes);
+        return basic_get_by_name_l(name, m_element_registry.shared_lock()->sparse_type_classes);
     }
 
     void add_mutation_rule(const mutation_rule_info& info) {
-        if (!info.apply) throw domain_error("bad mutation rule");
+        if (!info.apply) throw_exception::no_func(m_domain, info);
 
-        auto reg = m_registry.unique_lock();
+        auto reg = m_type_registry.unique_lock();
 
         auto& rc = reg->mutation_rules[&info];
         ++rc;
@@ -349,7 +387,7 @@ public:
         reg->type_queries.clear();
     }
     void remove_mutation_rule(const mutation_rule_info& info) noexcept {
-        auto reg = m_registry.unique_lock();
+        auto reg = m_type_registry.unique_lock();
         auto f = reg->mutation_rules.find(&info);
         if (f == reg->mutation_rules.end()) return; // not added
         assert(f->second > 0);
@@ -412,7 +450,7 @@ public:
             for (auto& r : rules) {
                 auto& info = *r.first;
                 if (auto err = info.apply(mutation.to_c_hanlde(), info.user_data)) {
-                    throw mutation_user_error("mutation rule", err);
+                    throw_exception::mutation_rule_user_error(mutation, info, err);
                 }
             }
             if (last_result == nt_mixins) {
@@ -422,7 +460,7 @@ public:
             }
             if (i == max_depenency_depth || i == int(rules.size())) {
                 // again: this is not necessarily a real cycle but we treat it as such
-                throw domain_error("rule interdependency too deep or cyclic");
+                throw_exception::cyclic_rule_deps(mutation);
             }
             if (i == 0) {
                 // first time running the loop and rules made changes, store original query to return
@@ -433,12 +471,14 @@ public:
     }
 
     const type& get_type(type_mutation& mutation) {
+        if (&mutation.dom != &m_domain) throw_exception::foreign_mutation(m_domain, mutation);
+
         type_query original_query(m_allocator); // prepare original query with our allocator
         const type* found = nullptr;
 
         {
             // search for stored query for this combo
-            auto reg = m_registry.shared_lock();
+            auto reg = m_type_registry.shared_lock();
             auto f = reg->type_queries.find(mutation.mixins);
             if (f != reg->type_queries.end()) return *f->second;
 
@@ -458,7 +498,7 @@ public:
             // but the code below is safe
             // worst (and extremely rare) case we wasted cpu applying the same rules twice
 
-            auto reg = m_registry.unique_lock();
+            auto reg = m_type_registry.unique_lock();
             reg->type_queries[std::move(original_query)] = found;
             return *found;
         }
@@ -469,7 +509,7 @@ public:
     const type& get_type(itlib::span<const mixin_info* const> mixins) {
         {
             // search for stored query for this combo
-            auto reg = m_registry.shared_lock();
+            auto reg = m_type_registry.shared_lock();
             auto f = reg->type_queries.find(mixins);
             if (f != reg->type_queries.end()) return *f->second;
         }
@@ -477,13 +517,13 @@ public:
         // no stored query, so create a mutation and apply rules
         // creating a mutation will run more or less the exact same as above again
         // TODO: optimize
-        type_mutation mut(m_empty_type, m_allocator);
+        type_mutation mut(m_domain, m_allocator);
         mut.mixins.assign(mixins.begin(), mixins.end());
         return get_type(mut);
     }
 
     struct ftable_build_helper {
-        mixin_info_span& m_mixins;
+        const type_mutation& m_mut;
 
         // number of reachable payloads per feature id
         compat::pmr::vector<uint32_t> m_num_reachable_pls;
@@ -491,13 +531,13 @@ public:
         // total number of ftable_payload-s to allocate
         uint32_t m_num_total_pls = 0;
 
-        ftable_build_helper(domain::impl& di, mixin_info_span& mixins)
-            : m_mixins(mixins)
-            , m_num_reachable_pls(di.m_allocator)
+        ftable_build_helper(type_mutation& mutation)
+            : m_mut(mutation)
+            , m_num_reachable_pls(m_mut.dom.get_allocator())
         {
             // first pass: find greatest feature_id in mixins to determine ftable size
             feature_id::int_t ftable_size = 0;
-            for (const auto* mixin : mixins) {
+            for (const auto* mixin : m_mut.mixins) {
                 for (auto& feature : mixin->features_span()) {
                     const auto size_with = feature.info->iid() + 1;
                     if (size_with > ftable_size) {
@@ -510,7 +550,7 @@ public:
             // * count reachable payloads per feature
             // * count total payloads
             m_num_reachable_pls.resize(ftable_size);
-            for (const auto* mixin : mixins) {
+            for (const auto* mixin : m_mut.mixins) {
                 for (auto& feature : mixin->features_span()) {
                     ++m_num_reachable_pls[feature.info->iid()];
                     ++m_num_total_pls;
@@ -549,8 +589,8 @@ public:
 
             // third pass
             // attach begin and end pointers of ftable entries and give them values
-            for (mixin_index_t i = 0; i < m_mixins.size(); ++i) {
-                const auto* mixin = m_mixins[i];
+            for (mixin_index_t i = 0; i < m_mut.mixins.size(); ++i) {
+                const auto* mixin = m_mut.mixins[i];
                 for (auto& feature : mixin->features_span()) {
                     auto& finfo = *feature.info;
                     auto& entry = ftable[finfo.iid()];
@@ -598,12 +638,12 @@ public:
                 // check for clashes
                 if (!entry.begin->data->info->allow_clashes) {
                     for (auto ie = entry.begin; ie != entry.end - 1; ++ie) {
-                        const auto& cur = *ie->data;
-                        const auto& next = *(ie + 1)->data;
-
-                        // same bid and prio = clash
-                        if (cur.bid == next.bid && cur.priority == next.priority)
-                            if (ie->data->bid == (ie + 1)->data->bid) throw mutation_error("feature clash");
+                        const auto& cur = *ie;
+                        const auto& next = *(ie + 1);
+                        if (cur.data->bid == next.data->bid && cur.data->priority == next.data->priority) {
+                            // same bid and prio = clash
+                            throw_exception::feature_clash(m_mut, cur, next);
+                        }
                     }
                 }
 
@@ -628,10 +668,10 @@ public:
         // first check validity
         for (size_t i = 0; i < mixins.size(); ++i) {
             auto m = mixins[i];
-            if (m->id == invalid_mixin_id) throw domain_error("unregistered mixin");
-            if (m->dom != &m_domain) throw domain_error("foreign mixin");
+            if (m->id == invalid_mixin_id) throw_exception::type_mut_error(mutation, "unregistered", *m);
+            if (m->dom != &m_domain) throw_exception::foreign_mixin(mutation, *m);
             for (size_t j = i + 1; j < mixins.size(); ++j) {
-                if (mixins[i] == mixins[j]) throw domain_error("duplicate mixins");
+                if (mixins[i] == mixins[j]) throw_exception::type_mut_error(mutation, "duplicate", *m);
             }
         }
 
@@ -654,7 +694,7 @@ public:
         // calc buf components
         const byte_size_t type_size = sizeof(type);
 
-        const ftable_build_helper ftable_helper(*this, mixins);
+        const ftable_build_helper ftable_helper(mutation);
         const byte_size_t ftable_size = ftable_helper.calc_ftable_byte_size();
 
         const byte_size_t mixins_buf_size = byte_size_t(mixins.byte_size());
@@ -752,7 +792,7 @@ public:
         new_type->sparse_mixin_indices = sparse_mixin_indices;
 
         // finally add new type to types
-        auto reg = m_registry.unique_lock();
+        auto reg = m_type_registry.unique_lock();
         auto& types = reg->types;
 
         // ... but first search if it's not already added
@@ -778,7 +818,7 @@ public:
     }
 
     void garbage_collect_types() noexcept {
-        auto l = m_registry.unique_lock();
+        auto l = m_type_registry.unique_lock();
         auto& types = l->types;
         itlib::erase_all_if(types, [&](const uptr<const type>& t) {
             if (t->num_objects() > 0) return false;
@@ -787,6 +827,52 @@ public:
         });
     }
 };
+
+struct domain_traverse::impl {
+    data_mutex<domain::impl::type_registry>::shared_lock_t tr;
+    data_mutex<domain::impl::element_registry>::shared_lock_t er;
+};
+
+domain_traverse::domain_traverse(const domain& d) noexcept {
+    m_impl = new impl{
+        d.m_impl->m_type_registry.shared_lock(),
+        d.m_impl->m_element_registry.shared_lock()
+    };
+}
+domain_traverse::~domain_traverse() {
+    delete m_impl;
+}
+
+void domain_traverse::traverse_mixins(std::function<void(const mixin_info&)> func) const {
+    for (auto* m : m_impl->er->sparse_mixins) {
+        if (m) func(*m);
+    }
+}
+void domain_traverse::traverse_features(std::function<void(const feature_info&)> func) const {
+    for (auto* f : m_impl->er->sparse_features) {
+        if (f) func(*f);
+    }
+}
+void domain_traverse::traverse_mutation_rules(std::function<void(const mutation_rule_info&, uint32_t)> func) const {
+    for (auto& mr : m_impl->tr->mutation_rules) {
+        func(*mr.first, mr.second);
+    }
+}
+void domain_traverse::traverse_type_classes(std::function<void(const type_class&)> func) const {
+    for (auto* tc : m_impl->er->sparse_type_classes) {
+        if (tc) func(*tc);
+    }
+}
+void domain_traverse::traverse_types(std::function<void(const type&)> func) const {
+    for (auto& t : m_impl->tr->types) {
+        func(*t);
+    }
+}
+void domain_traverse::traverse_type_queries(std::function<void(itlib::span<const mixin_info* const>, const type&)> func) const {
+    for (auto& tc : m_impl->tr->type_queries) {
+        func(tc.first, *tc.second);
+    }
+}
 
 domain::domain(std::string_view name, domain_settings settings, uintptr_t user_data, void* context, allocator alloc)
     : dnmx_basic_domain{dnmx_sv::from_std(name), settings, user_data, context}
@@ -867,7 +953,7 @@ const type& domain::get_empty_type() const noexcept {
 }
 
 size_t domain::num_types() const noexcept {
-    return m_impl->m_registry.shared_lock()->types.size();
+    return m_impl->m_type_registry.shared_lock()->types.size();
 }
 
 // performs garbage collection removing object types with zero objects
@@ -876,11 +962,11 @@ void domain::garbage_collect_types() noexcept {
 }
 
 size_t domain::num_type_queries() const noexcept {
-    return m_impl->m_registry.shared_lock()->type_queries.size();
+    return m_impl->m_type_registry.shared_lock()->type_queries.size();
 }
 
 size_t domain::num_mutation_rules() const noexcept {
-    return m_impl->m_registry.shared_lock()->mutation_rules.size();
+    return m_impl->m_type_registry.shared_lock()->mutation_rules.size();
 }
 
 }

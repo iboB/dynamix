@@ -308,43 +308,39 @@ void make_test_data(test_data* ti, dnmx_domain_handle dom) {
     T_NOT_NULL(ti->tsaw);
 }
 
-dnmx_error_return_t update_warrior(const dnmx_mixin_info* info, uintptr_t user_data, dnmx_mixin_index_t index, void* mixin) {
-    (void)index;
-    T_SV_EXPECT("warrior", info->name);
-    if (user_data == 666) return -1;
-    warrior* w = mixin;
+dnmx_error_return_t update_warrior(dnmx_mutate_func_args args) {
+    T_SV_EXPECT("warrior", args.info->name);
+    if (args.user_data == 666) return -1;
+    warrior* w = args.mixin_buf;
     w->target_x = 1;
     w->target_y = 2;
     w->speed = 55;
     return dnmx_result_success;
 }
 
-dnmx_error_return_t update_athlete(const dnmx_mixin_info* info, uintptr_t user_data, dnmx_mixin_index_t index, void* mixin) {
-    (void)index;
-    T_SV_EXPECT("athlete", info->name);
-    if (user_data == 666) return -1;
-    athlete* a = mixin;
+dnmx_error_return_t update_athlete(dnmx_mutate_func_args args) {
+    T_SV_EXPECT("athlete", args.info->name);
+    if (args.user_data == 666) return -1;
+    athlete* a = args.mixin_buf;
     a->speed = 22;
     a->target_name = dnmx_make_sv_lit("new york");
     return dnmx_result_success;
 }
 
-dnmx_error_return_t update_shooter(const dnmx_mixin_info* info, uintptr_t user_data, dnmx_mixin_index_t index, void* mixin) {
-    (void)index;
-    T_SV_EXPECT("shooter", info->name);
-    if (user_data == 666) return -1;
-    shooter* s = mixin;
+dnmx_error_return_t update_shooter(dnmx_mutate_func_args args) {
+    T_SV_EXPECT("shooter", args.info->name);
+    if (args.user_data == 666) return -1;
+    shooter* s = args.mixin_buf;
     s->target_x = 10;
     s->target_y = 42;
     return dnmx_result_success;
 }
 
-dnmx_error_return_t update_jumper(const dnmx_mixin_info* info, uintptr_t user_data, dnmx_mixin_index_t index, void* mixin) {
-    (void)index;
-    T_SV_EXPECT("jumper", info->name);
-    if (user_data == 666) return -1;
-    jumper* j = mixin;
-    j->height = (float)user_data;
+dnmx_error_return_t update_jumper(dnmx_mutate_func_args args) {
+    T_SV_EXPECT("jumper", args.info->name);
+    if (args.user_data == 666) return -1;
+    jumper* j = args.mixin_buf;
+    j->height = (float)args.user_data;
     return dnmx_result_success;
 }
 
@@ -434,8 +430,8 @@ void mutate(void) {
         dnmx_object_handle obj = dnmx_create_object_empty(dom);
         {
             dnmx_mutate_op ops[] = {
-                {.type = dnmx_mutate_op_add, .mixin_name = dnmx_make_sv_lit("athlete")},
-                {.type = dnmx_mutate_op_add, .mixin = &t.i_warrior, .init_override = update_warrior},
+                {.op_type = dnmx_mutate_op_add, .mixin_name = dnmx_make_sv_lit("athlete")},
+                {.op_type = dnmx_mutate_op_add, .mixin = &t.i_warrior, .init_override = update_warrior},
             };
             T_SUCCESS(dnmx_mutate(obj, ops, _countof(ops)));
         }
@@ -453,9 +449,9 @@ void mutate(void) {
 
         {
             dnmx_mutate_op ops[] = {
-                {.type = dnmx_mutate_op_remove, .mixin = &t.i_warrior},
-                {.type = dnmx_mutate_op_add, .mixin_name = dnmx_make_sv_lit("shooter"), .init_override = update_shooter, .user_data = 666},
-                {.type = dnmx_mutate_op_add, .mixin = &t.i_jumper, .init_override = update_jumper, .user_data = 50},
+                {.op_type = dnmx_mutate_op_remove, .mixin = &t.i_warrior},
+                {.op_type = dnmx_mutate_op_add, .mixin_name = dnmx_make_sv_lit("shooter"), .init_override = update_shooter, .user_data = 666},
+                {.op_type = dnmx_mutate_op_add, .mixin = &t.i_jumper, .init_override = update_jumper, .user_data = 50},
             };
             T_FAIL(dnmx_mutate(obj, ops, _countof(ops)));
             CHECK(dnmx_object_get_type(obj) == t.taw);
@@ -482,9 +478,9 @@ void mutate(void) {
 
         {
             dnmx_mutate_op ops[] = {
-                {.type = dnmx_mutate_op_to_back, .mixin = &t.i_athlete},
-                {.type = dnmx_mutate_op_remove, .mixin_name = dnmx_make_sv_lit("jumper")},
-                {.type = dnmx_mutate_op_add, .mixin = &t.i_warrior},
+                {.op_type = dnmx_mutate_op_to_back, .mixin = &t.i_athlete},
+                {.op_type = dnmx_mutate_op_remove, .mixin_name = dnmx_make_sv_lit("jumper")},
+                {.op_type = dnmx_mutate_op_add, .mixin = &t.i_warrior},
             };
             T_SUCCESS(dnmx_mutate(obj, ops, _countof(ops)));
             CHECK(dnmx_object_get_type(obj) == t.tsaw);

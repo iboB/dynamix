@@ -7,7 +7,7 @@
 #include "../type.hpp"
 #include "../globals.hpp"
 #include "../object_of.hpp"
-#include "../exception.hpp"
+#include "../throw_exception.hpp"
 
 namespace dynamix {
 template <typename Msg, typename Mixin>
@@ -21,8 +21,11 @@ auto call_next_impl_msg(Mixin* mixin, Args&&... args) -> typename msg_traits<Msg
     using traits = msg_traits<Msg>;
     auto* obj = static_cast<typename traits::obj_t*>(object_of(mixin));
 
-    auto next = obj->get_type().find_next_implementer(Msg::info, g::get_mixin_info<std::remove_cv_t<Mixin>>());
-    if (!next) throw bad_feature_access("next impl");
+    auto& mixin_info = g::get_mixin_info<std::remove_cv_t<Mixin>>();
+    auto next = obj->get_type().find_next_implementer(Msg::info, mixin_info);
+    if (!next) {
+        throw_exception::generic_feature_error(obj->get_type(), "no next implementer of", "dynamix msg", Msg::info, mixin_info);
+    }
 
     return traits::caller::call(*next, *obj, std::forward<Args>(args)...);
 }
@@ -38,8 +41,11 @@ auto call_next_bidder_set(Mixin* mixin, Args&&... args) -> typename msg_traits<M
     using traits = msg_traits<Msg>;
     auto* obj = static_cast<typename traits::obj_t*>(object_of(mixin));
 
+    auto& mixin_info = g::get_mixin_info<std::remove_cv_t<Mixin>>();
     auto next = obj->get_type().find_next_bidder_set(Msg::info, g::get_mixin_info<std::remove_cv_t<Mixin>>());
-    if (next.empty()) throw bad_feature_access("next bidder set");
+    if (next.empty()) {
+        throw_exception::generic_feature_error(obj->get_type(), "no next bidder set of", "dynamix msg", Msg::info, mixin_info);
+    }
 
     auto begin = next.begin();
     auto back = next.end() - 1;
@@ -56,8 +62,11 @@ auto call_next_bidder_top(Mixin* mixin, Args&&... args) -> typename msg_traits<M
     using traits = msg_traits<Msg>;
     auto* obj = static_cast<typename traits::obj_t*>(object_of(mixin));
 
-    auto next = obj->get_type().find_next_bidder_set(Msg::info, g::get_mixin_info<std::remove_cv_t<Mixin>>());
-    if (next.empty()) throw bad_feature_access("next bidder top");
+    auto& mixin_info = g::get_mixin_info<std::remove_cv_t<Mixin>>();
+    auto next = obj->get_type().find_next_bidder_set(Msg::info, mixin_info);
+    if (next.empty()) {
+        throw_exception::generic_feature_error(obj->get_type(), "no next bidder of", "dynamix msg", Msg::info, mixin_info);
+    }
 
     return traits::caller::call(*next.begin(), *obj, std::forward<Args>(args)...);
 }

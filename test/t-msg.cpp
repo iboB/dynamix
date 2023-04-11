@@ -69,8 +69,12 @@ TEST_CASE("empty obj") {
 
     CHECK(get_ptr::call(empty) == &empty);
 
-    CHECK_THROWS_WITH_AS(get_int::call(empty), "dynamix message", dynamix::bad_feature_access);
-    CHECK_THROWS_WITH_AS(overloaded(empty, 5), "dynamix message", dynamix::bad_feature_access);
+    CHECK_THROWS_WITH_AS(get_int::call(empty),
+        "msgt: {} does not implement dynamix msg 'get_int'",
+        dynamix::feature_error);
+    CHECK_THROWS_WITH_AS(overloaded(empty, 5),
+        "msgt: {} does not implement dynamix msg 'overload_i_msg'",
+        dynamix::feature_error);
 
     CHECK(overload_ci_msg::call(empty, 6) == 6);
     const test_obj& cempty = empty;
@@ -79,7 +83,9 @@ TEST_CASE("empty obj") {
 
 TEST_CASE("clash") {
     test_obj obj;
-    CHECK_THROWS_WITH_AS(mutate(obj, dynamix::add<common>(), dynamix::add<get_ptr_clash>()), "feature clash", dynamix::mutation_error);
+    CHECK_THROWS_WITH_AS(mutate(obj, dynamix::add<common>(), dynamix::add<get_ptr_clash>()),
+        "msgt: feature clash in {'common', 'get_ptr_clash'} on 'get_ptr' between 'get_ptr_clash' and 'common'",
+        dynamix::type_error);
 }
 
 TEST_CASE("uni") {
@@ -196,7 +202,9 @@ TEST_CASE("next impl") {
         test_obj obj;
         mutate(obj, add<next_impl>());
         CHECK(get_int::call(obj) == -1);
-        CHECK_THROWS_WITH_AS(inherited_func(obj, 1), "next impl", dynamix::bad_feature_access);
+        CHECK_THROWS_WITH_AS(inherited_func(obj, 1),
+            "msgt: {'next_impl'} no next implementer of dynamix msg 'inherited_msg' with 'next_impl'",
+            dynamix::feature_error);
     }
     {
         test_obj obj;
@@ -208,7 +216,9 @@ TEST_CASE("next impl") {
         test_obj obj;
         mutate(obj, add<next_impl>());
         int sum = 0;
-        CHECK_THROWS_WITH_AS(simple_mc::call(obj, sum), "next bidder set", dynamix::bad_feature_access);
+        CHECK_THROWS_WITH_AS(simple_mc::call(obj, sum),
+            "msgt: {'next_impl'} no next bidder set of dynamix msg 'simple_mc' with 'next_impl'",
+            dynamix::feature_error);
     }
     {
         test_obj obj;
@@ -361,4 +371,4 @@ DYNAMIX_DEFINE_MSG(fill_vec_msg, multicast, fill_vec, void, (const test_obj&, st
 
 #include <dynamix/define_domain.hpp>
 
-DYNAMIX_DEFINE_DOMAIN(test);
+DYNAMIX_DEFINE_DOMAIN(test, "msgt");

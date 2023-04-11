@@ -197,7 +197,7 @@ TEST_CASE("mixin moves") {
     }
 
     // v2!: mutation_error
-    CHECK_THROWS_AS(target.move_matching_from(nope), dynamix::mutation_error);
+    CHECK_THROWS_AS(target.move_matching_from(nope), dynamix::object_error);
 
     CHECK(get_obj_default(src) == &src);
     CHECK(get_obj_custom(src) == &src);

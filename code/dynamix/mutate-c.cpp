@@ -8,8 +8,8 @@
 #include "domain.hpp"
 #include "object_mutation.hpp"
 #include "error_return.hpp"
-#include "exception.hpp"
 #include "type_mutation.hpp"
+#include "throw_exception.hpp"
 
 #include <itlib/qalgorithm.hpp>
 
@@ -33,27 +33,27 @@ dnmx_error_return_t dnmx_mutate_to(dnmx_object_handle obj, dnmx_type_handle ht, 
             });
             if (!o) continue; // not overridden
 
-            auto wrap_init = [&](const mixin_info& info, mixin_index_t index, byte_t* mixin) {
+            auto wrap_init = [&](init_new_args args) {
                 if (o->init_new) {
-                    auto err = o->init_new(&info, o->user_data, index, mixin);
+                    auto err = o->init_new({&args.info, args.mixin_buf, &args.target_type, nullptr, args.target_index, invalid_mixin_index, o->user_data});
                     if (err) {
-                        throw mutation_user_error("mutate_to", err);
+                        throw_exception::obj_mut_user_error(args.target_type, "mutate_to", "init", args.info, err);
                     }
                 }
                 else {
-                    object_mutation::default_init_mixin(info, index, mixin);
+                    util::default_init_new_func(args);
                 }
             };
 
-            auto wrap_update = [&](const mixin_info& info, mixin_index_t index, byte_t* mixin) {
+            auto wrap_update = [&](update_common_args args) {
                 if (o->update_common) {
-                    auto err = o->update_common(&info, o->user_data, index, mixin);
+                    auto err = o->update_common({&args.info, args.mixin_buf, &args.target_type, &args.source_type, args.target_index, args.source_index, o->user_data});
                     if (err) {
-                        throw mutation_user_error("mutate_to", err);
+                        throw_exception::obj_mut_user_error(args.target_type, "mutate_to", "update", args.info, err);
                     }
                 }
                 else {
-                    object_mutation::empty_udpate_func(info, index, mixin);
+                    util::noop_udpate_common_func(args);
                 }
             };
 
@@ -74,7 +74,7 @@ DYNAMIX_API dnmx_error_return_t dnmx_mutate(dnmx_object_handle ho, const dnmx_mu
         type_mutation type_mut(obj->get_type());
 
         for (auto& op : ops) {
-            switch (op.type) {
+            switch (op.op_type) {
             case dnmx_mutate_op_add:
                 if (op.mixin) type_mut.add(*op.mixin);
                 else type_mut.add(op.mixin_name.to_std());
@@ -100,7 +100,7 @@ DYNAMIX_API dnmx_error_return_t dnmx_mutate(dnmx_object_handle ho, const dnmx_mu
         for (mixin_index_t i = 0; i < t.num_mixins(); ++i) {
             auto* m = t.mixins[i];
             auto o = itlib::pfind_if(ops, [&](const dnmx_mutate_op& op) {
-                if (op.type != dnmx_mutate_op_add) return false; // only collect add ops
+                if (op.op_type != dnmx_mutate_op_add) return false; // only collect add ops
                 if (!op.init_override) return false; // ... which have an init override
                 // ... for the mixin in question
                 if (op.mixin) return op.mixin == m;
@@ -108,14 +108,14 @@ DYNAMIX_API dnmx_error_return_t dnmx_mutate(dnmx_object_handle ho, const dnmx_mu
             });
             if (!o) continue; // not overridden
 
-            auto wrap_init = [&](const mixin_info& info, mixin_index_t index, byte_t* mixin) {
-                auto err = o->init_override(&info, o->user_data, index, mixin);
+            auto wrap_init = [&](init_new_args args) {
+                auto err = o->init_override({&args.info, args.mixin_buf, &args.target_type, nullptr, args.target_index, invalid_mixin_index, o->user_data});
                 if (err) {
-                    throw mutation_user_error("mutate", err);
+                    throw_exception::obj_mut_user_error(t, "mutate", "init", args.info, err);
                 }
             };
 
-            obj_mut.update_at(i, wrap_init, object_mutation::empty_udpate_func);
+            obj_mut.update_at(i, wrap_init, util::noop_udpate_common_func);
         }
 
         return result_success;

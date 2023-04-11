@@ -8,7 +8,7 @@
 #include "mixin_info.hpp"
 #include "feature_info.hpp"
 #include "feature_for_mixin.hpp"
-#include "exception.hpp"
+#include "throw_exception.hpp"
 
 #include <itlib/qalgorithm.hpp>
 #include <itlib/stride_span.hpp>
@@ -31,18 +31,24 @@ type_mutation::type_mutation(const type& base, const allocator& alloc) noexcept
 #define by_name [&](const auto* info) { return info->name == name; }
 
 static void do_to_back(compat::pmr::vector<const mixin_info*>::iterator i, compat::pmr::vector<const mixin_info*>& vec) {
-    if (i == vec.end()) throw mutation_error("missing mixin");
     auto* val = *i;
     vec.erase(i);
     vec.push_back(val);
 }
 
 void type_mutation::to_back(const mixin_info& info) {
-    do_to_back(itlib::qfind(mixins, &info), mixins);
+    auto f = itlib::qfind(mixins, &info);
+    if (f == mixins.end()) {
+        throw_exception::type_mut_error(*this, "to_back on missing mixin", info);
+    }
+    do_to_back(f, mixins);
 }
 
 const mixin_info& type_mutation::to_back(std::string_view name) {
     auto f = itlib::qfind_if(mixins, by_name);
+    if (f == mixins.end()) {
+        throw_exception::type_mut_error(*this, "to_back", name);
+    }
     do_to_back(f, mixins);
     return *mixins.back();
 }
@@ -99,7 +105,7 @@ const mixin_info* type_mutation::safe_add(std::string_view name) {
 
 const mixin_info& type_mutation::add(std::string_view name) {
     auto info = safe_add(name);
-    if (!info) throw mutation_error("missing mixin name");
+    if (!info) throw_exception::type_mut_error(*this, "add", name);
     return *info;
 }
 

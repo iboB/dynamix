@@ -95,7 +95,9 @@ class feature_parser : public util::mixin_info_data_builder<Mixin> {
 public:
     feature_parser(util::mixin_info_data& data, dnmx_sv name) noexcept
         : super(data, name)
-    {}
+    {
+        data.info.force_external = true;
+    }
 
     template <typename Message>
     feature_parser& operator&(Message*) {

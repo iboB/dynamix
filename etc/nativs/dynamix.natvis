@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) Borislav Stanimirov
+SPDX-License-Identifier: MIT
+-->
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+    <Type Name="dnmx_sv">
+        <Intrinsic Name="size" Expression="end - begin" />
+        <DisplayString>{begin,na}</DisplayString>
+        <StringView>begin,[size()]</StringView>
+        <Expand>
+            <Item Name="length">size()</Item>
+            <Item Name="string">begin,[size()]</Item>
+        </Expand>
+    </Type>
+    <Type Name="dnmx_basic_domain">
+        <Intrinsic Name="named" Expression="!!m_name.begin" />
+        <DisplayString Condition="named()">{m_name}</DisplayString>
+        <DisplayString Condition="!named()">&lt;unnamed&gt;</DisplayString>
+    </Type>
+    <Type Name="dnmx_feature_info">
+        <Intrinsic Name="registered" Expression="id.i != ~((unsigned)0)" />
+        <DisplayString Condition="registered()">
+            {{f: {name}, id = {id.i}}}
+        </DisplayString>
+        <DisplayString Condition="!registered()">
+            {{f: {name}, &lt;unreg&gt;}}
+        </DisplayString>
+    </Type>
+    <Type Name="dnmx_mixin_info">
+        <Intrinsic Name="registered" Expression="id.i != ~((unsigned)0)" />
+        <Intrinsic Name="external" Expression="!move_init || allocator || force_external" />
+        <DisplayString Condition="registered() &amp;&amp; !external()">
+            {{m: {name}, id = {id.i}, dom = {*dom}}}
+        </DisplayString>
+        <DisplayString Condition="registered() &amp;&amp; external()">
+            {{m: {name}, id = {id.i}, x, {*dom}}}
+        </DisplayString>
+        <DisplayString Condition="!registered()">
+            {{m: {name}, &lt;unreg&gt;}}
+        </DisplayString>
+    </Type>
+    <Type Name="dynamix::object">
+        <Intrinsic Name="type" Expression="(const dynamix::type*)m_type" />
+        <DisplayString Condition="m_sealed">sealed object</DisplayString>
+        <DisplayString Condition="!m_sealed">object</DisplayString>
+        <Expand>
+            <Item Name="type">type()</Item>
+            <CustomListItems MaxItemsPerView="64" >
+                <Variable Name="imix" InitialValue="0" />
+                <Size>type()->mixins.m_end - type()->mixins.m_begin</Size>
+                <Loop>
+                    <Item Name="{type()->mixins.m_begin[imix]->name}">(void*)m_mixin_data[imix].mixin</Item>
+                    <Exec>++imix</Exec>
+                </Loop>
+            </CustomListItems>
+            <Item Name="allocator">m_allocator</Item>
+            <Item Name="sealed">m_sealed</Item>
+        </Expand>
+    </Type>
+</AutoVisualizer>

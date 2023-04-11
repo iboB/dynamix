@@ -6,6 +6,8 @@
 #include "bits/noexcept.h"
 #include "error_return.h"
 
+#include <stdbool.h>
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -29,14 +31,18 @@ static inline void dnmx_mixin_common_move_func_copy(const dnmx_mixin_info* info,
     dnmx_mixin_common_copy_func(info, ptr, src);
 }
 
-// no common destroy func; nothing smart to do anyway
+// memset to 0xfe
+// may be useful for debugging
+// not set by DNMX_COMMON_INIT_MI
+DYNAMIX_API void dnmx_mixin_common_destroy_func(const dnmx_mixin_info* info, void* ptr) DNMX_NOEXCEPT;
 
 // memcmp
 // WARNING: memcmp may ruin your day with padding bytes in a struct
 // it's generally safe if you always memset to zero (like with dnmx_mixin_common_init_func)
 // or if the struct has no padding
-// but just in case this is not added in DNMX_COMMON_INIT_MI
+// but just in case none of these is added in DNMX_COMMON_INIT_MI
 DYNAMIX_API int dnmx_mixin_common_cmp_func(const dnmx_mixin_info* info, const void* a, const void* b) DNMX_NOEXCEPT;
+DYNAMIX_API bool dnmx_mixin_common_eq_func(const dnmx_mixin_info* info, const void* a, const void* b) DNMX_NOEXCEPT;
 
 ////////////////////////////////////////////////////////////////////
 

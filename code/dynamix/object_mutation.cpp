@@ -5,7 +5,7 @@
 
 #include "object.hpp"
 #include "mixin_allocator.hpp"
-#include "exception.hpp"
+#include "throw_exception.hpp"
 
 #include <cassert>
 
@@ -18,7 +18,7 @@ object_mutation::object_mutation(object& obj, const type& type)
     // then if allocate_mixin_data throws an exception,
     // the destructor will be called and it will rollback successfully
 {
-    if (m_object.m_sealed) throw mutation_error("sealed object");
+    if (m_object.m_sealed) throw_exception::obj_mut_sealed_object(obj.get_type(), "mutate");
     allocate_mixin_data();
 }
 
@@ -229,18 +229,21 @@ void object_mutation::finalize() noexcept {
     m_object.m_mixin_data = m_target_mixin_data;
 }
 
-void object_mutation::default_init_mixin(const mixin_info& info, mixin_index_t, byte_t* mixin) {
-    if (!info.init) throw mutation_error("missing default init");
-    auto err = info.init(&info, mixin);
-    if (err) throw mutation_user_error("default init user", err);
+namespace util {
+void default_init_new_func(init_new_args args) {
+    auto& info = args.info;
+    if (!info.init) throw_exception::obj_mut_error(args.target_type, "mutate to", "missing default init", info);
+    auto err = info.init(&info, args.mixin_buf);
+    if (err) throw_exception::obj_mut_user_error(args.target_type, "mutate to", "deafult init", info, err);
+}
 }
 
 void object_mutation::default_construct_each_new_mixin(mixin_index_t upto_index) {
-    construct_each_new_mixin(default_init_mixin, upto_index);
+    construct_each_new_mixin(util::default_init_new_func, upto_index);
 }
 
 void object_mutation::throw_bad_piecewise_mutation() {
-    throw mutation_error("bad piecewise mutation");
+    throw_exception::obj_error(m_target_type, "piecewise mutation out of order while mtating to");
 }
 
 }

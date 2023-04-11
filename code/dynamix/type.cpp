@@ -7,7 +7,7 @@
 #include "feature_for_mixin.hpp"
 #include "domain.hpp"
 #include "type_class.hpp"
-#include "exception.hpp"
+#include "throw_exception.hpp"
 
 #include <itlib/qalgorithm.hpp>
 
@@ -82,7 +82,7 @@ itlib::span<const type::ftable_payload> type::find_next_bidder_set(const feature
 
 bool type::is_of(std::string_view name) const {
     auto tc = dom.get_type_class(name);
-    if (!tc) throw domain_error("unknown type class");
+    if (!tc) throw_exception::unknown_type_class(*this, name);
     return is_of(*tc);
 }
 

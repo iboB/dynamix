@@ -50,7 +50,7 @@ TEST_CASE("basic_msgs")
     CHECK(!o.get_type().implements_strong<basic_def_msg_t>());
     // v2!: no implements with default
 
-    CHECK_THROWS_AS(basic_def(o), dynamix::bad_feature_access);
+    CHECK_THROWS_AS(basic_def(o), dynamix::feature_error);
 
     mutate(o)
         .add<mix_a>()

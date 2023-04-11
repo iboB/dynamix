@@ -204,7 +204,7 @@ public:
     // returns 1 if this compares "greater" than other
     // with different types: compare types lexicographically by canonical order
     // with the same type: compare mixins using their compare funcs
-    // if a mixin lacks a compare func, throws compare_error
+    // if a mixin lacks a compare func, throws object_error
     int compare(const object& other) const;
 
     dnmx_const_object_handle to_c_hanlde() const noexcept { return this; }

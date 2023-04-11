@@ -8,6 +8,7 @@
 #include "size.hpp"
 #include "globals.hpp"
 #include "common_mixin_info.hpp"
+#include "object_mutation_funcs.hpp"
 
 #include "bits/make_from_tuple.hpp"
 
@@ -24,7 +25,7 @@ public:
     object_mutate_op* to_obj_mutate(object&) { return this; }
 
     virtual bool overrides_init() const noexcept; // true by default
-    virtual void do_init(const mixin_info& info, mixin_index_t new_index, byte_t* new_mixin) = 0;
+    virtual void do_init(init_new_args args) = 0;
 };
 
 template <typename ConstructNew_Func>
@@ -35,8 +36,8 @@ struct object_mutate_op_with_func : public object_mutate_op {
         affected_info = &info;
     }
     virtual bool overrides_init() const noexcept final override { return true; }
-    virtual void do_init(const mixin_info& info, mixin_index_t i, byte_t* new_mixin) final override {
-        func(info, i, new_mixin);
+    virtual void do_init(init_new_args args) final override {
+        func(args);
     }
 };
 
@@ -58,8 +59,8 @@ struct object_mutate_op_with_args : public object_mutate_op {
         this->affected_info = &g::get_mixin_info<Mixin>();
     }
     virtual bool overrides_init() const noexcept final override { return true; }
-    virtual void do_init(const mixin_info&, mixin_index_t, byte_t* mixin) final override {
-        impl::make_from_tuple<Mixin>(mixin, std::move(args_tup));
+    virtual void do_init(init_new_args args) final override {
+        impl::make_from_tuple<Mixin>(args.mixin_buf, std::move(args_tup));
     }
 };
 

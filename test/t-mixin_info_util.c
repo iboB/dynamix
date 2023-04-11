@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include <dnmx/mixin_info_util.h>
+#include <splat/warnings.h>
 
 #include "s-unity.h"
 
@@ -41,6 +42,15 @@ bool is_cleared(const char* buf) {
     }
     return true;
 }
+bool is_fe(const char* buf) {
+    for (int i = 0; i < SIZE; ++i) {
+        PRAGMA_WARNING_PUSH
+        DISABLE_MSVC_WARNING(4310) // cast truncates constant value
+        if (buf[i] != (char)0xfe) return false;
+        PRAGMA_WARNING_POP
+    }
+    return true;
+}
 
 void funcs(void) {
     char buf_a[SIZE + 5] = {0};
@@ -77,10 +87,13 @@ void funcs(void) {
     CHECK(is_filled(buf_a));
 
     CHECK(dnmx_mixin_common_cmp_func(&info, buf_a, buf_b) == 0);
+    CHECK(dnmx_mixin_common_eq_func(&info, buf_a, buf_b));
     buf_a[3] = 5;
     CHECK(dnmx_mixin_common_cmp_func(&info, buf_a, buf_b) > 0);
+    CHECK_FALSE(dnmx_mixin_common_eq_func(&info, buf_a, buf_b));
     buf_b[3] = 15;
     CHECK(dnmx_mixin_common_cmp_func(&info, buf_a, buf_b) < 0);
+    CHECK_FALSE(dnmx_mixin_common_eq_func(&info, buf_a, buf_b));
 
     buf_a[3] = buf_b[3] = 4;
     T_SUCCESS(dnmx_mixin_noop_init_func(&info, buf_a));
@@ -91,6 +104,9 @@ void funcs(void) {
     dnmx_mixin_noop_copy_func(&info, buf_a, buf_b);
     CHECK(is_cleared(buf_a));
     CHECK(is_filled(buf_b));
+
+    dnmx_mixin_common_destroy_func(&info, buf_a);
+    CHECK(is_fe(buf_a));
 }
 
 typedef struct byte { uint8_t val; } byte;
