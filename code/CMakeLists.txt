@@ -93,6 +93,7 @@ target_sources(dynamix PRIVATE
     dnmx/domain_handle.h
     dynamix/domain-c.cpp
     dynamix/domain.from_info.hpp
+    dynamix/domain_traverse.hpp
 
     dnmx/object_mixin_data.h
     dynamix/object_mixin_data.hpp
@@ -138,6 +139,9 @@ target_sources(dynamix PRIVATE
     dynamix/mutate_to_ops.hpp
     dnmx/mutate.h
     dynamix/mutate-c.cpp
+
+    dynamix/dbg_dmp.hpp
+    dynamix/dbg_dmp.cpp
 
     dynamix/common_mixin_init.hpp
 

@@ -11,6 +11,7 @@
 #include "feature_for_mixin.hpp"
 #include "mutation_rule_info.hpp"
 #include "throw_exception.hpp"
+#include "domain_traverse.hpp"
 
 #include <itlib/qalgorithm.hpp>
 #include <itlib/data_mutex.hpp>
@@ -62,6 +63,9 @@ const mutation_rule_info canonicalize_rule = {
 };
 
 using mixin_info_span = const itlib::span<const mixin_info* const>;
+
+template <typename T>
+using data_mutex = itlib::data_mutex<T, shared_mutex>;
 }
 
 class domain::impl {
@@ -86,7 +90,7 @@ public:
         compat::pmr::vector<const mixin_info*> sparse_mixins;
         compat::pmr::vector<const type_class*> sparse_type_classes;
     };
-    itlib::data_mutex<element_registry, shared_mutex> m_element_registry;
+    data_mutex<element_registry> m_element_registry;
 
     struct deleter {
         void operator()(const type* ptr) {
@@ -150,7 +154,7 @@ public:
         // with them we avoid applying mutation rules for the same type query
         type_query_map type_queries;
     };
-    itlib::data_mutex<type_registry, shared_mutex> m_type_registry;
+    data_mutex<type_registry> m_type_registry;
 
     type m_empty_type;
 
@@ -821,6 +825,52 @@ public:
         });
     }
 };
+
+struct domain_traverse::impl {
+    data_mutex<domain::impl::type_registry>::shared_lock_t tr;
+    data_mutex<domain::impl::element_registry>::shared_lock_t er;
+};
+
+domain_traverse::domain_traverse(const domain& d) noexcept {
+    m_impl = new impl{
+        d.m_impl->m_type_registry.shared_lock(),
+        d.m_impl->m_element_registry.shared_lock()
+    };
+}
+domain_traverse::~domain_traverse() {
+    delete m_impl;
+}
+
+void domain_traverse::traverse_mixins(std::function<void(const mixin_info&)> func) const {
+    for (auto* m : m_impl->er->sparse_mixins) {
+        if (m) func(*m);
+    }
+}
+void domain_traverse::traverse_features(std::function<void(const feature_info&)> func) const {
+    for (auto* f : m_impl->er->sparse_features) {
+        if (f) func(*f);
+    }
+}
+void domain_traverse::traverse_mutation_rules(std::function<void(const mutation_rule_info&, uint32_t)> func) const {
+    for (auto& mr : m_impl->tr->mutation_rules) {
+        func(*mr.first, mr.second);
+    }
+}
+void domain_traverse::traverse_type_classes(std::function<void(const type_class&)> func) const {
+    for (auto* tc : m_impl->er->sparse_type_classes) {
+        if (tc) func(*tc);
+    }
+}
+void domain_traverse::traverse_types(std::function<void(const type&)> func) const {
+    for (auto& t : m_impl->tr->types) {
+        func(*t);
+    }
+}
+void domain_traverse::traverse_type_queries(std::function<void(itlib::span<const mixin_info* const>, const type&)> func) const {
+    for (auto& tc : m_impl->tr->type_queries) {
+        func(tc.first, *tc.second);
+    }
+}
 
 domain::domain(std::string_view name, domain_settings settings, uintptr_t user_data, void* context, allocator alloc)
     : dnmx_basic_domain{dnmx_sv::from_std(name), settings, user_data, context}

@@ -33,7 +33,9 @@ struct object_producer {
         : dom(d)
         , mixins(mix)
         , rnd(seed)
-    {}
+    {
+        printf("%u\n", seed);
+    }
 
     void produce() {
         // intentionally not reserving
@@ -244,9 +246,9 @@ TEST_CASE("fuzz objects and types") {
         producers.emplace_back(dom, mixins, seeder());
     }
 
-    for (auto& p : producers) {
-        p.produce();
-    }
+    //for (auto& p : producers) {
+    //    p.produce();
+    //}
 
     //std::vector<std::thread> threads;
     //for (auto& p : producers) {

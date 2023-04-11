@@ -25,6 +25,7 @@ namespace dynamix {
 
 class type;
 class type_mutation;
+class domain_traverse;
 
 // a domain is used to register mixins and features
 // it manages object types
@@ -121,6 +122,7 @@ private:
     // TODO: make into fast pimpl buffer to avoid all allocs
     class impl;
     impl* m_impl;
+    friend class domain_traverse;
 };
 
 }
