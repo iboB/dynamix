@@ -15,7 +15,8 @@
 namespace dynamix::util {
 namespace {
 struct p {
-    p(const void* pp) : ptr(pp) {}
+	template <typename T>
+    p(T* pp) : ptr(reinterpret_cast<const void*>(pp)) {}
     const void* ptr;
 };
 std::ostream& operator<<(std::ostream& out, p pp) {
