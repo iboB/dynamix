@@ -24,7 +24,15 @@ static constexpr int NUM_FEATURES = 50;
 static constexpr int NUM_DEPS = 15;
 static constexpr int NUM_MIXINS = 100;
 static constexpr int SIZE = 1000;
-static constexpr int MAX_FAILS = 1000;
+static constexpr int MAX_FAILS = 850;
+
+dynamix::error_return_t count_init_func(const dnmx_mixin_info* info, void* vptr) {
+    auto ptr = static_cast<dynamix::byte_t*>(vptr);
+    for (dynamix::byte_size_t i = 0; i < info->size; ++i) {
+        *ptr++ = dynamix::byte_t(i);
+    }
+    return dynamix::result_success;
+}
 
 template <typename T>
 void shuffle(std::vector<T>& vec, std::minstd_rand& rnd) {
@@ -43,6 +51,7 @@ struct object_producer {
     uint32_t seed;
     std::minstd_rand rnd;
     std::vector<dynamix::object> objects;
+    std::vector<dynamix::object> copies;
 
     object_producer(dynamix::domain& d, const std::deque<dynamix::util::mixin_info_data>& mix, uint32_t seed)
         : dom(d)
@@ -58,6 +67,11 @@ struct object_producer {
         while (objects.size() != SIZE) {
             auto num_mixins = rnd() % 10 + 1;
 
+            if (objects.size() == 1) {
+                // have the second object empty
+                num_mixins = 0;
+            }
+
             itlib::flat_set<const dynamix::mixin_info*> mix;
             while (mix.size() != num_mixins) mix.insert(&mixins[rnd() % mixins.size()].info); // generate unique infos
             auto mix_shuf = std::move(mix.modify_container());
@@ -65,9 +79,23 @@ struct object_producer {
 
             try {
                 auto& t = dom.get_type(mix_shuf);
-                auto& o = objects.emplace_back(dom);
-                o.reset_type(t);
+                {
+                    dynamix::object o(dom);
+                    o.reset_type(t);
+                    objects.push_back(std::move(o));
+                }
+                const auto& o = objects.back();
                 fails = 0;
+
+                if (rnd() % 2) {
+                    // try object::copy() 50% of the time
+                    copies.emplace_back(o.copy());
+                }
+                else {
+                    dynamix::object c(dom);
+                    c.copy_from(o);
+                    copies.push_back(std::move(c));
+                }
             }
             catch (const dynamix::exception&) {
                 ++fails;
@@ -151,7 +179,7 @@ public:
 
 TEST_CASE("fuzz objects and types") {
     const unsigned initial_seed = std::random_device{}();
-    // const unsigned initial_seed = 1098596837;
+    // const unsigned initial_seed = 1283054047;
     printf("initial seed: %u\n", initial_seed);
     std::minstd_rand seeder(initial_seed);
 
@@ -192,7 +220,7 @@ TEST_CASE("fuzz objects and types") {
         // funcs
         {
             // override init funcs from builder
-            info.init = dnmx_mixin_common_init_func;
+            info.init = count_init_func;
             info.move_init = dnmx_mixin_common_move_func;
             info.move_asgn = dnmx_mixin_common_move_func;
             info.copy_init = dnmx_mixin_common_copy_func;
@@ -213,8 +241,8 @@ TEST_CASE("fuzz objects and types") {
                 info.move_asgn = nullptr;
             }
 
-            if (rnd() % 4 == 0) {
-                // no copy 25% of the time
+            if (rnd() % 5 == 0) {
+                // no copy 20% of the time
                 info.copy_init = nullptr;
                 info.copy_asgn = nullptr;
             }
@@ -346,5 +374,14 @@ TEST_CASE("fuzz objects and types") {
 
     for (auto& p : producers) {
         CHECK(p.objects.size() == SIZE);
+        REQUIRE_FALSE(p.copies.empty());
+        auto ci = p.copies.begin();
+        for (auto& o : p.objects) {
+            if (!o.get_type().copyable()) continue;
+            if (o.get_type().equality_comparable()) {
+                CHECK(o.equals(*ci));
+            }
+            ++ci;
+        }
     }
 }
