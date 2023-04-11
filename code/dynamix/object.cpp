@@ -241,7 +241,7 @@ void object::clear() {
 
 void object::reset_type(const type& type) {
     if (type.num_mixins() == 0) {
-        if (m_sealed) throw_exception::obj_mut_sealed_object(get_type(), "reset_type");;
+        if (m_sealed) throw_exception::obj_mut_sealed_object(get_type(), "reset_type");
         clear_mixin_data();
         m_type = &type;
         return;

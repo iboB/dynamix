@@ -667,9 +667,9 @@ public:
         for (size_t i = 0; i < mixins.size(); ++i) {
             auto m = mixins[i];
             if (m->id == invalid_mixin_id) throw_exception::type_mut_error(mutation, "unregistered", *m);
-            if (m->dom != &m_domain) throw_exception::foreign_mixin(mutation, *m);;
+            if (m->dom != &m_domain) throw_exception::foreign_mixin(mutation, *m);
             for (size_t j = i + 1; j < mixins.size(); ++j) {
-                if (mixins[i] == mixins[j]) throw_exception::type_mut_error(mutation, "duplicate", *m);;
+                if (mixins[i] == mixins[j]) throw_exception::type_mut_error(mutation, "duplicate", *m);
             }
         }
 

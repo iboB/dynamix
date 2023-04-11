@@ -122,7 +122,7 @@ void duplicate_name(const domain& dom, const type_class& tc) {
 }
 
 void info_has_domain(const domain& dom, const mixin_info& info) {
-    e<domain_error>(dom) << "register mixin " << info << " which has a domain = " << *domain::from_c_handle(info.dom);;
+    e<domain_error>(dom) << "register mixin " << info << " which has a domain = " << *domain::from_c_handle(info.dom);
 }
 
 void unreg_foreign(const domain& dom, const feature_info& info) {
