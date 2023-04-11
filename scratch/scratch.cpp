@@ -3,20 +3,14 @@
 //
 #include <iostream>
 #include <dynamix/object.hpp>
-#include <dynamix/object_mutation.hpp>
-#include <dynamix/type.hpp>
-#include <dynamix/type_mutation.hpp>
-#include <dynamix/mutate_ops.hpp>
-
-//#include <itlib/qalgorithm.hpp>
-
-#include <array>
-#include <algorithm>
-
-namespace dynamix {
-
-
-}
+#include <dynamix/dbg_dmp.hpp>
+#include "../test/test_data.hpp"
 
 int main() {
+    dynamix::domain dom("scratch");
+    test_data t;
+    t.register_all_mixins(dom);
+    t.create_types(dom);
+    t.create_more_types(dom);
+    dynamix::util::dbg_dmp(std::cout, dom);
 }

@@ -161,6 +161,8 @@ public:
     void deallocate_object_buffer(allocator& alloc, void* ptr) const noexcept;
 
     static const type* from_c_handle(dnmx_type_handle ht) noexcept { return static_cast<const type*>(ht); }
+
+    const byte_size_t buf_size() const noexcept { return m_buf_size; }
 private:
     // size of own associated buffer
     // the domain allocates a single buffer for a type and all of its members
