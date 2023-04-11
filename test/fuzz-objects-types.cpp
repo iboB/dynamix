@@ -6,6 +6,7 @@
 #include <dynamix/object.hpp>
 #include <dynamix/mutate.hpp>
 #include <dynamix/exception.hpp>
+#include <dynamix/dbg_dmp.hpp>
 
 #include <doctest/doctest.h>
 
@@ -17,11 +18,23 @@
 #include <cstdlib>
 #include <random>
 #include <array>
+#include <iostream>
 
 static constexpr int NUM_FEATURES = 20;
 static constexpr int NUM_DEPS = 4;
 static constexpr int NUM_MIXINS = 10;
 static constexpr int SIZE = 100;
+
+template <typename T>
+void shuffle(std::vector<T>& vec, std::minstd_rand& rnd) {
+    // don't use std::shuffle as it has different implementations in
+    // different standard libraries and breaks the fuzz test determinism with a given seed
+    for (int i = 0; i < 2; ++i) {
+        for (auto& elem : vec) {
+            std::swap(elem, vec[rnd() % vec.size()]);
+        }
+    }
+}
 
 struct object_producer {
     dynamix::domain& dom;
@@ -46,7 +59,7 @@ struct object_producer {
             itlib::flat_set<const dynamix::mixin_info*> mix;
             while (mix.size() != num_mixins) mix.insert(&mixins[rnd() % mixins.size()].info); // generate unique infos
             auto mix_shuf = std::move(mix.modify_container());
-            std::shuffle(mix_shuf.begin(), mix_shuf.end(), rnd); // but not sorted
+            shuffle(mix_shuf, rnd); // but not sorted
 
             try {
                 auto& t = dom.get_type(mix_shuf);
@@ -159,7 +172,7 @@ TEST_CASE("fuzz objects and types") {
             itlib::flat_set<uint32_t> fids;
             while (fids.size() != num_features) fids.insert(rnd() % NUM_FEATURES); // generate unique indices
             auto fids_shuf = std::move(fids.modify_container());
-            std::shuffle(fids_shuf.begin(), fids_shuf.end(), rnd); // but not sorted
+            shuffle(fids_shuf, rnd); // but not sorted
 
             for (auto fid : fids_shuf) {
                 auto& name = m.stored_name;
@@ -233,7 +246,7 @@ TEST_CASE("fuzz objects and types") {
         }
     }
 
-    dynamix::domain dom;
+    dynamix::domain dom("fot");
     for (auto& m : mixins) {
         m.register_in(dom);
     }
@@ -245,6 +258,8 @@ TEST_CASE("fuzz objects and types") {
     for (int i = 0; i < 1; ++i) {
         producers.emplace_back(dom, mixins, seeder());
     }
+
+    dynamix::util::dbg_dmp(std::cout, dom);
 
     //for (auto& p : producers) {
     //    p.produce();
