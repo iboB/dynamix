@@ -20,10 +20,11 @@
 #include <array>
 #include <iostream>
 
-static constexpr int NUM_FEATURES = 20;
-static constexpr int NUM_DEPS = 4;
-static constexpr int NUM_MIXINS = 10;
-static constexpr int SIZE = 100;
+static constexpr int NUM_FEATURES = 50;
+static constexpr int NUM_DEPS = 15;
+static constexpr int NUM_MIXINS = 100;
+static constexpr int SIZE = 1000;
+static constexpr int MAX_FAILS = 1000;
 
 template <typename T>
 void shuffle(std::vector<T>& vec, std::minstd_rand& rnd) {
@@ -39,20 +40,21 @@ void shuffle(std::vector<T>& vec, std::minstd_rand& rnd) {
 struct object_producer {
     dynamix::domain& dom;
     const std::deque<dynamix::util::mixin_info_data>& mixins;
+    uint32_t seed;
     std::minstd_rand rnd;
     std::vector<dynamix::object> objects;
 
     object_producer(dynamix::domain& d, const std::deque<dynamix::util::mixin_info_data>& mix, uint32_t seed)
         : dom(d)
         , mixins(mix)
+        , seed(seed)
         , rnd(seed)
-    {
-        printf("%u\n", seed);
-    }
+    {}
 
     void produce() {
         // intentionally not reserving
         // we want the vector to move things around
+        int fails = 0;
         while (objects.size() != SIZE) {
             auto num_mixins = rnd() % 10 + 1;
 
@@ -65,16 +67,91 @@ struct object_producer {
                 auto& t = dom.get_type(mix_shuf);
                 auto& o = objects.emplace_back(dom);
                 o.reset_type(t);
+                fails = 0;
             }
             catch (const dynamix::exception&) {
+                ++fails;
+                if (fails == MAX_FAILS) {
+                    std::cout << "producer " << seed << " failed more than " << MAX_FAILS << " consecutive times\n";
+                    return;
+                }
                 continue;
             }
         }
     }
 };
 
+class custom_rule {
+    dynamix::mutation_rule_info m_info;
+    const dynamix::mixin_info& m_primary;
+    const dynamix::mixin_info& m_dep;
+    bool m_use_primary_name;
+    bool m_use_dep_name;
+    std::string m_name;
+public:
+    custom_rule(const dynamix::mixin_info& primary, const dynamix::mixin_info& dep, bool pname, bool dname)
+        : m_primary(primary)
+        , m_dep(dep)
+        , m_use_primary_name(pname)
+        , m_use_dep_name(dname)
+    {
+        m_name = "r ";
+        m_name += m_primary.name.to_std();
+        if (m_use_primary_name) {
+            m_name += "(name)";
+        }
+        else {
+            m_name += "(info)";
+        }
+
+        m_name += " drags ";
+
+        m_name += m_dep.name.to_std();
+        if (m_use_dep_name) {
+            m_name += "(name)";
+        }
+        else {
+            m_name += "(info)";
+        }
+
+        m_info.apply = apply;
+        m_info.name = dnmx_sv::from_std(m_name);
+        m_info.order_priority = 0;
+        m_info.user_data = reinterpret_cast<uintptr_t>(this);
+    }
+
+    static dynamix::error_return_t apply(dnmx_type_mutation_handle mutation, uintptr_t user_data) {
+        auto mut = dynamix::type_mutation::from_c_handle(mutation);
+        auto self = reinterpret_cast<custom_rule*>(user_data);
+        bool has_prim;
+        if (self->m_use_primary_name) {
+            has_prim = mut->has(self->m_primary.name.to_std());
+        }
+        else {
+            has_prim = mut->has(self->m_primary);
+        }
+
+        if (!has_prim) return dynamix::result_success;
+
+        if (self->m_use_dep_name) {
+            mut->add_if_lacking(self->m_dep.name.to_std());
+        }
+        else {
+            mut->add_if_lacking(self->m_dep);
+        }
+
+        return dynamix::result_success;
+    }
+
+    custom_rule(const custom_rule&) = delete;
+    custom_rule& operator=(const custom_rule&) = delete;
+
+    const dynamix::mutation_rule_info& info() const noexcept { return m_info; };
+};
+
 TEST_CASE("fuzz objects and types") {
-    unsigned initial_seed = 4133773066;// std::random_device{}();
+    const unsigned initial_seed = std::random_device{}();
+    // const unsigned initial_seed = 1098596837;
     printf("initial seed: %u\n", initial_seed);
     std::minstd_rand seeder(initial_seed);
 
@@ -228,21 +305,16 @@ TEST_CASE("fuzz objects and types") {
     }
 
     // add rules
+    std::deque<custom_rule> rules;
     for (auto& d : deps) {
         auto num = rnd() % 2 + 1;
         for (uint32_t i = 0; i < num; ++i) {
             auto to = rnd() % NUM_MIXINS;
-            auto& r = d.mutation_rule_info_storage.emplace_back();
             auto& m = mixins[to];
-            r.apply = [](dnmx_type_mutation_handle mutation, uintptr_t user_data) {
-                auto mut = dynamix::type_mutation::from_c_handle(mutation);
-                auto name = std::string_view(reinterpret_cast<const char*>(user_data));
-                mut->add_if_lacking(name);
-                return dynamix::result_success;
-            };
-            r.name = m.info.name;
-            r.user_data = reinterpret_cast<uintptr_t>(m.stored_name.c_str());
-            d.mutation_rule_infos.push_back(&r);
+            bool mname = rnd() % 2 == 0;
+            bool dname = rnd() % 2 == 0;
+            auto& r = rules.emplace_back(m.info, d.info, mname, dname);
+            d.mutation_rule_infos.push_back(&r.info());
         }
     }
 
@@ -255,22 +327,24 @@ TEST_CASE("fuzz objects and types") {
     }
 
     std::deque<object_producer> producers;
-    for (int i = 0; i < 1; ++i) {
+    for (int i = 0; i < 3; ++i) {
         producers.emplace_back(dom, mixins, seeder());
     }
 
-    dynamix::util::dbg_dmp(std::cout, dom);
+    // dynamix::util::dbg_dmp(std::cout, dom);
 
-    //for (auto& p : producers) {
-    //    p.produce();
-    //}
+    // producers[0].produce();
 
-    //std::vector<std::thread> threads;
-    //for (auto& p : producers) {
-    //    threads.emplace_back([&]() { p.produce(); });
-    //}
+    std::vector<std::thread> threads;
+    for (auto& p : producers) {
+        threads.emplace_back([&]() { p.produce(); });
+    }
 
-    //for (auto& t : threads) {
-    //    t.join();
-    //}
+    for (auto& t : threads) {
+        t.join();
+    }
+
+    for (auto& p : producers) {
+        CHECK(p.objects.size() == SIZE);
+    }
 }

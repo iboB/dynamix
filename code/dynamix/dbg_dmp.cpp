@@ -278,7 +278,7 @@ void dbg_dmp(std::ostream& out, const feature_info& fi, uint32_t) {
 
 void dbg_dmp(std::ostream& out, const mutation_rule_info& mri, uint32_t) {
     out << "rule: '" << mri.name.to_std() << "', prio: " << mri.order_priority
-        << ", ud" << mri.user_data << ", apply: " << p(mri.apply);
+        << ", ud: " << mri.user_data << ", apply: " << p(mri.apply);
 }
 
 void dbg_dmp(std::ostream& out, const type& t, uint32_t flags) {
