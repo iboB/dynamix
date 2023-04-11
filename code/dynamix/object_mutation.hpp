@@ -43,7 +43,7 @@ public:
             // matching
             auto oi = m_old_type->sparse_mixin_indices[info.iid()];
             auto mixin = m_old_mixin_data[oi].mixin;
-            update_common(update_common_args{info, mixin, m_target_type, ti, *m_old_type, oi});
+            update_common(update_common_args{{info, mixin, m_target_type, ti}, *m_old_type, oi});
         }
         else {
             // new
