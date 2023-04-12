@@ -24,8 +24,8 @@ std::vector<op_data> get_ops_combo(std::minstd_rand& rnd) {
     std::vector<op_data> ret;
     ret.reserve(ops_shuf.size());
     for (auto op : ops_shuf) {
-        auto a = rnd() % 10 + 1;
-        auto b = rnd() % 10 + 1;
+        auto a = uint32_t(rnd() % 10 + 1);
+        auto b = uint32_t(rnd() % 10 + 1);
         ret.push_back({op, a, b});
     }
     return ret;
