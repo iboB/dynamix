@@ -26,7 +26,7 @@ template <typename Mixin>
 void register_mixin(std::string_view name) {
     auto data = std::make_unique<dynamix::util::mixin_info_data>();
     dynamix::util::mixin_info_data_builder<Mixin> b(*data, name);
-    b.implements<accumulate_msg>();
+    b.template implements<accumulate_msg>();
     b.user_data(reinterpret_cast<uintptr_t>(static_cast<ctor>([](void* buf, uint32_t a, uint32_t b) {
         new (buf) Mixin(a, b);
     })));
