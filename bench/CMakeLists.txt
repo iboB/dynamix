@@ -20,3 +20,4 @@ endmacro()
 
 add_subdirectory(msg-unicast)
 add_subdirectory(msg-multicast)
+add_subdirectory(type-creation)
