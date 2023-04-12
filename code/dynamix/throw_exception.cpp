@@ -15,7 +15,7 @@
 namespace dynamix::throw_exception {
 namespace {
 template <typename Exception>
-class e {
+class e final {
     std::ostringstream out;
 public:
     e(const domain& dom) {
@@ -83,7 +83,8 @@ public:
         return *this;
     }
 
-    [[noreturn]] ~e() noexcept(false) {
+    ~e() noexcept(false) {
+        if (std::uncaught_exceptions()) return;
         throw Exception(out.str());
     }
 };
