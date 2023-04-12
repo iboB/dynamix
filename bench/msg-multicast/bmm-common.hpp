@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: MIT
 //
 #pragma once
+#include <cstdint>
+#include <vector>
+#include <random>
 
 #define ITERATE_OPS(MACRO) \
     MACRO(plus_plus, acc += arg + m_val_a) \
@@ -19,7 +22,14 @@
 
 #define ENUM(name, code) name,
 
-enum ops {
+enum op_id : uint32_t {
     ITERATE_OPS(ENUM)
     ops_count
 };
+
+struct op_data {
+    op_id op;
+    uint32_t a;
+    uint32_t b;
+};
+std::vector<op_data> get_ops_combo(std::minstd_rand& rnd);

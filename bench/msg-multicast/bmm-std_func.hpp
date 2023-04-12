@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <functional>
 #include <vector>
+#include <random>
 
 struct func_accumulator {
     using func = std::function<void(uint64_t&, uint32_t)>;
