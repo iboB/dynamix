@@ -19,3 +19,4 @@ macro(dynamix_benchmark name)
 endmacro()
 
 add_subdirectory(msg-unicast)
+add_subdirectory(msg-multicast)
