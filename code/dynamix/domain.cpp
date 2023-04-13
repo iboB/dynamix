@@ -75,9 +75,9 @@ bool mixin_span_less(const mixin_info_span& a, const mixin_info_span& b) {
     if (as != bs) return as < bs;
     return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
 }
-bool mixin_span_equal(const mixin_info_span& a, const mixin_info_span& b) {
-    return std::equal(a.begin(), a.end(), b.begin(), b.end());
-}
+//bool mixin_span_equal(const mixin_info_span& a, const mixin_info_span& b) {
+//    return std::equal(a.begin(), a.end(), b.begin(), b.end());
+//}
 }
 
 class domain::impl {
