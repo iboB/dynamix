@@ -18,6 +18,7 @@
 #include <itlib/flat_map.hpp>
 
 #include "compat/pmr/vector.hpp"
+#include "compat/pmr/set.hpp"
 
 #include <memory>
 #include <limits>
@@ -124,6 +125,20 @@ public:
     };
     using mutation_rule_map = itlib::flat_map<const mutation_rule_info*, uint32_t, rule_compare, compat::pmr::vector<std::pair<const mutation_rule_info*, uint32_t>>>;
 
+    struct type_compare {
+        bool operator()(const uptr<const type>& a, const uptr<const type>& b) const {
+            return mixin_span_less(a->mixins, b->mixins);
+        }
+        bool operator()(const uptr<const type>& a, mixin_info_span& b) const {
+            return mixin_span_less(a->mixins, b);
+        }
+        bool operator()(mixin_info_span& a, const uptr<const type>& b) const {
+            return mixin_span_less(a, b->mixins);
+        }
+        using is_transparent = void;
+    };
+    using type_set = compat::pmr::set<uptr<const type>, type_compare>;
+
     using type_query = compat::pmr::vector<const mixin_info*>;
     struct type_query_compare {
         bool operator()(const type_query& a, const type_query& b) const {
@@ -151,7 +166,7 @@ public:
         mutation_rule_map mutation_rules;
 
         // existing types
-        compat::pmr::vector<uptr<const type>> types;
+        type_set types;
 
         // stored type queries
         // with them we avoid applying mutation rules for the same type query
@@ -280,8 +295,13 @@ public:
             auto treg = m_type_registry.unique_lock();
             // since this mixin is no longer valid
             // remove all types which reference it
-            itlib::erase_all_if(treg->types, [&](const uptr<const type>& t) {
-                if (!t->has(info.id)) return false; // type does't have mixin
+            for (auto it = treg->types.begin(); it != treg->types.end(); ) {
+                auto& t = *it;
+                if (!t->has(info.id)) {
+                    // type does't have mixin
+                    ++it;
+                    continue;
+                }
 
                 // removing a type with active objects?
                 // UB and crashes await
@@ -289,8 +309,8 @@ public:
 
                 erase_queries_leading_to_l(treg->type_queries, *t);
 
-                return true;
-            });
+                it = treg->types.erase(it);
+            }
         }
 
         auto reg = m_element_registry.unique_lock();
@@ -401,14 +421,11 @@ public:
         reg->type_queries.clear();
     }
 
-    const type* find_exact_type_l(mixin_info_span query, const compat::pmr::vector<uptr<const type>>& types) const {
+    const type* find_exact_type_l(mixin_info_span query, const type_set& types) const {
         if (query.empty()) return &m_empty_type;
-        for (auto& t : types) {
-            if (mixin_span_equal(t->mixins, query)) {
-                return t.get();
-            }
-        }
-        return nullptr;
+        auto f = types.find(query);
+        if (f == types.end()) return nullptr;
+        return (*f).get();
     }
 
     // applies mutation rules for mutation and returns the original query to be preserved
@@ -788,11 +805,11 @@ public:
         }
         new_type->sparse_mixin_indices = sparse_mixin_indices;
 
-        // finally add new type to types
+        // finally add new type to types and return it
         auto reg = m_type_registry.unique_lock();
-        auto& types = reg->types;
+        auto res = reg->types.emplace(std::move(new_type));
 
-        // ... but first search if it's not already added
+        // note that the type may already be added
         // could be more than one thread waited at the mutex above for the exact same type
         // in which case we give up on our own
         // it may seem like a waste to have more than one thread create the exact same type
@@ -800,28 +817,28 @@ public:
         // it may seem to be a good idea to lock earlier, but this should be very very rare
         // we're willing to risk dropping materialized types every once in a blue moon
         // for the benefint of holding the unique_lock for as short amount of time as possible
-        if (const type* found = find_exact_type_l(mixins, reg->types)) {
-            // alas the type was added before, so just register the query
-            // (the query may also be the same as the one from the previous thread,
-            // but the code below is safe in such a case)
-            reg->type_queries[std::move(query)] = found;
-            return *found;
-        }
+        // in any case wi can disregard res.second and just register the query
+        // (the query may also be the same as the one from the previous thread,
+        // but the code below is safe in such a case)
 
-        // add type and query to list and return
-        auto& added = types.emplace_back(std::move(new_type));
-        reg->type_queries[std::move(query)] = added.get();
-        return *added;
+        const type* reg_type = res.first->get();
+        reg->type_queries[std::move(query)] = reg_type;
+        return *reg_type;
     }
 
     void garbage_collect_types() noexcept {
         auto l = m_type_registry.unique_lock();
         auto& types = l->types;
-        itlib::erase_all_if(types, [&](const uptr<const type>& t) {
-            if (t->num_objects() > 0) return false;
+        for (auto it = types.begin(); it != types.end(); ) {
+            auto& t = *it;
+            if (t->num_objects() > 0) {
+                // objects of this type still exist
+                ++it;
+                continue;
+            }
             erase_queries_leading_to_l(l->type_queries, *t);
-            return true;
-        });
+            it = types.erase(it);
+        }
     }
 };
 
