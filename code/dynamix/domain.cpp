@@ -66,6 +66,17 @@ using mixin_info_span = const itlib::span<const mixin_info* const>;
 
 template <typename T>
 using data_mutex = itlib::data_mutex<T, shared_mutex>;
+
+bool mixin_span_less(const mixin_info_span& a, const mixin_info_span& b) {
+    // first compare sizes, which greatly improves performance of searches
+    // (we don't actually care about the order of the types or queries)
+    size_t as = a.size(), bs = b.size();
+    if (as != bs) return as < bs;
+    return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
+}
+bool mixin_span_equal(const mixin_info_span& a, const mixin_info_span& b) {
+    return std::equal(a.begin(), a.end(), b.begin(), b.end());
+}
 }
 
 class domain::impl {
@@ -113,26 +124,16 @@ public:
     };
     using mutation_rule_map = itlib::flat_map<const mutation_rule_info*, uint32_t, rule_compare, compat::pmr::vector<std::pair<const mutation_rule_info*, uint32_t>>>;
 
-    static const mixin_id& id_from_mixin_info(const mixin_info* const& i) { return i->id; }
-
     using type_query = compat::pmr::vector<const mixin_info*>;
     struct type_query_compare {
-        bool do_compare(const mixin_info_span& a, const mixin_info_span& b) const {
-            size_t as = a.size(), bs = b.size();
-            if (as != bs) return as < bs;
-            return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
-        }
-
         bool operator()(const type_query& a, const type_query& b) const {
-            return do_compare(a, b);
+            return mixin_span_less(a, b);
         }
-
         bool operator()(const type_query& a, mixin_info_span& b) const {
-            return do_compare(a, b);
+            return mixin_span_less(a, b);
         }
-
         bool operator()(mixin_info_span& a, const type_query& b) const {
-            return do_compare(a, b);
+            return mixin_span_less(a, b);
         }
     };
     using type_query_map = itlib::flat_map<type_query, const type*, type_query_compare, compat::pmr::vector<std::pair<type_query, const type*>>>;
@@ -400,14 +401,10 @@ public:
         reg->type_queries.clear();
     }
 
-    static bool is_same_type(mixin_info_span a, mixin_info_span b) noexcept {
-        return std::equal(a.begin(), a.end(), b.begin(), b.end());
-    }
-
     const type* find_exact_type_l(mixin_info_span query, const compat::pmr::vector<uptr<const type>>& types) const {
         if (query.empty()) return &m_empty_type;
         for (auto& t : types) {
-            if (is_same_type(t->mixins, query)) {
+            if (mixin_span_equal(t->mixins, query)) {
                 return t.get();
             }
         }
