@@ -25,3 +25,5 @@ jobs:
         run: cmake --build . --config Release --target run-bench-dynamix-msg-unicast
       - name: Multicast messages
         run: cmake --build . --config Release --target run-bench-dynamix-msg-multicast
+      - name: Type Creation
+        run: cmake --build . --config Release --target run-bench-dynamix-type-creation
