@@ -19,6 +19,7 @@
 
 #include "compat/pmr/vector.hpp"
 #include "compat/pmr/set.hpp"
+#include "compat/pmr/map.hpp"
 
 #include <memory>
 #include <limits>
@@ -150,8 +151,9 @@ public:
         bool operator()(mixin_info_span& a, const type_query& b) const {
             return mixin_span_less(a, b);
         }
+        using is_transparent = void;
     };
-    using type_query_map = itlib::flat_map<type_query, const type*, type_query_compare, compat::pmr::vector<std::pair<type_query, const type*>>>;
+    using type_query_map = compat::pmr::map<type_query, const type*, type_query_compare>;
 
     // registry of types and helpers
     // it independently locked from the element registry
@@ -159,7 +161,7 @@ public:
         type_registry(allocator alloc)
             : mutation_rules({}, alloc)
             , types(alloc)
-            , type_queries({}, alloc)
+            , type_queries(alloc)
         {}
 
         // sorted rules with their refcounts
@@ -287,15 +289,24 @@ public:
             auto treg = m_type_registry.unique_lock();
             // since this mixin is no longer valid
             // remove all queries which contain it either as key or as value
-            // using modify_container is safe here as we're only removing and that doesn't affect order
-            itlib::erase_all_if(treg->type_queries.modify_container(), [&info](const std::pair<type_query, const type*>& p) {
-                if (p.second->has(info.id)) return true; // query leads to a type which contains mixin
-                if (itlib::pfind(p.first, &info)) return true; // query references type
-                return false;
-            });
+            auto& queries = treg->type_queries;
+            for (auto iq = queries.begin(); iq != queries.end(); ) {
+                if (iq->second->has(info.id)) {
+                    // query leads to a type which contains mixin
+                    iq = queries.erase(iq);
+                }
+                else if (itlib::pfind(iq->first, &info)) {
+                    // query references mixin
+                    iq = queries.erase(iq);
+                }
+                else {
+                    ++iq;
+                }
+            }
 
             // ... and remove all types which reference it
-            for (auto it = treg->types.begin(); it != treg->types.end(); ) {
+            auto& types = treg->types;
+            for (auto it = types.begin(); it != types.end(); ) {
                 auto& t = *it;
                 if (!t->has(info.id)) {
                     // type does't have mixin
@@ -307,7 +318,7 @@ public:
                 // UB and crashes await
                 assert(t->num_objects() == 0);
 
-                it = treg->types.erase(it);
+                it = types.erase(it);
             }
         }
 
@@ -828,6 +839,7 @@ public:
     void garbage_collect_types() noexcept {
         auto l = m_type_registry.unique_lock();
         auto& types = l->types;
+        auto& queries = l->type_queries;
         for (auto it = types.begin(); it != types.end(); ) {
             auto& t = *it;
             if (t->num_objects() > 0) {
@@ -836,11 +848,15 @@ public:
                 continue;
             }
 
-            // using modify_container is safe here as we're only removing and that doesn't affect order
-            itlib::erase_all_if(l->type_queries.modify_container(), [&t](const std::pair<type_query, const type*>& p) {
-                return p.second == t.get();
-            });
-
+            // erase queries which lead to this type
+            for (auto iq = queries.begin(); iq != queries.end(); ) {
+                if (iq->second == it->get()) {
+                    iq = queries.erase(iq);
+                }
+                else {
+                    ++iq;
+                }
+            }
             it = types.erase(it);
         }
     }

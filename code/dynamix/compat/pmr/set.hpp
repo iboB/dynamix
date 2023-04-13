@@ -14,6 +14,6 @@ using set = std::pmr::set<T, Cmp>;
 #include "allocator.hpp"
 namespace dynamix::compat::pmr {
 template <typename T, typename Cmp = std::less<T>>
-using set = std::pmr::set<T, Cmp, allocator<T>>;
+using set = std::set<T, Cmp, allocator<T>>;
 }
 #endif
