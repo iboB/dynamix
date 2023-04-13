@@ -282,19 +282,19 @@ public:
         info.dom = &m_domain;
     }
 
-    // remove associated type queries which lead to this type
-    static void erase_queries_leading_to_l(type_query_map& queries, const type& t) {
-        // using modify_container is safe here as we're only removing and that doesn't affect order
-        itlib::erase_all_if(queries.modify_container(), [&t](const std::pair<type_query, const type*>& p) {
-            return p.second == &t;
-        });
-    }
-
     void unregister_mixin(mixin_info& info) {
         {
             auto treg = m_type_registry.unique_lock();
             // since this mixin is no longer valid
-            // remove all types which reference it
+            // remove all queries which contain it either as key or as value
+            // using modify_container is safe here as we're only removing and that doesn't affect order
+            itlib::erase_all_if(treg->type_queries.modify_container(), [&info](const std::pair<type_query, const type*>& p) {
+                if (p.second->has(info.id)) return true; // query leads to a type which contains mixin
+                if (itlib::pfind(p.first, &info)) return true; // query references type
+                return false;
+            });
+
+            // ... and remove all types which reference it
             for (auto it = treg->types.begin(); it != treg->types.end(); ) {
                 auto& t = *it;
                 if (!t->has(info.id)) {
@@ -306,8 +306,6 @@ public:
                 // removing a type with active objects?
                 // UB and crashes await
                 assert(t->num_objects() == 0);
-
-                erase_queries_leading_to_l(treg->type_queries, *t);
 
                 it = treg->types.erase(it);
             }
@@ -837,7 +835,12 @@ public:
                 ++it;
                 continue;
             }
-            erase_queries_leading_to_l(l->type_queries, *t);
+
+            // using modify_container is safe here as we're only removing and that doesn't affect order
+            itlib::erase_all_if(l->type_queries.modify_container(), [&t](const std::pair<type_query, const type*>& p) {
+                return p.second == t.get();
+            });
+
             it = types.erase(it);
         }
     }

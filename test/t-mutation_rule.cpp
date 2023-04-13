@@ -341,3 +341,41 @@ TEST_CASE("rule interdependency") {
         CHECK(dom.num_type_queries() == 0);
     }
 }
+
+TEST_CASE("no-participation rule") {
+    // a rule may lead to a mixin which is a part of the query to not be a part of the type
+    test_data t;
+    domain dom("npr");
+
+    auto remove_actor = [](dnmx_type_mutation_handle mutation, uintptr_t) {
+        auto mut = type_mutation::from_c_handle(mutation);
+        mut->remove("actor");
+        return result_success;
+    };
+    mutation_rule_info mri = {};
+    mri.name = dnmx_make_sv_lit("no actor");
+    mri.apply = remove_actor;
+    dom.add_mutation_rule(mri);
+
+    t.register_all_mixins(dom);
+    t.create_more_types(dom);
+
+    CHECK(t.t_acp->num_mixins() == 2);
+    CHECK_FALSE(t.t_acp->has(*t.actor));
+
+    CHECK(dom.num_types() == 7);
+    CHECK(dom.num_type_queries() == 7);
+
+    {
+        const mixin_info* desc[] = {t.controlled, t.physical};
+        auto& t_ac = dom.get_type(desc);
+        CHECK(t_ac == *t.t_acp);
+    }
+
+    CHECK(dom.num_types() == 7);
+    CHECK(dom.num_type_queries() == 8);
+
+    dom.unregister_mixin(*t.actor);
+    CHECK(dom.num_types() == 7);
+    CHECK(dom.num_type_queries() == 4);
+}
