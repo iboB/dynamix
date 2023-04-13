@@ -16,4 +16,5 @@ Here's a list of notable planned new features and updates for DynaMix
     * Demo: lua integration
     * Demo: JS and wasm integration
 * Possibly never, but sounds nice
+    * Lazy mixin registration
     * Create a preprocessing tool (like Qt's moc) that can be used instead of the macros for mixin and feature definition

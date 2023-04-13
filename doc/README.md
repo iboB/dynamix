@@ -4,7 +4,7 @@
 
 * [Overview](overview.md)
 * Basics
-    * Adding DynaMix to a Project
+    * [Adding DynaMix to a Project](basics/adding.md)
     * [Elements and Glossary](basics/glossary.md)
     * C++ Basics
     * C Basics
@@ -12,7 +12,7 @@
     * Custom Allocators
     * Creating Plugins
     * Mutation Rules
-    * Custom Features
+    * Creating Custom Features
     * [Dangerous Functionalities](advanced/danger.md)
 * Working with DynaMix
     * [Performance](working-with/perf.md)
