@@ -1,7 +1,7 @@
 # Copyright (c) Borislav Stanimirov
 # SPDX-License-Identifier: MIT
 #
-CPMAddPackage(gh:iboB/picobench@2.03)
+CPMAddPackage(gh:iboB/picobench@2.04)
 
 add_subdirectory(picobench-main)
 
@@ -19,3 +19,5 @@ macro(dynamix_benchmark name)
 endmacro()
 
 add_subdirectory(msg-unicast)
+add_subdirectory(msg-multicast)
+add_subdirectory(type-creation)

@@ -6,6 +6,7 @@
 #include "tap-messages-traits.hpp"
 #include "tap-domain.hpp"
 #include <dynamix/define_mixin.hpp>
+#include <stdexcept>
 
 namespace tap {
 

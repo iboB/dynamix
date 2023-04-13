@@ -18,6 +18,8 @@
 #include <itlib/flat_map.hpp>
 
 #include "compat/pmr/vector.hpp"
+#include "compat/pmr/set.hpp"
+#include "compat/pmr/map.hpp"
 
 #include <memory>
 #include <limits>
@@ -66,6 +68,17 @@ using mixin_info_span = const itlib::span<const mixin_info* const>;
 
 template <typename T>
 using data_mutex = itlib::data_mutex<T, shared_mutex>;
+
+bool mixin_span_less(const mixin_info_span& a, const mixin_info_span& b) {
+    // first compare sizes, which greatly improves performance of searches
+    // (we don't actually care about the order of the types or queries)
+    size_t as = a.size(), bs = b.size();
+    if (as != bs) return as < bs;
+    return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
+}
+//bool mixin_span_equal(const mixin_info_span& a, const mixin_info_span& b) {
+//    return std::equal(a.begin(), a.end(), b.begin(), b.end());
+//}
 }
 
 class domain::impl {
@@ -113,29 +126,34 @@ public:
     };
     using mutation_rule_map = itlib::flat_map<const mutation_rule_info*, uint32_t, rule_compare, compat::pmr::vector<std::pair<const mutation_rule_info*, uint32_t>>>;
 
-    static const mixin_id& id_from_mixin_info(const mixin_info* const& i) { return i->id; }
+    struct type_compare {
+        bool operator()(const uptr<const type>& a, const uptr<const type>& b) const {
+            return mixin_span_less(a->mixins, b->mixins);
+        }
+        bool operator()(const uptr<const type>& a, mixin_info_span& b) const {
+            return mixin_span_less(a->mixins, b);
+        }
+        bool operator()(mixin_info_span& a, const uptr<const type>& b) const {
+            return mixin_span_less(a, b->mixins);
+        }
+        using is_transparent = void;
+    };
+    using type_set = compat::pmr::set<uptr<const type>, type_compare>;
 
     using type_query = compat::pmr::vector<const mixin_info*>;
     struct type_query_compare {
-        bool do_compare(const mixin_info_span& a, const mixin_info_span& b) const {
-            size_t as = a.size(), bs = b.size();
-            if (as != bs) return as < bs;
-            return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
-        }
-
         bool operator()(const type_query& a, const type_query& b) const {
-            return do_compare(a, b);
+            return mixin_span_less(a, b);
         }
-
         bool operator()(const type_query& a, mixin_info_span& b) const {
-            return do_compare(a, b);
+            return mixin_span_less(a, b);
         }
-
         bool operator()(mixin_info_span& a, const type_query& b) const {
-            return do_compare(a, b);
+            return mixin_span_less(a, b);
         }
+        using is_transparent = void;
     };
-    using type_query_map = itlib::flat_map<type_query, const type*, type_query_compare, compat::pmr::vector<std::pair<type_query, const type*>>>;
+    using type_query_map = compat::pmr::map<type_query, const type*, type_query_compare>;
 
     // registry of types and helpers
     // it independently locked from the element registry
@@ -143,14 +161,14 @@ public:
         type_registry(allocator alloc)
             : mutation_rules({}, alloc)
             , types(alloc)
-            , type_queries({}, alloc)
+            , type_queries(alloc)
         {}
 
         // sorted rules with their refcounts
         mutation_rule_map mutation_rules;
 
         // existing types
-        compat::pmr::vector<uptr<const type>> types;
+        type_set types;
 
         // stored type queries
         // with them we avoid applying mutation rules for the same type query
@@ -266,30 +284,42 @@ public:
         info.dom = &m_domain;
     }
 
-    // remove associated type queries which lead to this type
-    static void erase_queries_leading_to_l(type_query_map& queries, const type& t) {
-        // using modify_container is safe here as we're only removing and that doesn't affect order
-        itlib::erase_all_if(queries.modify_container(), [&t](const std::pair<type_query, const type*>& p) {
-            return p.second == &t;
-        });
-    }
-
     void unregister_mixin(mixin_info& info) {
         {
             auto treg = m_type_registry.unique_lock();
             // since this mixin is no longer valid
-            // remove all types which reference it
-            itlib::erase_all_if(treg->types, [&](const uptr<const type>& t) {
-                if (!t->has(info.id)) return false; // type does't have mixin
+            // remove all queries which contain it either as key or as value
+            auto& queries = treg->type_queries;
+            for (auto iq = queries.begin(); iq != queries.end(); ) {
+                if (iq->second->has(info.id)) {
+                    // query leads to a type which contains mixin
+                    iq = queries.erase(iq);
+                }
+                else if (itlib::pfind(iq->first, &info)) {
+                    // query references mixin
+                    iq = queries.erase(iq);
+                }
+                else {
+                    ++iq;
+                }
+            }
+
+            // ... and remove all types which reference it
+            auto& types = treg->types;
+            for (auto it = types.begin(); it != types.end(); ) {
+                auto& t = *it;
+                if (!t->has(info.id)) {
+                    // type does't have mixin
+                    ++it;
+                    continue;
+                }
 
                 // removing a type with active objects?
                 // UB and crashes await
                 assert(t->num_objects() == 0);
 
-                erase_queries_leading_to_l(treg->type_queries, *t);
-
-                return true;
-            });
+                it = types.erase(it);
+            }
         }
 
         auto reg = m_element_registry.unique_lock();
@@ -400,20 +430,6 @@ public:
         reg->type_queries.clear();
     }
 
-    static bool is_same_type(mixin_info_span a, mixin_info_span b) noexcept {
-        return std::equal(a.begin(), a.end(), b.begin(), b.end());
-    }
-
-    const type* find_exact_type_l(mixin_info_span query, const compat::pmr::vector<uptr<const type>>& types) const {
-        if (query.empty()) return &m_empty_type;
-        for (auto& t : types) {
-            if (is_same_type(t->mixins, query)) {
-                return t.get();
-            }
-        }
-        return nullptr;
-    }
-
     // applies mutation rules for mutation and returns the original query to be preserved
     // this is also an optimization opportunity
     // if the mutation doesn't change the query, we've wasted cpu to make this copy
@@ -479,15 +495,23 @@ public:
         {
             // search for stored query for this combo
             auto reg = m_type_registry.shared_lock();
-            auto f = reg->type_queries.find(mutation.mixins);
-            if (f != reg->type_queries.end()) return *f->second;
+            {
+                auto f = reg->type_queries.find(mutation.mixins);
+                if (f != reg->type_queries.end()) return *f->second;
+            }
 
             // query is not available, so we need to apply mutation rules
             // we can do it while holding the shared lock
             original_query = apply_mutation_rules_l(mutation, reg->mutation_rules);
 
             // now look for exact type
-            found = find_exact_type_l(mutation.mixins, reg->types);
+            if (mutation.mixins.empty()) {
+                found = &m_empty_type;
+            }
+            else {
+                auto f = reg->types.find(mutation.mixins);
+                if (f != reg->types.end()) found = f->get();
+            }
         }
 
         if (found) {
@@ -791,11 +815,11 @@ public:
         }
         new_type->sparse_mixin_indices = sparse_mixin_indices;
 
-        // finally add new type to types
+        // finally add new type to types and return it
         auto reg = m_type_registry.unique_lock();
-        auto& types = reg->types;
+        auto res = reg->types.emplace(std::move(new_type));
 
-        // ... but first search if it's not already added
+        // note that the type may already be added
         // could be more than one thread waited at the mutex above for the exact same type
         // in which case we give up on our own
         // it may seem like a waste to have more than one thread create the exact same type
@@ -803,28 +827,38 @@ public:
         // it may seem to be a good idea to lock earlier, but this should be very very rare
         // we're willing to risk dropping materialized types every once in a blue moon
         // for the benefint of holding the unique_lock for as short amount of time as possible
-        if (const type* found = find_exact_type_l(mixins, reg->types)) {
-            // alas the type was added before, so just register the query
-            // (the query may also be the same as the one from the previous thread,
-            // but the code below is safe in such a case)
-            reg->type_queries[std::move(query)] = found;
-            return *found;
-        }
+        // in any case we can disregard res.second and just register the query
+        // (the query may also be the same as the one from the previous thread,
+        // but the code below is safe in such a case)
 
-        // add type and query to list and return
-        auto& added = types.emplace_back(std::move(new_type));
-        reg->type_queries[std::move(query)] = added.get();
-        return *added;
+        const type* reg_type = res.first->get();
+        reg->type_queries[std::move(query)] = reg_type;
+        return *reg_type;
     }
 
     void garbage_collect_types() noexcept {
         auto l = m_type_registry.unique_lock();
         auto& types = l->types;
-        itlib::erase_all_if(types, [&](const uptr<const type>& t) {
-            if (t->num_objects() > 0) return false;
-            erase_queries_leading_to_l(l->type_queries, *t);
-            return true;
-        });
+        auto& queries = l->type_queries;
+        for (auto it = types.begin(); it != types.end(); ) {
+            auto& t = *it;
+            if (t->num_objects() > 0) {
+                // objects of this type still exist
+                ++it;
+                continue;
+            }
+
+            // erase queries which lead to this type
+            for (auto iq = queries.begin(); iq != queries.end(); ) {
+                if (iq->second == it->get()) {
+                    iq = queries.erase(iq);
+                }
+                else {
+                    ++iq;
+                }
+            }
+            it = types.erase(it);
+        }
     }
 };
 

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 #
 dynamix_benchmark(msg-unicast
-    bmu.cpp
+    bmu-benchmark.cpp
     bmu-msg.cpp
     bmu-std_func.cpp
     bmu-virtual.cpp

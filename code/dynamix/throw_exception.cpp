@@ -14,6 +14,7 @@
 
 namespace dynamix::throw_exception {
 namespace {
+struct throw_t {} do_throw;
 template <typename Exception>
 class e {
     std::ostringstream out;
@@ -83,50 +84,50 @@ public:
         return *this;
     }
 
-    [[noreturn]] ~e() noexcept(false) {
+    [[noreturn]] void operator<<(const throw_t&) {
         throw Exception(out.str());
     }
 };
 }
 
 void id_registered(const domain& dom, const feature_info& info) {
-    e<domain_error>(dom) << "register feature " << info << " with a valid id " << info.iid();
+    e<domain_error>(dom) << "register feature " << info << " with a valid id " << info.iid() << do_throw;
 }
 
 void id_registered(const domain& dom, const mixin_info& info) {
-    e<domain_error>(dom) << "register mixin " << info << " with a valid id " << info.iid();
+    e<domain_error>(dom) << "register mixin " << info << " with a valid id " << info.iid() << do_throw;
 }
 
 void empty_name(const domain& dom, const feature_info&) {
-    e<domain_error>(dom) << "register feature with empty name";
+    e<domain_error>(dom) << "register feature with empty name" << do_throw;
 }
 
 void empty_name(const domain& dom, const mixin_info&) {
-    e<domain_error>(dom) << "register mixin with empty name";
+    e<domain_error>(dom) << "register mixin with empty name" << do_throw;
 }
 
 void empty_name(const domain& dom, const type_class&) {
-    e<domain_error>(dom) << "register type class with empty name";
+    e<domain_error>(dom) << "register type class with empty name" << do_throw;
 }
 
 void duplicate_name(const domain& dom, const feature_info& info) {
-    e<domain_error>(dom) << "register feature with duplicate name " << info;
+    e<domain_error>(dom) << "register feature with duplicate name " << info << do_throw;
 }
 
 void duplicate_name(const domain& dom, const mixin_info& info) {
-    e<domain_error>(dom) << "register mixin with duplicate name " << info;
+    e<domain_error>(dom) << "register mixin with duplicate name " << info << do_throw;
 }
 
 void duplicate_name(const domain& dom, const type_class& tc) {
-    e<domain_error>(dom) << "register type class with duplicate name " << tc;
+    e<domain_error>(dom) << "register type class with duplicate name " << tc << do_throw;
 }
 
 void info_has_domain(const domain& dom, const mixin_info& info) {
-    e<domain_error>(dom) << "register mixin " << info << " which has a domain = " << *domain::from_c_handle(info.dom);
+    e<domain_error>(dom) << "register mixin " << info << " which has a domain = " << *domain::from_c_handle(info.dom) << do_throw;
 }
 
 void unreg_foreign(const domain& dom, const feature_info& info) {
-    e<domain_error>(dom) << "unregister foreign feature " << info << ", id = " << info.iid();
+    e<domain_error>(dom) << "unregister foreign feature " << info << ", id = " << info.iid() << do_throw;
 }
 void unreg_foreign(const domain& dom, const mixin_info& info) {
     e<domain_error> out(dom);
@@ -137,18 +138,19 @@ void unreg_foreign(const domain& dom, const mixin_info& info) {
     else {
         out << "<null>";
     }
+    out << do_throw;
 }
 
 void no_func(const domain& dom, const mutation_rule_info& info) {
-    e<domain_error>(dom) << "register mutation rule " << info << " with apply function = null";
+    e<domain_error>(dom) << "register mutation rule " << info << " with apply function = null" << do_throw;
 }
 
 void no_func(const domain& dom, const type_class& tc) {
-    e<domain_error>(dom) << "register type class " << tc << " with match function = null";
+    e<domain_error>(dom) << "register type class " << tc << " with match function = null" << do_throw;
 }
 
 void foreign_mutation(const domain& dom, const type_mutation& mut) {
-    e<domain_error>(dom) << "requested type with foreign mutation " << mut << " of domain '" << mut.dom << '\'';
+    e<domain_error>(dom) << "requested type with foreign mutation " << mut << " of domain '" << mut.dom << '\'' << do_throw;
 }
 
 void foreign_mixin(const type_mutation& mut, const mixin_info& m) {
@@ -160,57 +162,57 @@ void foreign_mixin(const type_mutation& mut, const mixin_info& m) {
     else {
         out << "<null>";
     }
-    out << " while trying to create type " << mut;
+    out << " while trying to create type " << mut << do_throw;
 }
 
 
 void mutation_rule_user_error(const type_mutation& mut, const mutation_rule_info& info, error_return_t error) {
-    e<type_error>(mut.dom) << "applying mutation rule " << info << " to " << mut << " failed with error " << error;
+    e<type_error>(mut.dom) << "applying mutation rule " << info << " to " << mut << " failed with error " << error << do_throw;
 }
 
 void cyclic_rule_deps(const type_mutation& mut) {
-    e<type_error>(mut.dom) << "rule interdependency too deep or cyclic at " << mut;
+    e<type_error>(mut.dom) << "rule interdependency too deep or cyclic at " << mut << do_throw;
 }
 
 void type_mut_error(const type_mutation& mut, std::string_view err, const mixin_info& m) {
-    e<type_error>(mut.dom) << "creating type " << mut << ": " << m << ' ' << err;
+    e<type_error>(mut.dom) << "creating type " << mut << ": " << m << ' ' << err << do_throw;
 }
 
 void type_mut_error(const type_mutation& mut, std::string_view err, std::string_view name) {
-    e<type_error>(mut.dom) << "creating type " << mut << ": unknown mixin '" << name << "' in " << err;
+    e<type_error>(mut.dom) << "creating type " << mut << ": unknown mixin '" << name << "' in " << err << do_throw;
 }
 
 void feature_clash(const type_mutation& mut, const dnmx_ftable_payload& a, const dnmx_ftable_payload& b) {
     e<type_error>(mut.dom) << "feature clash in " << mut << " on " << *a.data->info << " between " <<
-        *mut.mixins[a.mixin_index] << " and " << *mut.mixins[b.mixin_index];
+        *mut.mixins[a.mixin_index] << " and " << *mut.mixins[b.mixin_index] << do_throw;
 }
 
 void unknown_type_class(const type& t, const std::string_view name) {
-    e<type_error>(t.dom) << "type " << t << ": unknown type class '" << name << '\'';
+    e<type_error>(t.dom) << "type " << t << ": unknown type class '" << name << '\'' << do_throw;
 }
 
 void obj_mut_error(const type& t, std::string_view op, std::string_view err, const mixin_info& m) {
-    e<object_error>(t.dom) << op << " object of type " << t << ": " << m << ' ' << err;
+    e<object_error>(t.dom) << op << " object of type " << t << ": " << m << ' ' << err << do_throw;
 }
 
 void obj_mut_user_error(const type& t, std::string_view op, std::string_view ovr, const mixin_info& m, error_return_t error) {
-    e<object_error>(t.dom) << op << " object of type " << t << ": " << ovr << ' ' << m << " failed with error " << error;
+    e<object_error>(t.dom) << op << " object of type " << t << ": " << ovr << ' ' << m << " failed with error " << error << do_throw;
 }
 
 void obj_mut_sealed_object(const type& t, std::string_view op) {
-    e<object_error>(t.dom) << op << " sealed object of type " << t;
+    e<object_error>(t.dom) << op << " sealed object of type " << t << do_throw;
 }
 
 void obj_error(const type& t, std::string_view op) {
-    e<object_error>(t.dom) << op << " object of type " << t;
+    e<object_error>(t.dom) << op << " object of type " << t << do_throw;
 }
 
 void generic_feature_error(const type& t, std::string_view err, std::string_view feature_type, const feature_info& f) {
-    e<feature_error>(t.dom) << t << ' ' << err << ' ' << feature_type << ' ' << f;
+    e<feature_error>(t.dom) << t << ' ' << err << ' ' << feature_type << ' ' << f << do_throw;
 }
 
 void generic_feature_error(const type& t, std::string_view err, std::string_view feature_type, const feature_info& f, const mixin_info& m) {
-    e<feature_error>(t.dom) << t << ' ' << err << ' ' << feature_type << ' ' << f << " with " << m;
+    e<feature_error>(t.dom) << t << ' ' << err << ' ' << feature_type << ' ' << f << " with " << m << do_throw;
 }
 
 }
