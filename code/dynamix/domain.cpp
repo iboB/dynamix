@@ -421,13 +421,6 @@ public:
         reg->type_queries.clear();
     }
 
-    const type* find_exact_type_l(mixin_info_span query, const type_set& types) const {
-        if (query.empty()) return &m_empty_type;
-        auto f = types.find(query);
-        if (f == types.end()) return nullptr;
-        return (*f).get();
-    }
-
     // applies mutation rules for mutation and returns the original query to be preserved
     // this is also an optimization opportunity
     // if the mutation doesn't change the query, we've wasted cpu to make this copy
@@ -493,15 +486,23 @@ public:
         {
             // search for stored query for this combo
             auto reg = m_type_registry.shared_lock();
-            auto f = reg->type_queries.find(mutation.mixins);
-            if (f != reg->type_queries.end()) return *f->second;
+            {
+                auto f = reg->type_queries.find(mutation.mixins);
+                if (f != reg->type_queries.end()) return *f->second;
+            }
 
             // query is not available, so we need to apply mutation rules
             // we can do it while holding the shared lock
             original_query = apply_mutation_rules_l(mutation, reg->mutation_rules);
 
             // now look for exact type
-            found = find_exact_type_l(mutation.mixins, reg->types);
+            if (mutation.mixins.empty()) {
+                found = &m_empty_type;
+            }
+            else {
+                auto f = reg->types.find(mutation.mixins);
+                if (f != reg->types.end()) found = f->get();
+            }
         }
 
         if (found) {
@@ -817,7 +818,7 @@ public:
         // it may seem to be a good idea to lock earlier, but this should be very very rare
         // we're willing to risk dropping materialized types every once in a blue moon
         // for the benefint of holding the unique_lock for as short amount of time as possible
-        // in any case wi can disregard res.second and just register the query
+        // in any case we can disregard res.second and just register the query
         // (the query may also be the same as the one from the previous thread,
         // but the code below is safe in such a case)
 
