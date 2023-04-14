@@ -12,8 +12,6 @@
 extern "C" {
 #endif
 
-struct dnmx_basic_type;
-
 struct dnmx_basic_object {
     // object data visible to C so that queries can be inlined there too
 
