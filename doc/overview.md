@@ -45,6 +45,8 @@ In a multiple inheritance hierarchy, it is popular to have a common parent class
 
 To access a sibling in a multiple inheritance hierarchy, you would use `dynamic_cast` to cast `this` to the type of the sibling. To access a mixin in a DynaMix type, you would use `dynamix::object::get` to get a reference to the mixin.
 
+Here's a list of the most important differences between polymorphism with multiple inheritance and DynaMix:
+
 * **Late binding**: in C++ you need to know the type of an object at compile time to be able to polymorphically call a member function. With DynaMix, you can polymorphically call a feature of a type, without having to know the type at compile time. This is not possible with C++ types.
 * **No combinatorial explosion of types**: you compose types at runtime, and don't need to explicitly list all possible combinations of building-block types.
 * **No type-bound interfaces**: since the interface is physically separated from the implementation (or type), you don't need to have a single class implement an interface. You could separate the implementation of an interface between multiple mixins. To allow have this with C++ polymorphism, you would define an separate interface class for each and every virtual function you want to implement. 
