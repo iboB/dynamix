@@ -8,14 +8,6 @@ It must be noted that the library is a means to create a project's *architecture
 
 It in this regard it can be compared to [COM](https://en.wikipedia.org/wiki/Component_Object_Model) which is a library that introduces more orhtodox (in the style of Java or C#) type of dynamic polymorphism to C. A [list of more comparisons](misc/dynamix-vs-x.md) of DynaMix to existing solutions is available.
 
-## Library name
-
-DynaMix is a portmanteau which stands for "dynamic mixins".
-
-In C++ circles the term "mixin" has gained some popularity. In this context a mixin is a building block for a type, which interacts via other building blocks via [CRTP](https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern). This is a way to accomplish static polymorphism and everything is resolved at compile time.
-
-The purpose of DynaMix is to accomplish something very similar, but at run time, in a dynamic manner, and hence the name is Dynamic Mixins.
-
 ## Key library features
 
 * Compose objects from mixins at run time
@@ -40,6 +32,33 @@ In classic OOP terminology, DynaMix is a solution with the following features:
 * Late binding
 * Multicast
 * Reachable overrides
+
+## DynaMix vs Multiple Inheritance in C++
+
+The closest thing to DynaMix which is available in C++ is multiple inheritance. Comparing DynaMix to multiple inheritnance used many times in this documentation to illustrate the library's features.
+
+You can even say that DynaMix provides the *exact* same features as multiple inheritance. The difference is that DynaMix does this at run time, while multiple inheritance is done at compile time. 
+
+When using DynaMix, you can think of the mixins which compose a DynaMix type as the parents of a C++ type in a multiple inheritance hierarchy. Just like a C++ type inherited from multiple parents will obtain the members of all its parents, a DynaMix type composed of multiple mixins will obtain the *features* of all of its mixins. An object instance of a C++ type composed of multiple parents will implicitly instantiate all of its parents, while an object instance of a DynaMix type composed of multiple mixins will implicitly instantiate all of its mixins.
+
+In a multiple inheritance hierarchy, it is popular to have a common parent class which is inherited virtually from all building blocks. This can be compared to `dynamix::object`.
+
+To access a sibling in a multiple inheritance hierarchy, you would use `dynamic_cast` to cast `this` to the type of the sibling. To access a mixin in a DynaMix type, you would use `dynamix::object::get` to get a reference to the mixin.
+
+* `Late binding`: in C++ you need to know the type of an object at compile time to be able to polymorphically call a member function. With DynaMix, you can polymorphically call a feature of a type, without having to know the type at compile time. This is not possible with C++ types.
+* `No combinatorial explosion of types`: you compose types at runtime, and don't need to explicitly list all possible combinations of building-block types.
+* `No type-bound interfaces`: since the interface is physically separated from the implementation (or type), you don't need to have a single class implement an interface. You could separate the implementation of an interface between multiple mixins. To allow have this with C++ polymorphism, you would define an separate interface class for each and every virtual function you want to implement. 
+* `Live object mutation`: since the composition of a type is done at runtime, you can change the composition of an object instance at any time. This is not possible with multiple inheritance.
+* `Type-level polymorphism`: In C++ you need an instance of a type to be able to polymorphically call a member function. With DynaMix, you can polymorphically access a feature of a type, without having to instantiate an object of that type. This is not possible with C++ types.
+* `Runtime reflection`: DynaMix offers more reflection and introspection capabitilies than what is possible with `typeid`.
+
+## Library name
+
+DynaMix is a portmanteau which stands for "dynamic mixins".
+
+In C++ circles the term "mixin" has gained some popularity. In this context a mixin is a building block for a type, which interacts via other building blocks via [CRTP](https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern). This is a way to accomplish static polymorphism and everything is resolved at compile time (no virtual functions are used, no common parent, `static_cast` is used to cast between types).
+
+CRTP mixins take multiple inheritnace to the static end of the polymorphism spectrum. DynaMix uses mixins to achieve dynamix polymorphism, more so than what is possible with plain multiple inheritance, and hence the name is Dynamic Mixins.
 
 ## When (and when not) to use DynaMix
 
