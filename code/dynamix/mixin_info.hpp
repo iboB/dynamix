@@ -4,6 +4,7 @@
 #pragma once
 #include "../dnmx/mixin_info.h"
 #include "mixin_info_fwd.hpp"
+#include "mixin_id.hpp"
 #include "error_return.hpp"
 
 namespace dynamix {
