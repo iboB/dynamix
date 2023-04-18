@@ -13,7 +13,8 @@ extern "C" {
 #endif
 
 struct dnmx_basic_object {
-    // object data visible to C so that queries can be inlined there too
+    // members prefixed with m_ indicate that they are "private"
+    // and direct access is not recommended
 
     // type. never null
     dnmx_type_handle m_type;

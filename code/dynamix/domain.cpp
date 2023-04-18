@@ -109,7 +109,7 @@ public:
         void operator()(const type* ptr) {
             const void* cvptr = ptr;
             auto vptr = const_cast<void*>(cvptr);
-            ptr->dom.m_impl->m_allocator.deallocate_bytes(vptr, ptr->m_buf_size, alignof(type));
+            ptr->dom.m_impl->m_allocator.deallocate_bytes(vptr, ptr->buf_size, alignof(type));
         }
     };
 
@@ -183,7 +183,7 @@ public:
         , m_allocator(std::move(alloc))
         , m_element_registry(m_allocator)
         , m_type_registry(m_allocator)
-        , m_empty_type(domain)
+        , m_empty_type(domain, 0)
     {
         if (m_domain.m_settings.canonicalize_types) {
             // we solve this requirement by adding a mutation rule which sorts the mixins of the new type
@@ -747,8 +747,7 @@ public:
             total_obj_type_buf_size,
             alignof(type)
         ));
-        uptr<type> new_type(new (new_type_bytes) type(m_domain));
-        new_type->m_buf_size = total_obj_type_buf_size;
+        uptr<type> new_type(new (new_type_bytes) type(m_domain, total_obj_type_buf_size));
         auto* bptr = new_type_bytes + sizeof(type);
 
         // ftable

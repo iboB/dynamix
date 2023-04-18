@@ -29,7 +29,11 @@ class domain;
 
 class DYNAMIX_API type : public dnmx_basic_type {
     friend class domain;
-    type(domain& dom) noexcept : dnmx_basic_type({nullptr, 0}), dom(dom) {}
+    type(domain& dom, byte_size_t buf_size) noexcept
+        : dnmx_basic_type({nullptr, 0})
+        , dom(dom)
+        , buf_size(buf_size)
+    {}
 public:
     type(const type&) = delete;
     type& operator=(const type&) = delete;
@@ -162,13 +166,11 @@ public:
 
     static const type* from_c_handle(dnmx_type_handle ht) noexcept { return static_cast<const type*>(ht); }
 
-    byte_size_t buf_size() const noexcept { return m_buf_size; }
-private:
     // size of own associated buffer
     // the domain allocates a single buffer for a type and all of its members
     // this is the buffer size (it's used when deallocating)
-    byte_size_t m_buf_size = 0;
-
+    byte_size_t buf_size;
+private:
     mutable itlib::atomic_relaxed_counter<size_t> m_num_objects = {};
 };
 

@@ -57,7 +57,7 @@ void dbg_dmp_l(std::ostream& out, const type& t, uint32_t flags, domain_traverse
     for (auto& f : ftable) num_features += !!f;
 
     if (flags & dnmx_type_dmp_ex) {
-        out << NIND "size: " << t.buf_size();
+        out << NIND "size: " << t.buf_size;
         out << NIND "obj buf size: " << t.object_buffer_size;
         out << NIND "obj buf align: " << t.object_buffer_alignment;
         out << NIND "num obj: " << t.num_objects();
