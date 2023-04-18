@@ -51,6 +51,7 @@ To access a sibling in a multiple inheritance hierarchy, you would use `dynamic_
 * **Live object mutation**: since the composition of a type is done at runtime, you can change the composition of an object instance at any time. This is not possible with multiple inheritance.
 * **Type-level polymorphism**: In C++ you need an instance of a type to be able to polymorphically call a member function. With DynaMix, you can polymorphically access a feature of a type, without having to instantiate an object of that type. This is not possible with C++ types.
 * **Runtime reflection**: DynaMix offers more reflection and introspection capabitilies than what is possible with `typeid`.
+* **Open interface**: If a C++ library offers a polymophic interface with virtual functions, the way to extend the library is to create new implementations of its interfaces. With DynaMix, you can naturally do that, but you can also create new features which extend the interface as opposed to the implementation. This is not possible with C++ types.
 
 ## Library name
 
