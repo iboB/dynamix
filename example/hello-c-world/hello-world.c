@@ -32,13 +32,16 @@ int main() {
     init_hello_mixins();
     dnmx_object_handle greeter = dnmx_create_object_empty(hello_domain.domain);
 
+    // Composition
     {
         dnmx_mutate_op op = {.op_type = dnmx_mutate_op_add, .mixin = &hello};
         dnmx_mutate(greeter, &op, 1);
     }
 
+    // Polymorphic call
     speak(greeter);
 
+    // Mutation: keep the interface, but change the implementation
     {
         dnmx_mutate_op ops[] = {
             {.op_type = dnmx_mutate_op_remove, .mixin = &hello},
@@ -47,6 +50,7 @@ int main() {
         dnmx_mutate(greeter, ops, 2);
     }
 
+    // Polymorphic call in mutated object
     speak(greeter);
 
     dnmx_destroy_object(greeter);
