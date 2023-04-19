@@ -98,8 +98,13 @@ public:
     }
 
     void apply() {
+        m_applied = true;
         auto& type = m_obj.get_domain().get_type(std::move(m_type_mut));
         m_obj.reset_type(type);
+    }
+
+    void cancel() {
+        m_applied = true;
     }
 };
 inline gradual_mutation mutate(object& obj) {

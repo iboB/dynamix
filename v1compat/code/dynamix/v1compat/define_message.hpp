@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 //
 #pragma once
+#include <dynamix/common_feature_info.hpp>
 
 #define DYNAMIX_V1_DEFINE_MESSAGE(message_name) \
     const ::dynamix::common_feature_info& I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::get_info_safe() { \
