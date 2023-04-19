@@ -240,8 +240,12 @@ void object::clear() {
 }
 
 void object::reset_type(const type& type) {
+    if (m_sealed) throw_exception::obj_mut_sealed_object(get_type(), "reset_type");
+    if (&type == m_type) return; // noop
+
+    // optimization: check if type has zero mixins instead of calling domain::get_empty_type
     if (type.num_mixins() == 0) {
-        if (m_sealed) throw_exception::obj_mut_sealed_object(get_type(), "reset_type");
+        assert(type == type.dom.get_empty_type()); // it must be the empty type, though
         clear_mixin_data();
         m_type = &type;
         return;

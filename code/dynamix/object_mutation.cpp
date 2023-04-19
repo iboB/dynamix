@@ -84,12 +84,22 @@ void object_mutation::deallocate_external_mixin(void* ptr, const mixin_info& inf
     );
 }
 
-// * allocated using own allocator
-// * fill object pointer appropriately to newly allocated mixins
-// * attach common external mixins to mixin_data elements
-// * no mixin initialization here
 void object_mutation::allocate_mixin_data() {
     assert(m_allocated_upto == 0);
+
+    if (m_target_type == *m_old_type) {
+        // tag: same_type_shortcut
+        // we've somehow ended-up mutating the object with the same type
+        // in this case we know that there are no new mixins and only common ones
+        // we can skip allocating new mixin data altogether
+        m_target_mixin_data = m_old_mixin_data;
+        return;
+    }
+
+    // * allocate using object allocator
+    // * fill object pointer appropriately to newly allocated mixins
+    // * attach common external mixins to mixin_data elements
+    // * no mixin initialization here
 
     auto buf = m_target_type.allocate_object_buffer(m_object.m_allocator);
     m_target_mixin_data = reinterpret_cast<object_mixin_data*>(buf);
@@ -171,13 +181,24 @@ void object_mutation::destroy_new_mixins() noexcept {
 
 void object_mutation::rollback() noexcept {
     m_complete = false;
-    destroy_new_mixins();
-    deallocate_mixin_data();
+    if (m_target_type != *m_old_type) {
+        // tag: same_type_shortcut
+        // no new mixins, no allocated mixin data
+        destroy_new_mixins();
+        deallocate_mixin_data();
+    }
     m_moved_out_from = true;
 }
 
 void object_mutation::finalize() noexcept {
     if (!m_complete) return;
+
+    if (m_target_type == *m_old_type) {
+        // tag: same_type_shortcut
+        m_old_mixin_data = nullptr;
+        m_old_type = nullptr;
+        return;
+    }
 
     // free old data if any
     if (m_old_mixin_data) {

@@ -863,7 +863,7 @@ TEST_CASE("seal") {
     CHECK_THROWS_WITH_AS(mutate(sobj, add(*t.mesh)), "sl: mutate sealed object of type {'movable'}", object_error);
     CHECK(sobj.equals(scopy));
 
-    CHECK_THROWS_WITH_AS(sobj.reset_type(*t.t_mov), "sl: mutate sealed object of type {'movable'}", object_error);
+    CHECK_THROWS_WITH_AS(sobj.reset_type(*t.t_afmi), "sl: reset_type sealed object of type {'movable'}", object_error);
     CHECK(sobj.equals(scopy));
 
     {
@@ -873,4 +873,24 @@ TEST_CASE("seal") {
 
     object csobj(*t.t_asim, {}, true);
     CHECK(csobj.sealed());
+}
+
+TEST_CASE("same type") {
+    test_data t;
+    domain dom("sl");
+    t.register_all_mixins(dom);
+    t.create_types(dom);
+
+    object obj(*t.t_afmi);
+    const auto inv = obj.get(*t.invisible);
+    CHECK(inv);
+
+    obj.reset_type(*t.t_afmi);
+    CHECK(inv == obj.get(*t.invisible));
+
+    mutate_to(obj, *t.t_afmi);
+    CHECK(inv == obj.get(*t.invisible));
+
+    perform_object_mutation(obj, *t.t_afmi);
+    CHECK(inv == obj.get(*t.invisible));
 }

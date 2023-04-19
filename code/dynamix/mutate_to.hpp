@@ -15,6 +15,8 @@ inline void mutate_to(object& obj, const type& type) {
 
 template <typename... Ops>
 void mutate_to(object& obj, const type& type, Ops&&... ops) {
+    if (obj.get_type() == type) return; // noop
+
     // here we need to:
     // * filter out ops that are not applicable for the object mutation which is to come
     // * sort the applicable ones by index in the new type
