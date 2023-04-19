@@ -5,7 +5,6 @@
 #include "mutation_rule.hpp"
 #include <dynamix/globals.hpp>
 #include <dynamix/type_mutation.hpp>
-#include <itlib/qalgorithm.hpp>
 #include <vector>
 
 namespace dynamix::v1compat {
@@ -21,7 +20,7 @@ public:
 };
 }
 
-class dependent_mixins : public mutation_rule, public impl::mixin_list {
+class DYNAMIX_V1COMPAT_API dependent_mixins_oneshot : public mutation_rule, public impl::mixin_list {
     const mixin_info* master = nullptr;
 public:
     template <typename Mixin>
@@ -29,36 +28,23 @@ public:
         master = &g::get_mixin_info<Mixin>();
     }
 
-    virtual void apply_to(type_mutation& mut) override {
-        if (mut.has(*master)) {
-            for (auto i : infos) {
-                mut.add_if_lacking(*i);
-            }
-        }
-        else {
-            for (auto i : infos) {
-                mut.remove(*i);
-            }
-        }
-    }
+    virtual void apply_to(type_mutation& mut) override;
 };
 
-class mutually_exclusive_mixins : public mutation_rule, public impl::mixin_list {
+class DYNAMIX_V1COMPAT_API dependent_mixins_dep : public mutation_rule, public impl::mixin_list {
+    const mixin_info* master = nullptr;
 public:
-    virtual void apply_to(type_mutation& mut) override {
-        // we want to keep the last
-        // so reverse, keep the first, then reverse again
-        std::reverse(mut.mixins.begin(), mut.mixins.end());
-        bool found = false;
-        itlib::erase_all_if(mut.mixins, [&](const mixin_info* i) {
-            auto f = itlib::pfind(infos, i);
-            if (!f) return false; // don't care about this one
-            if (found) return true; // erase if another mutually exclusive was found
-            found = true;
-            return false; // keep the first
-        });
-        std::reverse(mut.mixins.begin(), mut.mixins.end());
+    template <typename Mixin>
+    void set_master() {
+        master = &g::get_mixin_info<Mixin>();
     }
+
+    virtual void apply_to(type_mutation& mut) override;
+};
+
+class DYNAMIX_V1COMPAT_API mutually_exclusive_mixins : public mutation_rule, public impl::mixin_list {
+public:
+    virtual void apply_to(type_mutation& mut) override;
 };
 
 template <typename Mixin>

@@ -31,7 +31,12 @@ bound_impl bind(Message*, Func f) {
 
 struct mixin_name {
     std::string_view name;
-    mixin_name(std::string_view n) : name(n) {}
+    explicit mixin_name(std::string_view n) : name(n) {}
+};
+
+struct dependency_mixin {
+    bool value;
+    explicit dependency_mixin(bool val = true) : value(val) {}
 };
 
 // templated so the type can be passed along with the perks
@@ -121,6 +126,11 @@ public:
 
     feature_parser& operator&(mixin_name n) {
         super::name(n.name);
+        return *this;
+    }
+
+    feature_parser& operator&(dependency_mixin dep) {
+        super::dependency(dep.value);
         return *this;
     }
 
