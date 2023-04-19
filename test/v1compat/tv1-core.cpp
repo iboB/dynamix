@@ -131,6 +131,7 @@ TEST_CASE("complex_apply_mutation") {
     CHECK_FALSE(o.get<counter>());
     CHECK(!o.implements(dummy_msg));
     CHECK(!o.implements(unused_msg));
+    CHECK(!o.get_type().implements_strong("dummy"));
 
     mutate(o).add<no_messages>();
     CHECK(o.has<no_messages>());
@@ -142,6 +143,7 @@ TEST_CASE("complex_apply_mutation") {
     CHECK(o.has<counter>());
     CHECK(o.get<counter>());
     CHECK(o.implements(dummy_msg));
+    CHECK(o.get_type().implements_strong("dummy"));
     CHECK(o.get<counter>()->get_count() == 0);
     o.get<counter>()->count_uni();
     CHECK(o.get<counter>()->get_count() == 1);
