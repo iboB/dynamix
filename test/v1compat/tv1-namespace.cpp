@@ -36,17 +36,14 @@ TEST_CASE("mixins") {
 namespace mixins1 {
 class a {};
 class b {};
-
-// v2!: a manual name must be used here
-//      no typeid
-DYNAMIX_V1_DEFINE_MIXIN(a, mixin_name("mixins1::a"));
-DYNAMIX_V1_DEFINE_MIXIN(b, mixin_name("mixins1::b"));
+DYNAMIX_V1_DEFINE_MIXIN(a, dynamix::v1compat::none);
+DYNAMIX_V1_DEFINE_MIXIN(b, dynamix::v1compat::none);
 }
 
 namespace mixins2 {
 class a {};
 class b {};
 
-DYNAMIX_V1_DEFINE_MIXIN(a, mixin_name("mixins2::a"));
-DYNAMIX_V1_DEFINE_MIXIN(b, mixin_name("mixins2::b"));
+DYNAMIX_V1_DEFINE_MIXIN(a, dynamix::v1compat::none);
+DYNAMIX_V1_DEFINE_MIXIN(b, dynamix::v1compat::none);
 }

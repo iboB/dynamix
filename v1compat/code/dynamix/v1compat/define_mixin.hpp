@@ -4,6 +4,9 @@
 #pragma once
 #include "domain.hpp"
 #include <dynamix/define_mixin.hpp>
+#if !defined(DYNAMIX_USE_TYPEID) || DYNAMIX_USE_TYPEID
+#include <dynamix/bits/type_name_from_typeid.hpp>
+#endif
 
 namespace dynamix::v1compat {
 
@@ -102,6 +105,9 @@ public:
         : super(data, name)
     {
         data.info.force_external = true;
+#if !defined(DYNAMIX_USE_TYPEID) || DYNAMIX_USE_TYPEID
+        super::store_name(util::get_type_name_from_typeid<Mixin>());
+#endif
     }
 
     template <typename Message>
