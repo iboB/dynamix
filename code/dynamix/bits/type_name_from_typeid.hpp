@@ -12,13 +12,13 @@
 #endif
 
 namespace dynamix::util {
-std::string get_type_name_from_typeid(const char* typeid_name) {
+inline std::string get_type_name_from_typeid(const char* typeid_name) {
 #if defined(__GNUC__) // __GNUC__ is defined with clang
     // use cxxabi to unmangle the gcc typeid name
     int cxa_demangle_status = 0;
-    auto str = abi::__cxa_demangle(typeid_name, nullptr, nullptr, &cxa_demangle_status);
-    std::string ret = str;
-    free(typeid_name);
+    char* demangled = abi::__cxa_demangle(typeid_name, nullptr, nullptr, &cxa_demangle_status);
+    std::string ret = demangled;
+    free(demangled);
     return ret;
 #elif defined(_MSC_VER)
     std::string_view sv_name = typeid_name;
