@@ -37,7 +37,7 @@ namespace throw_exception {
 // type_error
 [[noreturn]] void mutation_rule_user_error(const type_mutation& mut, const mutation_rule_info& info, error_return_t error);
 [[noreturn]] void cyclic_rule_deps(const type_mutation& mut);
-[[noreturn]] void type_mut_error(const type_mutation& mut, std::string_view err, const mixin_info& m);
+[[noreturn]] DYNAMIX_API void type_mut_error(const type_mutation& mut, std::string_view err, const mixin_info& m);
 [[noreturn]] void type_mut_error(const type_mutation& mut, std::string_view op, std::string_view mixin_name);
 [[noreturn]] void feature_clash(const type_mutation& mut, const dnmx_ftable_payload& a, const dnmx_ftable_payload& b);
 [[noreturn]] void unknown_type_class(const type& t, const std::string_view name);

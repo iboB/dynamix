@@ -15,10 +15,12 @@ DYNAMIX_V1_DECLARE_MIXIN(c);
 class a {};
 class b {};
 class c {};
+class dep {};
 
 DYNAMIX_V1_DEFINE_MIXIN(a, dynamix::v1compat::none);
 DYNAMIX_V1_DEFINE_MIXIN(b, dynamix::v1compat::none);
 DYNAMIX_V1_DEFINE_MIXIN(c, dynamix::v1compat::none);
+DYNAMIX_V1_DEFINE_MIXIN(dep, dynamix::v1compat::dependency_mixin(true));
 
 using namespace dynamix::v1compat;
 
@@ -29,7 +31,7 @@ TEST_SUITE_BEGIN("mutation rules");
 class custom_rule : public mutation_rule {
 public:
     void apply_to(dynamix::type_mutation& mutation) override {
-        // v2!: mutation is different: no realtive checks
+        // v2!: mutation is different: no relative checks
         if (mutation.has<a>()) {
             mutation.add_if_lacking<b>();
         }
@@ -105,8 +107,75 @@ TEST_CASE("custom rule") {
     CHECK(depr == remove_mutation_rule(1));
 }
 
-TEST_CASE("dependent") {
-    auto rule = new dependent_mixins;
+// v2!: depdendent_mixins split into dependent_mixins_dep and dependent_mixins_oneshot
+TEST_CASE("dependent dep") {
+    auto rule = new dependent_mixins_dep;
+    rule->set_master<a>();
+    rule->add<dep>();
+    auto id = add_mutation_rule(rule);
+
+    object o;
+
+    mutate(o)
+        .add<a>();
+
+    CHECK(o.has<a>());
+    CHECK(o.has<dep>());
+    CHECK(!o.has<c>());
+
+    mutate(o)
+        .remove<dep>();
+
+    // v2!: this relation is no longer possible
+    // dep is alays bound to a
+    //CHECK(o.has<a>());
+    //CHECK(!o.has<dep>());
+    //CHECK(!o.has<c>());
+
+    //mutate(o)
+    //    .add<dep>();
+
+    CHECK(o.has<a>());
+    CHECK(o.has<dep>());
+    CHECK(!o.has<c>());
+
+    mutate(o)
+        .remove<a>();
+
+    CHECK(o.empty());
+
+    mutate(o)
+        .add<dep>()
+        .add<c>();
+
+    CHECK(!o.has<a>());
+    // v2!: this relation is no longer possible:
+    // b is always bound to a
+    CHECK_FALSE(o.has<dep>());
+    CHECK(o.has<c>());
+
+    auto rule2 = new dependent_mixins_dep;
+    rule2->set_master<b>();
+    rule2->add<dep>();
+    auto id2 = add_mutation_rule(rule2);
+
+    mutate(o).add<b>();
+    CHECK(o.has<dep>());
+    mutate(o).add<a>();
+    CHECK(o.has<dep>());
+    mutate(o).remove<b>();
+    CHECK(o.has<dep>());
+    mutate(o).remove<a>();
+    CHECK_FALSE(o.has<dep>());
+
+    auto r = remove_mutation_rule(id);
+    CHECK(r.get() == rule);
+    r = remove_mutation_rule(id2);
+    CHECK(r.get() == rule2);
+}
+
+TEST_CASE("dependent oneshot") {
+    auto rule = new dependent_mixins_oneshot;
     rule->set_master<a>();
     rule->add<b>();
     auto id = add_mutation_rule(rule);
@@ -116,15 +185,11 @@ TEST_CASE("dependent") {
     mutate(o)
         .add<a>();
 
-    CHECK(o.has<a>());
-    CHECK(o.has<b>());
-    CHECK(!o.has<c>());
-
     mutate(o)
         .remove<b>();
 
     // v2!: this relation is no longer possible
-    // b is alays bound to a
+    // dep is alays bound to a
     //CHECK(o.has<a>());
     //CHECK(!o.has<b>());
     //CHECK(!o.has<c>());
@@ -132,6 +197,7 @@ TEST_CASE("dependent") {
     //mutate(o)
     //    .add<b>();
 
+    // v2!: this relation is no longer possible:
     CHECK(o.has<a>());
     CHECK(o.has<b>());
     CHECK(!o.has<c>());
@@ -139,16 +205,14 @@ TEST_CASE("dependent") {
     mutate(o)
         .remove<a>();
 
-    CHECK(o.empty());
+    // v2!: b is detached from a on remove
+    CHECK(o.has<b>());
 
     mutate(o)
-        .add<b>()
         .add<c>();
 
     CHECK(!o.has<a>());
-    // v2!: this relation is no longer possible:
-    // b is always bound to a
-    CHECK_FALSE(o.has<b>());
+    CHECK(o.has<b>());
     CHECK(o.has<c>());
 
     auto r = remove_mutation_rule(id);

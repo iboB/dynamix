@@ -4,6 +4,9 @@
 #pragma once
 #include "domain.hpp"
 #include <dynamix/define_mixin.hpp>
+#if !defined(DYNAMIX_USE_TYPEID) || DYNAMIX_USE_TYPEID
+#include <dynamix/bits/type_name_from_typeid.hpp>
+#endif
 
 namespace dynamix::v1compat {
 
@@ -31,7 +34,12 @@ bound_impl bind(Message*, Func f) {
 
 struct mixin_name {
     std::string_view name;
-    mixin_name(std::string_view n) : name(n) {}
+    explicit mixin_name(std::string_view n) : name(n) {}
+};
+
+struct dependency_mixin {
+    bool value;
+    explicit dependency_mixin(bool val = true) : value(val) {}
 };
 
 // templated so the type can be passed along with the perks
@@ -97,6 +105,9 @@ public:
         : super(data, name)
     {
         data.info.force_external = true;
+#if !defined(DYNAMIX_USE_TYPEID) || DYNAMIX_USE_TYPEID
+        super::store_name(util::get_type_name_from_typeid<Mixin>());
+#endif
     }
 
     template <typename Message>
@@ -121,6 +132,11 @@ public:
 
     feature_parser& operator&(mixin_name n) {
         super::name(n.name);
+        return *this;
+    }
+
+    feature_parser& operator&(dependency_mixin dep) {
+        super::dependency(dep.value);
         return *this;
     }
 

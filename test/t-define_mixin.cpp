@@ -208,6 +208,11 @@ TEST_CASE("declared mixins only") {
     CHECK(obj2.empty());
     CHECK(obj3.get<bob>() == o2bob);
 
+    auto co2bob = obj3.get<const bob>();
+    CHECK(co2bob);
+    static_assert(std::is_same_v<decltype(co2bob), const bob*>);
+    CHECK(co2bob == o2bob);
+
     {
         const auto& cobj3 = obj3;
         CHECK(cobj3.has<bob>());

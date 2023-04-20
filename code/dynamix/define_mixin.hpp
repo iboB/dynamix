@@ -37,7 +37,7 @@ struct mixin_info_data_instance {
 
 #define DYNAMIX_DEFINE_MIXIN_EX(domain_tag, mixin, builder) \
 static const ::dynamix::util::mixin_info_data& I_DYNAMIX_MIXIN_INFO_VAR(mixin) = ::dynamix::impl::mixin_info_data_instance<domain_tag, mixin>::the_data_safe(); \
-const ::dynamix::mixin_info& _dynamix_get_mixin_info(mixin*) { \
+const ::dynamix::mixin_info& _dynamix_get_mixin_info(const mixin*) { \
     return I_DYNAMIX_MIXIN_INFO_VAR(mixin).info; \
 } \
 using namespace ::dynamix::util::builder_literals; \

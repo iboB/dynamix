@@ -6,6 +6,8 @@
 #include "domain.hpp"
 
 #include <dynamix/domain.hpp>
+#include <dynamix/mixin_info.hpp>
+#include <dynamix/throw_exception.hpp>
 
 #include <itlib/data_mutex.hpp>
 #include <itlib/qalgorithm.hpp>
@@ -63,6 +65,36 @@ std::shared_ptr<mutation_rule> remove_mutation_rule(mutation_rule_id id) {
     auto& dom = domain::instance();
     dom.remove_mutation_rule(r->info());
     return r;
+}
+
+void dependent_mixins_oneshot::apply_to(type_mutation& mut) {
+    if (!mut.has(*master)) return;
+    for (auto i : infos) {
+        mut.add_if_lacking(*i);
+    }
+}
+
+void dependent_mixins_dep::apply_to(type_mutation& mut) {
+    if (!mut.has(*master)) return;
+    for (auto i : infos) {
+        if (!i->dependency) dynamix::throw_exception::type_mut_error(mut, "rule with no dep", *i);
+        mut.add_if_lacking(*i);
+    }
+}
+
+void mutually_exclusive_mixins::apply_to(type_mutation& mut) {
+    // we want to keep the last
+    // so reverse, keep the first, then reverse again
+    std::reverse(mut.mixins.begin(), mut.mixins.end());
+    bool found = false;
+    itlib::erase_all_if(mut.mixins, [&](const mixin_info* i) {
+        auto f = itlib::pfind(infos, i);
+        if (!f) return false; // don't care about this one
+        if (found) return true; // erase if another mutually exclusive was found
+        found = true;
+        return false; // keep the first
+    });
+    std::reverse(mut.mixins.begin(), mut.mixins.end());
 }
 
 }
