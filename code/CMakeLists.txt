@@ -28,6 +28,7 @@ target_sources(dynamix PRIVATE
     dynamix/bits/make_from_tuple.hpp
     dynamix/bits/make_nullptr.hpp
     dynamix/bits/q_const.hpp
+    dynamix/bits/type_name_from_typeid.hpp
 
     dynamix/compat/pmr/pmr.hpp
     dynamix/compat/pmr/allocator.hpp
