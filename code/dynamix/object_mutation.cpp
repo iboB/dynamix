@@ -162,10 +162,15 @@ void object_mutation::deallocate_mixin_data() noexcept {
             deallocate_external_mixin(data.buf, info);
         }
     }
-    // finally deallocate ret
-    m_target_type.deallocate_object_buffer(m_object.m_allocator, m_target_mixin_data);
-    m_target_mixin_data = nullptr;
+
     m_allocated_upto = 0;
+
+    // finally deallocate ret
+    // (which will be null if its allocation threw or the object was sealed)
+    if (m_target_mixin_data) {
+        m_target_type.deallocate_object_buffer(m_object.m_allocator, m_target_mixin_data);
+        m_target_mixin_data = nullptr;
+    }
 }
 
 void object_mutation::destroy_new_mixins() noexcept {
