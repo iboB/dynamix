@@ -87,7 +87,7 @@ void object_mutation::deallocate_external_mixin(void* ptr, const mixin_info& inf
 void object_mutation::allocate_mixin_data() {
     assert(m_allocated_upto == 0);
 
-    if (m_target_type == *m_old_type) {
+    if (&m_target_type == m_old_type) {
         // tag: same_type_shortcut
         // we've somehow ended-up mutating the object with the same type
         // in this case we know that there are no new mixins and only common ones
@@ -162,10 +162,15 @@ void object_mutation::deallocate_mixin_data() noexcept {
             deallocate_external_mixin(data.buf, info);
         }
     }
-    // finally deallocate ret
-    m_target_type.deallocate_object_buffer(m_object.m_allocator, m_target_mixin_data);
-    m_target_mixin_data = nullptr;
+
     m_allocated_upto = 0;
+
+    // finally deallocate ret
+    // (which will be null if its allocation threw or the object was sealed)
+    if (m_target_mixin_data) {
+        m_target_type.deallocate_object_buffer(m_object.m_allocator, m_target_mixin_data);
+        m_target_mixin_data = nullptr;
+    }
 }
 
 void object_mutation::destroy_new_mixins() noexcept {
@@ -181,7 +186,7 @@ void object_mutation::destroy_new_mixins() noexcept {
 
 void object_mutation::rollback() noexcept {
     m_complete = false;
-    if (m_target_type != *m_old_type) {
+    if (&m_target_type != m_old_type) {
         // tag: same_type_shortcut
         // no new mixins, no allocated mixin data
         destroy_new_mixins();
@@ -193,7 +198,7 @@ void object_mutation::rollback() noexcept {
 void object_mutation::finalize() noexcept {
     if (!m_complete) return;
 
-    if (m_target_type == *m_old_type) {
+    if (&m_target_type == m_old_type) {
         // tag: same_type_shortcut
         m_old_mixin_data = nullptr;
         m_old_type = nullptr;

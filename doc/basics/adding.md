@@ -19,7 +19,7 @@ The dependencies are:
 * [iboB/splat](https://github.com/iboB/splat) `~> 1.3.1`
 * [iboB/itlib](https://github.com/iboB/itlib) `~> 1.9.0`
 * CMake only: [iboB/icm](https://github.com/iboB/icm) `~> 1.4.4`
-* Tests only: [iboB/doctest-util](https://github.com/iboB/doctest-util) `~> 0.2.0`
+* Tests only: [iboB/doctest-util](https://github.com/iboB/doctest-util) `~> 0.1.1`
 * Tests only: [iboB/doctest-lib](https://github.com/iboB/doctest-lib) `~> 2.4.9a`
 * C Tests only: [ThrowTheSwitch/Unity](https://github.com/iboB/doctest-util) `~> 2.5.2`
 * Benchmarks only: [iboB/picobench](https://github.com/iboB/picobench) `~> 2.04`

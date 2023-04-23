@@ -46,3 +46,6 @@ jobs:
         run: cmake --build . --config ${{ matrix.cfg.btype }} ${{ matrix.cfg.buildflags }}
       - name: Test
         run: ctest -C ${{ matrix.cfg.btype }} --output-on-failure
+        env:
+          # just set this to all configs, it will be used where it matters and ignored otherwise
+          UBSAN_OPTIONS: halt_on_error=1
