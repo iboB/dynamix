@@ -84,6 +84,11 @@
           "name": "DYNAMIX_STATIC",
           "value": "True",
           "type": "BOOL"
+        },
+        {
+          "name": "DYNAMIX_V1COMPAT_STATIC",
+          "value": "True",
+          "type": "BOOL"
         }
       ]
     }

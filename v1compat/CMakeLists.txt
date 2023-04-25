@@ -9,10 +9,9 @@ target_link_libraries(dynamix-v1compat PUBLIC
     dynamix::dynamix
 )
 
-option(DYNAMIX_V1COMPAT_STATIC "DynaMix-v1compat: build as static lib" OFF)
-if(DYNAMIX_STATIC)
-    # cannot have v1compat shared with dynamix static
-    set(DYNAMIX_V1COMPAT_STATIC ON)
+option(DYNAMIX_V1COMPAT_STATIC "DynaMix-v1compat: build as static lib" ${DYNAMIX_STATIC})
+if(DYNAMIX_STATIC AND NOT DYNAMIX_V1COMPAT_STATIC)
+    message(FATAL_ERROR "DynaMix-v1compat: cannot build v1compat as shared while DynaMix core lib is static")
 endif()
 option(DYNAMIX_V1COMPAT_GENERATE_CODE "DynaMix-v1compat: generate message macros with cmake" ON)
 
