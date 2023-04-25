@@ -9,6 +9,11 @@ target_link_libraries(dynamix-v1compat PUBLIC
     dynamix::dynamix
 )
 
+option(DYNAMIX_V1COMPAT_STATIC "DynaMix-v1compat: build as static lib" OFF)
+if(DYNAMIX_STATIC)
+    # cannot have v1compat shared with dynamix static
+    set(DYNAMIX_V1COMPAT_STATIC ON)
+endif()
 option(DYNAMIX_V1COMPAT_GENERATE_CODE "DynaMix-v1compat: generate message macros with cmake" ON)
 
 set(genOutDir ${CMAKE_CURRENT_SOURCE_DIR}/code/dynamix/v1compat/gen)

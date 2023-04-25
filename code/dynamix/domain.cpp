@@ -57,13 +57,6 @@ error_return_t sort_by_canonical_order(dnmx_type_mutation_handle mutation, uintp
     return result_success;
 }
 
-const mutation_rule_info canonicalize_rule = {
-    dnmx_make_sv_lit("canonicalize types"),
-    sort_by_canonical_order,
-    0,
-    std::numeric_limits<int32_t>::max()
-};
-
 using mixin_info_span = const itlib::span<const mixin_info* const>;
 
 template <typename T>
@@ -178,6 +171,13 @@ public:
 
     type m_empty_type;
 
+    const mutation_rule_info m_canonicalize_rule = {
+        dnmx_make_sv_lit("canonicalize types"),
+        sort_by_canonical_order,
+        0,
+        std::numeric_limits<int32_t>::max()
+    };
+
     impl(domain& domain, allocator alloc)
         : m_domain(domain)
         , m_allocator(std::move(alloc))
@@ -187,7 +187,7 @@ public:
     {
         if (m_domain.m_settings.canonicalize_types) {
             // we solve this requirement by adding a mutation rule which sorts the mixins of the new type
-            add_mutation_rule(canonicalize_rule);
+            add_mutation_rule(m_canonicalize_rule);
         }
     }
 
