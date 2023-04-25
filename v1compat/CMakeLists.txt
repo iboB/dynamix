@@ -1,6 +1,12 @@
 # Copyright (c) Borislav Stanimirov
 # SPDX-License-Identifier: MIT
 #
+option(DYNAMIX_V1COMPAT_STATIC "DynaMix-v1compat: build as static lib" ${DYNAMIX_STATIC})
+if(DYNAMIX_STATIC AND NOT DYNAMIX_V1COMPAT_STATIC)
+    message(FATAL_ERROR "DynaMix-v1compat: cannot build v1compat as shared while DynaMix core lib is static")
+endif()
+option(DYNAMIX_V1COMPAT_GENERATE_CODE "DynaMix-v1compat: generate message macros with cmake" ON)
+
 icm_add_lib(dynamix-v1compat DYNAMIX_V1COMPAT)
 add_library(dynamix::v1compat ALIAS dynamix-v1compat)
 target_include_directories(dynamix-v1compat INTERFACE code)
@@ -8,12 +14,6 @@ target_include_directories(dynamix-v1compat INTERFACE code)
 target_link_libraries(dynamix-v1compat PUBLIC
     dynamix::dynamix
 )
-
-option(DYNAMIX_V1COMPAT_STATIC "DynaMix-v1compat: build as static lib" ${DYNAMIX_STATIC})
-if(DYNAMIX_STATIC AND NOT DYNAMIX_V1COMPAT_STATIC)
-    message(FATAL_ERROR "DynaMix-v1compat: cannot build v1compat as shared while DynaMix core lib is static")
-endif()
-option(DYNAMIX_V1COMPAT_GENERATE_CODE "DynaMix-v1compat: generate message macros with cmake" ON)
 
 set(genOutDir ${CMAKE_CURRENT_SOURCE_DIR}/code/dynamix/v1compat/gen)
 set(generatedFiles
