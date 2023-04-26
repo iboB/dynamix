@@ -64,4 +64,4 @@
     } \
     const ::dynamix::feature_info& I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::info = I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::get_info_safe(); \
     I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name) * I_DYNAMIX_V1_MESSAGE_TAG(message_name) = nullptr; \
-    return_type I_DYNAMIX_V1_DEFAULT_IMPL_FUNC_NAME(message_name)(I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::traits::obj_t& dm_self %{coma_args_signature})
+    return_type I_DYNAMIX_V1_DEFAULT_IMPL_FUNC_NAME(message_name)([[maybe_unused]] I_DYNAMIX_V1_MSG_STRUCT_NAME(message_name)::traits::obj_t& dm_self %{coma_args_signature})

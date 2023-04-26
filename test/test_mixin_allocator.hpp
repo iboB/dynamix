@@ -14,7 +14,7 @@ public:
     virtual dynamix::byte_t* alloc_mixin_buf(const dynamix::mixin_info& info) override {
         if (info.user_data == 666) throw std::logic_error("bad alloc");
 
-#if defined(_MSC_VER)
+#if defined(_WIN32)
         void* ret = _aligned_malloc(info.obj_buf_size, info.obj_buf_alignment_and_mixin_offset);
 #else
         // aligned_alloc requires size to be a multiple of alignment
@@ -24,7 +24,7 @@ public:
         return static_cast<dynamix::byte_t*>(ret);
     }
     virtual void dealloc_mixin_buf(dynamix::byte_t* ptr, const dynamix::mixin_info&) noexcept override {
-#if defined(_MSC_VER)
+#if defined(_WIN32)
         _aligned_free(ptr);
 #else
         free(ptr);
