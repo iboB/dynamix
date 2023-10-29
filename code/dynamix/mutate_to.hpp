@@ -21,7 +21,7 @@ void mutate_to(object& obj, const type& type, Ops&&... ops) {
     // * filter out ops that are not applicable for the object mutation which is to come
     // * sort the applicable ones by index in the new type
     // * apply
-    // we could do it boost::mpl-style: by doint it in a tuple of ops
+    // we could do it boost::mpl-style: by doing it in a tuple of ops
     // the code however will be very hard to follow and will compile for a really long time
     // instead we sacrifice a tiny bit of performance and do it in a more readable fashion
     // and help the the compiler a bit with this complicated task
