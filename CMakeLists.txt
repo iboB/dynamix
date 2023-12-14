@@ -12,7 +12,7 @@ include(./get_cpm.cmake)
 
 #######################################
 # cmake lib
-CPMAddPackage("gh:iboB/icm@1.4.5")
+CPMAddPackage("gh:iboB/icm@1.5.0")
 
 list(APPEND CMAKE_MODULE_PATH
     "${icm_SOURCE_DIR}"
@@ -27,7 +27,8 @@ include(icm_dev_mode)
 #######################################
 # options
 
-option(DYNAMIX_STATIC "DynaMix: build as a static library" OFF)
+option(BUILD_SHARED_LIBS "DynaMix: build shared libraries" ON)
+option(DYNAMIX_STATIC "DynaMix: build dynamix as a static library" OFF)
 option(DYNAMIX_BUILD_V1COMPAT "DynaMix: build v1 compatibility lib" ${ICM_DEV_MODE})
 option(DYNAMIX_BUILD_TESTS "DynaMix: enable testing and build tests" ${ICM_DEV_MODE})
 option(DYNAMIX_BUILD_EXAMPLES "DynaMix: build examples" ${ICM_DEV_MODE})
@@ -37,14 +38,6 @@ option(DYNAMIX_BUILD_BENCH "DynaMix: build benchmarks" ${ICM_DEV_MODE})
 
 # Off by default since it's slow
 option(DYNAMIX_BUILD_COMPILER_BENCH "DynaMix: build compilation time benchmarks (may be really slow)" OFF)
-
-#######################################
-# cfg
-if(ICM_STATIC_LIBS OR DYNAMIX_STATIC)
-    set(DYNAMIX_SHARED FALSE)
-else()
-    set(DYNAMIX_SHARED TRUE)
-endif()
 
 #######################################
 # code

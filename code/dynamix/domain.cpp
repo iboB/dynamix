@@ -609,7 +609,7 @@ public:
         itlib::span<const type::ftable_entry> build_ftable(byte_t* const ptr) const {
             std::fill(ptr, ptr + calc_ftable_byte_size(), byte_t{0});
             itlib::span<mutable_ftable_entry> ftable(reinterpret_cast<mutable_ftable_entry*>(ptr), m_num_reachable_pls.size());
-            auto ftable_pl_ptr = reinterpret_cast<type::ftable_payload*>(ptr + ftable.byte_size());
+            auto ftable_pl_ptr = reinterpret_cast<type::ftable_payload*>(ptr + ftable.size_bytes());
 
             // third pass
             // attach begin and end pointers of ftable entries and give them values
@@ -721,7 +721,7 @@ public:
         const ftable_build_helper ftable_helper(mutation);
         const byte_size_t ftable_size = ftable_helper.calc_ftable_byte_size();
 
-        const byte_size_t mixins_buf_size = byte_size_t(mixins.byte_size());
+        const byte_size_t mixins_buf_size = byte_size_t(mixins.size_bytes());
 
         const byte_size_t mixin_offsets_buf_size = byte_size_t(mixins.size() * sizeof(uint32_t));
 

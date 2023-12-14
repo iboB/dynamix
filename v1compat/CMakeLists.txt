@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 #
 option(DYNAMIX_V1COMPAT_STATIC "DynaMix-v1compat: build as static lib" ${DYNAMIX_STATIC})
-if(DYNAMIX_STATIC AND NOT DYNAMIX_V1COMPAT_STATIC)
+if(BUILD_SHARED_LIBS AND DYNAMIX_STATIC AND NOT DYNAMIX_V1COMPAT_STATIC)
     message(FATAL_ERROR "DynaMix-v1compat: cannot build v1compat as shared while DynaMix core lib is static")
 endif()
 option(DYNAMIX_V1COMPAT_GENERATE_CODE "DynaMix-v1compat: generate message macros with cmake" ON)

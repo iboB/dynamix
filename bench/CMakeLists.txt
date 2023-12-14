@@ -1,7 +1,7 @@
 # Copyright (c) Borislav Stanimirov
 # SPDX-License-Identifier: MIT
 #
-CPMAddPackage(gh:iboB/picobench@2.05)
+CPMAddPackage(gh:iboB/picobench@2.06)
 
 add_subdirectory(picobench-main)
 
