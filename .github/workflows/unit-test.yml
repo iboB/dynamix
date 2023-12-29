@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         cfg:
-          # ubuntu sanitizing address, undefined, leak, thread
+          # ubuntu sanitize address, undefined, leak, thread
           - {name: 'linux gcc dbg s:addr,ub,leak', os: ubuntu-latest, btype: Debug, cmakeflags: '-DSAN_ADDR=1 -DSAN_UB=1 -DSAN_LEAK=1'}
           - {name: 'linux gcc rel s:addr', os: ubuntu-latest, btype: RelWithDebInfo, cmakeflags: '-DSAN_ADDR=1'}
           - {name: 'linux gcc rel s:thread', os: ubuntu-latest, btype: RelWithDebInfo, cmakeflags: '-DSAN_THREAD=1'}
@@ -24,10 +24,9 @@ jobs:
           - {name: 'mac clang dbg s:addr', os: macos-latest, btype: Debug, cmakeflags: '-DSAN_ADDR=1'}
           - {name: 'mac clang rel s:addr', os: macos-latest, btype: RelWithDebInfo, cmakeflags: '-DSAN_ADDR=1'}
           - {name: 'mac clang rel s:thread', os: macos-latest, btype: RelWithDebInfo, cmakeflags: '-DSAN_THREAD=1'}
-          # windows: no santizer with RelWithDebInfo (likely a msvc sanitizer bug... working on it)
-          # https://developercommunity.visualstudio.com/t/Address-sanitizer-in-Release-may-introdu/10314256?port=1025&fsid=c7b0f725-0959-4e2d-b63e-e4711eb92eca
+          # windows sanitize address
           - {name: 'win msvc dbg s:addr', os: windows-latest, btype: Debug, cmakeflags: '-DSAN_ADDR=1'}
-          - {name: 'win msvc rel', os: windows-latest, btype: RelWithDebInfo, cmakeflags: ''}
+          - {name: 'win msvc rel s:addr', os: windows-latest, btype: RelWithDebInfo, cmakeflags: '-DSAN_ADDR=1'}
     defaults:
       run:
         working-directory: ci
