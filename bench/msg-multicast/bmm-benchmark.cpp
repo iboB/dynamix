@@ -25,7 +25,7 @@ void benchmark(Accumulator (*factory)(std::minstd_rand&), picobench::state& pb) 
     for (auto& a : vec) {
         sum += a.accumulate(rng() % 10);
     }
-    pb.set_result(sum);
+    pb.set_result(uintptr_t(sum));
 }
 
 void virt(picobench::state& pb) {
