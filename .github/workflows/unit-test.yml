@@ -34,18 +34,23 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v3
+      - name: Install Ninja
+        uses: seanmiddleditch/gha-setup-ninja@v4
       - name: VC Vars
         # Setup vcvars on Windows
         # MSVC's address sanitizer attaches dependencies to several DLLs which are not in PATH
         # vcvars will add them to PATH and allow msvc asan executables to run
         if: matrix.cfg.os == 'windows-latest'
         uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+          toolset: 14.38.33130
       - name: Configure
-        run: cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.cfg.btype }} ${{ matrix.cfg.cmakeflags }}
+        run: cmake .. -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.cfg.btype }} ${{ matrix.cfg.cmakeflags }}
       - name: Build
-        run: cmake --build . --config ${{ matrix.cfg.btype }} ${{ matrix.cfg.buildflags }}
+        run: cmake --build . ${{ matrix.cfg.buildflags }}
       - name: Test
-        run: ctest -C ${{ matrix.cfg.btype }} --output-on-failure
+        run: ctest --output-on-failure
         env:
           # just set this to all configs, it will be used where it matters and ignored otherwise
           UBSAN_OPTIONS: halt_on_error=1
