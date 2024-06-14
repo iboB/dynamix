@@ -41,9 +41,6 @@ jobs:
         # vcvars will add them to PATH and allow msvc asan executables to run
         if: matrix.cfg.os == 'windows-latest'
         uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
-          toolset: 14.38.33130
       - name: Configure
         run: cmake .. -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.cfg.btype }} ${{ matrix.cfg.cmakeflags }}
       - name: Build
