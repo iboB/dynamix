@@ -1,0 +1,101 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true
+      }
+    },
+    {
+      "name": "base-debug",
+      "hidden": true,
+      "inherits": "base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+      "name": "base-release",
+      "hidden": true,
+      "inherits": "base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
+    },
+    {
+      "name": "static",
+      "hidden": true,
+      "cacheVariables": { "BUILD_SHARED_LIBS": "OFF" }
+    },
+    {
+      "name": "asan",
+      "hidden": true,
+      "cacheVariables": { "SAN_ADDR": true }
+    },
+    {
+      "name": "ubsan",
+      "hidden": true,
+      "cacheVariables": { "SAN_UB": true }
+    },
+    {
+      "name": "lsan",
+      "hidden": true,
+      "cacheVariables": { "SAN_LEAK": true }
+    },
+    {
+      "name": "tsan",
+      "hidden": true,
+      "cacheVariables": { "SAN_THREAD": true }
+    },
+
+    // common presets
+    {
+      "name": "debug",
+      "inherits": "base-debug"
+    },
+    {
+      "name": "release",
+      "inherits": "base-release"
+    },
+
+    {
+      "name": "static-debug",
+      "inherits": ["base-debug", "static"]
+    },
+    {
+      "name": "static-release",
+      "inherits": ["base-release", "static"]
+    },
+
+    // sanitizer presets
+    {
+      "name": "asan-debug",
+      "inherits": ["base-debug", "asan"]
+    },
+    {
+      "name": "asan-release",
+      "inherits": ["base-release", "asan"]
+    },
+    {
+      "name": "tsan-debug",
+      "inherits": ["base-debug", "tsan"]
+    },
+    {
+      "name": "tsan-release",
+      "inherits": ["base-release", "tsan"]
+    },
+    {
+      // linux supports combining these sanitizers
+      "name": "aublsan-debug",
+      "inherits": ["base-debug", "asan", "ubsan", "lsan"]
+    },
+
+    // platform specific presets (may only work with an IDE)
+    {
+      "name": "win-32bit-debug",
+      "inherits": "base-debug",
+      "architecture": { "value": "Win32", "strategy": "external" }
+    }
+  ]
+}
