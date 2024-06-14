@@ -49,7 +49,6 @@
       "cacheVariables": { "SAN_THREAD": true }
     },
 
-    // common presets
     {
       "name": "debug",
       "inherits": "base-debug"
@@ -68,7 +67,6 @@
       "inherits": ["base-release", "static"]
     },
 
-    // sanitizer presets
     {
       "name": "asan-debug",
       "inherits": ["base-debug", "asan"]
@@ -86,12 +84,11 @@
       "inherits": ["base-release", "tsan"]
     },
     {
-      // linux supports combining these sanitizers
       "name": "aublsan-debug",
+      "description": "combining addr, ub and leak sanitizers is widely supported on many platforms",
       "inherits": ["base-debug", "asan", "ubsan", "lsan"]
     },
 
-    // platform specific presets (may only work with an IDE)
     {
       "name": "win-32bit-debug",
       "inherits": "base-debug",
