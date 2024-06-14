@@ -59,38 +59,38 @@
     },
 
     {
-      "name": "static-debug",
+      "name": "debug-static",
       "inherits": ["base-debug", "static"]
     },
     {
-      "name": "static-release",
+      "name": "release-static",
       "inherits": ["base-release", "static"]
     },
 
     {
-      "name": "asan-debug",
+      "name": "debug-asan",
       "inherits": ["base-debug", "asan"]
     },
     {
-      "name": "asan-release",
+      "name": "release-asan",
       "inherits": ["base-release", "asan"]
     },
     {
-      "name": "tsan-debug",
+      "name": "debug-tsan",
       "inherits": ["base-debug", "tsan"]
     },
     {
-      "name": "tsan-release",
+      "name": "release-tsan",
       "inherits": ["base-release", "tsan"]
     },
     {
-      "name": "aublsan-debug",
+      "name": "debug-aublsan",
       "description": "combining addr, ub and leak sanitizers is widely supported on many platforms",
       "inherits": ["base-debug", "asan", "ubsan", "lsan"]
     },
 
     {
-      "name": "win-32bit-debug",
+      "name": "win-debug-32bit",
       "inherits": "base-debug",
       "architecture": { "value": "Win32", "strategy": "external" }
     }
