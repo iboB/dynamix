@@ -89,7 +89,7 @@ This software is distributed under the MIT Software License.
 
 See accompanying file LICENSE or copy [here](https://opensource.org/licenses/MIT).
 
-Copyright &copy; 2013-2023 [Borislav Stanimirov](http://github.com/iboB), [Zahary Karadjov](http://github.com/zah)
+Copyright &copy; 2013-2024 [Borislav Stanimirov](http://github.com/iboB), [Zahary Karadjov](http://github.com/zah)
 
 ### Logo
 
