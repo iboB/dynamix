@@ -6,7 +6,7 @@ Currently the only supported way to add DynaMix to a project is as a [CPM.cmake]
 
 ## As a CPM.cmake package
 
-The recommended and the easiest way to add the library would be as a [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake) package. If you are using this package manager (and you should be), you only need to add the package `iboB/dynamix` like `CPMAddPackage(gh:iboB/dynamix@2.0.0)`
+The recommended and the easiest way to add the library would be as a [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake) package. If you are using this package manager (and you should be), you only need to add the package `iboB/dynamix` like `CPMAddPackage(gh:iboB/dynamix@2.0.2)`
 
 ## As a submodule/subrepo
 
