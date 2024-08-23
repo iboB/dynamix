@@ -29,6 +29,16 @@
       "cacheVariables": { "BUILD_SHARED_LIBS": "OFF" }
     },
     {
+      "name": "gcc",
+      "hidden": true,
+      "cacheVariables": { "CMAKE_C_COMPILER": "gcc", "CMAKE_CXX_COMPILER": "g++" }
+    },
+    {
+      "name": "clang",
+      "hidden": true,
+      "cacheVariables": { "CMAKE_C_COMPILER": "clang", "CMAKE_CXX_COMPILER": "clang++" }
+    },
+    {
       "name": "asan",
       "hidden": true,
       "cacheVariables": { "SAN_ADDR": true }
@@ -65,6 +75,15 @@
     {
       "name": "release-static",
       "inherits": ["base-release", "static"]
+    },
+
+    {
+      "name": "debug-gcc",
+      "inherits": ["base-debug", "gcc"]
+    },
+    {
+      "name": "release-gcc",
+      "inherits": ["base-release", "gcc"]
     },
 
     {
