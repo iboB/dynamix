@@ -7,8 +7,8 @@ icm_add_lib(dynamix DYNAMIX)
 add_library(dynamix::dynamix ALIAS dynamix)
 target_include_directories(dynamix INTERFACE .)
 
-CPMAddPackage("gh:iboB/itlib@1.11.1")
-CPMAddPackage("gh:iboB/splat@1.3.3")
+CPMAddPackage(gh:iboB/itlib@1.11.4)
+CPMAddPackage(gh:iboB/splat@1.3.3)
 
 target_link_libraries(dynamix PUBLIC
     splat::splat
