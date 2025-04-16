@@ -1,9 +1,5 @@
-// DynaMix
-// Copyright (c) 2013-2019 Borislav Stanimirov, Zahary Karadjov
-//
-// Distributed under the MIT Software License
-// See accompanying file LICENSE.txt or copy at
-// https://opensource.org/licenses/MIT
+// Copyright (c) Borislav Stanimirov
+// SPDX-License-Identifier: MIT
 //
 #include <dynamix/v1compat/core.hpp>
 #include <dynamix/v1compat/combinators.hpp>
