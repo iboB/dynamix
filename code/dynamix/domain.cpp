@@ -825,7 +825,7 @@ public:
         // before waiting on the unique_lock
         // it may seem to be a good idea to lock earlier, but this should be very very rare
         // we're willing to risk dropping materialized types every once in a blue moon
-        // for the benefint of holding the unique_lock for as short amount of time as possible
+        // for the benefit of holding the unique_lock for as short amount of time as possible
         // in any case we can disregard res.second and just register the query
         // (the query may also be the same as the one from the previous thread,
         // but the code below is safe in such a case)
