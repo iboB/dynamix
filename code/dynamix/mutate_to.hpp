@@ -8,6 +8,8 @@
 
 #include <algorithm>
 
+#include <splat/warnings.h>
+
 namespace dynamix {
 inline void mutate_to(object& obj, const type& type) {
     obj.reset_type(type);
@@ -39,10 +41,17 @@ void mutate_to(object& obj, const type& type, Ops&&... ops) {
         return false;
     });
 
+    PRAGMA_WARNING_PUSH
+    // workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104165
+    // gcc 12.5 and later triggers an out-of-bounds warning about unreachable code in std::sort
+    DISABLE_GCC_ONLY_WARNING("-Warray-bounds")
+
     // sort by index
     std::sort(obj_mutates, obj_mutates_end, [](const object_mutate_op* a, const object_mutate_op* b) {
         return a->mixin_index < b->mixin_index;
     });
+
+    PRAGMA_WARNING_POP
 
     // when overriding ops are sorted, we can do a piecewise mutation
     object_mutation obj_mut(obj, type);
