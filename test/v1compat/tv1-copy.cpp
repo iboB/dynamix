@@ -124,6 +124,7 @@ TEST_CASE("obj_copy_fail") {
     // v2!: all exceptions here are object_error
     CHECK_THROWS_AS(object foo = o1.copy(), dynamix::object_error);
 
+    object empty;
     object o2;
     mutate(o2)
         .add<special_copy>()
@@ -131,7 +132,7 @@ TEST_CASE("obj_copy_fail") {
         .add<no_copy>();
 
     CHECK(!o2.copyable());
-    CHECK_THROWS_AS(o1.copy_from(o2), dynamix::object_error);
+    CHECK_THROWS_AS(empty.copy_from(o2), dynamix::object_error);
 
     object o3;
     mutate(o3)
@@ -139,7 +140,7 @@ TEST_CASE("obj_copy_fail") {
         .add<no_copy>();
 
     CHECK(!o3.copyable());
-    CHECK_THROWS_AS(o1.copy_from(o3), dynamix::object_error);
+    CHECK_THROWS_AS(empty.copy_from(o3), dynamix::object_error);
 
     object o4;
     mutate(o4)
@@ -150,4 +151,3 @@ TEST_CASE("obj_copy_fail") {
 
     CHECK_THROWS_AS(o4.copy_from(o1), dynamix::object_error);
 }
-
