@@ -58,6 +58,15 @@
       "hidden": true,
       "cacheVariables": { "SAN_THREAD": true }
     },
+    {
+      "name": "coverage",
+      "hidden": true,
+      "inherits": "clang",
+      "cacheVariables": {
+      	"CMAKE_CXX_FLAGS": "-fprofile-instr-generate -fcoverage-mapping",
+      	"CMAKE_EXE_LINKER_FLAGS": "-fprofile-instr-generate"
+      }
+    },
 
     {
       "name": "debug",
@@ -106,6 +115,11 @@
       "name": "debug-aublsan",
       "description": "combining addr, ub and leak sanitizers is widely supported on many platforms",
       "inherits": ["base-debug", "asan", "ubsan", "lsan"]
+    },
+
+    {
+    	"name": "debug-coverage",
+    	"inherits": ["base-debug", "coverage"]
     },
 
     {

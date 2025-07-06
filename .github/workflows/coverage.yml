@@ -1,0 +1,31 @@
+name: Coverage
+on: [push, pull_request]
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Install Ninja
+        uses: seanmiddleditch/gha-setup-ninja@v5
+      - name: Install LLVM
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y llvm
+      - name: Configure
+        run: cmake --preset=debug-coverage -B coverage
+      - name: Build
+        run: cmake --build coverage
+      - name: Test
+        run: ctest --test-dir coverage --output-on-failure
+        env:
+          LLVM_PROFILE_FILE: cov-%p-%m.profraw
+      - name: Generate Coverage Report
+        run: |
+          llvm-profdata merge -o coverage.profdata $(find coverage -name "*.profraw")
+          llvm-cov export -instr-profile=coverage.profdata -format=lcov -object coverage/code/libdynamix.so coverage/v1compat/libdynamix-v1compat.so  > coverage.lcov
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.lcov
+          token: ${{ secrets.CODECOV_TOKEN }}
