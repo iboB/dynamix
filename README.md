@@ -1,6 +1,6 @@
 # [![DynaMix](https://s22.postimg.cc/u1sqhb7jl/README.jpg)](https://ibob.github.io/dynamix/)
 
-[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/) [![Standard](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build](https://github.com/iboB/dynamix/actions/workflows/unit-test.yml/badge.svg)](https://github.com/iboB/dynamix/actions/workflows/unit-test.yml)
+[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/) [![Standard](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build](https://github.com/iboB/dynamix/actions/workflows/unit-test.yml/badge.svg)](https://github.com/iboB/dynamix/actions/workflows/unit-test.yml) [![codecov](https://codecov.io/gh/iboB/dynamix/graph/badge.svg?token=7uRZ3g3O86)](https://codecov.io/gh/iboB/dynamix)
 
 > *IMPORTANT* v2 is here. It is a big change. The last v1 release was [v1.4.0](https://github.com/iboB/dynamix/releases/tag/v1.4.0)
 
