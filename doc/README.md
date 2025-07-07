@@ -1,32 +1,50 @@
-# DynaMix Documentation Index
+# DynaMix Documentation
 
-*The documentation is still in progress*
+Welcome to the DynaMix documentation! This is your guide to understanding and using the library for dynamic polymorphism and runtime object composition.
 
-* [Overview](overview.md)
-* Basics
-    * [Adding DynaMix to a Project](basics/adding.md)
-    * [Elements and Glossary](basics/glossary.md)
-    * C++ Basics
-    * C Basics
-* Advanced Topics
-    * Custom Allocators
-    * Creating Plugins
-    * Mutation Rules
-    * Creating Custom Features
-    * [Dangerous Functionalities](advanced/danger.md)
-* Working with DynaMix
-    * [Performance](working-with/perf.md)
-    * Thread Safety
-    * Debugging
-    * Tips and Tricks
-    * Common Problems and Solutions
-* Annotated Demos
-* Misc
-    * [FAQ](misc/faq.md)
-    * [Differences Between v1 and v2](misc/v2-vs-v1.md)
-    * [Migrating from v1](misc/migrating-from-v1.md)
-    * [Comparisons: Dynamix vs X](misc/dynamix-vs-x.md)
-    * Implementation Notes
-    * [Non-features](misc/non-features.md)
-    * History and Inspiration
-* [Roadmap](roadmap.md)
+*Note: This documentation is still in progress and being actively improved.*
+
+## Getting Started
+
+* [Overview](overview.md) - What is DynaMix and why might you want to use it?
+* [Adding DynaMix to a Project](basics/adding.md) - Get up and running quickly
+* [Elements and Glossary](basics/glossary.md) - Understanding the core concepts
+
+## Learn the Basics
+
+* C++ Basics - *Coming soon*
+* C Basics - *Coming soon*
+
+## Advanced Topics
+
+* Custom Allocators - *Coming soon*
+* Creating Plugins - *Coming soon*
+* Mutation Rules - *Coming soon*
+* Creating Custom Features - *Coming soon*
+* [Dangerous Functionalities](advanced/danger.md) - Things that can work but probably shouldn't
+
+## Working with DynaMix
+
+* [Performance](working-with/perf.md) - Understanding the performance characteristics
+* Thread Safety - *Coming soon*
+* Debugging - *Coming soon*
+* Tips and Tricks - *Coming soon*
+* Common Problems and Solutions - *Coming soon*
+
+## Demos and Examples
+
+* Annotated Demos - *Coming soon*
+
+## Reference and Misc
+
+* [FAQ](misc/faq.md) - Frequently asked questions
+* [Differences Between v1 and v2](misc/v2-vs-v1.md) - What changed between versions
+* [Migrating from v1](misc/migrating-from-v1.md) - How to upgrade your code
+* [Comparisons: DynaMix vs X](misc/dynamix-vs-x.md) - How it compares to other solutions
+* [Non-features](misc/non-features.md) - Things we deliberately don't do
+* Implementation Notes - *Coming soon*
+* History and Inspiration - *Coming soon*
+
+## Development
+
+* [Roadmap](roadmap.md) - What's coming next
