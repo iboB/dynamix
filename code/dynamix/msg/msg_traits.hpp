@@ -5,6 +5,7 @@
 #include "msg_caller.hpp"
 #include "../any.hpp"
 #include "../bits/q_const.hpp"
+#include <tuple>
 
 namespace dynamix {
 template <typename Msg, typename Func>
@@ -20,6 +21,7 @@ struct basic_msg_traits<Msg, Ret(Obj, Args...)> {
     static_assert(std::is_reference_v<Obj>);
     using obj_t = std::remove_reference_t<Obj>;
     static constexpr bool is_const = std::is_const_v<obj_t>;
+    using args_t = std::tuple<Args...>;
 
     using caller = msg_caller<Obj, Ret, Args...>;
     static Ret call_unicast(Obj obj, Args... args) {
