@@ -9,6 +9,7 @@
 #include <dynamix/dbg_dmp.hpp>
 
 #include <doctest/doctest.h>
+#include <doctest/util/random.hpp>
 
 #include <itlib/qalgorithm.hpp>
 #include <itlib/flat_set.hpp>
@@ -178,9 +179,7 @@ public:
 };
 
 TEST_CASE("fuzz objects and types") {
-    const unsigned initial_seed = std::random_device{}();
-    // const unsigned initial_seed = 1283054047;
-    printf("initial seed: %u\n", initial_seed);
+    const unsigned initial_seed = GET_RANDOM_DEVICE_SEED("fuzz objects and types");
     std::minstd_rand seeder(initial_seed);
 
     std::minstd_rand rnd(seeder());

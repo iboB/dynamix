@@ -5,6 +5,7 @@
 #include <dynamix/feature_info_data.hpp>
 
 #include <doctest/doctest.h>
+#include <doctest/util/random.hpp>
 #include <thread>
 #include <deque>
 #include <cstdlib>
@@ -101,8 +102,7 @@ TEST_CASE("fuzz features") {
     std::deque<feature_generator> generators;
     std::deque<feature_getter> getters;
 
-    unsigned initial_seed = std::random_device{}();
-    printf("initial seed: %u\n", initial_seed);
+    unsigned initial_seed = GET_RANDOM_DEVICE_SEED("fuzz features");
     std::minstd_rand seeder(initial_seed);
     for (auto& b : bases) {
         generators.emplace_back(dom, b, seeder());

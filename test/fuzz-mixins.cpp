@@ -3,6 +3,7 @@
 #include <dynamix/mixin_info_data.hpp>
 
 #include <doctest/doctest.h>
+#include <doctest/util/random.hpp>
 #include <itlib/qalgorithm.hpp>
 #include <thread>
 #include <deque>
@@ -134,8 +135,7 @@ TEST_CASE("fuzz mixins") {
     std::deque<mixin_generator> generators;
     std::deque<mixin_getter> getters;
 
-    unsigned initial_seed = std::random_device{}();
-    printf("initial seed: %u\n", initial_seed);
+    unsigned initial_seed = GET_RANDOM_DEVICE_SEED("fuzz mixins");
     std::minstd_rand seeder(initial_seed);
 
     dynamix::domain dom;
