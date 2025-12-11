@@ -1,7 +1,7 @@
 # Copyright (c) Borislav Stanimirov
 # SPDX-License-Identifier: MIT
 #
-CPMAddPackage(gh:iboB/doctest-util@0.1.3)
+CPMAddPackage(gh:iboB/doctest-util@0.1.4)
 CPMAddPackage(gh:ThrowTheSwitch/Unity@2.6.1)
 set_target_properties(doctest PROPERTIES FOLDER test)
 set_target_properties(doctest-main PROPERTIES FOLDER test)
