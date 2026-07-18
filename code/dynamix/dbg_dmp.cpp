@@ -15,7 +15,7 @@
 namespace dynamix::util {
 namespace {
 struct p {
-	template <typename T>
+    template <typename T>
     p(T* pp) : ptr(reinterpret_cast<const void*>(pp)) {}
     const void* ptr;
 };
