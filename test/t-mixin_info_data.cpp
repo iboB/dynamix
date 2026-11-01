@@ -47,16 +47,16 @@ TEST_CASE("mixin_info_data build allocator") {
 
     test_mixin_allocator alloc;
     b.uses_allocator(alloc);
-    CHECK(info.allocator == alloc.to_c_hanlde());
-    CHECK(info.allocator == data.stored_alloc->to_c_hanlde());
+    CHECK(info.allocator == alloc.to_c_handle());
+    CHECK(info.allocator == data.stored_alloc->to_c_handle());
 
     b.uses_allocator<test_mixin_allocator>();
-    CHECK(info.allocator != alloc.to_c_hanlde());
-    CHECK(info.allocator == data.stored_alloc->to_c_hanlde());
+    CHECK(info.allocator != alloc.to_c_handle());
+    CHECK(info.allocator == data.stored_alloc->to_c_handle());
 
     b.uses_allocator(alloc);
-    CHECK(info.allocator == alloc.to_c_hanlde());
-    CHECK(info.allocator == data.stored_alloc->to_c_hanlde());
+    CHECK(info.allocator == alloc.to_c_handle());
+    CHECK(info.allocator == data.stored_alloc->to_c_handle());
 }
 
 TEST_CASE("mixin_info_data build mutation rules") {

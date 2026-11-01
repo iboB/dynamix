@@ -100,7 +100,7 @@ public:
     template <typename Feature>
     [[nodiscard]] bool implements() const noexcept { return implements(g::get_feature_info_fast<Feature>()); }
 
-    // find the implemeter of feature after mixin
+    // find the implementer of feature after mixin
     // if:
     //  the mixin is a part of this type
     //  the mixin implements the feature

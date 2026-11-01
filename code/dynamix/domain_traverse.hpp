@@ -18,7 +18,7 @@ class type;
 
 // this class is used to traverse the domain's registries
 // it is used dump the domain's state in dbg_dmp
-// it can also be used for ther debugging and testing purposes
+// it can also be used for other debugging and testing purposes
 // implemented in domain.cpp
 class DYNAMIX_API domain_traverse {
     // TODO: make into fast pimpl buffer to avoid all allocs

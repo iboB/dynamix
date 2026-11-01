@@ -72,7 +72,7 @@ public:
     object& operator=(const object& o) = delete;
 
     // create a copy
-    // note that this will slice the type if you use it witha a class inherited from object
+    // note that this will slice the type if you use it with a class inherited from object
     // may throw `bad_copy` if copy is not possible
     // optionally provide an allocator for the copy, otherwise the default is used
     [[nodiscard]] object copy(const allocator& alloc = {}) const;
@@ -95,7 +95,7 @@ public:
 
     // copy-assign matching mixins from o
     // will not touch own type
-    // will throw bad_copy if the matchin mixins have no copy-assignment
+    // will throw bad_copy if the matching mixins have no copy-assignment
     // if any of the underlying copy ops throws, the object will end-up
     // in a semi-copied state
     void copy_matching_from(const object& o);
@@ -180,11 +180,11 @@ public:
     // check whether object is empty - has no mixins
     [[nodiscard]] bool empty() const noexcept { return !m_mixin_data; }
 
-    // allcator associated with this object (may be nullptr)
+    // allocator associated with this object (may be nullptr)
     allocator get_allocator() const noexcept { return m_allocator; }
 
     // seal object to prevent mutations
-    // sealed status is transfered on move but not in any other case
+    // sealed status is transferred on move but not in any other case
     void seal() noexcept { m_sealed = true; }
     [[nodiscard]] bool sealed() const noexcept { return m_sealed; }
 
@@ -207,9 +207,9 @@ public:
     // if a mixin lacks a compare func, throws object_error
     int compare(const object& other) const;
 
-    dnmx_const_object_handle to_c_hanlde() const noexcept { return this; }
+    dnmx_const_object_handle to_c_handle() const noexcept { return this; }
     static const object* from_c_handle(dnmx_const_object_handle ho) noexcept { return static_cast<const object*>(ho); }
-    dnmx_object_handle to_c_hanlde() noexcept { return this; }
+    dnmx_object_handle to_c_handle() noexcept { return this; }
     static object* from_c_handle(dnmx_object_handle ho) noexcept { return static_cast<object*>(ho); }
 private:
     friend class object_mutation;
@@ -217,8 +217,8 @@ private:
     // null constructor for temporary objects which are supposed to be
     // initialized shortly after this call
     // with it we don't pay the price of calling domain.get_empty_type()
-    // WARNING: this is a stricly i-know-what-im-doing constructor
-    // many meethods of such a object will lead to a starigh-up crash
+    // WARNING: this is a strictly i-know-what-im-doing constructor
+    // many methods of such a object will lead to a straight-up crash
     object(std::nullptr_t, allocator alloc) noexcept;
 
     allocator m_allocator;

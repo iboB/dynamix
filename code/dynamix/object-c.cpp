@@ -15,7 +15,7 @@ extern "C" {
 dnmx_object_handle dnmx_create_object_empty(dnmx_domain_handle hd) {
     try {
         auto obj = new object(*domain::from_c_handle(hd));
-        return obj->to_c_hanlde();
+        return obj->to_c_handle();
     }
     catch (std::exception&) {
         return nullptr;
@@ -24,7 +24,7 @@ dnmx_object_handle dnmx_create_object_empty(dnmx_domain_handle hd) {
 dnmx_object_handle dnmx_create_object_default(dnmx_type_handle ht) {
     try {
         auto obj = new object(*type::from_c_handle(ht));
-        return obj->to_c_hanlde();
+        return obj->to_c_handle();
     }
     catch (std::exception&) {
         return nullptr;
@@ -33,7 +33,7 @@ dnmx_object_handle dnmx_create_object_default(dnmx_type_handle ht) {
 dnmx_object_handle dnmx_create_object_copy(dnmx_const_object_handle ho) {
     try {
         auto obj = new object(object::from_c_handle(ho)->copy());
-        return obj->to_c_hanlde();
+        return obj->to_c_handle();
     }
     catch (std::exception&) {
         return nullptr;
@@ -42,7 +42,7 @@ dnmx_object_handle dnmx_create_object_copy(dnmx_const_object_handle ho) {
 dnmx_object_handle dnmx_create_object_usurp(dnmx_object_handle ho) {
     try {
         auto obj = new object(std::move(*object::from_c_handle(ho)));
-        return obj->to_c_hanlde();
+        return obj->to_c_handle();
     }
     catch (std::exception&) {
         return nullptr;
@@ -63,7 +63,7 @@ dnmx_error_return_t dnmx_object_copy_from(dnmx_object_handle ho, dnmx_const_obje
 }
 
 dnmx_domain_handle dnmx_object_get_domain(dnmx_const_object_handle ho) {
-    return self->get_domain().to_c_hanlde();
+    return self->get_domain().to_c_handle();
 }
 dnmx_type_handle dnmx_object_get_type(dnmx_const_object_handle ho) {
     return ho->m_type;

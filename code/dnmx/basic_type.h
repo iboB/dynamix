@@ -15,7 +15,7 @@ extern "C" {
 
 typedef struct dnmx_feature_for_mixin dnmx_feature_for_mixin;
 
-// feature data for the ftable which consists of tighly packed elements for faster acciess
+// feature data for the ftable which consists of tightly packed elements for faster access
 typedef struct dnmx_ftable_payload {
     dnmx_mixin_index_t mixin_index; // index of mixin which provided this payload (never invalid)
     dnmx_feature_payload payload; // copied from feature_for_mixin (to save the indirection)

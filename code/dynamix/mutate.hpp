@@ -19,7 +19,7 @@ void mutate(object& obj, Ops&&... ops) {
     mutate_to(obj, type, std::forward<Ops>(ops)...);
 }
 
-// v1 comaptible mutate which only works with mixins with default init functions
+// v1 compatible mutate which only works with mixins with default init functions
 // not extensible
 class gradual_mutation {
     type_mutation m_type_mut;

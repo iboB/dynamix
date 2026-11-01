@@ -31,7 +31,7 @@ object_mutation::object_mutation(object& obj, const type& type, int) noexcept
     , m_allocated_upto(0)
     , m_updated_upto(0)
 {
-    // mixin data is allocated at this point by the delagator constructor
+    // mixin data is allocated at this point by the delegating constructor
 }
 
 // "inverse" init
@@ -220,7 +220,7 @@ void object_mutation::finalize() noexcept {
                 auto* new_mixin = m_target_mixin_data[m_target_type.sparse_mixin_indices[info.iid()]].mixin;
                 info.move_init(&info, new_mixin, old_data.mixin);
 
-                // desroy the one we moved-out from
+                // destroy the one we moved-out from
                 if (auto destroy = info.destroy) {
                     destroy(&info, old_data.mixin);
                 }

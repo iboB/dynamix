@@ -311,7 +311,7 @@ public:
         }
         {
             MM(ai, {update_actor});
-            desc.allocator = m_mixin_alloc.to_c_hanlde();
+            desc.allocator = m_mixin_alloc.to_c_handle();
             desc.order_priority = -1800;
         }
         {
@@ -338,7 +338,7 @@ public:
         }
         {
             MM(physical, {get_position, set_position, get_direction, set_direction, update_physics});
-            desc.allocator = m_mixin_alloc.to_c_hanlde();
+            desc.allocator = m_mixin_alloc.to_c_handle();
             desc.order_priority = -1500;
             desc.equals = util::call_mixin_equality_operator<m_physical>;
         }

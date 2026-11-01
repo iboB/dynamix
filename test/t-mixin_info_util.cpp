@@ -116,7 +116,7 @@ TEST_CASE("funcs") {
 
 struct byte { uint8_t val; };
 
-DISABLE_MSVC_WARNING(4324) // disable padding waring for type below
+DISABLE_MSVC_WARNING(4324) // disable padding warning for type below
 struct alignas(16) vec3 {
     double x, y, z;
 

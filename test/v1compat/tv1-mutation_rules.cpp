@@ -127,7 +127,7 @@ TEST_CASE("dependent dep") {
         .remove<dep>();
 
     // v2!: this relation is no longer possible
-    // dep is alays bound to a
+    // dep is always bound to a
     //CHECK(o.has<a>());
     //CHECK(!o.has<dep>());
     //CHECK(!o.has<c>());
@@ -189,7 +189,7 @@ TEST_CASE("dependent oneshot") {
         .remove<b>();
 
     // v2!: this relation is no longer possible
-    // dep is alays bound to a
+    // dep is always bound to a
     //CHECK(o.has<a>());
     //CHECK(!o.has<b>());
     //CHECK(!o.has<c>());

@@ -261,7 +261,7 @@ TEST_CASE("fuzz objects and types") {
             }
         }
 
-        // size, aligment
+        // size, alignment
         {
             static constexpr std::array<dynamix::byte_size_t, 7> alignments = {0, 1, 2, 4, 8, 16, 32};
             auto alignment = alignments[rnd() % alignments.size()];

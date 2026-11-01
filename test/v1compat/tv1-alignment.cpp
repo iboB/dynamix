@@ -42,7 +42,7 @@ public:
     }
 };
 
-DISABLE_MSVC_WARNING(4324) // disable padding waring for types below
+DISABLE_MSVC_WARNING(4324) // disable padding warning for types below
 
 class alignas(8) align_8 {
 public:

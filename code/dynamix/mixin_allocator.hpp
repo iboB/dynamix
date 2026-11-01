@@ -21,7 +21,7 @@ struct DYNAMIX_API mixin_allocator {
     [[nodiscard]] virtual byte_t* alloc_mixin_buf(const mixin_info& info) = 0;
     virtual void dealloc_mixin_buf(byte_t* ptr, const mixin_info& info) noexcept = 0;
 
-    dnmx_mixin_allocator_handle to_c_hanlde() noexcept { return reinterpret_cast<dnmx_mixin_allocator_handle>(this); }
+    dnmx_mixin_allocator_handle to_c_handle() noexcept { return reinterpret_cast<dnmx_mixin_allocator_handle>(this); }
     static mixin_allocator* from_c_handle(dnmx_mixin_allocator_handle ha) noexcept { return reinterpret_cast<mixin_allocator*>(ha); }
 };
 

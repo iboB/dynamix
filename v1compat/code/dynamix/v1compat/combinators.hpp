@@ -39,7 +39,7 @@ public:
     }
 
     /// The result of the operation if the multicast call has been made
-    /// with an input/ouput parameter - an instance of `boolean_and`
+    /// with an input/output parameter - an instance of `boolean_and`
     bool result() const {
         return _result;
     }

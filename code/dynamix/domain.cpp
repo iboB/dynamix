@@ -254,8 +254,8 @@ public:
     // then surely the mixin should be unregistered too
     // then all types infos containing that mixin (and in turn this feature)
     // will be dropped eventually
-    // for a short while we will live with incosistent lists of feature and mixins
-    // if something breaks because of this inconsitency, then this would have been a
+    // for a short while we will live with inconsistent lists of feature and mixins
+    // if something breaks because of this inconsistency, then this would have been a
     // break anyway - the mixins referencing this feature would keep on living??
     void unregister_feature(feature_info& info) {
         basic_unregister_l(info, m_element_registry.unique_lock()->sparse_features);
@@ -276,7 +276,7 @@ public:
             basic_register_l(*const_cast<feature_info*>(f.info), reg->sparse_features, !m_domain.m_settings.allow_duplicate_feature_names);
 
             // note that if the registration fails, previously registered features are not rolled back
-            // and they shouldnt: features are separate from mixins
+            // and they shouldn't: features are separate from mixins
         }
 
         // register mixin itself
@@ -309,7 +309,7 @@ public:
             for (auto it = types.begin(); it != types.end(); ) {
                 auto& t = *it;
                 if (!t->has(info.id)) {
-                    // type does't have mixin
+                    // type doesn't have mixin
                     ++it;
                     continue;
                 }
@@ -441,7 +441,7 @@ public:
         // it would be easy to say "users must take care of them by order_priority" and dynamix 1 did just that
         // however since we allow adding rules with mixin registration and potentially adding of rules
         // by plugins this task would be really hard for users
-        // so we help by doing a poor man's toplogical sort: multiple applications
+        // so we help by doing a poor man's topological sort: multiple applications
         // we can't do a real topological sort, because rules are opaque
         // (and there is no obvious way to make them non-opaque, while keeping their power)
         // so, we run them again and again until applying them produces the same result as the previous apply
@@ -465,7 +465,7 @@ public:
             // apply rules
             for (auto& r : rules) {
                 auto& info = *r.first;
-                if (auto err = info.apply(mutation.to_c_hanlde(), info.user_data)) {
+                if (auto err = info.apply(mutation.to_c_handle(), info.user_data)) {
                     throw_exception::mutation_rule_user_error(mutation, info, err);
                 }
             }
