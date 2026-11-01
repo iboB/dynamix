@@ -3,3 +3,4 @@
 #
 add_subdirectory(hello-world)
 add_subdirectory(hello-c-world)
+add_subdirectory(guide)
