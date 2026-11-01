@@ -7,14 +7,14 @@
 
 * [Overview](overview.md) - What is DynaMix and why might you want to use it?
 * [Adding DynaMix to a Project](basics/adding.md) - Get up and running quickly
-* Hello World - A walkthrough of a minimal DynaMix program
+* [Hello World](basics/hello-world.md) - A walkthrough of a minimal DynaMix program
 * [Core Concepts and Glossary](basics/glossary.md) - Learn the core concepts
 
 ## C++ Guide
 
 * Domains
 * Defining Mixins
-* Messages
+* [Messages](cpp/messages.md)
 * Objects
 * Mutations
 * Mutation Rules
