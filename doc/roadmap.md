@@ -14,7 +14,7 @@ Here's a list of notable planned new features and updates for DynaMix
 
 ## Not Soon
 
-* Public case study: A demo project, that better illustrates the libraries functionalities in a "real life" scenario. Complete with a document which gives problems for motivation and their DynaMix solutions.
+* Public case study: A demo project, that better illustrates the library's functionalities in a "real life" scenario. Complete with a document which gives problems for motivation and their DynaMix solutions.
 * Zig bindings and interface
 * Demo: lua integration
 * Demo: JS and wasm integration

@@ -1,4 +1,4 @@
-# Glossary
+# Core Concepts and Glossary
 
 ## Object
 
@@ -34,7 +34,7 @@ The mixin *provides* feature implementations.
 
 ## Mixin Feature
 
-The mixin features are a list of abstract features which are provided by a mixin to a type. Using the multiple inheritance example from above, much like a class inherits methods, static members, and typedefs from multiple parents, types and objects obtain the *abstract mixins features* of the mixins they are composed of.
+The mixin features are a list of abstract features which are provided by a mixin to a type. Using the multiple inheritance example from above, much like a class inherits methods, static members, and typedefs from multiple parents, types and objects obtain the *abstract mixin features* of the mixins they are composed of.
 
 A feature is a definition. A *feature implementation* is provided by a mixin. An implementation on its own is nothing but a completely type-erased (`void`) pointer.
 
