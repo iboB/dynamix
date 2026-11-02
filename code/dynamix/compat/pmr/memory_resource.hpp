@@ -7,7 +7,7 @@
 #if DYNAMIX_HAS_PMR
 #include <memory_resource>
 namespace dynamix::compat::pmr {
-using memory_resouce = std::pmr::memory_resource;
+using memory_resource = std::pmr::memory_resource;
 }
 #else
 #include "../../../dnmx/api.h"
