@@ -15,3 +15,4 @@ endmacro()
 
 dynamix_guide_example(messages)
 dynamix_guide_example(mixins)
+dynamix_guide_example(mutations)

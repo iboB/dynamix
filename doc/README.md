@@ -16,7 +16,7 @@
 * [Defining Mixins](cpp/mixins.md)
 * [Messages](cpp/messages.md)
 * Objects
-* Mutations
+* [Mutations](cpp/mutations.md)
 * Mutation Rules
 * Type Classes
 * Accessing the Object from a Mixin
