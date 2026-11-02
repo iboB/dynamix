@@ -96,6 +96,17 @@ void object_mutation::allocate_mixin_data() {
         return;
     }
 
+    if (m_target_type.num_mixins() == 0) {
+        // tag: empty_target_shortcut
+        // we're mutating to the empty type (say all mixins have been removed)
+        // objects of the empty type have no mixin data, so there is nothing to allocate
+        // (moreover the empty type has no valid buffer size or alignment)
+        m_target_mixin_data = nullptr;
+        // there are no mixins to update, so the mutation is complete right away
+        m_complete = true;
+        return;
+    }
+
     // * allocate using object allocator
     // * fill object pointer appropriately to newly allocated mixins
     // * attach common external mixins to mixin_data elements

@@ -559,6 +559,20 @@ TEST_CASE("mutate") {
         CHECK(obj.num_mixins() == 1);
         CHECK(obj.has(*t.procedural_geometry));
 
+        // remove the last mixin
+        mutate(obj, remove(*t.procedural_geometry));
+        CHECK(obj.empty());
+        CHECK(obj.get_type() == dom.get_empty_type());
+
+        mutate(obj, add(*t.procedural_geometry));
+        CHECK(obj.num_mixins() == 1);
+
+        // with mutate_to
+        mutate_to(obj, dom.get_empty_type(), construct(*t.actor, custom_actor_init));
+        CHECK(obj.empty());
+
+        mutate(obj, add(*t.procedural_geometry));
+
         auto& t_p = obj.get_type();
         mutate(obj, add_if_lacking(*t.procedural_geometry), add_if_lacking("procedural_geometry"));
         CHECK(&obj.get_type() == &t_p);
