@@ -17,10 +17,10 @@
 * [Messages](cpp/messages.md)
 * [Objects](cpp/objects.md)
 * [Mutations](cpp/mutations.md)
-* Mutation Rules
-* Type Classes
-* Accessing the Object from a Mixin
-* Error Handling
+* [Mutation Rules](cpp/mutation-rules.md)
+* [Type Classes](cpp/type-classes.md)
+* [Accessing the Object from a Mixin](cpp/dm-this.md)
+* [Error Handling](cpp/error-handling.md)
 
 ## C Guide
 
@@ -30,7 +30,6 @@
 
 * Allocators and Internal/External Mixins
 * Multiple Domains, Shared Libraries, and Plugins
-* Custom Mutation Rules
 * Custom Features
 * Mixins Without Macros
 * Reflection and Introspection

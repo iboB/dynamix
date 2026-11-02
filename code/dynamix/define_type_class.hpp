@@ -20,7 +20,7 @@ struct registered_type_class_instance {
 };
 }
 
-// define a type class with bool(const type&);
+// define a type class with a match function: bool(dnmx_type_handle) noexcept
 #define DYNAMIX_DEFINE_TYPE_CLASS_WITH(domain_tag, tc, func) \
     const dynamix::type_class tc::m_dynamix_type_class = {dnmx_make_sv_lit(#tc), func}; \
     static ::dynamix::impl::registered_type_class_instance I_DNMX_PP_CAT(_dynamix_type_class_, tc)(::dynamix::g::get_domain<domain_tag>(), tc::m_dynamix_type_class)

@@ -205,7 +205,7 @@ The builder which `DYNAMIX_DEFINE_MIXIN` evaluates to is [`util::mixin_info_data
 | `order_priority(p)` | Set the key for the canonical order of mixins. See [Domains](domains.md). |
 | `uses_allocator<Alloc>()`, `uses_allocator(alloc)` | Use a mixin allocator. Implies an external mixin. See [Allocators](../advanced/allocators.md). |
 | `on_mutation(rule, perks)` | Add a common mutation rule for this mixin, like `also_adds<M>` or `attaches_to<M>`. See [Mutation Rules](mutation-rules.md). |
-| `adds_mutation_rule(...)` | Add a custom mutation rule. Implies `dependency()`. See [Custom Mutation Rules](../advanced/mutation-rules.md). |
+| `adds_mutation_rule(...)` | Add a custom mutation rule. Implies `dependency()`. See [Custom rules](mutation-rules.md#custom-rules). |
 | `dependency(b = true)` | Mark the mixin as a dependency. Dependencies are removed at the start of every mutation and are expected to be re-added by mutation rules. See [Mutation Rules](mutation-rules.md). |
 | `user_data(value)` | Set a `uintptr_t` value which the library doesn't touch. |
 | `noop(anything)` | Do nothing. Useful in macros which extend mixin definitions. |
