@@ -15,7 +15,7 @@
 * [Domains](cpp/domains.md)
 * [Defining Mixins](cpp/mixins.md)
 * [Messages](cpp/messages.md)
-* Objects
+* [Objects](cpp/objects.md)
 * [Mutations](cpp/mutations.md)
 * Mutation Rules
 * Type Classes
