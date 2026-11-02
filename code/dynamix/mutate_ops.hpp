@@ -108,6 +108,12 @@ struct add_if_lacking_mixin_op_with_args final : public mutate_op_add_if_lacking
 namespace mutate_ops {
 inline mutate_op_remove_by_info remove(const dynamix::mixin_info& info) { return mutate_op_remove_by_info(info); }
 inline mutate_op_remove_by_name remove(std::string_view name) { return mutate_op_remove_by_name(name); }
+// the const char* overload exists to protect from ::remove(const char*) from <cstdio> which deletes files
+// with `using namespace dynamix`, an unqualified `remove("name")` would otherwise silently call it
+// (being an exact match for string literals) instead of the string_view overload above
+// with this overload such calls are ambiguous and thus a compilation error
+// to remove a mixin by name, qualify the call: `dynamix::remove("name")`
+inline mutate_op_remove_by_name remove(const char* name) { return mutate_op_remove_by_name(name); }
 template <typename Mixin>
 mutate_op_remove_by_info remove() { return mutate_op_remove_by_info(g::get_mixin_info<Mixin>()); }
 

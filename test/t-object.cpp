@@ -14,8 +14,21 @@
 #include <doctest/doctest.h>
 
 #include <optional>
+#include <cstdio>
+#include <type_traits>
 
 using namespace dynamix;
+
+// with `using namespace dynamix` an unqualified remove by name must not compile
+// otherwise it silently calls ::remove from <cstdio> which deletes files
+namespace {
+template <typename T, typename = void>
+struct can_call_unqualified_remove : std::false_type {};
+template <typename T>
+struct can_call_unqualified_remove<T, std::void_t<decltype(remove(std::declval<T>()))>> : std::true_type {};
+static_assert(!can_call_unqualified_remove<const char*>::value);
+static_assert(std::is_same_v<decltype(dynamix::remove("x")), mutate_op_remove_by_name>);
+}
 
 TEST_SUITE_BEGIN("dynamix");
 
