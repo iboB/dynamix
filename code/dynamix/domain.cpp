@@ -653,6 +653,8 @@ public:
                     if (adata.bid != bdata.bid) return adata.bid > bdata.bid;
 
                     // then by prio
+                    // priority behaves like a position in the mixin order (higher prio = earlier mixin)
+                    // since mixins are in reverse order here (see below), lower prio comes first
                     if (adata.priority != bdata.priority) return adata.priority < bdata.priority;
 
                     // then by mixin order such that the last mixin is first

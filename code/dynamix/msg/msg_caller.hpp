@@ -67,8 +67,9 @@ struct msg_caller {
         auto fe = t.ftable_at(info.id); // ftable entry
         if /*likely*/ (fe) {
             // reverse order of execution:
-            // this way the same-prio multicast execution order follows the mixins order
-            // and prio messages will higher prio be executed first
+            // this way the same-prio multicast execution order follows the mixin order
+            // and implementations with a higher prio are executed first
+            // (priority behaves like a position in the mixin order: higher prio = earlier)
             for (auto i = fe.top_bid_back; i != fe.begin; --i) {
                 call(*i, obj, args...); // args are copied! return value is ignored
             }
