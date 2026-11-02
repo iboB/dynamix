@@ -14,3 +14,4 @@ macro(dynamix_guide_example name)
 endmacro()
 
 dynamix_guide_example(messages)
+dynamix_guide_example(mixins)

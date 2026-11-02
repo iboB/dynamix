@@ -13,7 +13,7 @@
 ## C++ Guide
 
 * Domains
-* Defining Mixins
+* [Defining Mixins](cpp/mixins.md)
 * [Messages](cpp/messages.md)
 * Objects
 * Mutations
