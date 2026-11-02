@@ -102,7 +102,7 @@ void dbg_dmp_l(std::ostream& out, const type& t, uint32_t flags, domain_traverse
 }
 
 void dbg_dmp_l(std::ostream& out, const type_class& tc, uint32_t flags, domain_traverse* tr) {
-    out << "type class: '" << tc.name.to_std() << ", match: " << p(tc.matches);
+    out << "type class: '" << tc.name.to_std() << "', match: " << p(tc.matches);
     if (tc.matches && tr && (flags & dnmx_tc_dmp_matching_types)) {
         tr->traverse_types([&](const type& t) {
             if (!tc.matches(&t)) return;
@@ -293,5 +293,18 @@ void dbg_dmp(std::ostream& out, const type& t, uint32_t flags) {
 
 void dbg_dmp(std::ostream& out, const type_class& tc, uint32_t flags) {
     dbg_dmp_l(out, tc, flags, nullptr);
+}
+
+void dbg_dmp(std::ostream& out, const object& o) {
+    auto& t = o.get_type();
+    out << "object (" << &o << ")";
+    if (o.sealed()) out << " sealed";
+    out << NIND;
+    dbg_dmp_l(out, t, 0, nullptr);
+    for (mixin_index_t i = 0; i < t.num_mixins(); ++i) {
+        auto& info = *t.mixins[i];
+        out << NIND IND "'" << info.name.to_std() << "': " << p(o.get_at(i));
+        if (info.external()) out << " (external)";
+    }
 }
 }
