@@ -240,12 +240,15 @@ Overridden implementations are also still *reachable*. See [Calling the next imp
 
 ### By priority
 
-Priority is a secondary key. It's used to order implementations with the *same* bid. For unicasts, an implementation with a *lower* priority value overrides one with a higher value. For example, an implementation with `-1_prio` would override one with the default priority of `0`, regardless of mixin order.
+Priority orders implementations which have the *same* bid. The best way to think about it is that **priority behaves like a position in the mixin order**: an implementation with a higher priority is ordered as if its mixin were *earlier* in the type than the mixins of implementations with lower priorities. Only implementations with the same priority are ordered by the actual mixin order.
 
-Priority is more natural for multicasts (see below), and for unicasts bids are usually the better tool.
+Since later mixins override earlier ones, for unicasts this means that a *lower* priority overrides a higher one. For example an implementation with `-1_prio` overrides one with the default priority of `0`, regardless of the mixin order.
+
+> [!TIP]
+> Using priorities for unicasts is a code smell. Use bids instead. Priorities are meant for multicasts, where they control the order of execution (see [below](#execution-order)).
 
 > [!IMPORTANT]
-> This is the opposite of DynaMix v1, where a higher priority overrode a lower one for unicasts. See [Differences Between v1 and v2](../misc/v2-vs-v1.md).
+> For unicasts this is the opposite of DynaMix v1, where a higher priority overrode a lower one. The multicast behavior is the same as in v1: higher priorities are executed first. See [Differences Between v1 and v2](../misc/v2-vs-v1.md).
 
 ## Multicasts
 
@@ -264,6 +267,8 @@ where `print_description` calls `describe(obj, parts)` once and prints all `part
 Multicasts are the DynaMix counterpart of the observer pattern or a signal: the caller sends a message to the object and every interested mixin reacts to it. Since the implementations are part of the type, there is no list of subscribers to manage.
 
 ### Execution order
+
+Multicasts are executed in the mixin order, and [priority behaves like a position in the mixin order](#by-priority). Thus:
 
 * Implementations with a higher priority are executed first.
 * Implementations with the same priority are executed in the order of their mixins in the type.
@@ -299,6 +304,10 @@ Then:
 
 * A unicast executes the first implementation.
 * A multicast executes all implementations with the first (top) bid, from last to first. Thus the implementation which a unicast would execute is executed last and its result is returned.
+
+Within a bid, the ftable is in *reverse* mixin order. This way the overriding implementation is first, and a unicast call needs only a single constant-time lookup. Priority sorts implementations as if it were a position in the mixin order, and so it's reversed, too: "lower priorities first" in the ftable means "as if later in the mixin order".
+
+This is the reason why priority seems to work in opposite directions for unicasts and multicasts. It doesn't. In both cases it acts as the mixin order. It's just that for unicasts the *last* implementation in the mixin order has the final word, while multicasts execute the *first* implementation first.
 
 ## Calling the next implementation
 

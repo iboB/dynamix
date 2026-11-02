@@ -46,7 +46,7 @@ Features have two signed integer properties, called bid and priority which are u
 
 Bid is the major sort key. The higher the bid, the earlier the feature will be added in the `ftable`. Features with a higher bid (say 34) *override* features with a lower bid (say -5).
 
-Priority is used as an additional sort key for features with the same bid. It is however treated with the opposite value. The smaller the priority, the earlier the feature will be added in the ftable. With the same bid, a feature with a smaller priority (say -1) *precedes* features with a bigger priority (say 10).
+Priority is used as an additional sort key for features with the same bid. It behaves like a position in the mixin order: a feature with a bigger priority (say 10) is ordered as if its mixin were *earlier* in the type than one with a smaller priority (say -1). Since the `ftable` is in reverse mixin order (see below), the smaller the priority, the earlier the feature will be added in the ftable. With the same bid, a feature with a smaller priority *precedes* features with a bigger priority in the `ftable`.
 
 When bid *and* priority are the same, the order in which the implementations appear in the `ftable` is the opposite of the mixin order in the type. The last mixin in the type will add the first features in the `ftable`.
 
