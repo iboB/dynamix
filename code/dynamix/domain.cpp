@@ -265,11 +265,21 @@ public:
         if (info.dom != nullptr && info.dom != &m_domain) throw_exception::info_has_domain(m_domain, info);
         auto reg = m_element_registry.unique_lock();
 
+        // check that the mixin's already registered features are registered here
+        // a feature can only be registered in a single domain
+        // we check them all before registering anything, so that this error leaves no partial registrations
+        for (auto& f : info.features_span()) {
+            if (f.info->id == invalid_feature_id) continue; // not registered
+            auto fid = f.info->iid();
+            if (fid >= reg->sparse_features.size() || reg->sparse_features[fid] != f.info) {
+                throw_exception::foreign_feature(m_domain, info, *f.info);
+            }
+        }
+
         // register mixin's features
         for (auto& f : info.features_span()) {
             if (f.info->id != invalid_feature_id) {
-                // already registered
-                assert(reg->sparse_features[f.info->iid()] == f.info); // sanity
+                // already registered (and checked above)
                 continue;
             }
             // we need to const_cast. this is the price of lazy ops in C++

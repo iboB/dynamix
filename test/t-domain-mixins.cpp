@@ -151,6 +151,34 @@ TEST_CASE("auto-reg features") {
     check_unreg(t.unused_feature);
 }
 
+TEST_CASE("foreign features") {
+    test_data t;
+    domain d1("d1"), d2("d2");
+
+    // actor's features, including get_name, are registered in d1
+    d1.register_mixin(*t.actor);
+    CHECK(d1.get_feature_info(t.get_name->id) == t.get_name);
+
+    // stats also implements features of actor, so it can't be registered in d2
+    CHECK_THROWS_WITH_AS(d2.register_mixin(*t.stats),
+        "d2: register mixin 'stats' with feature 'serialize' which is registered in another domain (id = 3)",
+        domain_error);
+
+    // no partial registration happened
+    CHECK_FALSE(t.stats->registered());
+    CHECK_FALSE(d2.get_mixin_info("stats"));
+    CHECK(invalid_feature_id == t.get_hp->id);
+    CHECK(invalid_feature_id == t.take_damage->id);
+
+    // explicitly registering features doesn't help: they are owned by d1
+    CHECK_THROWS_AS(d2.register_feature(*t.get_name), domain_error);
+
+    // it's fine to register stats in d1
+    d1.register_mixin(*t.stats);
+    CHECK(t.stats->registered());
+    CHECK(d1.get_feature_info(t.get_hp->id) == t.get_hp);
+}
+
 TEST_CASE("register dupe mixins") {
     test_data t;
     domain_settings s = {};

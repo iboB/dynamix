@@ -27,6 +27,7 @@ namespace throw_exception {
 [[noreturn]] void duplicate_name(const domain& dom, const mixin_info& info);
 [[noreturn]] void duplicate_name(const domain& dom, const type_class& tc);
 [[noreturn]] void info_has_domain(const domain& dom, const mixin_info& info);
+[[noreturn]] void foreign_feature(const domain& dom, const mixin_info& mixin, const feature_info& feature);
 [[noreturn]] void unreg_foreign(const domain& dom, const feature_info& info);
 [[noreturn]] void unreg_foreign(const domain& dom, const mixin_info& info);
 [[noreturn]] void no_func(const domain& dom, const mutation_rule_info& info);

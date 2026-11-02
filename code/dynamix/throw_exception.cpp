@@ -126,12 +126,17 @@ void info_has_domain(const domain& dom, const mixin_info& info) {
     e<domain_error>(dom) << "register mixin " << info << " which has a domain = " << *domain::from_c_handle(info.dom) << do_throw;
 }
 
+void foreign_feature(const domain& dom, const mixin_info& mixin, const feature_info& feature) {
+    e<domain_error>(dom) << "register mixin " << mixin << " with feature " << feature
+        << " which is registered in another domain (id = " << feature.iid() << ")" << do_throw;
+}
+
 void unreg_foreign(const domain& dom, const feature_info& info) {
     e<domain_error>(dom) << "unregister foreign feature " << info << ", id = " << info.iid() << do_throw;
 }
 void unreg_foreign(const domain& dom, const mixin_info& info) {
     e<domain_error> out(dom);
-    out << "unregister foreign feature " << info << ", id = " << info.iid() << ", domain = ";
+    out << "unregister foreign mixin " << info << ", id = " << info.iid() << ", domain = ";
     if (info.dom) {
         out << *domain::from_c_handle(info.dom);
     }

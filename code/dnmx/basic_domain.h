@@ -15,7 +15,7 @@ struct dnmx_basic_domain {
 
     dnmx_domain_settings m_settings;
 
-    // a user data which accessible wherever the domain is
+    // user data which is accessible wherever the domain is
     // the library does not touch this value
     uintptr_t user_data;
 

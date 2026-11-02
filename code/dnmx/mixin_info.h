@@ -42,7 +42,7 @@ struct dnmx_mixin_info {
     dnmx_domain_handle dom;
 
     // name of mixin
-    // if domain_settings::unique_mixin_names is true (the default),
+    // if domain_settings::allow_duplicate_mixin_names is false (the default),
     // the name must be unique for the domain
     // this is the only value without a sane default
     dnmx_sv name;
@@ -112,8 +112,8 @@ struct dnmx_mixin_info {
     uint32_t num_features;
 
     // key for canonical order
-    // if domain_settings::canonical_types is true, this is used to sort mixins in types
-    // it is also used to compare types. Types are compare by lexicographical canonical mixin order
+    // if domain_settings::canonicalize_types is true, this is used to sort mixins in types
+    // it is also used to compare types. Types are compared by lexicographical canonical mixin order
     // the smaller the number, the earlier the mixin will appear in an object
     // will also affect multicast order if not otherwise specified
     // mixins with the same order_priority are compared by name
