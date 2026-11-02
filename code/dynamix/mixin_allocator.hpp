@@ -16,8 +16,8 @@ struct DYNAMIX_API mixin_allocator {
 
     // allocate external mixin buffer for an object
     // note that this has to return at least:
-    // size = info.desc.obj_buf_size()
-    // alignment = info.desc.obj_buf_alignment_and_mixin_offset()
+    // size = info.obj_buf_size
+    // alignment = info.obj_buf_alignment_and_mixin_offset
     [[nodiscard]] virtual byte_t* alloc_mixin_buf(const mixin_info& info) = 0;
     virtual void dealloc_mixin_buf(byte_t* ptr, const mixin_info& info) noexcept = 0;
 
