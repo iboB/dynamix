@@ -24,7 +24,7 @@
 
 ## C Guide
 
-* The C Interface - How it differs from the C++ one
+* [The C Interface](c/c-interface.md) - How it differs from the C++ one
 
 ## Advanced Topics
 

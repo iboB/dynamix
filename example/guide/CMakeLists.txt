@@ -21,3 +21,11 @@ dynamix_guide_example(objects)
 dynamix_guide_example(mutation_rules)
 dynamix_guide_example(type_classes)
 dynamix_guide_example(dm_this)
+
+# C
+add_executable(dynamix-guide-c_interface c_interface.c)
+target_link_libraries(dynamix-guide-c_interface dynamix::dynamix)
+set_target_properties(dynamix-guide-c_interface PROPERTIES FOLDER example/guide)
+if(DYNAMIX_BUILD_TESTS)
+    add_test(NAME dynamix-guide-c_interface COMMAND dynamix-guide-c_interface)
+endif()
