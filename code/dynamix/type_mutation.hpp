@@ -34,8 +34,8 @@ public:
 
     // add mixin
     void add(const mixin_info& info) { mixins.push_back(&info); }
-    const mixin_info& add(std::string_view name); // can throw bad_mutation
-    const mixin_info* safe_add(std::string_view name); // no bad_mutation if name is not a registered mixin
+    const mixin_info& add(std::string_view name); // can throw type_error
+    const mixin_info* safe_add(std::string_view name); // no type_error if name is not a registered mixin
     template <typename Mixin>
     const mixin_info& add() {
         auto& info = g::get_mixin_info<Mixin>();
@@ -49,8 +49,8 @@ public:
         add(info);
         return true;
     }
-    const mixin_info* add_if_lacking(std::string_view name); // can throw bad_mutation
-    const mixin_info* safe_add_if_lacking(std::string_view name); // no bad_mutation if name is not a registered mixin
+    const mixin_info* add_if_lacking(std::string_view name); // can throw type_error
+    const mixin_info* safe_add_if_lacking(std::string_view name); // no type_error if name is not a registered mixin
     template <typename Mixin>
     bool add_if_lacking() {
         auto& info = g::get_mixin_info<Mixin>();
