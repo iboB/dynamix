@@ -277,6 +277,19 @@ public:
         }
 
         // register mixin's features
+        //
+        // NOTE: features which are registered here are never unregistered implicitly
+        // (unregister_mixin doesn't touch them)
+        // this is a problem if the feature info's lifetime ends while it's still registered:
+        // for example if a plugin defines its own feature (say a message) and is then unloaded
+        // the domain would be left with a dangling pointer and the next registration or lookup by name
+        // of a feature would be use-after-free
+        // a potential solution is to ref-count implicitly registered features
+        // (count the registered mixins which implement each)
+        // and unregister them when the count reaches zero
+        // this was considered and rejected (for now): it adds a lot of code for an extremely rare case
+        // plugins are supposed to implement existing features, not define new ones
+        // the documented workaround is to unregister such features explicitly
         for (auto& f : info.features_span()) {
             if (f.info->id != invalid_feature_id) {
                 // already registered (and checked above)

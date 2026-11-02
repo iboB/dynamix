@@ -28,12 +28,12 @@
 
 ## Advanced Topics
 
-* Allocators and Internal/External Mixins
-* Multiple Domains, Shared Libraries, and Plugins
-* Custom Features
-* Mixins Without Macros
-* Reflection and Introspection
-* Hotswap
+* [Allocators and Internal/External Mixins](advanced/allocators.md)
+* [Multiple Domains, Shared Libraries, and Plugins](advanced/plugins.md)
+* [Custom Features](advanced/custom-features.md)
+* [Mixins Without Macros](advanced/no-macros.md)
+* [Reflection and Introspection](advanced/reflection.md)
+* [Hotswap](advanced/plugins.md#hotswap)
 * [Dangerous Functionalities](advanced/danger.md)
 
 ## Working with DynaMix

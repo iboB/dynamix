@@ -21,6 +21,10 @@ dynamix_guide_example(objects)
 dynamix_guide_example(mutation_rules)
 dynamix_guide_example(type_classes)
 dynamix_guide_example(dm_this)
+dynamix_guide_example(allocators)
+dynamix_guide_example(no_macros)
+dynamix_guide_example(custom_features)
+dynamix_guide_example(reflection)
 
 # C
 add_executable(dynamix-guide-c_interface c_interface.c)
