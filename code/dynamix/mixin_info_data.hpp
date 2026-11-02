@@ -120,6 +120,38 @@ public:
         return *this;
     }
 
+    // key for canonical order (see mixin_info::order_priority)
+    self& order_priority(int32_t p) noexcept {
+        m_data.info.order_priority = p;
+        return *this;
+    }
+
+    // force the mixin to be external (see mixin_info::force_external)
+    self& force_external(bool b = true) noexcept {
+        m_data.info.force_external = b;
+        return *this;
+    }
+
+    // set the function used to check mixins for equality in object::equals
+    // with no argument (or nullptr) uses the mixin's operator==, which must be noexcept
+    // (with a void mixin, nullptr just clears the function)
+    self& uses_equal(dnmx_mixin_eq_func func = nullptr) noexcept {
+        if constexpr (std::is_void_v<Mixin>) {
+            m_data.info.equals = func;
+        }
+        else {
+            m_data.info.equals = func ? func : &call_mixin_equality_operator<Mixin>;
+        }
+        return *this;
+    }
+
+    // set the function used to compare mixins in object::compare (and object::equals if there is no equality function)
+    // there is no default: C++17 has no operator<=> which would be a sane one
+    self& uses_compare(dnmx_mixin_cmp_func func) noexcept {
+        m_data.info.compare = func;
+        return *this;
+    }
+
     // add features
     //
     // there are three ways to provide the payload of a feature implementation:

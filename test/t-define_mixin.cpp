@@ -429,3 +429,89 @@ const dynamix::common_feature_info& feature_ddd::get_info_safe() {
     return fi;
 }
 const dynamix::feature_info& feature_ddd::info = feature_ddd::get_info_safe();
+
+// builder perks for mixin info fields
+
+struct eva {
+    int i = 0;
+    bool operator==(const eva& other) const noexcept { return i == other.i; }
+};
+struct fred {
+    int i = 0;
+};
+struct gina {};
+
+int compare_fred(const dynamix::mixin_info*, const void* a, const void* b) noexcept {
+    auto& fa = *static_cast<const fred*>(a);
+    auto& fb = *static_cast<const fred*>(b);
+    return (fa.i > fb.i) - (fa.i < fb.i);
+}
+
+DYNAMIX_DEFINE_MIXIN(test, eva)
+    .uses_equal()
+    .order_priority(-100)
+;
+DYNAMIX_DEFINE_MIXIN(test, fred)
+    .uses_compare(compare_fred)
+    .force_external()
+;
+DYNAMIX_DEFINE_MIXIN(test, gina);
+
+TEST_CASE("builder info fields") {
+    auto& ie = dynamix::g::get_mixin_info<eva>();
+    CHECK(ie.order_priority == -100);
+    CHECK(ie.equals);
+    CHECK_FALSE(ie.compare);
+    CHECK_FALSE(ie.external());
+
+    auto& ifr = dynamix::g::get_mixin_info<fred>();
+    CHECK(ifr.order_priority == 0);
+    CHECK_FALSE(ifr.equals);
+    CHECK(ifr.compare == &compare_fred);
+    CHECK(ifr.external());
+
+    auto& ig = dynamix::g::get_mixin_info<gina>();
+    CHECK_FALSE(ig.equals);
+    CHECK_FALSE(ig.compare);
+
+    using namespace dynamix::mutate_ops;
+
+    // canonical order: eva has a lower order priority than alice, so it's first
+    test_obj a, b;
+    mutate(a, add<alice>(), add<eva>());
+    CHECK(a.get_type().mixins[0] == &ie);
+
+    mutate(b, add<eva>());
+    CHECK_FALSE(a.equals(b)); // different types
+    mutate(b, add<alice>());
+    CHECK(&a.get_type() == &b.get_type());
+    CHECK_FALSE(a.equals(b)); // alice has no equality func
+
+    test_obj c, d;
+    mutate(c, add<eva>(), add<fred>());
+    mutate(d, add<eva>(), add<fred>());
+    CHECK(c.equals(d));
+    CHECK_THROWS_AS(c.compare(d), dynamix::object_error); // eva has no compare func
+
+    c.get<eva>()->i = 1;
+    CHECK_FALSE(c.equals(d));
+    c.get<eva>()->i = 0;
+
+    d.get<fred>()->i = 5;
+    CHECK_FALSE(c.equals(d)); // equals falls back to compare for fred
+
+    test_obj f1, f2;
+    mutate(f1, add<fred>());
+    mutate(f2, add<fred>());
+    CHECK(f1.compare(f2) == 0);
+    f2.get<fred>()->i = 5;
+    CHECK(f1.compare(f2) < 0);
+    CHECK(f2.compare(f1) > 0);
+
+    test_obj g1, g2;
+    mutate(g1, add<gina>());
+    mutate(g2, add<gina>());
+    CHECK(g1.equals(g1)); // self is always equal
+    CHECK_FALSE(g1.equals(g2)); // no equality or compare funcs
+    CHECK_THROWS_AS(g1.compare(g2), dynamix::object_error);
+}
