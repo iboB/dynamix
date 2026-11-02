@@ -87,16 +87,15 @@ DYNAMIX_DEFINE_MSG(render_msg, unicast, render, void, (const dynamix::object&));
 
 // [define]
 // a type class is defined by a function which checks a type
-bool is_renderable(dnmx_type_handle ht) noexcept {
-    return dynamix::type::from_c_handle(ht)->implements_strong<render_msg>();
+bool is_renderable(const dynamix::type& t) {
+    return t.implements_strong<render_msg>();
 }
 DYNAMIX_DEFINE_TYPE_CLASS_WITH(game, renderable, is_renderable);
 
-bool is_physical(dnmx_type_handle ht) noexcept {
-    auto t = dynamix::type::from_c_handle(ht);
-    return t->has<transform>() && t->has<body>();
-}
-DYNAMIX_DEFINE_TYPE_CLASS_WITH(game, physical, is_physical);
+// ... or by a captureless lambda
+DYNAMIX_DEFINE_TYPE_CLASS_WITH(game, physical, [](const dynamix::type& t) {
+    return t.has<transform>() && t.has<body>();
+});
 // [define]
 
 DYNAMIX_DEFINE_DOMAIN(game, "game");

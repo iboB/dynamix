@@ -555,3 +555,40 @@ TEST_CASE("add_if_lacking") {
     mutate(obj2, remove<donna>(), add_if_lacking<donna>(8));
     CHECK(obj2.get<donna>()->i == 7); // donna was not lacking in the source
 }
+
+// type class match function variants
+
+DYNAMIX_DECLARE_TYPE_CLASS(impl_aaa_by_type);
+DYNAMIX_DECLARE_TYPE_CLASS(has_bob_by_handle);
+
+bool implements_aaa(const dynamix::type& t) {
+    return t.implements_strong<feature_aaa>();
+}
+DYNAMIX_DEFINE_TYPE_CLASS_WITH(test, impl_aaa_by_type, implements_aaa);
+
+// not noexcept
+bool has_bob(dnmx_type_handle th) {
+    return dynamix::type::from_c_handle(th)->has<bob>();
+}
+DYNAMIX_DEFINE_TYPE_CLASS_WITH(test, has_bob_by_handle, has_bob);
+
+// noexcept functions with a handle are used as they are
+static_assert(dynamix::util::make_type_class_match_func<implements_bbb>() == &implements_bbb);
+
+TEST_CASE("type class match funcs") {
+    using namespace dynamix::mutate_ops;
+    test_obj obj;
+    mutate(obj, add<alice>());
+    CHECK(obj.is_of<impl_aaa_by_type>());
+    CHECK(obj.is_of("impl_aaa_by_type"));
+    CHECK_FALSE(obj.is_of<has_bob_by_handle>());
+
+    test_obj obj2;
+    mutate(obj2, add<donna>());
+    CHECK_FALSE(obj2.is_of<impl_aaa_by_type>());
+
+    mutate(obj2, add<bob>());
+    CHECK(obj2.is_of<has_bob_by_handle>());
+    CHECK(obj2.is_of("has_bob_by_handle"));
+    CHECK(obj2.is_of<impl_aaa_by_type>()); // bob implements aaa
+}
