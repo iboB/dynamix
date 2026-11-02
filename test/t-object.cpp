@@ -545,6 +545,15 @@ TEST_CASE("mutate") {
         mutate(obj, remove(*t.empty));
         CHECK(obj.num_mixins() == 1);
         CHECK(obj.has(*t.procedural_geometry));
+
+        auto& t_p = obj.get_type();
+        mutate(obj, add_if_lacking(*t.procedural_geometry), add_if_lacking("procedural_geometry"));
+        CHECK(&obj.get_type() == &t_p);
+
+        mutate(obj, add_if_lacking(*t.movable), add_if_lacking("empty"));
+        CHECK(obj.num_mixins() == 3);
+        CHECK(obj.has(*t.movable));
+        CHECK(obj.has(*t.empty));
     }
 
     {

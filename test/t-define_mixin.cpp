@@ -515,3 +515,43 @@ TEST_CASE("builder info fields") {
     CHECK_FALSE(g1.equals(g2)); // no equality or compare funcs
     CHECK_THROWS_AS(g1.compare(g2), dynamix::object_error);
 }
+
+TEST_CASE("add_if_lacking") {
+    using namespace dynamix::mutate_ops;
+    charlie::lifetime_stats cs;
+
+    test_obj obj;
+    std::vector<int> ints = {1, 2, 3};
+    mutate(obj, add_if_lacking<charlie>(std::move(ints)));
+    CHECK(ints.empty()); // consumed
+    CHECK(obj.get<charlie>()->vec == std::vector<int>{1, 2, 3});
+    CHECK(cs.total == 1);
+
+    std::vector<int> ints2 = {4, 5};
+    mutate(obj, add_if_lacking<charlie>(std::move(ints2)), add_if_lacking<donna>(1, 2));
+    CHECK(ints2 == std::vector<int>{4, 5}); // not consumed: charlie was not lacking
+    CHECK(obj.get<charlie>()->vec == std::vector<int>{1, 2, 3});
+    CHECK(obj.get<donna>()->i == 3);
+    CHECK(cs.living == 1);
+    CHECK(cs.total - cs.m_ctr == 1); // charlie was only moved (to the new object buffer)
+
+    mutate(obj, add_if_lacking<donna>(5, 5));
+    CHECK(obj.get<donna>()->i == 3);
+
+    mutate(obj, add_if_lacking<alice>());
+    CHECK(obj.has<alice>());
+    auto& t = obj.get_type();
+    mutate(obj, add_if_lacking<alice>(), add_if_lacking<charlie>(std::string_view("x")));
+    CHECK(&obj.get_type() == &t);
+
+    // lvalues and temporaries
+    test_obj obj2;
+    std::string_view sv = "lval";
+    mutate(obj2, add_if_lacking<charlie>(sv), add_if_lacking<donna>(int(7)));
+    CHECK(obj2.get<charlie>()->str == "lval");
+    CHECK(obj2.get<donna>()->i == 7);
+
+    // removing and re-adding in the same mutation
+    mutate(obj2, remove<donna>(), add_if_lacking<donna>(8));
+    CHECK(obj2.get<donna>()->i == 7); // donna was not lacking in the source
+}
