@@ -12,7 +12,7 @@
 
 ## C++ Guide
 
-* Domains
+* [Domains](cpp/domains.md)
 * [Defining Mixins](cpp/mixins.md)
 * [Messages](cpp/messages.md)
 * Objects
