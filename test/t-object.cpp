@@ -623,7 +623,7 @@ TEST_CASE("more mutation errors") {
         t.mesh->user_data = 200;
 
         CHECK_THROWS_WITH_AS(object afmi(*t.t_afmi),
-            "me: mutate to object of type {'ai', 'flyer', 'mesh', 'invisible'}: deafult init 'mesh' failed with error 1000",
+            "me: mutate to object of type {'ai', 'flyer', 'mesh', 'invisible'}: default init 'mesh' failed with error 1000",
             object_error);
 
         CHECK(lstats.ai.living == 0);
