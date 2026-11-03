@@ -28,7 +28,7 @@
 ## Advanced Topics
 
 * [Allocators and Internal/External Mixins](advanced/allocators.md)
-* [Shared Libraries, Plugins, Hotswap, and Multiple Domains](advanced/plugins.md)
+* [Shared Libraries and Plugins](advanced/plugins.md) ... and hot reloading (or hotswap).
 * [Custom Features](advanced/custom-features.md)
 * [Mixins Without Macros](advanced/no-macros.md)
 * [Reflection and Introspection](advanced/reflection.md)
