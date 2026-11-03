@@ -558,16 +558,16 @@ TEST_CASE("mutate") {
         mutate_to(obj, dom.get_empty_type(), construct(*t.actor, custom_actor_init));
         CHECK(obj.empty());
 
-        //mutate(obj, add(*t.procedural_geometry));
+        mutate(obj, add(*t.procedural_geometry));
 
-        //auto& t_p = obj.get_type();
-        //mutate(obj, add_if_lacking(*t.procedural_geometry), add_if_lacking("procedural_geometry"));
-        //CHECK(&obj.get_type() == &t_p);
+        auto& t_p = obj.get_type();
+        mutate(obj, add_if_lacking(*t.procedural_geometry), add_if_lacking("procedural_geometry"));
+        CHECK(&obj.get_type() == &t_p);
 
-        //mutate(obj, add_if_lacking(*t.movable), add_if_lacking("empty"));
-        //CHECK(obj.num_mixins() == 3);
-        //CHECK(obj.has(*t.movable));
-        //CHECK(obj.has(*t.empty));
+        mutate(obj, add_if_lacking(*t.movable), add_if_lacking("empty"));
+        CHECK(obj.num_mixins() == 3);
+        CHECK(obj.has(*t.movable));
+        CHECK(obj.has(*t.empty));
     }
 
     {

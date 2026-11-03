@@ -64,4 +64,23 @@ struct object_mutate_op_with_args : public object_mutate_op {
     }
 };
 
+// like object_mutate_op_with_args, but stores references to the arguments
+// thus the arguments are only consumed (moved from) if the op is applied
+// WARNING: references to temporaries are only valid until the end of the full expression which created them
+// so ops of this type *must* be used inline: `mutate(obj, add_if_lacking<M>(args...))`
+template <typename Mixin, typename... Args>
+struct object_mutate_op_with_arg_refs : public object_mutate_op {
+    std::tuple<Args&&...> args_tup;
+
+    object_mutate_op_with_arg_refs(Args&&... args)
+        : args_tup(std::forward<Args>(args)...)
+    {
+        this->affected_info = &g::get_mixin_info<Mixin>();
+    }
+    virtual bool overrides_init() const noexcept final override { return true; }
+    virtual void do_init(init_new_args args) final override {
+        impl::make_from_tuple<Mixin>(args.mixin_buf, std::move(args_tup));
+    }
+};
+
 }

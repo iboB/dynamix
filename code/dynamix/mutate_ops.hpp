@@ -52,6 +52,16 @@ struct mutate_op_to_back_by_name : public mutate_op_by_name, public simple_mutat
     void apply_to_type_mutation(type_mutation& mut) { mut.to_back(name); }
 };
 
+struct mutate_op_add_if_lacking_by_info : public mutate_op_by_info, public simple_mutate_op {
+    using mutate_op_by_info::mutate_op_by_info;
+    void apply_to_type_mutation(type_mutation& mut) { mut.add_if_lacking(info); }
+};
+
+struct mutate_op_add_if_lacking_by_name : public mutate_op_by_name, public simple_mutate_op {
+    using mutate_op_by_name::mutate_op_by_name;
+    void apply_to_type_mutation(type_mutation& mut) { mut.add_if_lacking(name); }
+};
+
 template <typename ConstructNew_Func>
 struct add_mixin_op_with_func_by_name final : public mutate_op_by_name, public object_mutate_op_with_func<ConstructNew_Func> {
     add_mixin_op_with_func_by_name(std::string_view name, ConstructNew_Func&& func)
@@ -81,6 +91,18 @@ struct add_mixin_op_with_args final : mutate_op_just_add_by_info, public object_
     using object_mutate_op::to_obj_mutate;
 };
 
+// the args are only consumed if the mixin is lacking and is constructed
+// (see object_mutate_op_with_arg_refs)
+template <typename Mixin, typename... Args>
+struct add_if_lacking_mixin_op_with_args final : public mutate_op_add_if_lacking_by_info, public object_mutate_op_with_arg_refs<Mixin, Args...> {
+    add_if_lacking_mixin_op_with_args(Args&&... args)
+        : mutate_op_add_if_lacking_by_info(g::get_mixin_info<Mixin>())
+        , object_mutate_op_with_arg_refs<Mixin, Args...>(std::forward<Args>(args)...)
+    {
+    }
+    using object_mutate_op::to_obj_mutate;
+};
+
 ////////////////////////////////////////////
 // functions
 
@@ -107,6 +129,17 @@ add_mixin_op_with_func_by_name<ConstructNew_Func> add(std::string_view name, Con
 template <typename Mixin, typename... Args>
 add_mixin_op_with_args<Mixin, Args...> add(Args&&... args) { return add_mixin_op_with_args<Mixin, Args...>(std::forward<Args>(args)...); }
 
+// add a mixin only if the object doesn't already have it
+// if constructor arguments are provided, they will only be consumed if the mixin is constructed
+// WARNING: the op stores references to the arguments, so it must be used inline:
+// `mutate(obj, add_if_lacking<M>(args...))`
+inline mutate_op_add_if_lacking_by_info add_if_lacking(const dynamix::mixin_info& info) { return mutate_op_add_if_lacking_by_info(info); }
+inline mutate_op_add_if_lacking_by_name add_if_lacking(std::string_view name) { return mutate_op_add_if_lacking_by_name(name); }
+template <typename Mixin>
+mutate_op_add_if_lacking_by_info add_if_lacking() { return mutate_op_add_if_lacking_by_info(g::get_mixin_info<Mixin>()); }
+template <typename Mixin, typename... Args>
+add_if_lacking_mixin_op_with_args<Mixin, Args...> add_if_lacking(Args&&... args) { return add_if_lacking_mixin_op_with_args<Mixin, Args...>(std::forward<Args>(args)...); }
+
 inline mutate_op_to_back_by_info to_back(const dynamix::mixin_info& info) { return mutate_op_to_back_by_info(info); }
 inline mutate_op_to_back_by_name to_back(std::string_view name) { return mutate_op_to_back_by_name(name); }
 template <typename Mixin>
@@ -114,6 +147,7 @@ mutate_op_to_back_by_info to_back() { return mutate_op_to_back_by_info(g::get_mi
 }
 
 using mutate_ops::add;
+using mutate_ops::add_if_lacking;
 using mutate_ops::remove;
 using mutate_ops::to_back;
 
