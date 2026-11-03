@@ -4,6 +4,7 @@
 #include <iostream>
 #include <dynamix/object.hpp>
 #include <dynamix/dbg_dmp.hpp>
+#include <dynamix/mutate.hpp>
 #include "../test/test_data.hpp"
 
 int main() {
@@ -13,4 +14,12 @@ int main() {
     t.create_types(dom);
     t.create_more_types(dom);
     dynamix::util::dbg_dmp(std::cout, dom);
+
+    dynamix::object obj(dom);
+    mutate(obj,
+        dynamix::add(*t.movable),
+        dynamix::add(*t.procedural_geometry)
+    );
+    dynamix::util::dbg_dmp(std::cout, obj);
+    return 0;
 }
