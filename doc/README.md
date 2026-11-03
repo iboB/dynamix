@@ -7,43 +7,40 @@
 
 * [Overview](overview.md) - What is DynaMix and why might you want to use it?
 * [Adding DynaMix to a Project](basics/adding.md) - Get up and running quickly
-* Hello World - A walkthrough of a minimal DynaMix program
+* [Hello World](basics/hello-world.md) - A walkthrough of a minimal DynaMix program
 * [Core Concepts and Glossary](basics/glossary.md) - Learn the core concepts
 
 ## C++ Guide
 
-* Domains
-* Defining Mixins
-* Messages
-* Objects
-* Mutations
-* Mutation Rules
-* Type Classes
-* Accessing the Object from a Mixin
-* Error Handling
+* [Domains](cpp/domains.md)
+* [Objects](cpp/objects.md)
+* [Mixins](cpp/defining-mixins.md)
+* [Messages](cpp/messages.md)
+* [Types and Mutations](cpp/types-and-mutations.md)
+* [Mutation Rules](cpp/mutation-rules.md)
+* [Type Classes](cpp/type-classes.md)
+* [Error Handling](cpp/error-handling.md)
 
 ## C Guide
 
-* The C Interface - How it differs from the C++ one
+* [The C Interface](c/c-interface.md) - How it differs from the C++ one
 
 ## Advanced Topics
 
-* Allocators and Internal/External Mixins
-* Multiple Domains, Shared Libraries, and Plugins
-* Custom Mutation Rules
-* Custom Features
-* Mixins Without Macros
-* Reflection and Introspection
-* Hotswap
+* [Allocators and Internal/External Mixins](advanced/allocators.md)
+* [Shared Libraries, Plugins, Hotswap, and Multiple Domains](advanced/plugins.md)
+* [Custom Features](advanced/custom-features.md)
+* [Mixins Without Macros](advanced/no-macros.md)
+* [Reflection and Introspection](advanced/reflection.md)
 * [Dangerous Functionalities](advanced/danger.md)
 
 ## Working with DynaMix
 
-* Performance
-* Thread Safety
-* Debugging
-* Tips and Tricks
-* Common Problems and Solutions
+* [Performance](working-with/perf.md)
+* [Thread Safety](working-with/thread-safety.md)
+* [Debugging](working-with/debugging.md)
+* [Tips and Tricks](working-with/tips-and-tricks.md)
+* [Common Problems and Solutions](working-with/problems-and-solutions.md)
 
 ## Examples
 
@@ -62,9 +59,9 @@
 * [Migrating from v1](misc/migrating-from-v1.md) - How to migrate your code from DynaMix v1 to v2
 * [Comparisons: DynaMix vs X](misc/dynamix-vs-x.md) - Comparisons with other solutions
 * [Non-features](misc/non-features.md) - Things DynaMix deliberately does not do
-* History and Inspiration
+* [History and Inspiration](misc/history.md)
 
 ## Development
 
-* Implementation Notes
+* [Implementation Notes](misc/implementation-notes.md)
 * [Roadmap](roadmap.md) - What's coming next
