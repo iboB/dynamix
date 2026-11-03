@@ -24,7 +24,7 @@ void a_set_a(void* vself, int val) {
     self->ia = val;
 }
 
-// v2!: consntess is respected on bind
+// v2!: constness is respected on bind
 int a_multi(const void* vself) {
     auto self = reinterpret_cast<const a*>(vself);
     return self->ia;
@@ -41,7 +41,7 @@ void a2_set_a(void* vself, int val) {
     self->ia2 = val + 1;
 }
 
-// v2!: consntess is respected on bind
+// v2!: constness is respected on bind
 int a2_multi(const void* vself) {
     auto self = reinterpret_cast<const a2*>(vself);
     return self->ia2 + 1;

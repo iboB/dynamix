@@ -173,7 +173,7 @@ TEST_CASE("multi") {
 
     CHECK(track_copy::defaults == 1);
     CHECK(track_copy::copies == 3); // for each multicast but the last + 1 for the msg call
-    CHECK(track_copy::moves == 4); // for each caller + 1 for the last mutlicast
+    CHECK(track_copy::moves == 4); // for each caller + 1 for the last multicast
     CHECK(track_ref::defaults == 1);
     CHECK(track_ref::copies == 0);
     CHECK(track_ref::moves == 0);

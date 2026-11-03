@@ -21,7 +21,7 @@ The dependencies are:
 * CMake only: [iboB/icm](https://github.com/iboB/icm) `~> 1.4.5`
 * Tests only: [iboB/doctest-util](https://github.com/iboB/doctest-util) `~> 0.1.1`
 * Tests only: [iboB/doctest-lib](https://github.com/iboB/doctest-lib) `~> 2.4.9a`
-* C Tests only: [ThrowTheSwitch/Unity](https://github.com/iboB/doctest-util) `~> 2.5.2`
+* C Tests only: [ThrowTheSwitch/Unity](https://github.com/ThrowTheSwitch/Unity) `~> 2.5.2`
 * Benchmarks only: [iboB/picobench](https://github.com/iboB/picobench) `~> 2.04`
 
 ## More

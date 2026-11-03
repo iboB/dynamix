@@ -106,7 +106,7 @@ TEST_CASE("uni") {
     CHECK_FALSE(get_ptr::call(obj));
 
     {
-        // check that value is succesfully moved by call
+        // check that value is successfully moved by call
         std::vector<int> ints = {1, 2, 3, 4, 5};
         auto ints_data = ints.data();
         simple_uni_vec::call(obj, std::move(ints));
@@ -114,7 +114,7 @@ TEST_CASE("uni") {
     }
 
     {
-        // check that value is succesfully moved by message func
+        // check that value is successfully moved by message func
         std::vector<int> ints = {1, 2, 3, 4, 5};
         auto ints_data = ints.data();
         uni_vec(obj, std::move(ints));
@@ -128,7 +128,7 @@ TEST_CASE("uni") {
     }
 
     mutate(obj, add<over>());
-    CHECK(get_int::call(obj) == 100); // overriden
+    CHECK(get_int::call(obj) == 100); // overridden
     CHECK(get_int::call(obj) == 99);
 
     CHECK(inherited_func(obj, 1) == 100);

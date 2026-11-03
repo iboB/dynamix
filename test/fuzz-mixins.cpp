@@ -65,7 +65,7 @@ struct mixin_generator {
         for (int i = 0; i < SIZE; ++i) {
             auto op = rnd() % 10;
             if (op == 0) {
-                // unregisterd one in 10 times
+                // unregistered one in 10 times
                 unreg_mixin();
             }
             else {
