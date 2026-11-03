@@ -23,7 +23,7 @@ enum dnmx_dbg_dmp_flags {
 
     dnmx_mixin_dmp_ex = 0x100,
     dnmx_mixin_dmp_features = 0x200,
-    dmnx_mixin_dmp_all = 0xF00,
+    dnmx_mixin_dmp_all = 0xF00,
 
     dnmx_type_dmp_ex = 0x1000,
     dnmx_type_dmp_ftable = 0x2000,
@@ -52,7 +52,7 @@ namespace util {
 DYNAMIX_API void dbg_dmp(std::ostream& out, const domain& d, uint32_t flags = dnmx_dmp_all);
 DYNAMIX_API void dbg_dmp(std::ostream& out, const feature_info& fi, uint32_t flags = dnmx_feature_dmp_all);
 DYNAMIX_API void dbg_dmp(std::ostream& out, const mutation_rule_info& mri, uint32_t flags = dnmx_mr_dmp_all);
-DYNAMIX_API void dbg_dmp(std::ostream& out, const mixin_info& mi, uint32_t flags = dmnx_mixin_dmp_all);
+DYNAMIX_API void dbg_dmp(std::ostream& out, const mixin_info& mi, uint32_t flags = dnmx_mixin_dmp_all);
 DYNAMIX_API void dbg_dmp(std::ostream& out, const type& t, uint32_t flags = dnmx_type_dmp_all);
 
 // does not support matching types
