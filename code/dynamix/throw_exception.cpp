@@ -126,12 +126,17 @@ void info_has_domain(const domain& dom, const mixin_info& info) {
     e<domain_error>(dom) << "register mixin " << info << " which has a domain = " << *domain::from_c_handle(info.dom) << do_throw;
 }
 
+void register_foreign(const domain& dom, const mixin_info& mi, const feature_info& fi) {
+    e<domain_error>(dom) << "while registering mixin " << mi << " attempt to register feature " <<
+        fi << " which is registered in another domain" << do_throw;
+}
+
 void unreg_foreign(const domain& dom, const feature_info& info) {
     e<domain_error>(dom) << "unregister foreign feature " << info << ", id = " << info.iid() << do_throw;
 }
 void unreg_foreign(const domain& dom, const mixin_info& info) {
     e<domain_error> out(dom);
-    out << "unregister foreign feature " << info << ", id = " << info.iid() << ", domain = ";
+    out << "unregister foreign mixin " << info << ", id = " << info.iid() << ", domain = ";
     if (info.dom) {
         out << *domain::from_c_handle(info.dom);
     }
@@ -164,7 +169,6 @@ void foreign_mixin(const type_mutation& mut, const mixin_info& m) {
     }
     out << " while trying to create type " << mut << do_throw;
 }
-
 
 void mutation_rule_user_error(const type_mutation& mut, const mutation_rule_info& info, error_return_t error) {
     e<type_error>(mut.dom) << "applying mutation rule " << info << " to " << mut << " failed with error " << error << do_throw;

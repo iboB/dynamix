@@ -246,7 +246,7 @@ public:
         basic_register_l(info, m_element_registry.unique_lock()->sparse_features, !m_domain.m_settings.allow_duplicate_feature_names);
     }
 
-    // to be pedantic when we clear features we should clear all object types which
+    // to be pedantic when we clear features, we should clear all object types which
     // implement them, but this seems to be unnecessary
     // if a feature has found its way into a type info, then there must be a mixin that uses it
     // if the feature is local to a module, then that mixin must be local to the module too
@@ -254,8 +254,8 @@ public:
     // then surely the mixin should be unregistered too
     // then all types infos containing that mixin (and in turn this feature)
     // will be dropped eventually
-    // for a short while we will live with incosistent lists of feature and mixins
-    // if something breaks because of this inconsitency, then this would have been a
+    // for a short while we will live with inconsistent lists of feature and mixins
+    // if something breaks because of this inconsistency, then this would have been a
     // break anyway - the mixins referencing this feature would keep on living??
     void unregister_feature(feature_info& info) {
         basic_unregister_l(info, m_element_registry.unique_lock()->sparse_features);
@@ -268,15 +268,31 @@ public:
         // register mixin's features
         for (auto& f : info.features_span()) {
             if (f.info->id != invalid_feature_id) {
-                // already registered
-                assert(reg->sparse_features[f.info->iid()] == f.info); // sanity
+                // already registered, but check that it is registered with this domain
+                const auto fid = f.info->iid();
+                if (fid >= reg->sparse_features.size() || reg->sparse_features[fid] != f.info) {
+                    // NOTE: currently features registered by register_mixin and, by extension, DEFINE_MIXIN macros,
+                    // are not unregistered by unregister_mixin
+                    // this is a problem if the feature_info's lifetime ends and is not manually unregistered
+                    // an example: a plugin which defines its own features gets unloaded
+                    // in this case the domain is left with a dangling pointer and the next registration of name lookup
+                    // will be UB (use after free)
+                    // a potential solution would be to refcount features much like mutation rules, and then have
+                    // unregister_mixin decrement the refcount of all features it registered
+                    // this was considered and rejected (for now): it would add a lot of code for an extremely rare case
+                    // plugins are expected to implement existing "app" features, not define their own
+                    // in case you crash here on a plugin reload:
+                    // - the workaround is to manually unregister plugin-local features before unloading the plugin
+                    // - you may open an issue if you want to see this feature refcounted and auto-unregistered
+                    throw_exception::register_foreign(m_domain, info, *f.info);
+                }
                 continue;
             }
             // we need to const_cast. this is the price of lazy ops in C++
             basic_register_l(*const_cast<feature_info*>(f.info), reg->sparse_features, !m_domain.m_settings.allow_duplicate_feature_names);
 
             // note that if the registration fails, previously registered features are not rolled back
-            // and they shouldnt: features are separate from mixins
+            // and they shouldn't: features are separate from mixins
         }
 
         // register mixin itself
@@ -309,7 +325,7 @@ public:
             for (auto it = types.begin(); it != types.end(); ) {
                 auto& t = *it;
                 if (!t->has(info.id)) {
-                    // type does't have mixin
+                    // type doesn't have mixin
                     ++it;
                     continue;
                 }
@@ -441,7 +457,7 @@ public:
         // it would be easy to say "users must take care of them by order_priority" and dynamix 1 did just that
         // however since we allow adding rules with mixin registration and potentially adding of rules
         // by plugins this task would be really hard for users
-        // so we help by doing a poor man's toplogical sort: multiple applications
+        // so we help by doing a poor man's topological sort: multiple applications
         // we can't do a real topological sort, because rules are opaque
         // (and there is no obvious way to make them non-opaque, while keeping their power)
         // so, we run them again and again until applying them produces the same result as the previous apply
@@ -653,6 +669,8 @@ public:
                     if (adata.bid != bdata.bid) return adata.bid > bdata.bid;
 
                     // then by prio
+                    // priority behaves like a position in the mixin order (higher prio = earlier mixin)
+                    // since mixins are in reverse order here (see below), lower prio comes first
                     if (adata.priority != bdata.priority) return adata.priority < bdata.priority;
 
                     // then by mixin order such that the last mixin is first

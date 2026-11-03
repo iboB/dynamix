@@ -167,3 +167,24 @@ TEST_CASE("register dupe mixins") {
     CHECK(dom.get_mixin_info(t.movable->id) == t.movable);
     CHECK(dom.get_mixin_info(dup.id) == &dup);
 }
+
+TEST_CASE("foreign features") {
+    test_data t;
+    domain d1("d1"), d2("d2");
+
+    // actor's features, including get_name, are registered in d1
+    d1.register_mixin(*t.actor);
+    CHECK(d1.get_feature_info(t.get_name->id) == t.get_name);
+
+    // stats also implements features of actor, so it can't be registered in d2
+    CHECK_THROWS_WITH_AS(d2.register_mixin(*t.stats),
+        "d2: while registering mixin 'stats' attempt to register feature 'serialize' which is registered in another domain",
+        domain_error);
+
+    // no partial registration happened
+    CHECK_FALSE(t.stats->registered());
+    CHECK_FALSE(d2.get_mixin_info("stats"));
+
+    // explicitly registering features doesn't help: they are owned by d1
+    CHECK_THROWS_AS(d2.register_feature(*t.get_name), domain_error);
+}
