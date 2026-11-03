@@ -112,7 +112,7 @@ public:
     using dnmx_basic_domain::user_data;
     using dnmx_basic_domain::context;
 
-    dnmx_domain_handle to_c_hanlde() const noexcept { return this; }
+    dnmx_domain_handle to_c_handle() const noexcept { return this; }
     static domain* from_c_handle(dnmx_domain_handle hd) noexcept { return const_cast<domain*>(static_cast<const domain*>(hd)); }
 
     // only used in tests

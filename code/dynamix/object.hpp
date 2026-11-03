@@ -207,9 +207,9 @@ public:
     // if a mixin lacks a compare func, throws object_error
     int compare(const object& other) const;
 
-    dnmx_const_object_handle to_c_hanlde() const noexcept { return this; }
+    dnmx_const_object_handle to_c_handle() const noexcept { return this; }
     static const object* from_c_handle(dnmx_const_object_handle ho) noexcept { return static_cast<const object*>(ho); }
-    dnmx_object_handle to_c_hanlde() noexcept { return this; }
+    dnmx_object_handle to_c_handle() noexcept { return this; }
     static object* from_c_handle(dnmx_object_handle ho) noexcept { return static_cast<object*>(ho); }
 private:
     friend class object_mutation;

@@ -465,7 +465,7 @@ public:
             // apply rules
             for (auto& r : rules) {
                 auto& info = *r.first;
-                if (auto err = info.apply(mutation.to_c_hanlde(), info.user_data)) {
+                if (auto err = info.apply(mutation.to_c_handle(), info.user_data)) {
                     throw_exception::mutation_rule_user_error(mutation, info, err);
                 }
             }

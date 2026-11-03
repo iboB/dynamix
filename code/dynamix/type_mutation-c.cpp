@@ -15,7 +15,7 @@ extern "C" {
 dnmx_type_mutation_handle dnmx_create_type_mutation_empty(dnmx_domain_handle hd) {
     try {
         auto mut = new type_mutation(*domain::from_c_handle(hd));
-        return mut->to_c_hanlde();
+        return mut->to_c_handle();
     }
     catch (std::exception&) {
         return nullptr;
@@ -25,7 +25,7 @@ dnmx_type_mutation_handle dnmx_create_type_mutation_empty(dnmx_domain_handle hd)
 dnmx_type_mutation_handle dnmx_create_type_mutation_from_type(dnmx_type_handle ht) {
     try {
         auto mut = new type_mutation(*type::from_c_handle(ht));
-        return mut->to_c_hanlde();
+        return mut->to_c_handle();
     }
     catch (std::exception&) {
         return nullptr;
@@ -37,7 +37,7 @@ void dnmx_destroy_unused_type_mutation(dnmx_type_mutation_handle hmut) {
 }
 
 dnmx_domain_handle dnmx_type_mutation_get_domain(dnmx_type_mutation_handle hmut) {
-    return self->dom.to_c_hanlde();
+    return self->dom.to_c_handle();
 }
 
 bool dnmx_type_mutation_has(dnmx_type_mutation_handle hmut, const dnmx_mixin_info* info) {

@@ -95,7 +95,7 @@ public:
     // set allocator
     self& uses_allocator(t_any<mixin_allocator> alloc) {
         m_data.stored_alloc = alloc;
-        m_data.info.allocator = m_data.stored_alloc->to_c_hanlde();
+        m_data.info.allocator = m_data.stored_alloc->to_c_handle();
         return *this;
     }
 

@@ -95,7 +95,7 @@ public:
     [[nodiscard]] bool implements() const noexcept { return implements(g::get_feature_info_fast<Feature>()); }
 
 
-    dnmx_type_mutation_handle to_c_hanlde() noexcept { return reinterpret_cast<dnmx_type_mutation_handle>(this); }
+    dnmx_type_mutation_handle to_c_handle() noexcept { return reinterpret_cast<dnmx_type_mutation_handle>(this); }
     static type_mutation* from_c_handle(dnmx_type_mutation_handle ha) noexcept { return reinterpret_cast<type_mutation*>(ha); }
 };
 

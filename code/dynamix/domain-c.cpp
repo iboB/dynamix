@@ -16,7 +16,7 @@ extern "C" {
 
 dnmx_domain_handle dnmx_create_domain(dnmx_sv name, dnmx_domain_settings settings, uintptr_t user_data, void* context) {
     auto new_dom = new dynamix::domain(name.to_std(), settings, user_data, context);
-    return new_dom->to_c_hanlde();
+    return new_dom->to_c_handle();
 }
 void dnmx_destroy_domain(dnmx_domain_handle hd) {
     delete self;
