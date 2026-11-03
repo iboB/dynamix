@@ -81,7 +81,7 @@ state create_state(dynamix::domain& dom, uint32_t features_per_mixin, uint32_t n
             b.store_name("mixin_" + std::to_string(i));
         }
 
-        // size, aligment
+        // size, alignment
         {
             static constexpr std::array<dynamix::byte_size_t, 7> alignments = {0, 1, 2, 4, 8, 16, 32};
             auto alignment = alignments[rnd() % alignments.size()];

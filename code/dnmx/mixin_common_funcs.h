@@ -48,7 +48,7 @@ DYNAMIX_API bool dnmx_mixin_common_eq_func(const dnmx_mixin_info* info, const vo
 
 // noop funcs: do nothing (but they do it really fast)
 // use carefully
-// NOTE: it's somewhat of a dillema whether they should be left inline
+// NOTE: it's somewhat of a dilema whether they should be left inline
 // for now leave them as such and allow the linker to squash them if possible
 
 static inline dnmx_error_return_t dnmx_mixin_noop_init_func(const dnmx_mixin_info* i, void* p) DNMX_NOEXCEPT {

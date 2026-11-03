@@ -18,12 +18,12 @@ typedef struct dnmx_feature_info {
     // will be set by the domain once registered
     dnmx_feature_id id;
 
-    // if domain_settings::unique_feature_names is true (the default),
+    // if domain_settings::allow_duplicate_feature_names is false (the default),
     // the name must be unique for the domain
     dnmx_sv name;
 
-    // determines whether it's an error to have concurrency clashes in the ftable
-    // it false, it's an error to have two mixins to provide the feature with the same bid and priority
+    // determines whether it's an error to have clashes in the ftable
+    // it false, it's an error to have two mixins provide the feature with the same bid and priority
     bool allow_clashes;
 
     // optional default payload for feature

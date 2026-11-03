@@ -17,15 +17,15 @@ typedef struct dnmx_domain_settings {
     // also note that ordering can be achieved externally
     bool canonicalize_types;
 
-    // if true, enforces that newly registered feature types have unique names
-    // will produce an error if a feature with a duplicate name is registered
+    // if true, this allows newly registered feature types to have duplicate names
+    // otherwise, registering a feature with a duplicate name will produce an error
     // WARNING: if duplicate names exist,
-    // any ops involing with feature names will produce unpredictable results
+    // any ops involving feature names will produce unpredictable results
     bool allow_duplicate_feature_names;
 
-    // if true, enforces that newly registered mixin types have unique names
-    // will produce an error if a mixin with a duplicate name is registered
+    // if true, this allows newly registered mixin types to have duplicate names
+    // otherwise, registering a mixin with a duplicate name will produce an error
     // WARNING: if duplicate names exist,
-    // any ops involing with mixin names will produce unpredictable results
+    // any ops involving mixin names will produce unpredictable results
     bool allow_duplicate_mixin_names;
 } dnmx_domain_settings;

@@ -26,9 +26,9 @@ struct dnmx_basic_object {
     // m_mixin_data is also an array with an element for each mixins
     // each element contains two pointers:
     // * buf: pointing to the memory allocated for an external mixin
-    //        or nullptr if tnis is an internal mixin
+    //        or nullptr if this is an internal mixin
     // * mixin: pointer to the mixin within its external buffer
-    //          or within the unified obj buffer
+    //        or within the unified obj buffer
     // (each mixin pointer is prepended by sizeof(void*) bytes which contain
     // a pointer to *this* object
     dnmx_object_mixin_data* m_mixin_data;

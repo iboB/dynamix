@@ -31,7 +31,7 @@ typedef int(*dnmx_mixin_cmp_func)(const dnmx_mixin_info* info, const void* a, co
 
 // this needs to be filled before registering mixins
 // default values can be obtained via dnmx_make_mixin_info()
-// after a mixin is registered, changing any of tese values
+// after a mixin is registered, changing any of these values
 // is forbidden and will lead to UB - crashes or bugs
 // the only exception to the rule above is user_data
 struct dnmx_mixin_info {
@@ -42,12 +42,12 @@ struct dnmx_mixin_info {
     dnmx_domain_handle dom;
 
     // name of mixin
-    // if domain_settings::unique_mixin_names is true (the default),
+    // if domain_settings::allow_duplicate_mixin_names is false (the default),
     // the name must be unique for the domain
     // this is the only value without a sane default
     dnmx_sv name;
 
-    // size and alignent of mixin
+    // size and alignment of mixin
     // can both be zero
     // if size is not zero, alignment must be a power of 2
     // use set_size_alignment or dnmx_set_mixin_info_size_and_alignment to set
@@ -87,7 +87,7 @@ struct dnmx_mixin_info {
     // optional allocator for this mixin
     // the user is responsible for preserving the lifetime of the allocator while
     // the mixin is registered
-    // the presense of an allocator makes the mixin implicitly external
+    // the presence of an allocator makes the mixin implicitly external
     dnmx_mixin_allocator_handle allocator;
 
     // optional value which can be used to categorize different mixins in a type
@@ -112,8 +112,8 @@ struct dnmx_mixin_info {
     uint32_t num_features;
 
     // key for canonical order
-    // if domain_settings::canonical_types is true, this is used to sort mixins in types
-    // it is also used to compare types. Types are compare by lexicographical canonical mixin order
+    // if domain_settings::canonicalize_types is true, this is used to sort mixins in types
+    // it is also used to compare types. Types are compared by lexicographical canonical mixin order
     // the smaller the number, the earlier the mixin will appear in an object
     // will also affect multicast order if not otherwise specified
     // mixins with the same order_priority are compared by name
