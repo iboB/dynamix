@@ -50,7 +50,7 @@ public:
     object(object&& o) noexcept;
 
     // if allocators match, this does simple pointer copies and doesn't throw
-    // if they don't, the op is not supported (yet?) and will throw bad_move
+    // if they don't, the op is not supported (yet?) and will throw object_error
     object& operator=(object&& o);
 
     //////////////////////////
@@ -62,18 +62,18 @@ public:
     // class copyable_obj : public dynamix::object {
     // public:
     //   using dynamix::object::object;
-    //   copyable_obj(const copyable_obj& other) : dynamix::object(other.copy) {}
+    //   copyable_obj(const copyable_obj& other) : dynamix::object(other.copy()) {}
     //   copyable_obj& operator=(const copyable_obj& other) { copy_from(other); return *this; }
     //   // DON'T FORGET THESE (the copy ops from above hide them)
     //   copyable_obj(copyable_obj&& o) noexcept = default;
     //   copyable_obj& operator=(copyable_obj&& o) = default;
-    // }
+    // };
     object(const object& o) = delete;
     object& operator=(const object& o) = delete;
 
     // create a copy
-    // note that this will slice the type if you use it witha a class inherited from object
-    // may throw `bad_copy` if copy is not possible
+    // note that this will slice the type if you use it with a class inherited from object
+    // may throw `object_error` if copy is not possible
     // optionally provide an allocator for the copy, otherwise the default is used
     [[nodiscard]] object copy(const allocator& alloc = {}) const;
 
@@ -82,7 +82,7 @@ public:
     // * calls assignment operators for mixins that exist in both objects
     // * copy-constructs new mixins
     // * destroys mixins that don't exist in source.
-    // * may throw `bad_copy` if copy is not possible
+    // * may throw `object_error` if copy is not possible
     // * has basic exception safety guarantees: if a copy of any member fails,
     //   the object will be valid but unpredictable (potentially "half-copied")
     //   the type won't be changed, but some mixins may be copy-assigned from the source
@@ -95,7 +95,7 @@ public:
 
     // copy-assign matching mixins from o
     // will not touch own type
-    // will throw bad_copy if the matchin mixins have no copy-assignment
+    // will throw `object_error` if the matching mixins have no copy-assignment
     // if any of the underlying copy ops throws, the object will end-up
     // in a semi-copied state
     void copy_matching_from(const object& o);
@@ -103,7 +103,7 @@ public:
     // move-assigns matching mixins from o
     // will not touch own type
     // optionally fall-back to move-construction via arg if move assignment isn't available for a mixin
-    // will throw bad_move if move is not possible
+    // will throw `object_error` if move is not possible
     void move_matching_from(object& o, bool fallback_to_init = false);
 
     //////////////////////////
@@ -180,11 +180,11 @@ public:
     // check whether object is empty - has no mixins
     [[nodiscard]] bool empty() const noexcept { return !m_mixin_data; }
 
-    // allcator associated with this object (may be nullptr)
+    // allocator associated with this object (may be nullptr)
     allocator get_allocator() const noexcept { return m_allocator; }
 
     // seal object to prevent mutations
-    // sealed status is transfered on move but not in any other case
+    // sealed status is transferred on move but not in any other case
     void seal() noexcept { m_sealed = true; }
     [[nodiscard]] bool sealed() const noexcept { return m_sealed; }
 
@@ -217,8 +217,8 @@ private:
     // null constructor for temporary objects which are supposed to be
     // initialized shortly after this call
     // with it we don't pay the price of calling domain.get_empty_type()
-    // WARNING: this is a stricly i-know-what-im-doing constructor
-    // many meethods of such a object will lead to a starigh-up crash
+    // WARNING: this is a strictly i-know-what-im-doing constructor
+    // many methods of such a object will lead to a straight-up crash
     object(std::nullptr_t, allocator alloc) noexcept;
 
     allocator m_allocator;

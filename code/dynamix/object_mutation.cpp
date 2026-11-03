@@ -31,7 +31,7 @@ object_mutation::object_mutation(object& obj, const type& type, int) noexcept
     , m_allocated_upto(0)
     , m_updated_upto(0)
 {
-    // mixin data is allocated at this point by the delagator constructor
+    // mixin data is allocated at this point by the delegating constructor
 }
 
 // "inverse" init
@@ -220,7 +220,7 @@ void object_mutation::finalize() noexcept {
                 auto* new_mixin = m_target_mixin_data[m_target_type.sparse_mixin_indices[info.iid()]].mixin;
                 info.move_init(&info, new_mixin, old_data.mixin);
 
-                // desroy the one we moved-out from
+                // destroy the one we moved-out from
                 if (auto destroy = info.destroy) {
                     destroy(&info, old_data.mixin);
                 }
@@ -260,7 +260,7 @@ void default_init_new_func(init_new_args args) {
     auto& info = args.info;
     if (!info.init) throw_exception::obj_mut_error(args.target_type, "mutate to", "missing default init", info);
     auto err = info.init(&info, args.mixin_buf);
-    if (err) throw_exception::obj_mut_user_error(args.target_type, "mutate to", "deafult init", info, err);
+    if (err) throw_exception::obj_mut_user_error(args.target_type, "mutate to", "default init", info, err);
 }
 }
 
@@ -269,7 +269,7 @@ void object_mutation::default_construct_each_new_mixin(mixin_index_t upto_index)
 }
 
 void object_mutation::throw_bad_piecewise_mutation() {
-    throw_exception::obj_error(m_target_type, "piecewise mutation out of order while mtating to");
+    throw_exception::obj_error(m_target_type, "piecewise mutation out of order while mutating to");
 }
 
 }

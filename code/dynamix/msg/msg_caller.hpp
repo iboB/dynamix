@@ -35,7 +35,7 @@ struct msg_caller {
     //   assigned as a message payload and we cast it to `ret(const void* mixin_ptr, args...)` here
     //   this is safe: there is no difference between Mixin* and const void* on assembly level
     //   moreover there is not way for a compiler to know what we do with the function pointer when it's
-    //   added to a feature_for_mixin instance (and thus it cannot elliminate the call)
+    //   added to a feature_for_mixin instance (and thus it cannot eliminate the call)
     // * the minor one is that we cast to const void* indiscriminately while we technically must copy
     //   the const-ness of the object
     //   this, unlike the major one, is fixable but since we're doing this ub anyway, why bother?
@@ -67,8 +67,9 @@ struct msg_caller {
         auto fe = t.ftable_at(info.id); // ftable entry
         if /*likely*/ (fe) {
             // reverse order of execution:
-            // this way the same-prio multicast execution order follows the mixins order
-            // and prio messages will higher prio be executed first
+            // this way the same-prio multicast execution order follows the mixin order
+            // and implementations with a higher prio are executed first
+            // (priority behaves like a position in the mixin order: higher prio = earlier)
             for (auto i = fe.top_bid_back; i != fe.begin; --i) {
                 call(*i, obj, args...); // args are copied! return value is ignored
             }

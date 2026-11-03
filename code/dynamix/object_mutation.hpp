@@ -15,7 +15,7 @@ class object;
 class DYNAMIX_API object_mutation {
 public:
     // init for a transition to a type
-    // may thow if the related allocations throw
+    // may throw if the related allocations throw
     object_mutation(object& obj, const type& type);
 
     // if no exceptions are thrown, will try to complete the mutation by default_construct_each_new_mixin
@@ -117,7 +117,7 @@ private:
 
     // "inverse" init
     // will fill target values from object
-    // this is useful if one only wans to call the destroy and deallocate functions
+    // this is useful if one only wants to call the destroy and deallocate functions
     object_mutation(std::nullptr_t, object& obj) noexcept;
 
     // moved to a function so that we don't have to include exception.hpp here

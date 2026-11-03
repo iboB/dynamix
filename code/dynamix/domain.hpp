@@ -53,7 +53,7 @@ public:
     void register_mixin(mixin_info& info); // also register mixin's features
 
     // unregistrators
-    // optionally unregister infos (they must have been registered sucessfully before that)
+    // optionally unregister infos (they must have been registered successfully before that)
     // unregistrators also remove all object types which use such an info
     // the user is responsible to make sure that there are no living objects of such types
     // if objects do remain, using them in any way (even to destroy them) is ub (likely crash)
@@ -86,7 +86,7 @@ public:
     // will return an existing type or create a new one if such doesn't exist
     // the mixins must be previously registered with the domain
     // the mixins in the list must be unique
-    // the returned value will be invalidated if a pariticipating mixin gets unregistered
+    // the returned value will be invalidated if a participating mixin gets unregistered
     const type& get_type(type_mutation&& mutation);
 
     // shorthand for getting a type by a given list
@@ -99,8 +99,8 @@ public:
 
     // get the domain's empty type
     // this type implements default implementations and has no mixins
-    // disgregards mutation rules, so
-    // this is not necessaritly equivalent to get_type({}) as mutation rules
+    // disregards mutation rules, so
+    // this is not necessarily equivalent to get_type({}) as mutation rules
     // may exist which add mixins to empty queries (such rules are evil, but que sera sera)
     const type& get_empty_type() const noexcept;
 
