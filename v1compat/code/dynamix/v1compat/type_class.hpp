@@ -9,6 +9,7 @@
 #include <dynamix/define_type_class.hpp>
 
 namespace dynamix::v1compat {
+
 class type_class : public dynamix::type_class {
 public:
     using match_func = dnmx_type_class_match_func;
@@ -24,7 +25,7 @@ public:
 
 #define DYNAMIX_V1_DEFINE_TYPE_CLASS(tc) \
     static bool I_DNMX_PP_CAT(_implement_, tc)(const ::dynamix::type&); \
-    DYNAMIX_DEFINE_TYPE_CLASS_WITH(::dynamix::v1compat::domain_tag, tc, [](dnmx_type_handle th) noexcept { \
-        return I_DNMX_PP_CAT(_implement_, tc)(*::dynamix::type::from_c_handle(th)); \
+    DYNAMIX_DEFINE_TYPE_CLASS_WITH(::dynamix::v1compat::domain_tag, tc, [](const ::dynamix::type& tc) noexcept { \
+        return I_DNMX_PP_CAT(_implement_, tc)(tc); \
     }); \
     bool I_DNMX_PP_CAT(_implement_, tc)(const ::dynamix::type& type)

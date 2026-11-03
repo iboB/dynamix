@@ -243,14 +243,13 @@ TEST_CASE("common mixin init") {
 
 #include <dynamix/define_type_class.hpp>
 
-bool implements_bbb(const dnmx_type_handle th) noexcept {
-    return dynamix::type::from_c_handle(th)->implements_strong<feature_bbb>();
+bool implements_bbb(const dynamix::type& t) noexcept {
+    return t.implements_strong<feature_bbb>();
 }
 DYNAMIX_DEFINE_TYPE_CLASS_WITH(test, impl_bbb, implements_bbb);
-bool implements_ccc(const dnmx_type_handle th) noexcept {
-    return dynamix::type::from_c_handle(th)->implements_strong<feature_ccc>();
-}
-DYNAMIX_DEFINE_TYPE_CLASS_WITH(test, impl_ccc, implements_ccc);
+DYNAMIX_DEFINE_TYPE_CLASS_WITH(test, impl_ccc, [](const dynamix::type& t) noexcept {
+    return t.implements_strong<feature_ccc>();
+});
 
 struct alice {
     alice() = default;

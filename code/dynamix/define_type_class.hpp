@@ -7,6 +7,8 @@
 #include "domain.hpp"
 #include "type.hpp"
 
+#include <type_traits>
+
 namespace dynamix::impl {
 struct registered_type_class_instance {
     domain& dom;
@@ -18,9 +20,11 @@ struct registered_type_class_instance {
         dom.unregister_type_class(tc);
     }
 };
-}
+
+} // namespace dynamix::impl
 
 // define a type class with bool(const type&);
 #define DYNAMIX_DEFINE_TYPE_CLASS_WITH(domain_tag, tc, func) \
-    const dynamix::type_class tc::m_dynamix_type_class = {dnmx_make_sv_lit(#tc), func}; \
+    const dynamix::type_class tc::m_dynamix_type_class = {dnmx_make_sv_lit(#tc), \
+        [](dnmx_type_handle ht) noexcept -> bool { return func(*::dynamix::type::from_c_handle(ht)); } }; \
     static ::dynamix::impl::registered_type_class_instance I_DNMX_PP_CAT(_dynamix_type_class_, tc)(::dynamix::g::get_domain<domain_tag>(), tc::m_dynamix_type_class)
