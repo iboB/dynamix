@@ -154,6 +154,29 @@ public:
     }
 
     // add features
+    // there are three ways to provide the payload of a feature implementation:
+    // * implements<Feature>()
+    //   ask the feature traits: "given this mixin type, produce a feature payload for it"
+    //   (Feature::traits::make_payload_for)
+    // * implements_with<Feature>(pl)
+    //   ask the feature traits: "take this payload and produce an adequate feature payload"
+    //   the produced payload is owned by the mixin info data (Feature::traits::make_payload_with)
+    // * implements_by<Feature>(pl)
+    //   ask the feature traits: "take this payload reference and produce an adequate feature payload"
+    //   the caller is responsible for the lifetime of the referenced payload
+    //   (Feature::traits::make_payload_by)
+    //   NOTE: for messages this takes a function (or a captureless lambda) which is converted
+    //   to a function pointer, so passing temporaries is safe there: functions are never destroyed
+    //
+    // the payload arguments of implements_with and implements_by are forwarded to the feature traits
+    // as they are (including rvalues and const lvalues)
+    // the builder does not interfere: it's up to the feature traits to accept only what's safe
+    // (for example by taking a non-const lvalue reference in make_payload_by to reject temporaries)
+    //
+    // the non-template overloads of implements_with and implements_by do the same with an explicit
+    // feature info and no traits: the payload is moved/copied into an owning any, or referenced
+    //
+    // the builder perks arguments provide the bid and priority of the implementation
     self& implements_with_payload(const feature_info& info, any payload, builder_perks perks_a = {}, builder_perks perks_b = {}) {
         int32_t bid = perks_a.bid.value_or(perks_b.bid.value_or(0));
         int32_t priority = perks_a.priority.value_or(perks_b.priority.value_or(0));
@@ -174,17 +197,9 @@ public:
     }
 
     template <typename Feature, typename Payload>
-    self& implements_by(Payload& tpl, builder_perks perks_a = {}, builder_perks perks_b = {}) {
+    self& implements_by(Payload&& tpl, builder_perks perks_a = {}, builder_perks perks_b = {}) {
         using traits = typename Feature::traits;
-        any pl = traits::make_payload_by(get_allocator(), impl::make_nullptr<Mixin>(), tpl);
-        const feature_info& finfo = g::get_feature_info_safe<Feature>();
-        return implements_with_payload(finfo, pl, perks_a, perks_b);
-    }
-
-    template <typename Feature, typename Payload>
-    self& implements_by(const Payload& tpl, builder_perks perks_a = {}, builder_perks perks_b = {}) {
-        using traits = typename Feature::traits;
-        any pl = traits::make_payload_by(get_allocator(), impl::make_nullptr<Mixin>(), tpl);
+        any pl = traits::make_payload_by(get_allocator(), impl::make_nullptr<Mixin>(), std::forward<Payload>(tpl));
         const feature_info& finfo = g::get_feature_info_safe<Feature>();
         return implements_with_payload(finfo, pl, perks_a, perks_b);
     }
