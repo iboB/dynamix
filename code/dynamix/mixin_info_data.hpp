@@ -86,13 +86,13 @@ public:
         return *this;
     }
 
-    // override and store store name
+    // override and store name
     self& store_name(std::string_view sname) {
         m_data.stored_name = sname;
         return name(m_data.stored_name);
     }
 
-    // set allocator
+    // set allocator (see mixin_info::allocator)
     self& uses_allocator(t_any<mixin_allocator> alloc) {
         m_data.stored_alloc = alloc;
         m_data.info.allocator = m_data.stored_alloc->to_c_handle();
@@ -108,15 +108,48 @@ public:
         return uses_allocator(make_any<Alloc>(m_data.get_allocator()));
     }
 
-    // user data
+    // user data (see mixin_info::user_data)
     self& user_data(uintptr_t data) {
         m_data.info.user_data = data;
         return *this;
     }
 
-    // dependency status
+    // dependency status (see mixin_info::dependency)
     self& dependency(bool b = true) {
         m_data.info.dependency = b;
+        return *this;
+    }
+
+    // key for canonical order (see mixin_info::order_priority)
+    self& order_priority(int32_t p) noexcept {
+        m_data.info.order_priority = p;
+        return *this;
+    }
+
+    // force the mixin to be external (see mixin_info::force_external)
+    self& force_external(bool b = true) noexcept {
+        m_data.info.force_external = b;
+        return *this;
+    }
+
+    // set the function used to check mixins for equality in object::equals (see mixin_info::equals)
+    // with no argument (or nullptr) uses the mixin's operator==, which must be noexcept
+    // (with a void mixin, nullptr just clears the function)
+    self& uses_equal(dnmx_mixin_eq_func func = nullptr) noexcept {
+        if constexpr (std::is_void_v<Mixin>) {
+            m_data.info.equals = func;
+        }
+        else {
+            m_data.info.equals = func ? func : &call_mixin_equality_operator<Mixin>;
+        }
+        return *this;
+    }
+
+    // set the function used to compare mixins in object::compare (and object::equals if there is no equality function)
+    // there is no default
+    // with C++20 we can use operator<=> for a sane default
+    self& uses_compare(dnmx_mixin_cmp_func func) noexcept {
+        m_data.info.compare = func;
         return *this;
     }
 
