@@ -52,7 +52,7 @@ struct hello {
 
 struct bye {
     void speak() const {
-        std::cout << "Good bye from DynaMix." << std::endl;
+        std::cout << "Goodbye from DynaMix." << std::endl;
     }
 };
 

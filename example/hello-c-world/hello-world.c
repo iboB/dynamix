@@ -73,7 +73,7 @@ dnmx_feature_for_mixin hello_feature_for_mixin = {
 };
 
 void say_bye(void) {
-    puts("Good bye from DynaMix.");
+    puts("Goodbye from DynaMix.");
 }
 dnmx_feature_for_mixin bye_feature_for_mixin = {
     .info = &hello_domain.speak,
