@@ -1,6 +1,6 @@
 # Objects
 
-`dynamix::object` is the class whose instances are composed of mixins. By itself it's not much more than a container for mixins and a pointer to its [type](mutations.md#types). Everything that it can do comes from its mixins and their [features](messages.md).
+`dynamix::object` is the class whose instances are composed of mixins. By itself it's not much more than a container for mixins and a pointer to its [type](types-and-mutations.md#types). Everything that it can do comes from its mixins and their [features](messages.md).
 
 > [!TIP]
 > The code on this page is from [example/guide/e-objects.cpp](../../example/guide/e-objects.cpp).
@@ -53,7 +53,7 @@ std::cout << "first: " << hero.get_type().mixins[0]->name.to_std() << '\n';
 | `unchecked_get_at(index)` | Get the mixin at an index without checking it. |
 | `num_mixins()` | Number of mixins. |
 | `empty()` | True if the object has no mixins. |
-| `get_type()` | The object's [type](mutations.md#types), which has many more queries. |
+| `get_type()` | The object's [type](types-and-mutations.md#types), which has many more queries. |
 | `get_domain()` | The object's domain. |
 | `is_of<TypeClass>()`, `is_of(type_class)`, `is_of(name)` | Check whether the object's type matches a [type class](type-classes.md). |
 

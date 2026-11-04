@@ -199,18 +199,18 @@ struct impostor {};
 
 // [define-mixins]
 DYNAMIX_DEFINE_MIXIN(game, person)
-.implements<get_name_msg>()
-.implements<rename_msg>()
-.implements<describe_msg>(1_prio) // higher priority: described first
+    .implements<get_name_msg>()
+    .implements<rename_msg>()
+    .implements<describe_msg>(1_prio) // higher priority: described first
 ;
 
 DYNAMIX_DEFINE_MIXIN(game, human_voice)
-.implements<speak_msg>()
+    .implements<speak_msg>()
 ;
 
 DYNAMIX_DEFINE_MIXIN(game, dragon_form)
-.implements<speak_msg>()
-.implements<describe_msg>()
+    .implements<speak_msg>()
+    .implements<describe_msg>()
 ;
 
 DYNAMIX_DEFINE_MIXIN(game, silenced)
@@ -218,14 +218,14 @@ DYNAMIX_DEFINE_MIXIN(game, silenced)
     // the first argument is a pointer to the mixin
     .implements_by<speak_msg>([](const silenced*) -> std::string { return "..."; }, 1_bid)
     .implements<describe_msg>()
-    ;
+;
 
 DYNAMIX_DEFINE_MIXIN(game, shouting)
-.implements<speak_msg>(2_bid)
+    .implements<speak_msg>(2_bid)
 ;
 
 DYNAMIX_DEFINE_MIXIN(game, impostor)
-.implements_by<get_name_msg>([](const impostor*) -> std::string { return "Bob"; })
+    .implements_by<get_name_msg>([](const impostor*) -> std::string { return "Bob"; })
 ;
 // [define-mixins]
 

@@ -145,12 +145,12 @@ int main() {
 namespace game {
 // DYNAMIX_DEFINE_MIXIN must be in the namespace of the mixin
 DYNAMIX_DEFINE_MIXIN(world, transform)
-.uses_equal() // use transform::operator==
+    .uses_equal() // use transform::operator==
 ;
 DYNAMIX_DEFINE_MIXIN(world, health);
 DYNAMIX_DEFINE_MIXIN(world, inventory);
 DYNAMIX_DEFINE_MIXIN(world, script_state)
-.name("script")
+    .name("script")
 ;
 
 DYNAMIX_DEFINE_DOMAIN(world, "world");

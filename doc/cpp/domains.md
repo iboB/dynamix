@@ -1,6 +1,6 @@
 # Domains
 
-A domain is an instance of the library, of sorts. It's a registry of [mixins](mixins.md), [features](messages.md), [mutation rules](mutation-rules.md), and [type classes](type-classes.md), and it creates and owns the [types](mutations.md#types) composed of them. Every object belongs to a domain, which is set when the object is created and never changes.
+A domain is an instance of the library, of sorts. It's a registry of [mixins](mixins.md), [features](messages.md), [mutation rules](mutation-rules.md), and [type classes](type-classes.md), and it creates and owns the [types](types-and-mutations.md#types) composed of them. Every object belongs to a domain, which is set when the object is created and never changes.
 
 Most projects need a single domain. Multiple domains are useful for independent subsystems which use DynaMix in different ways, like game objects and UI widgets, or for parts of a project which need different domain settings.
 
