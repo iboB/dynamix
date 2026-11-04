@@ -4,13 +4,13 @@
 
 > *IMPORTANT* v2 is here. It is a big change. The last v1 release was [v1.4.0](https://github.com/iboB/dynamix/releases/tag/v1.4.0)
 
-DynaMix (*Dynamic Mixins*) is an alternative take on object oriented programming and dynamic polymorphism. It lets users compose and modify polymorphic objects at run time. The main target language is C++, but C is also supported.
+DynaMix (*Dynamic Mixins*) is an alternative take on object oriented programming and dynamic (runtime) polymorphism. It lets users compose and modify polymorphic objects at run time. The main target language is C++, but C is also supported.
 
 The library is a means to create a project's **architecture** rather than achieve its purpose. It helps with *extensibility*, *readability*, *scalability* and *interoperability*. It focuses on **maximal performance** and **minimal memory overhead**.
 
 DynaMix is applicable for the software architecture of systems with complex objects including, but not limited to:
 
-* Games (especially role-playing ones or strategies)
+* Games (especially role-playing games or strategies)
 * CAD systems
 * Enterprise systems
 
@@ -48,7 +48,8 @@ Here is a small example of what code may look like using the library:
 
 Here are some of the key features of the library:
 
-* Compose objects from mixins at run time
+* Dynamic type composition: compose objects from mixins at run time
+* Type-level polymorphism: inspect types and their capabilities without creating any objects
 * Physically separate interface and implementation
 * Non-intrusive &ndash; mixins don't need to have a common parent or any special code inside
 * Mutate "live" objects by changing their composition at run time
@@ -57,6 +58,7 @@ Here are some of the key features of the library:
 * Add "hotswap" to a project while developing
 * Have complete runtime reflection by symbols or strings
 * Messages:
+    * Open methods, late binding, singular dispatch, uni- and multicast, overridable, reachable overrides
     * Fast polymorphic calls &ndash; comparable to `std::function`
     * Have multicast messages, which are handled by many mixins within an object
     * Thread safe message calls &ndash; as thread safe as the underlying methods.
