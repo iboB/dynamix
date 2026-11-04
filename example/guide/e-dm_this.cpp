@@ -1,7 +1,7 @@
 // Copyright (c) Borislav Stanimirov
 // SPDX-License-Identifier: MIT
 //
-// Companion example for doc/cpp/dm-this.md
+// Companion example for doc/cpp/mixins.md
 //
 #include <dynamix/declare_domain.hpp>
 #include <dynamix/declare_mixin.hpp>

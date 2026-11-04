@@ -24,7 +24,7 @@ dynamix::object empty(dynamix::g::get_domain<game>());
 dynamix::object npc(npc_type); // default constructs the mixins of the type
 ```
 
-An empty object has no mixins. Its type is the domain's empty type, which still implements features with [default implementations](messages.md#default-implementations). Objects are then composed with [mutations](mutations.md).
+An empty object has no mixins. Its type is the domain's empty type, which still implements features with [default implementations](messages.md#default-implementations). Objects are then composed with [mutations](types-and-mutations.md).
 
 Both constructors take an optional `dynamix::allocator`, which is a polymorphic allocator (`std::pmr::polymorphic_allocator` or a compatible implementation where it's not available). It's used to allocate the object's mixins. See [Allocators](../advanced/allocators.md).
 
@@ -59,7 +59,7 @@ std::cout << "first: " << hero.get_type().mixins[0]->name.to_std() << '\n';
 
 Lookups by type, id, and info are constant time. Lookups by name are linear and search for the name in all mixins of the type. Prefer the others in performance-critical code.
 
-Remember that [mutations](mutations.md#what-happens-in-a-mutation) invalidate pointers to internal mixins. Don't keep pointers to mixins across mutations.
+Remember that [mutations](types-and-mutations.md#what-happens-in-a-mutation) invalidate pointers to internal mixins. Don't keep pointers to mixins across mutations.
 
 Accessing mixins directly is useful, but the object-oriented way to work with DynaMix objects is through their features. Code which uses messages doesn't need to know which mixins an object has. Code which uses `get` does. Prefer messages for code which deals with behavior and use `get` when you need the data of a specific mixin.
 
@@ -140,7 +140,7 @@ std::cout << "moved-from is empty: " << hero.empty() << '\n'; // true
 
 So moving objects is cheap, and pointers to mixins remain valid. A moved-from object is fully usable.
 
-The move constructor is `noexcept`. Move assignment works when both objects have the same allocator. Otherwise it throws `object_error`. Moves also transfer the [sealed](mutations.md#sealed-objects) status.
+The move constructor is `noexcept`. Move assignment works when both objects have the same allocator. Otherwise it throws `object_error`. Moves also transfer the [sealed](types-and-mutations.md#sealed-objects) status.
 
 `move_matching_from(other, fallback_to_init = false)` move-assigns the mixins which both objects have. If `fallback_to_init` is true, mixins which are not move assignable are destroyed and move constructed instead.
 
@@ -150,8 +150,8 @@ The move constructor is `noexcept`. Move assignment works when both objects have
 |---|---|
 | `clear()` | Remove all mixins. The object becomes empty. |
 | `reset_type(type)` | Change the object's type. New mixins are default constructed and mixins in both types are not touched. Equivalent to `mutate_to(obj, type)`. |
-| `seal()`, `sealed()` | [Seal](mutations.md#sealed-objects) the object or check if it's sealed. |
+| `seal()`, `sealed()` | [Seal](types-and-mutations.md#sealed-objects) the object or check if it's sealed. |
 | `equals(other)`, `compare(other)` | Compare objects. See [Equality and comparison](mixins.md#equality-and-comparison). |
 | `get_allocator()` | The object's allocator. |
 
-The object of a mixin can be accessed from within the mixin. See [Accessing the Object from a Mixin](dm-this.md).
+The object of a mixin can be accessed from within the mixin. See [Accessing the Object from a Mixin](types-and-mutations.md#accessing-the-object-from-a-mixin).

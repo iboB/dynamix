@@ -1,7 +1,7 @@
 // Copyright (c) Borislav Stanimirov
 // SPDX-License-Identifier: MIT
 //
-// Companion example for doc/cpp/mutations.md
+// Companion example for doc/cpp/types-and-mutations.md
 //
 #include <dynamix/declare_domain.hpp>
 #include <dynamix/declare_mixin.hpp>

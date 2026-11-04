@@ -132,7 +132,7 @@ error: world: copy object of type {'transform', 'health', 'inventory', 'script'}
 
 These checks happen at run time, because the composition of objects is only known at run time. A failed mutation leaves the object unchanged.
 
-See [Mutations](mutations.md) for the ways to construct mixins with arguments.
+See [Mutations](types-and-mutations.md) for the ways to construct mixins with arguments.
 
 ## Names
 
