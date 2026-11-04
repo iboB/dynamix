@@ -5,7 +5,7 @@ A domain is an instance of the library, of sorts. It's a registry of [mixins](mi
 Most projects need a single domain. Multiple domains are useful for independent subsystems which use DynaMix in different ways, like game objects and UI widgets, or for parts of a project which need different domain settings.
 
 > [!TIP]
-> The code on this page is from [example/guide/domains.cpp](../../example/guide/domains.cpp).
+> The code on this page is from [example/guide/e-domains.cpp](../../example/guide/e-domains.cpp).
 
 ## Contents
 

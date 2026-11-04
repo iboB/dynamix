@@ -44,8 +44,8 @@
 
 ## Examples
 
-* [Hello World](../example/hello-world/hello-world.cpp) - A minimal C++ program
-* [Hello C World](../example/hello-c-world/hello-world.c) - A minimal C program
+* [Hello World](../example/hello-world.cpp) - A minimal C++ program
+* [Hello C World](../example/hello-world.c) - A minimal C program
 * [App and Plugins](../test/app-plugin/) - An application with a core library and plugins which extend and modify its objects
 
 ## Reference

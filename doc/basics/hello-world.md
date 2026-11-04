@@ -1,6 +1,6 @@
 # Hello World
 
-This page walks through [example/hello-world](../../example/hello-world/hello-world.cpp), a minimal DynaMix program. It shows the four elements every DynaMix program has: a *domain*, *mixins*, a *message* (the most common kind of mixin feature), and *objects*. They're all introduced briefly in [Core Concepts](glossary.md).
+This page walks through [example/hello-world](../../example/hello-world.cpp), a minimal DynaMix program. It shows the four elements every DynaMix program has: a *domain*, *mixins*, a *message* (the most common kind of mixin feature), and *objects*. They're all introduced briefly in [Core Concepts](glossary.md).
 
 The program creates an object, gives it the ability to speak, then mutates the object to change *how* it speaks while keeping the interface the same.
 
