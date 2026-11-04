@@ -9,4 +9,10 @@ dynamix_example(messages e-messages.cpp)
 dynamix_example(mutations e-mutations.cpp)
 dynamix_example(mutation-rules e-mutation-rules.cpp)
 dynamix_example(type-classes e-type-classes.cpp)
+
 dynamix_example(c-interface e-c-interface.c)
+
+dynamix_example(allocators e-allocators.cpp)
+dynamix_example(custom-features e-custom-features.cpp)
+dynamix_example(no-macros e-no-macros.cpp)
+dynamix_example(reflection e-reflection.cpp)

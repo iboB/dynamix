@@ -1,7 +1,7 @@
 # DynaMix Documentation
 
 > [!NOTE]
-> This is unfortunately still in progress and being actively improved. Entries without links are not written yet.
+> This is unfortunately still in progress and being actively improved. Some entries are not written yet.
 
 ## Getting Started
 
