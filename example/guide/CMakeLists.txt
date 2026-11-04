@@ -2,3 +2,4 @@
 # SPDX-License-Identifier: MIT
 #
 dynamix_example(domains e-domains.cpp)
+dynamix_example(objects e-objects.cpp)
