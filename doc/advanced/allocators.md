@@ -136,7 +136,7 @@ DYNAMIX_DEFINE_MIXIN(game, particle)
 ;
 ```
 
-The buffer must have the size `info.obj_buf_size` and the alignment `info.obj_buf_alignment_and_mixin_offset`. It's bigger than the mixin, because a pointer to the object is stored before it (this is how [`object_of`](../cpp/dm-this.md#object_of) works).
+The buffer must have the size `info.obj_buf_size` and the alignment `info.obj_buf_alignment_and_mixin_offset`. It's bigger than the mixin, because a pointer to the object is stored before it (this is how [`object_of`](../cpp/mixins.md#object_of) works).
 
 A mixin allocator is used for all instances of the mixin, regardless of the allocators of their objects. It's useful for mixins which are created in large numbers, like particles or bullets, where a pool allocator would be faster and use less memory than the general-purpose heap.
 
