@@ -6,14 +6,20 @@
 #include <dynamix/feature_info_data.hpp>
 #include <dynamix/type_mutation.hpp>
 
+#include <bench-rand.hpp>
+
 #include <memory>
 #include <vector>
-#include <unordered_set>
-#include <random>
+#include <set>
 #include <array>
 
 #define PICOBENCH_IMPLEMENT
-#include <picobench/picobench.hpp>
+#include <bench-main.hpp>
+
+enum bench_kind : uintptr_t {
+    bench_create,
+    bench_lookup,
+};
 
 // some code pasted from fuzz-objects-types.cpp
 
@@ -92,8 +98,7 @@ state create_state(dynamix::domain& dom, uint32_t features_per_mixin, uint32_t n
 
         // features
         {
-            std::unordered_set<uint32_t> fids;
-            while (fids.size() != features_per_mixin) fids.insert(rnd() % ret.features.size()); // generate unique indices
+            auto fids = dbench::pick_unique(features_per_mixin, uint32_t(ret.features.size()), rnd);
             for (auto fid : fids) {
                 auto& f = *ret.features[fid];
 
@@ -132,62 +137,124 @@ state create_state(dynamix::domain& dom, uint32_t features_per_mixin, uint32_t n
     return ret;
 }
 
-void benchmark(uint32_t mixins, uint32_t features, uint32_t rules, picobench::state& pb) {
-    dynamix::domain dom("bench");
-    std::minstd_rand rnd(13);
-
-    // first create types by index while the rng is not tainted by create_state
-    std::vector<std::vector<uint32_t>> indices(pb.iterations());
-    for (auto& is : indices) {
-        auto num_mixins = mixins;
-        std::unordered_set<uint32_t> mids;
-        while (mids.size() != num_mixins) {
-            mids.insert(rnd() % NUM_MIXINS);
-        }
-        is.assign(mids.begin(), mids.end());
-    }
-
-    auto state = create_state(dom, features, rules, rnd);
-
-    std::vector<std::vector<const dynamix::mixin_info*>> types;
-    types.reserve(pb.iterations());
-
-    for (auto& is : indices) {
-        auto& t = types.emplace_back();
-        t.reserve(is.size());
-        for (auto index : is) {
-            t.push_back(&state.mixins[index]->info);
+// generate n unique type queries, each with `mixins` unique mixins in random order
+// since types are ordered, queries with the same mixins in different orders are different types
+// there are NUM_MIXINS! / (NUM_MIXINS - mixins)! possible queries (30240 for 5 of 10)
+std::vector<std::vector<uint32_t>> make_unique_queries(size_t n, uint32_t mixins, dbench::rng_t& rng) {
+    std::set<std::vector<uint32_t>> unique;
+    std::vector<std::vector<uint32_t>> ret;
+    ret.reserve(n);
+    while (ret.size() != n) {
+        auto q = dbench::pick_unique(mixins, NUM_MIXINS, rng);
+        if (unique.insert(q).second) {
+            ret.push_back(std::move(q));
         }
     }
-
-    picobench::scope benchmark(pb);
-    for (auto& t : types) {
-        dom.get_type(t);
-    }
-    pb.set_result(dom.num_types());
+    return ret;
 }
+
+struct bench_params {
+    uint32_t mixins;
+    uint32_t features;
+    uint32_t rules;
+};
+
+struct test_data {
+    state st; // declared before the domain so it's destroyed after it
+    dynamix::domain dom;
+    std::vector<std::vector<const dynamix::mixin_info*>> queries;
+
+    test_data(const bench_params& p, size_t n)
+        : dom("bench")
+    {
+        dbench::rng_t rng(13);
+
+        // first create queries by index while the rng is not tainted by create_state
+        auto indices = make_unique_queries(n, p.mixins, rng);
+
+        st = create_state(dom, p.features, p.rules, rng);
+
+        queries.reserve(n);
+        for (auto& is : indices) {
+            auto& q = queries.emplace_back();
+            q.reserve(is.size());
+            for (auto index : is) {
+                q.push_back(&st.mixins[index]->info);
+            }
+        }
+    }
+};
+
+// every query is unique and the domain is new, so every get_type creates a new type
+// this includes applying mutation rules and building the feature table
+// in practice this happens once per unique type in a domain
+void create_types(const bench_params& p, picobench::state& pb) {
+    test_data data(p, size_t(pb.iterations()));
+
+    {
+        picobench::scope benchmark(pb);
+        for (auto& q : data.queries) {
+            data.dom.get_type(q);
+        }
+    }
+    pb.set_result(data.dom.num_types());
+}
+
+// all types are created before the measured part, so every get_type is a lookup of an existing type
+// this is what happens in the vast majority of mutations
+void lookup_types(const bench_params& p, picobench::state& pb) {
+    test_data data(p, size_t(pb.iterations()));
+
+    std::vector<const dynamix::type*> types;
+    types.reserve(data.queries.size());
+    for (auto& q : data.queries) {
+        types.push_back(&data.dom.get_type(q));
+    }
+
+    // look the types up in a different order than the one in which they were created
+    dbench::rng_t rng(42);
+    const auto order = dbench::make_access_order(data.queries.size(), true, rng);
+
+    uintptr_t found = 0;
+    {
+        picobench::scope benchmark(pb);
+        for (auto i : order) {
+            auto& t = data.dom.get_type(data.queries[i]);
+            found += &t == types[i];
+        }
+    }
+    pb.set_result(found);
+}
+
+constexpr bench_params trivial_mixins_params = {5, 0, 0};
+constexpr bench_params many_rules_params = {5, 0, 10};
+constexpr bench_params many_features_params = {5, 20, 0};
 
 void trivial_mixins(picobench::state& pb) {
-    benchmark(5, 0, 0, pb);
+    if (pb.benchmark_user_data() == bench_create) create_types(trivial_mixins_params, pb);
+    else lookup_types(trivial_mixins_params, pb);
 }
-PICOBENCH(trivial_mixins).baseline();
 
 void many_rules(picobench::state& pb) {
-    benchmark(5, 0, 10, pb);
+    if (pb.benchmark_user_data() == bench_create) create_types(many_rules_params, pb);
+    else lookup_types(many_rules_params, pb);
 }
-PICOBENCH(many_rules);
 
 void many_features(picobench::state& pb) {
-    benchmark(5, 20, 0, pb);
+    if (pb.benchmark_user_data() == bench_create) create_types(many_features_params, pb);
+    else lookup_types(many_features_params, pb);
 }
-PICOBENCH(many_features);
+
+PICOBENCH_SUITE("type creation");
+PICOBENCH(trivial_mixins).user_data(bench_create).baseline();
+PICOBENCH(many_rules).user_data(bench_create);
+PICOBENCH(many_features).user_data(bench_create);
+
+PICOBENCH_SUITE("type lookup");
+PICOBENCH(trivial_mixins).user_data(bench_lookup).baseline();
+PICOBENCH(many_rules).user_data(bench_lookup);
+PICOBENCH(many_features).user_data(bench_lookup);
 
 int main(int argc, char* argv[]) {
-    picobench::runner r;
-    r.set_compare_results_across_samples(true);
-    r.set_compare_results_across_benchmarks(true);
-    //r.set_default_state_iterations({15024});
-    r.set_default_state_iterations({ 128, 1024, 16384 });
-    r.parse_cmd_line(argc, argv);
-    return r.run();
+    return dbench::run(argc, argv, {128, 1024, 16384});
 }

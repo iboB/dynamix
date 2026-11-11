@@ -4,27 +4,39 @@
 #include "bmm-msg.hpp"
 #include "bmm-std_func.hpp"
 #include "bmm-virtual.hpp"
-#include "bmm-msg.hpp"
+
+#include <bench-rand.hpp>
 
 #define PICOBENCH_IMPLEMENT
-#include <picobench/picobench.hpp>
+#include <bench-main.hpp>
 
 constexpr uint32_t seed = 666;
 
 template <typename Accumulator>
 void benchmark(Accumulator (*factory)(std::minstd_rand&), picobench::state& pb) {
-    std::minstd_rand rng(seed);
+    dbench::rng_t rng(seed);
+    const auto n = size_t(pb.iterations());
 
     std::vector<Accumulator> vec;
-    vec.reserve(pb.iterations());
-    for (int i = 0; i < pb.iterations(); ++i) {
+    vec.reserve(n);
+    for (size_t i = 0; i < n; ++i) {
         vec.push_back(factory(rng));
     }
 
+    // generate all data before the measured part
+    // args[i] is the argument for the i-th call (not for the i-th object)
+    std::vector<uint32_t> args(n);
+    for (auto& a : args) {
+        a = rng() % 10;
+    }
+    const auto order = dbench::make_access_order(n, pb.benchmark_user_data() == dbench::shuffled, rng);
+
     uint64_t sum = 0;
-    picobench::scope benchmark(pb);
-    for (auto& a : vec) {
-        sum += a.accumulate(rng() % 10);
+    {
+        picobench::scope benchmark(pb);
+        for (size_t i = 0; i < n; ++i) {
+            sum += vec[order[i]].accumulate(args[i]);
+        }
     }
     pb.set_result(uintptr_t(sum));
 }
@@ -33,26 +45,31 @@ void virt(picobench::state& pb) {
     benchmark<virt_accumulator>(make_virt_accumulator, pb);
 }
 
-PICOBENCH(virt).baseline();
-
 void std_func(picobench::state& pb) {
     benchmark<func_accumulator>(make_func_accumulator, pb);
 }
-
-PICOBENCH(std_func);
 
 void dynamix_msg(picobench::state& pb) {
     benchmark<dobject>(make_msg_accumulator, pb);
 }
 
-PICOBENCH(dynamix_msg);
+// note that the memory layouts differ:
+// * virt: each accumulator has a vector of individually allocated ops
+// * std_func: each accumulator has a vector of std::function-s (typically using the small buffer)
+// * dynamix_msg: each object has its mixins in a single buffer
+
+// objects are accessed in the order in which they were created
+PICOBENCH_SUITE("multicast: sequential access");
+PICOBENCH(virt).user_data(dbench::sequential).baseline();
+PICOBENCH(std_func).user_data(dbench::sequential);
+PICOBENCH(dynamix_msg).user_data(dbench::sequential);
+
+// objects are accessed in random order
+PICOBENCH_SUITE("multicast: shuffled access");
+PICOBENCH(virt).user_data(dbench::shuffled).baseline();
+PICOBENCH(std_func).user_data(dbench::shuffled);
+PICOBENCH(dynamix_msg).user_data(dbench::shuffled);
 
 int main(int argc, char* argv[]) {
-    picobench::runner r;
-    r.set_compare_results_across_samples(true);
-    r.set_compare_results_across_benchmarks(true);
-    //r.set_default_state_iterations({15024});
-    r.set_default_state_iterations({ 128, 1024, 16384 });
-    r.parse_cmd_line(argc, argv);
-    return r.run();
+    return dbench::run(argc, argv, {1024, 65536, 1048576});
 }
