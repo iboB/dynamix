@@ -3,12 +3,18 @@
 #
 CPMAddPackage(gh:iboB/picobench@2.10.0)
 
+add_library(dynamix-bench-common STATIC
+    common/bench-main.cpp
+)
+target_link_libraries(dynamix-bench-common PUBLIC picobench::picobench)
+target_include_directories(dynamix-bench-common INTERFACE common)
+
 macro(dynamix_benchmark name)
     set(tgt bench-dynamix-${name})
     add_executable(${tgt})
     set_target_properties(${tgt} PROPERTIES FOLDER bench)
     target_sources(${tgt} PRIVATE ${ARGN})
-    target_link_libraries(${tgt} dynamix::dynamix picobench::picobench)
+    target_link_libraries(${tgt} dynamix::dynamix dynamix-bench-common)
     add_custom_target(
         run-${tgt}
         COMMAND ${tgt}
