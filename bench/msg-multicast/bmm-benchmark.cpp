@@ -33,7 +33,7 @@ void benchmark(Accumulator (*factory)(std::minstd_rand&), picobench::state& pb) 
 
     uint64_t sum = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (size_t i = 0; i < n; ++i) {
             sum += vec[order[i]].accumulate(args[i]);
         }

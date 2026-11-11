@@ -196,7 +196,7 @@ void cpp_class(picobench::state& pb) {
     std::vector<std::unique_ptr<composite>> objs;
     objs.reserve(size_t(pb.iterations()));
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (int i = 0; i < pb.iterations(); ++i) {
             objs.push_back(std::make_unique<composite>());
         }
@@ -208,7 +208,7 @@ void cpp_components(picobench::state& pb) {
     std::vector<entity> objs;
     objs.reserve(size_t(pb.iterations()));
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (int i = 0; i < pb.iterations(); ++i) {
             objs.push_back(make_entity());
         }
@@ -223,7 +223,7 @@ void dynamix_mutate(picobench::state& pb) {
     std::vector<dynamix::object> objs;
     objs.reserve(size_t(pb.iterations()));
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (int i = 0; i < pb.iterations(); ++i) {
             mutate_to_full(objs.emplace_back(dom()));
         }
@@ -237,7 +237,7 @@ void dynamix_from_type(picobench::state& pb) {
     std::vector<dynamix::object> objs;
     objs.reserve(size_t(pb.iterations()));
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (int i = 0; i < pb.iterations(); ++i) {
             objs.emplace_back(t);
         }
@@ -252,7 +252,7 @@ void dynamix_from_type_arena(picobench::state& pb) {
     std::vector<dynamix::object> objs;
     objs.reserve(size_t(pb.iterations()));
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (int i = 0; i < pb.iterations(); ++i) {
             objs.emplace_back(t, dynamix::allocator(&arena));
         }
@@ -279,7 +279,7 @@ void cpp_class(picobench::state& pb) {
     std::vector<std::unique_ptr<composite>> objs;
     objs.reserve(src.size());
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (auto& s : src) {
             objs.push_back(std::make_unique<composite>(*s));
         }
@@ -292,7 +292,7 @@ void cpp_components(picobench::state& pb) {
     std::vector<entity> objs;
     objs.reserve(src.size());
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (auto& s : src) {
             objs.push_back(s.copy());
         }
@@ -305,7 +305,7 @@ void dynamix_copy(picobench::state& pb) {
     std::vector<dynamix::object> objs;
     objs.reserve(src.size());
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (auto& s : src) {
             objs.push_back(s.copy());
         }
@@ -329,7 +329,7 @@ template <typename Vec>
 void destroy_benchmark(picobench::state& pb, Vec objs) {
     auto count = count_components(objs);
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         objs.clear();
     }
     pb.set_result(count);
@@ -379,7 +379,7 @@ void cpp_components(picobench::state& pb) {
 
     uintptr_t count = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (auto& e : objs) {
             e.add<inventory>();
             count += e.components.size();
@@ -403,7 +403,7 @@ void dynamix_benchmark(picobench::state& pb, dynamix::allocator alloc) {
 
     uintptr_t count = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (auto& o : objs) {
             mutate(o, add<inventory>());
             count += o.num_mixins();
@@ -451,7 +451,7 @@ void big_benchmark(picobench::state& pb) {
 
     uintptr_t count = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (auto& o : objs) {
             mutate(o, add<health>());
             count += o.num_mixins();

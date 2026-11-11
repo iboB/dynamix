@@ -192,7 +192,7 @@ void create_types(const bench_params& p, picobench::state& pb) {
     test_data data(p, size_t(pb.iterations()));
 
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (auto& q : data.queries) {
             data.dom.get_type(q);
         }
@@ -217,7 +217,7 @@ void lookup_types(const bench_params& p, picobench::state& pb) {
 
     uintptr_t found = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (auto i : order) {
             auto& t = data.dom.get_type(data.queries[i]);
             found += &t == types[i];

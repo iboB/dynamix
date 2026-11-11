@@ -1,0 +1,44 @@
+# Copyright (c) Borislav Stanimirov
+# SPDX-License-Identifier: MIT
+#
+# Runs the single-threaded benchmarks with cachegrind and compares their instruction counts
+# with bench/cachegrind/baseline.json. Fails if any benchmark has regressed.
+#
+# Instruction counts depend on the compiler, the standard library, and valgrind.
+# The runner image is pinned and the baseline must be produced in the same environment.
+# The results of every run are uploaded as an artifact, which can be used as a new baseline.
+# See bench/cachegrind/README.md
+name: Cachegrind
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  cachegrind:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+      - name: Install valgrind, Ruby, and Ninja
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y valgrind ruby ninja-build
+      - name: Tool versions
+        run: |
+          g++ --version | head -1
+          valgrind --version
+          ldd --version | head -1
+          ruby --version
+      - name: Configure
+        run: cmake --preset release-gcc -B build -DDYNAMIX_BENCH_CACHEGRIND=ON
+      - name: Run benchmarks with cachegrind
+        run: cmake --build build --target cachegrind-bench-dynamix
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cachegrind-results
+          path: build/bench/cachegrind-results.json
+          if-no-files-found: ignore

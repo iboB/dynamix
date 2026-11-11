@@ -58,7 +58,7 @@ void direct(picobench::state& pb) {
 
     uintptr_t sum = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (size_t i = 0; i < objs.size(); ++i) {
             sum += objs[i]->get_value(data.args[i]);
         }
@@ -73,7 +73,7 @@ void virt(picobench::state& pb) {
 
     uintptr_t sum = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (size_t i = 0; i < objs.size(); ++i) {
             sum += objs[i]->get_value(data.args[i]);
         }
@@ -87,7 +87,7 @@ void msg(picobench::state& pb) {
 
     uintptr_t sum = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (size_t i = 0; i < objs.size(); ++i) {
             sum += get_value(objs[i], data.args[i]);
         }
@@ -103,7 +103,7 @@ void get_mixin(picobench::state& pb) {
 
     uintptr_t sum = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (size_t i = 0; i < objs.size(); ++i) {
             sum += objs[i].get<value_holder>()->get_value(data.args[i]);
         }
@@ -118,7 +118,7 @@ void msg_next_impl(picobench::state& pb) {
 
     uintptr_t sum = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (size_t i = 0; i < objs.size(); ++i) {
             sum += get_value(objs[i], data.args[i]);
         }
@@ -142,7 +142,7 @@ void implemented(picobench::state& pb) {
 
     uintptr_t sum = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (size_t i = 0; i < objs.size(); ++i) {
             sum += ident(objs[i], data.args[i]);
         }
@@ -156,7 +156,7 @@ void default_impl(picobench::state& pb) {
 
     uintptr_t sum = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (size_t i = 0; i < objs.size(); ++i) {
             sum += ident_default(objs[i], data.args[i]);
         }
@@ -189,7 +189,7 @@ void query_benchmark(picobench::state& pb, Query q) {
 
     uintptr_t count = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (auto& o : objs) {
             count += q(o);
         }

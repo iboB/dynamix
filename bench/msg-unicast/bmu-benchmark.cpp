@@ -74,7 +74,7 @@ void virt(picobench::state& pb) {
 
     uintptr_t sum = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (size_t i = 0; i < data.order.size(); ++i) {
             sum += shapes[data.order[i]]->area(data.args[i]);
         }
@@ -98,7 +98,7 @@ void std_func(picobench::state& pb) {
 
     uintptr_t sum = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (size_t i = 0; i < data.order.size(); ++i) {
             sum += shapes[data.order[i]](data.args[i]);
         }
@@ -127,7 +127,7 @@ void dynamix_msg(picobench::state& pb) {
 
     uintptr_t sum = 0;
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         for (size_t i = 0; i < data.order.size(); ++i) {
             sum += area(shapes[data.order[i]], data.args[i]);
         }

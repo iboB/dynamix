@@ -51,7 +51,7 @@ uintptr_t run_parallel(picobench::state& pb, unsigned num_threads, size_t n, Fun
     while (ready.load(std::memory_order_acquire) != num_threads) std::this_thread::yield();
 
     {
-        picobench::scope benchmark(pb);
+        dbench::scope benchmark(pb);
         go.store(true, std::memory_order_release);
         for (auto& th : threads) th.join();
     }
