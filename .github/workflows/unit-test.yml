@@ -16,17 +16,17 @@ jobs:
         cfg:
           # ubuntu sanitize address, undefined, leak, thread
           - {name: 'linux gcc dbg s:addr,ub,leak', os: ubuntu-latest, preset: debug-aublsan}
-          - {name: 'linux gcc rel s:addr', os: ubuntu-latest, preset: release-asan}
-          - {name: 'linux gcc rel s:thread', os: ubuntu-latest, preset: release-tsan}
+          - {name: 'linux gcc rel s:addr', os: ubuntu-latest, preset: reldeb-asan}
+          - {name: 'linux gcc rel s:thread', os: ubuntu-latest, preset: reldeb-tsan}
           # macos - no ub santizer (there are still some apple-specific ub sanitizer issues to fix)
           # https://github.com/iboB/dynamix/issues/44
           # also no leak sanitizer since it's not supported by apple
           - {name: 'mac clang dbg s:addr', os: macos-latest, preset: debug-asan}
-          - {name: 'mac clang rel s:addr', os: macos-latest, preset: release-asan}
-          - {name: 'mac clang rel s:thread', os: macos-latest, preset: release-tsan}
+          - {name: 'mac clang rel s:addr', os: macos-latest, preset: reldeb-asan}
+          - {name: 'mac clang rel s:thread', os: macos-latest, preset: reldeb-tsan}
           # windows sanitize address
           - {name: 'win msvc dbg s:addr', os: windows-latest, preset: debug-asan}
-          - {name: 'win msvc rel s:addr', os: windows-latest, preset: release-asan}
+          - {name: 'win msvc rel s:addr', os: windows-latest, preset: reldeb-asan}
     steps:
       - name: Clone
         uses: actions/checkout@v4
