@@ -59,11 +59,6 @@ struct test_data {
 void virt(picobench::state& pb) {
     const test_data data(pb);
 
-    std::minstd_rand rng(seed);
-    auto rnd = [&]() {
-        return rng() % 10;
-    };
-
     std::vector<std::unique_ptr<shape>> shapes;
     shapes.reserve(data.shapes.size());
     for (auto& d : data.shapes) {
