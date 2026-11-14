@@ -9,11 +9,11 @@
 #include <memory>
 #include <vector>
 #include <unordered_set>
-#include <random>
 #include <array>
 
 #include <picobench/picobench.hpp>
 #include <bench-main.hpp>
+#include <bench-rand.hpp>
 
 // some code pasted from fuzz-objects-types.cpp
 
@@ -61,7 +61,7 @@ struct state {
     std::vector<std::unique_ptr<custom_rule>> rules;
 };
 
-state create_state(dynamix::domain& dom, uint32_t features_per_mixin, uint32_t num_rules, std::minstd_rand& rnd) {
+state create_state(dynamix::domain& dom, uint32_t features_per_mixin, uint32_t num_rules, dbench::rng_t& rnd) {
     state ret;
     for (uint32_t i = 0; i < features_per_mixin * 10; ++i) {
         auto& f = ret.features.emplace_back(new dynamix::util::feature_info_data);
@@ -134,7 +134,7 @@ state create_state(dynamix::domain& dom, uint32_t features_per_mixin, uint32_t n
 
 void benchmark(uint32_t mixins, uint32_t features, uint32_t rules, picobench::state& pb) {
     dynamix::domain dom("bench");
-    std::minstd_rand rnd(13);
+    dbench::rng_t rnd(13);
 
     // first create types by index while the rng is not tainted by create_state
     std::vector<std::vector<uint32_t>> indices(pb.iterations());

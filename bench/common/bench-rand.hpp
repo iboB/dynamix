@@ -13,7 +13,10 @@
 // and the same seed would produce different data on different platforms
 namespace dbench {
 
-using rng_t = std::minstd_rand;
+// inherit from random engine so that we can forward declare this
+class rng_t : public std::minstd_rand {
+    using std::minstd_rand::linear_congruential_engine;
+};
 
 template <typename T>
 void shuffle(itlib::span<T> span, rng_t& rng) {

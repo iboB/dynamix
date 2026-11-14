@@ -4,7 +4,6 @@
 #pragma once
 #include <cstdint>
 #include <vector>
-#include <random>
 
 #define ITERATE_OPS(MACRO) \
     MACRO(plus_plus, acc += arg + m_val_a) \
@@ -32,4 +31,6 @@ struct op_data {
     uint32_t a;
     uint32_t b;
 };
-std::vector<op_data> get_ops_combo(std::minstd_rand& rnd);
+
+namespace dbench { class rng_t; }
+std::vector<op_data> get_ops_combo(dbench::rng_t& rnd);

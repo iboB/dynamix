@@ -3,9 +3,8 @@
 //
 #include "bmm-common.hpp"
 #include <bench-rand.hpp>
-#include <itlib/flat_set.hpp>
 
-std::vector<op_data> get_ops_combo(std::minstd_rand& rnd) {
+std::vector<op_data> get_ops_combo(dbench::rng_t& rnd) {
     auto num_ops = uint32_t(rnd() % 5 + 2); // generate between 2 and 6 ops
     auto ops = dbench::pick_unique(num_ops, ops_count, rnd); // unique ops in random order
 

@@ -12,6 +12,8 @@
 #include <dynamix/msg/func_traits.hpp>
 #include <dynamix/msg/define_msg.hpp>
 
+#include <bench-rand.hpp>
+
 DYNAMIX_MAKE_FUNC_TRAITS(accumulate);
 DYNAMIX_DEFINE_MSG(accumulate_msg, multicast, accumulate, void, (const dobject&, uint64_t&, uint32_t));
 
@@ -50,7 +52,7 @@ void register_ops() {
     ITERATE_OPS(REGISTER_OP)
 }
 
-dobject make_msg_accumulator(std::minstd_rand& rnd) {
+dobject make_msg_accumulator(dbench::rng_t& rnd) {
     // lazy init
     if (mixin_infos.empty()) register_ops();
 

@@ -21,7 +21,7 @@ func_accumulator::func vop_from_op(op_id op, uint32_t a, uint32_t b) {
     }
 }
 
-func_accumulator make_func_accumulator(std::minstd_rand& rnd) {
+func_accumulator make_func_accumulator(dbench::rng_t& rnd) {
     auto combo = get_ops_combo(rnd);
 
     func_accumulator ret;

@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include <random>
 
 struct base_op {
     virtual ~base_op();
@@ -23,5 +22,6 @@ struct virt_accumulator {
     }
 };
 
-virt_accumulator make_virt_accumulator(std::minstd_rand& rnd);
+namespace dbench { class rng_t; }
+virt_accumulator make_virt_accumulator(dbench::rng_t& rnd);
 

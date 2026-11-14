@@ -27,7 +27,7 @@ std::unique_ptr<base_op> fop_from_op(op_id op, uint32_t a, uint32_t b) {
     }
 }
 
-virt_accumulator make_virt_accumulator(std::minstd_rand& rnd) {
+virt_accumulator make_virt_accumulator(dbench::rng_t& rnd) {
     auto combo = get_ops_combo(rnd);
 
     virt_accumulator ret;

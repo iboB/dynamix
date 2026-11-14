@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <functional>
 #include <vector>
-#include <random>
 
 struct func_accumulator {
     using func = std::function<void(uint64_t&, uint32_t)>;
@@ -19,4 +18,5 @@ struct func_accumulator {
     }
 };
 
-func_accumulator make_func_accumulator(std::minstd_rand& rnd);
+namespace dbench { class rng_t; }
+func_accumulator make_func_accumulator(dbench::rng_t& rnd);
