@@ -1,6 +1,7 @@
 # Copyright (c) Borislav Stanimirov
 # SPDX-License-Identifier: MIT
 #
-dynamix_benchmark(type-creation
-    bt-benchmark.cpp
+dynamix_benchmark(
+    NAME type-creation
+    SOURCES bt-benchmark.cpp
 )

@@ -1,6 +1,7 @@
 # Copyright (c) Borislav Stanimirov
 # SPDX-License-Identifier: MIT
 #
-dynamix_benchmark(object-lifetime
-    bol-benchmark.cpp
+dynamix_benchmark(
+    NAME object-lifetime
+    SOURCES bol-benchmark.cpp
 )

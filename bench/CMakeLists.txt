@@ -9,18 +9,24 @@ add_library(dynamix-bench-common STATIC
 target_link_libraries(dynamix-bench-common PUBLIC picobench::picobench)
 target_include_directories(dynamix-bench-common INTERFACE common)
 
-macro(dynamix_benchmark name)
-    set(tgt bench-dynamix-${name})
+function(dynamix_benchmark)
+    cmake_parse_arguments(ARG "" "NAME" "SOURCES;LIBRARIES" ${ARGN})
+
+    set(tgt bench-dynamix-${ARG_NAME})
+
+    # executable
     add_executable(${tgt})
+    target_sources(${tgt} PRIVATE ${ARG_SOURCES})
     set_target_properties(${tgt} PROPERTIES FOLDER bench)
-    target_sources(${tgt} PRIVATE ${ARGN})
-    target_link_libraries(${tgt} dynamix::dynamix dynamix-bench-common)
+    target_link_libraries(${tgt} dynamix::dynamix dynamix-bench-common ${ARG_LIBRARIES})
+
+    # run target
     add_custom_target(
         run-${tgt}
         COMMAND ${tgt}
     )
     set_target_properties(run-${tgt} PROPERTIES FOLDER bench)
-endmacro()
+endfunction()
 
 add_subdirectory(msg-unicast)
 add_subdirectory(msg-multicast)
