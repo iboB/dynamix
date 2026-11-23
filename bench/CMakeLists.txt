@@ -1,7 +1,7 @@
 # Copyright (c) Borislav Stanimirov
 # SPDX-License-Identifier: MIT
 #
-CPMAddPackage(gh:iboB/picobench@2.10.0)
+CPMAddPackage(gh:iboB/picobench@2.11.0)
 
 add_library(dynamix-bench-common STATIC
     common/bench-main.cpp
