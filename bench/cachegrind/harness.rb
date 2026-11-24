@@ -28,11 +28,17 @@ end
 
 def run_benchmark(valgrind, exe, suite, bench, iters, tmp_file)
   cmd = [
+    valgrind, '--tool=cachegrind', '--cache-sim=no', '--instr-at-start=no',
+    "--cachegrind-out-file=#{tmp_file}",
     exe, "--run-suite=#{suite}", "--run-only=#{bench}", "--iters=#{iters}", '--samples=1'
   ]
   out, err, status = Open3.capture3(*cmd)
   raise "FAILED: #{cmd}\n#{out}\n#{err}" unless status.success?
-  (exe + suite + bench).length
+  File.foreach(tmp_file) do |line|
+    m = line.match(/^summary:\s+(\d+)/)
+    return (m[1].to_f / iters).round if m
+  end
+  raise "no summary in cachegrind output for #{exe} #{suite}/#{bench}"
 end
 
 options = {

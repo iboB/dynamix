@@ -21,7 +21,7 @@ if(DYNAMIX_BENCH_CACHEGRIND)
         message(FATAL_ERROR "DYNAMIX_BENCH_CACHEGRIND requires valgrind (with headers) and ruby")
     endif()
     target_include_directories(dynamix-bench-common SYSTEM PUBLIC ${DYNAMIX_VALGRIND_INCLUDE_DIR})
-    target_compile_definitions(dynamix-bench-common PUBLIC DYNAMIX_BENCH_CACHEGRIND=1)
+    target_compile_definitions(dynamix-bench-common PUBLIC BENCH_CACHEGRIND=1)
 endif()
 
 # smoke test: a quick run with a small number of iterations and a single sample
