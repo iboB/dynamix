@@ -188,11 +188,9 @@ struct test_data {
 void create_types(const bench_params& p, picobench::state& pb) {
     test_data data(p, size_t(pb.iterations()));
 
-    {
-        picobench::scope benchmark(pb);
-        for (auto& q : data.queries) {
-            data.dom.get_type(q);
-        }
+    for (auto i : pb) {
+        auto& q = data.queries[i];
+        data.dom.get_type(q);
     }
     pb.set_result(data.dom.num_types());
 }

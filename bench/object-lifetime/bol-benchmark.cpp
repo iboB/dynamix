@@ -194,11 +194,8 @@ namespace create {
 void cpp_class(picobench::state& pb) {
     std::vector<std::unique_ptr<composite>> objs;
     objs.reserve(size_t(pb.iterations()));
-    {
-        picobench::scope benchmark(pb);
-        for (int i = 0; i < pb.iterations(); ++i) {
-            objs.push_back(std::make_unique<composite>());
-        }
+    for (picobench::iterate _ : pb) {
+        objs.push_back(std::make_unique<composite>());
     }
     pb.set_result(count_components(objs));
 }
@@ -206,11 +203,8 @@ void cpp_class(picobench::state& pb) {
 void cpp_components(picobench::state& pb) {
     std::vector<entity> objs;
     objs.reserve(size_t(pb.iterations()));
-    {
-        picobench::scope benchmark(pb);
-        for (int i = 0; i < pb.iterations(); ++i) {
-            objs.push_back(make_entity());
-        }
+    for (picobench::iterate _ : pb) {
+        objs.push_back(make_entity());
     }
     pb.set_result(count_components(objs));
 }
@@ -220,11 +214,8 @@ void dynamix_mutate(picobench::state& pb) {
     full_type(); // make sure the type exists
     std::vector<dynamix::object> objs;
     objs.reserve(size_t(pb.iterations()));
-    {
-        picobench::scope benchmark(pb);
-        for (int i = 0; i < pb.iterations(); ++i) {
-            mutate_to_full(objs.emplace_back(dom()));
-        }
+    for (picobench::iterate _ : pb) {
+        mutate_to_full(objs.emplace_back(dom()));
     }
     pb.set_result(count_components(objs));
 }
@@ -234,11 +225,8 @@ void dynamix_from_type(picobench::state& pb) {
     auto& t = full_type();
     std::vector<dynamix::object> objs;
     objs.reserve(size_t(pb.iterations()));
-    {
-        picobench::scope benchmark(pb);
-        for (int i = 0; i < pb.iterations(); ++i) {
-            objs.emplace_back(t);
-        }
+    for (picobench::iterate _ : pb) {
+        objs.emplace_back(t);
     }
     pb.set_result(count_components(objs));
 }
@@ -249,11 +237,8 @@ void dynamix_from_type_arena(picobench::state& pb) {
     dbench::arena_resource arena; // must outlive the objects
     std::vector<dynamix::object> objs;
     objs.reserve(size_t(pb.iterations()));
-    {
-        picobench::scope benchmark(pb);
-        for (int i = 0; i < pb.iterations(); ++i) {
-            objs.emplace_back(t, dynamix::allocator(&arena));
-        }
+    for (picobench::iterate _ : pb) {
+        objs.emplace_back(t, dynamix::allocator(&arena));
     }
     pb.set_result(count_components(objs));
 }
@@ -276,11 +261,8 @@ void cpp_class(picobench::state& pb) {
     const auto src = make_composites(size_t(pb.iterations()));
     std::vector<std::unique_ptr<composite>> objs;
     objs.reserve(src.size());
-    {
-        picobench::scope benchmark(pb);
-        for (auto& s : src) {
-            objs.push_back(std::make_unique<composite>(*s));
-        }
+    for (auto i : pb) {
+        objs.push_back(std::make_unique<composite>(*src[i]));
     }
     pb.set_result(count_components(objs));
 }
@@ -289,11 +271,8 @@ void cpp_components(picobench::state& pb) {
     const auto src = make_entities(size_t(pb.iterations()));
     std::vector<entity> objs;
     objs.reserve(src.size());
-    {
-        picobench::scope benchmark(pb);
-        for (auto& s : src) {
-            objs.push_back(s.copy());
-        }
+    for (auto i : pb) {
+        objs.push_back(src[i].copy());
     }
     pb.set_result(count_components(objs));
 }
@@ -302,11 +281,8 @@ void dynamix_copy(picobench::state& pb) {
     const auto src = make_dynamix_objects(size_t(pb.iterations()));
     std::vector<dynamix::object> objs;
     objs.reserve(src.size());
-    {
-        picobench::scope benchmark(pb);
-        for (auto& s : src) {
-            objs.push_back(s.copy());
-        }
+    for (auto i : pb) {
+        objs.push_back(src[i].copy());
     }
     pb.set_result(count_components(objs));
 }
@@ -376,13 +352,11 @@ void cpp_components(picobench::state& pb) {
     }
 
     uintptr_t count = 0;
-    {
-        picobench::scope benchmark(pb);
-        for (auto& e : objs) {
-            e.add<inventory>();
-            count += e.components.size();
-            e.remove<inventory>();
-        }
+    for (auto i : pb) {
+        auto& e = objs[i];
+        e.add<inventory>();
+        count += e.components.size();
+        e.remove<inventory>();
     }
     pb.set_result(count);
 }
@@ -400,13 +374,11 @@ void dynamix_benchmark(picobench::state& pb, dynamix::allocator alloc) {
     mutate(objs.front(), remove<inventory>());
 
     uintptr_t count = 0;
-    {
-        picobench::scope benchmark(pb);
-        for (auto& o : objs) {
-            mutate(o, add<inventory>());
-            count += o.num_mixins();
-            mutate(o, remove<inventory>());
-        }
+    for (auto i : pb) {
+        auto& o = objs[i];
+        mutate(o, add<inventory>());
+        count += o.num_mixins();
+        mutate(o, remove<inventory>());
     }
     pb.set_result(count);
 }
@@ -448,13 +420,11 @@ void big_benchmark(picobench::state& pb) {
     mutate(objs.front(), dynamix::remove<health>());
 
     uintptr_t count = 0;
-    {
-        picobench::scope benchmark(pb);
-        for (auto& o : objs) {
-            mutate(o, add<health>());
-            count += o.num_mixins();
-            mutate(o, dynamix::remove<health>());
-        }
+    for (auto i : pb) {
+        auto& o = objs[i];
+        mutate(o, add<health>());
+        count += o.num_mixins();
+        mutate(o, dynamix::remove<health>());
     }
     pb.set_result(count);
 }
