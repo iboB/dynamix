@@ -11,6 +11,10 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v7
+      - name: Install missing tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y valgrind
       - name: Tool versions
         run: |
           g++ --version | head -1
