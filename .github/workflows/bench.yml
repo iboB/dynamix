@@ -1,7 +1,10 @@
 # Copyright (c) Borislav Stanimirov
 # SPDX-License-Identifier: MIT
 #
-name: Benchmark
+# smoke test for the benchmarks: mostly check that they build and run
+# timings here are not meaningful (CI machines are noisy) and are not compared to anything
+# the cachegrind build is used for regression testing
+name: Benchmark Smoke Test
 on:
   push:
     branches: [master]
@@ -20,9 +23,5 @@ jobs:
         uses: seanmiddleditch/gha-setup-ninja@v5
       - name: Configure
         run: cmake --preset release -B build
-      - name: Unicast messages
-        run: cmake --build build --target run-bench-dynamix-msg-unicast
-      - name: Multicast messages
-        run: cmake --build build --target run-bench-dynamix-msg-multicast
-      - name: Type Creation
-        run: cmake --build build --target run-bench-dynamix-type-creation
+      - name: Run Benchmarks
+        run: cmake --build build --target smoke-bench-dynamix
