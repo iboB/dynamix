@@ -67,7 +67,7 @@ parser = OptionParser.new { |opts|
   opts.on('--fail-on-regression', 'fail on a regression') { options[:fail_reg] = _1 }
   opts.on('--fail-on-improvement', 'fail on an improvement') { options[:fail_imp] = _1 }
   opts.on('--fail-on-new', 'fail on an unknown benchmark') { options[:fail_new] = _1 }
-  opts.on('--fail-on-rem', 'fail on a missing benchmark') { options[:fail_rem] = _1 }
+  opts.on('--fail-on-removed', 'fail on a missing benchmark') { options[:fail_rem] = _1 }
 }
 exes = parser.parse(ARGV)
 baseline_file = options[:baseline]

@@ -1,0 +1,29 @@
+name: Cachegrind
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+jobs:
+  cachegrind:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Clone
+        uses: actions/checkout@v7
+      - name: Tool versions
+        run: |
+          g++ --version | head -1
+          valgrind --version
+          ldd --version | head -1
+          ruby --version
+      - name: Configure
+        run: cmake --preset release-gcc -B build -DDYNAMIX_BENCH_CACHEGRIND=ON
+      - name: Run benchmarks with cachegrind
+        run: cmake --build build --target cachegrind-bench-dynamix
+      - name: Upload results
+        uses: actions/upload-artifact@v7
+        with:
+          name: cachegrind-results
+          path: build/bench/cachegrind-results.json
+          if-no-files-found: ignore

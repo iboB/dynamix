@@ -85,6 +85,7 @@ if(DYNAMIX_BENCH_CACHEGRIND)
         --valgrind ${DYNAMIX_VALGRIND}
         --baseline ${CMAKE_CURRENT_SOURCE_DIR}/cachegrind/baseline.json
         --output ${CMAKE_CURRENT_BINARY_DIR}/cachegrind-results.json
+        --fail-on-regression --fail-on-improvement --fail-on-new --fail-on-removed
     )
 
     add_custom_target(
