@@ -5,9 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone
-        uses: actions/checkout@v4
-      - name: Install Ninja
-        uses: seanmiddleditch/gha-setup-ninja@v5
+        uses: actions/checkout@v7
       - name: Install LLVM
         run: |
           sudo apt-get update

@@ -29,15 +29,15 @@ jobs:
           - {name: 'win msvc rel s:addr', os: windows-latest, preset: reldeb-asan}
     steps:
       - name: Clone
-        uses: actions/checkout@v4
-      - name: Install Ninja
-        uses: seanmiddleditch/gha-setup-ninja@v5
+        uses: actions/checkout@v7
       - name: VC Vars
         # Setup vcvars on Windows
         # MSVC's address sanitizer attaches dependencies to several DLLs which are not in PATH
         # vcvars will add them to PATH and allow msvc asan executables to run
         if: matrix.cfg.os == 'windows-latest'
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
       - name: Configure
         run: cmake --preset ${{ matrix.cfg.preset }} -B build
       - name: Build
