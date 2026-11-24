@@ -5,7 +5,7 @@
 
 #include <dynamix/type.hpp>
 
-#include <picobench/picobench.hpp>
+#include <picobench-cfg.hpp>
 #include <bench-rand.hpp>
 #include <bench-main.hpp>
 

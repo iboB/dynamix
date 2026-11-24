@@ -4,7 +4,7 @@
 #include "bench-main.hpp"
 
 #define PICOBENCH_IMPLEMENT
-#include <picobench/picobench.hpp>
+#include "picobench-cfg.hpp"
 
 namespace dbench {
 int run_bench(int argc, char* argv[], std::vector<int> default_iterations) {

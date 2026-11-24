@@ -4,7 +4,7 @@
 
 #include <par/pchunk.hpp>
 
-#include <picobench/picobench.hpp>
+#include <picobench-cfg.hpp>
 #include <bench-main.hpp>
 
 // benchmark how operations scale with multiple threads

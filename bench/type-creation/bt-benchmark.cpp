@@ -12,7 +12,7 @@
 #include <array>
 #include <set>
 
-#include <picobench/picobench.hpp>
+#include <picobench-cfg.hpp>
 #include <bench-main.hpp>
 #include <bench-rand.hpp>
 

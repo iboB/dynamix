@@ -5,7 +5,7 @@
 #include "bmm-std_func.hpp"
 #include "bmm-virtual.hpp"
 
-#include <picobench/picobench.hpp>
+#include <picobench-cfg.hpp>
 #include <bench-main.hpp>
 #include <bench-rand.hpp>
 

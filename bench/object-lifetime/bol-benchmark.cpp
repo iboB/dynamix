@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include <picobench/picobench.hpp>
+#include <picobench-cfg.hpp>
 #include <bench-main.hpp>
 
 // measure the creation, copying, destruction, and mutation of objects
