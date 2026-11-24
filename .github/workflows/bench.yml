@@ -19,6 +19,13 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v7
+      - name: VC Vars
+        # Setup vcvars on Windows
+        # this will make CMake select msvc on windows-latest
+        if: matrix.os == 'windows-latest'
+        uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
       - name: Configure
         run: cmake --preset release -B build
       - name: Run Benchmarks
