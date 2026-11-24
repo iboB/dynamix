@@ -22,3 +22,9 @@ bench-dynamix-msg-call --run-suite=queries
 The data for each benchmark is generated with a fixed seed and the random utilities in [common](common/), which produce the same data with every standard library.
 
 Results are only comparable when produced on the same machine. Use a quiet machine (no other load, fixed CPU frequency if possible) for meaningful results. The "Dim" column is the number of objects or operations, and picobench reports the fastest of several samples.
+
+
+## CI
+
+* CI runs the benchmarks as a smoke test with a few iterations and single sample. Since CI machines are unreliable, this is only a sanity check that the benchmarks run and don't crash. The results are not compared to a baseline.
+* CI runs the benchmarks with Cachegrind and compares the instruction counts to a baseline. See [cachegrind/README.md](cachegrind/README.md) for details.

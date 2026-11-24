@@ -59,13 +59,13 @@ void dynamix_msg(picobench::state& pb) {
 // * dynamix_msg: each object has its mixins in a single buffer
 
 // objects are accessed in the order in which they were created
-PICOBENCH_SUITE("multicast: sequential access");
+PICOBENCH_SUITE("sequential access");
 PICOBENCH(virt).user_data(dbench::access_sequential).baseline();
 PICOBENCH(std_func).user_data(dbench::access_sequential);
 PICOBENCH(dynamix_msg).user_data(dbench::access_sequential);
 
 // objects are accessed in random order
-PICOBENCH_SUITE("multicast: shuffled access");
+PICOBENCH_SUITE("shuffled access");
 PICOBENCH(virt).user_data(dbench::access_shuffled).baseline();
 PICOBENCH(std_func).user_data(dbench::access_shuffled);
 PICOBENCH(dynamix_msg).user_data(dbench::access_shuffled);

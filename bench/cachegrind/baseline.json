@@ -1,0 +1,20 @@
+{
+  "bench-dynamix-msg-call/call kinds/direct": 79,
+  "bench-dynamix-msg-call/call kinds/virt": 77,
+  "bench-dynamix-msg-call/call kinds/msg": 76,
+  "bench-dynamix-msg-call/call kinds/get_mixin": 82,
+  "bench-dynamix-msg-call/call kinds/msg_next_impl": 86,
+  "bench-dynamix-msg-call/default implementation/implemented": 96,
+  "bench-dynamix-msg-call/default implementation/default_impl": 97,
+  "bench-dynamix-msg-call/queries/hoho": 81,
+  "bench-dynamix-msg-call/queries/get_by_type": 81,
+  "bench-dynamix-msg-call/queries/has_by_name": 81,
+  "bench-dynamix-msg-call/queries/implements": 80,
+  "bench-dynamix-msg-call/queries/type_class": 80,
+  "bench-dynamix-msg-unicast/sequential access/virt": 80,
+  "bench-dynamix-msg-unicast/sequential access/std_func": 101,
+  "bench-dynamix-msg-unicast/sequential access/dynamix_msg": 94,
+  "bench-dynamix-msg-unicast/shuffled access/virt": 85,
+  "bench-dynamix-msg-unicast/shuffled access/std_func": 89,
+  "bench-dynamix-msg-unicast/shuffled access/dynamix_msg": 92
+}

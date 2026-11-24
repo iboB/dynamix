@@ -72,4 +72,35 @@ if(DYNAMIX_BENCH_CACHEGRIND)
         type-creation
         object-lifetime
     )
+
+    set(exes)
+    foreach(b ${benchmarks})
+        list(APPEND exes $<TARGET_FILE:bench-dynamix-${b}>)
+    endforeach()
+
+    set(cg_cmd
+        ${DYNAMIX_RUBY} ${CMAKE_CURRENT_SOURCE_DIR}/cachegrind/harness.rb
+        --valgrind ${DYNAMIX_VALGRIND}
+        --baseline ${CMAKE_CURRENT_SOURCE_DIR}/cachegrind/baseline.json
+        --output ${CMAKE_CURRENT_BINARY_DIR}/cachegrind-results.json
+    )
+
+    add_custom_target(
+        cachegrind-bench-dynamix
+        COMMAND ${cg_cmd} ${exes}
+        USES_TERMINAL
+    )
+    add_custom_target(
+        cachegrind-bench-dynamix-update-baseline
+        COMMAND ${cg_cmd} --update-baseline ${exes}
+    )
+    foreach(b ${benchmarks})
+        add_dependencies(cachegrind-bench-dynamix bench-dynamix-${b})
+        add_dependencies(cachegrind-bench-dynamix-update-baseline bench-dynamix-${b})
+    endforeach()
+    set_target_properties(
+        cachegrind-bench-dynamix
+        cachegrind-bench-dynamix-update-baseline
+        PROPERTIES FOLDER bench
+    )
 endif()
