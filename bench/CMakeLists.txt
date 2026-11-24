@@ -32,7 +32,7 @@ add_custom_target(smoke-bench-dynamix)
 set_target_properties(smoke-bench-dynamix PROPERTIES FOLDER bench)
 
 function(dynamix_benchmark)
-    cmake_parse_arguments(ARG "" "NAME" "SOURCES;LIBRARIES" ${ARGN})
+    cmake_parse_arguments(ARG "SKIP_SMOKE_TEST" "NAME" "SOURCES;LIBRARIES" ${ARGN})
 
     set(tgt bench-dynamix-${ARG_NAME})
 
@@ -42,14 +42,16 @@ function(dynamix_benchmark)
     set_target_properties(${tgt} PROPERTIES FOLDER bench)
     target_link_libraries(${tgt} dynamix::dynamix dynamix-bench-common ${ARG_LIBRARIES})
 
-    # smoke target
-    add_custom_target(
-        smoke-${tgt}
-        COMMAND ${tgt} ${DYNAMIX_BENCH_SMOKE_ARGS}
-    )
-    set_target_properties(smoke-${tgt} PROPERTIES FOLDER bench)
+    if(NOT ARG_SKIP_SMOKE_TEST)
+        # smoke target
+        add_custom_target(
+            smoke-${tgt}
+            COMMAND ${tgt} ${DYNAMIX_BENCH_SMOKE_ARGS}
+        )
+        set_target_properties(smoke-${tgt} PROPERTIES FOLDER bench)
 
-    add_dependencies(smoke-bench-dynamix smoke-${tgt})
+        add_dependencies(smoke-bench-dynamix smoke-${tgt})
+    endif()
 endfunction()
 
 add_subdirectory(msg-unicast)
