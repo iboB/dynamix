@@ -43,7 +43,7 @@ void report_objects() {
     dbench::counting_resource res;
 
     auto row = [&](uint32_t n, uint32_t ext) {
-        auto query = ms.first_n(n, ext);
+        auto query = ms.get_first_n(n, ext);
         auto& t = dom.get_type(query);
         res.reset_counters();
         auto before = res.bytes;
@@ -74,9 +74,9 @@ void report_mutations() {
     // func can put objects in keep, so that their destruction is not counted
     auto row = [&](const char* name, auto func) {
         std::vector<dynamix::object> keep;
-        dynamix::object obj(get_type(dom, ms.first_n(5)), dynamix::allocator(&res));
+        dynamix::object obj(get_type(dom, ms.get_first_n(5)), dynamix::allocator(&res));
         func(obj, keep); // create types
-        dynamix::object obj2(get_type(dom, ms.first_n(5)), dynamix::allocator(&res));
+        dynamix::object obj2(get_type(dom, ms.get_first_n(5)), dynamix::allocator(&res));
         keep.clear();
         keep.reserve(1);
         res.reset_counters();
@@ -125,12 +125,12 @@ void report_types() {
             }
 
             auto i = queries.begin();
-            get_type(dom, ms.query(*i, false)); // warm up the registries
+            get_type(dom, ms.get_query(*i, false)); // warm up the registries
             ++i;
 
             auto before = res.bytes;
             for (; i != queries.end(); ++i) {
-                get_type(dom, ms.query(*i, false));
+                get_type(dom, ms.get_query(*i, false));
             }
             auto bytes = res.bytes - before;
             std::printf("| %6u | %14u | %10zu |\n", n, f, bytes / 100);

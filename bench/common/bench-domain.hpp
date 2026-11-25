@@ -69,7 +69,7 @@ struct bench_domain {
         add_mixins(features_per_mixin, std::make_integer_sequence<int, Num_Mixins>{});
     }
 
-    std::vector<const dynamix::mixin_info*> query(itlib::span<const uint32_t> indices, bool ext) const {
+    std::vector<const dynamix::mixin_info*> get_query(itlib::span<const uint32_t> indices, bool ext) const {
         std::vector<const dynamix::mixin_info*> ret;
         const auto& q = ext ? external : internal;
         for (auto i : indices) {
@@ -78,7 +78,7 @@ struct bench_domain {
         return ret;
     }
 
-    std::vector<const dynamix::mixin_info*> first_n(uint32_t n, uint32_t num_external = 0) const {
+    std::vector<const dynamix::mixin_info*> get_first_n(uint32_t n, uint32_t num_external = 0) const {
         std::vector<const dynamix::mixin_info*> ret;
         for (uint32_t i = 0; i < n; ++i) {
             const auto& q = i < n - num_external ? internal : external;
