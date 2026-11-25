@@ -9,7 +9,7 @@ Powered by [picobench](https://github.com/iboB/picobench)
 | [msg-call](msg-call/) | Kinds of calls (direct, virtual, message, getting a mixin, calling the next implementation), default implementations, and queries (`has`, `get`, `implements`, type classes) |
 | [object-lifetime](object-lifetime/) | Creating, copying, destroying, and mutating objects vs a C++ class and the entity-component pattern, with custom allocators, and internal vs external mixins |
 | [type-creation](type-creation/) | Creating new types and looking up existing ones |
-| [threads](threads/) | Scaling of message calls, mutations, and type creation with multiple threads |
+| [multi-threaded](multi-threaded/) | Scaling of message calls, mutations, and type creation with multiple threads |
 | [memory](memory/) | Not a timing benchmark: a report of the memory used by objects and types, and the allocations of common operations |
 
 Each benchmark has a target `run-bench-dynamix-<name>`, or the executable can be run directly. Note that picobench command line options use a double dash. For example:
